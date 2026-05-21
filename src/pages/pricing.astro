@@ -1,0 +1,1496 @@
+---
+import Layout from '../layouts/Layout.astro';
+---
+
+<Layout
+  title="Commit Pricing — Free for devs, $15/mo for builders, $29/mo for teams"
+  description="Open source and free forever for individual developers. Developer at $15/month for builders. Pro at $29/month for teams — per project, not per seat. Enterprise at $199/month for compliance and unlimited scale."
+  canonical="https://getcommit.dev/pricing"
+>
+  <!-- Nav -->
+  <nav>
+    <div class="container nav-inner">
+      <a href="/" class="nav-brand">Commit</a>
+      <ul class="nav-links">
+        <li><a href="/#mcp">MCP</a></li>
+        <li><a href="/audit">Audit</a></li>
+        <li><a href="/watchlist">Watchlist</a></li>
+        <li><a href="/extension">Extension</a></li>
+        <li><a href="/blog">Writing</a></li>
+        <li><a href="/pricing">Pricing</a></li><li><a href="/docs">Docs</a></li><li><a href="https://github.com/piiiico/proof-of-commitment" target="_blank" rel="noopener">GitHub</a></li>
+        <li><a href="mailto:pico@amdal.dev">Contact</a></li>
+      </ul>
+    </div>
+  </nav>
+
+  <!-- Hero -->
+  <section class="pricing-hero">
+    <div class="container">
+      <div class="editorial" style="max-width: var(--max-content); margin: 0 auto;">
+        <span class="hero-eyebrow">Pricing</span>
+        <h1 class="pricing-title">
+          Free for devs.<br />
+          <em>$15/mo for builders. $29/mo for teams.</em>
+        </h1>
+        <p class="pricing-lead">
+          The CLI, web audit, and single-package API are <strong>free forever</strong>.
+          Developer ($15/mo) adds batch scanning and CI/CD automation for builders.
+          Pro ($29/mo) adds team-scale monitoring and alerts — priced per project,
+          not per seat. A 50-person team pays the same as a 5-person team.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <hr class="section-divider" />
+
+  <!-- Pricing tiers -->
+  <section class="tiers-section">
+    <div class="container">
+      <div class="tiers-grid">
+
+        <!-- Open (Free) -->
+        <div class="tier-card">
+          <div class="tier-header">
+            <div class="tier-name">Open</div>
+            <div class="tier-price">
+              <span class="price-amount">Free</span>
+              <span class="price-period">forever</span>
+            </div>
+            <p class="tier-tagline">Individual developers, open source maintainers, evaluators.</p>
+          </div>
+          <a href="/audit" class="tier-cta tier-cta-ghost">Get Started →</a>
+          <ul class="tier-features">
+            <li class="feature-item">
+              <span class="feature-check">✓</span>
+              <span>CLI (<code>npx proof-of-commitment</code>)</span>
+            </li>
+            <li class="feature-item">
+              <span class="feature-check">✓</span>
+              <span>Web audit tool</span>
+            </li>
+            <li class="feature-item">
+              <span class="feature-check">✓</span>
+              <span>Single-package API — 200 req/day per IP</span>
+            </li>
+            <li class="feature-item">
+              <span class="feature-check">✓</span>
+              <span>README badges (unlimited)</span>
+            </li>
+            <li class="feature-item">
+              <span class="feature-check">✓</span>
+              <span>GitHub Action — 1 repo, manual trigger</span>
+            </li>
+            <li class="feature-item">
+              <span class="feature-check">✓</span>
+              <span>MCP server (local stdio mode)</span>
+            </li>
+            <li class="feature-item">
+              <span class="feature-check">✓</span>
+              <span>Full score breakdown + risk flags</span>
+            </li>
+          </ul>
+        </div>
+
+        <!-- Developer ($15/mo) — new tier -->
+        <div class="tier-card tier-card-dev">
+          <div class="tier-new">New</div>
+          <div class="tier-header">
+            <div class="tier-name">Developer</div>
+            <div class="tier-price">
+              <span class="price-amount">$15</span>
+              <span class="price-period">/ month</span>
+            </div>
+            <p class="tier-tagline">Builders, open source maintainers, dev-stage projects wanting automation without team overhead.</p>
+          </div>
+          <button type="button" data-tier="developer" class="tier-cta tier-cta-dev checkout-btn">Subscribe — $15/mo →</button>
+          <ul class="tier-features">
+            <li class="feature-item">
+              <span class="feature-check">✓</span>
+              <span>Everything in Open</span>
+            </li>
+            <li class="feature-item">
+              <span class="feature-check">✓</span>
+              <span>Single-package API — 1,000 req/day (5× free)</span>
+            </li>
+            <li class="feature-item">
+              <span class="feature-check">✓</span>
+              <span>Batch API (up to 5 packages) — 2,000 req/month</span>
+            </li>
+            <li class="feature-item">
+              <span class="feature-check">✓</span>
+              <span>GitHub repo audit — 50 req/month</span>
+            </li>
+            <li class="feature-item">
+              <span class="feature-check">✓</span>
+              <span>GitHub Action — unlimited repos, auto-trigger on PR</span>
+            </li>
+            <li class="feature-item">
+              <span class="feature-check">✓</span>
+              <span>Dependency monitoring — 3 projects, daily scans</span>
+            </li>
+            <li class="feature-item">
+              <span class="feature-check">✓</span>
+              <span>Email alerts</span>
+            </li>
+            <li class="feature-item">
+              <span class="feature-check">✓</span>
+              <span>Historical score data — 30 days</span>
+            </li>
+            <li class="feature-item">
+              <span class="feature-check">✓</span>
+              <span>1 API key</span>
+            </li>
+            <li class="feature-item">
+              <span class="feature-check">✓</span>
+              <span>MCP server (remote HTTP mode)</span>
+            </li>
+          </ul>
+        </div>
+
+        <!-- Pro ($29/mo) — highlighted -->
+        <div class="tier-card tier-card-pro">
+          <div class="tier-recommended">Most popular</div>
+          <div class="tier-header">
+            <div class="tier-name">Pro</div>
+            <div class="tier-price">
+              <span class="price-amount">$29</span>
+              <span class="price-period">/ month</span>
+            </div>
+            <p class="tier-tagline">Small teams, indie devs with multiple projects, security-conscious startups.</p>
+          </div>
+          <button type="button" data-tier="pro" class="tier-cta tier-cta-primary checkout-btn">Subscribe — $29/mo →</button>
+          <ul class="tier-features">
+            <li class="feature-item">
+              <span class="feature-check">✓</span>
+              <span>Everything in Open</span>
+            </li>
+            <li class="feature-item">
+              <span class="feature-check">✓</span>
+              <span>Batch API (up to 20 packages) — 10,000 req/month</span>
+            </li>
+            <li class="feature-item">
+              <span class="feature-check">✓</span>
+              <span>GitHub repo audit — 500 req/month</span>
+            </li>
+            <li class="feature-item">
+              <span class="feature-check">✓</span>
+              <span>Dependency graph analysis — 200 req/month</span>
+            </li>
+            <li class="feature-item">
+              <span class="feature-check">✓</span>
+              <span>GitHub Action — unlimited repos, auto-trigger on PR</span>
+            </li>
+            <li class="feature-item">
+              <span class="feature-check">✓</span>
+              <span>Dependency monitoring — 10 projects, daily scans</span>
+            </li>
+            <li class="feature-item">
+              <span class="feature-check">✓</span>
+              <span>Alert webhooks (Slack, email, custom URL)</span>
+            </li>
+            <li class="feature-item">
+              <span class="feature-check">✓</span>
+              <span>Historical score data — 90 days</span>
+            </li>
+            <li class="feature-item">
+              <span class="feature-check">✓</span>
+              <span>2 API keys</span>
+            </li>
+            <li class="feature-item">
+              <span class="feature-check">✓</span>
+              <span>MCP server (remote HTTP mode)</span>
+            </li>
+            <li class="feature-item">
+              <span class="feature-check">✓</span>
+              <span>Priority badge CDN (&lt;500ms cache)</span>
+            </li>
+          </ul>
+        </div>
+
+        <!-- Enterprise ($199/mo) -->
+        <div class="tier-card">
+          <div class="tier-header">
+            <div class="tier-name">Enterprise</div>
+            <div class="tier-price">
+              <span class="price-amount">$199</span>
+              <span class="price-period">/ month</span>
+            </div>
+            <p class="tier-tagline">Mid-market companies, compliance-driven orgs, platform teams.</p>
+          </div>
+          <a href="mailto:support@getcommit.dev?subject=Commit Enterprise" class="tier-cta tier-cta-ghost">Contact Us →</a>
+          <ul class="tier-features">
+            <li class="feature-item">
+              <span class="feature-check">✓</span>
+              <span>Everything in Pro</span>
+            </li>
+            <li class="feature-item">
+              <span class="feature-check">✓</span>
+              <span>Batch API — unlimited</span>
+            </li>
+            <li class="feature-item">
+              <span class="feature-check">✓</span>
+              <span>Dependency monitoring — unlimited projects, hourly scans</span>
+            </li>
+            <li class="feature-item">
+              <span class="feature-check">✓</span>
+              <span>Historical score data — 1 year</span>
+            </li>
+            <li class="feature-item">
+              <span class="feature-check">✓</span>
+              <span>SBOM import/export (CycloneDX, SPDX)</span>
+            </li>
+            <li class="feature-item">
+              <span class="feature-check">✓</span>
+              <span>Custom risk thresholds per org</span>
+            </li>
+            <li class="feature-item">
+              <span class="feature-check">✓</span>
+              <span>SSO / SAML</span>
+            </li>
+            <li class="feature-item">
+              <span class="feature-check">✓</span>
+              <span>99.9% uptime SLA</span>
+            </li>
+            <li class="feature-item">
+              <span class="feature-check">✓</span>
+              <span>Quarterly compliance reports (SOC 2 narrative)</span>
+            </li>
+            <li class="feature-item">
+              <span class="feature-check">✓</span>
+              <span>Dedicated Slack Connect or email support</span>
+            </li>
+            <li class="feature-item">
+              <span class="feature-check">✓</span>
+              <span>On-prem scoring engine (add-on)</span>
+            </li>
+          </ul>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- Waitlist capture -->
+  <section class="waitlist-section">
+    <div class="container">
+      <div class="waitlist-card reveal">
+        <div class="waitlist-text">
+          <h2 class="waitlist-heading">Get your free API key</h2>
+          <p class="waitlist-body">
+            Free tier: 200 req/day, no credit card required.
+            Ready to scale? Pro starts at $29/month — API key delivered by email.
+          </p>
+          <a href="/get-started" class="waitlist-cta-link">Get your API key →</a>
+        </div>
+        <div class="waitlist-form-area">
+          <form id="waitlist-form" class="waitlist-form" novalidate>
+            <div class="waitlist-input-row">
+              <input
+                id="waitlist-email"
+                type="email"
+                name="email"
+                placeholder="you@company.com"
+                autocomplete="email"
+                required
+                class="waitlist-input"
+              />
+              <button type="submit" id="waitlist-btn" class="waitlist-submit">
+                Get free API key
+              </button>
+            </div>
+            <p id="waitlist-success" class="waitlist-feedback waitlist-success" hidden>
+              ✓ Check your inbox — your API key is on its way.
+            </p>
+            <p id="waitlist-error" class="waitlist-feedback waitlist-error" hidden></p>
+          </form>
+          <p class="waitlist-divider-text">— or —</p>
+          <a href="/get-started" class="waitlist-getkey-btn">Get a free API key now →</a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <hr class="section-divider" />
+
+  <!-- Competitive comparison table -->
+  <section class="compare-section">
+    <div class="container">
+      <div class="editorial reveal" style="max-width: var(--max-content); margin: 0 auto 2.5rem;">
+        <span class="section-label">Competitive comparison</span>
+        <h2 class="section-heading">Per-seat pricing doesn't scale. <em>Ours does.</em></h2>
+        <p class="compare-intro">
+          Socket and Snyk charge per developer — the cost compounds as your team grows.
+          Commit is priced per project. A 50-person team pays the same as a 5-person team.
+        </p>
+      </div>
+
+      <div class="table-wrapper reveal">
+        <table class="compare-table">
+          <thead>
+            <tr>
+              <th class="col-scenario">Team size / scenario</th>
+              <th class="col-tool">Socket.dev</th>
+              <th class="col-tool">Snyk</th>
+              <th class="col-commit">Commit</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td class="scenario-cell">
+                <strong>Solo dev / OSS maintainer</strong>
+                <span class="scenario-sub">building integrations</span>
+              </td>
+              <td class="competitor-cell">$25/mo (Team min)</td>
+              <td class="competitor-cell">$25/mo (Team min)</td>
+              <td class="commit-cell-highlight">
+                <strong>$15/mo</strong>
+                <span class="savings-badge">Developer tier</span>
+              </td>
+            </tr>
+            <tr>
+              <td class="scenario-cell">
+                <strong>5-dev startup</strong>
+                <span class="scenario-sub">10 projects</span>
+              </td>
+              <td class="competitor-cell">$125/mo</td>
+              <td class="competitor-cell">$125/mo</td>
+              <td class="commit-cell-highlight">
+                <strong>$29/mo</strong>
+                <span class="savings-badge">77% cheaper</span>
+              </td>
+            </tr>
+            <tr>
+              <td class="scenario-cell">
+                <strong>15-dev team</strong>
+                <span class="scenario-sub">20 projects</span>
+              </td>
+              <td class="competitor-cell">$750/mo</td>
+              <td class="competitor-cell">$1,575/mo</td>
+              <td class="commit-cell-highlight">
+                <strong>$29/mo</strong>
+                <span class="savings-badge">96% cheaper</span>
+              </td>
+            </tr>
+            <tr>
+              <td class="scenario-cell">
+                <strong>50-dev company</strong>
+                <span class="scenario-sub">50 projects</span>
+              </td>
+              <td class="competitor-cell">$2,500/mo</td>
+              <td class="competitor-cell">$5,250/mo</td>
+              <td class="commit-cell-highlight">
+                <strong>$199/mo</strong>
+                <span class="savings-badge">92% cheaper</span>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <p class="table-footnote">
+        Socket Team at $25/dev/mo · Snyk Team at $25/dev/mo, Ignite at $105/dev/mo ·
+        Commit Developer $15/mo for solo builders · Commit Pro flat $29/mo regardless of team size.
+        Socket and Snyk are excellent tools — they're just priced for a different model.
+      </p>
+    </div>
+  </section>
+
+  <hr class="section-divider" />
+
+  <!-- FAQ -->
+  <section class="faq-section">
+    <div class="container">
+      <div class="editorial" style="max-width: var(--max-content); margin: 0 auto;">
+        <h2 class="section-heading">Frequently asked</h2>
+
+        <div class="faq-list">
+          <div class="faq-item reveal">
+            <h3 class="faq-q">What's the difference between Developer and Pro?</h3>
+            <p class="faq-a">
+              Developer ($15/mo) is for builders: you get 5× more API requests than free,
+              batch scanning for up to 5 packages at once, GitHub Action auto-triggers on PR,
+              and monitoring for 3 projects. It's the right tier when you're building something
+              with Commit's API but aren't yet running team-scale pipelines.
+            </p>
+            <p class="faq-a" style="margin-top: 0.75rem;">
+              Pro ($29/mo) is for teams in production: 10,000 requests/month (pooled),
+              batch up to 20 packages, 10 monitored projects, Slack/webhook alerts,
+              90-day history, and priority badge CDN. If you're integrating into a
+              team CI/CD pipeline, Pro is the right tier.
+            </p>
+          </div>
+
+          <div class="faq-item reveal">
+            <h3 class="faq-q">Why per-project, not per-seat?</h3>
+            <p class="faq-a">
+              Per-seat pricing is standard in security SaaS because it's easy to enforce — SSO gives you headcount.
+              But it creates perverse incentives: teams avoid adding contributors to save costs, and security coverage gets gaps.
+            </p>
+            <p class="faq-a" style="margin-top: 0.75rem;">
+              Commit's data comes from public registries — we don't touch your code, so we don't need to count seats.
+              Per-project pricing aligns cost with value: you pay for what you monitor, not for who's on your team.
+              A growing team shouldn't cost more for the same security coverage. That's the structural advantage of being metadata-only.
+            </p>
+          </div>
+
+          <div class="faq-item reveal">
+            <h3 class="faq-q">Is Commit replacing Socket or Snyk?</h3>
+            <p class="faq-a">
+              No. Use all of them. Socket detects malicious code <em>after</em> it's published.
+              Snyk finds known CVEs. Commit identifies structural exposure <em>before</em> any code changes —
+              it maps which packages are the kind of thing that gets targeted.
+              The ua-parser-js attack (October 2021) triggered zero warnings in Socket or Snyk beforehand.
+              The structural signal — 1 maintainer, 100M+ downloads/week — was visible for years.
+            </p>
+          </div>
+
+          <div class="faq-item reveal">
+            <h3 class="faq-q">What counts as a "project" for Pro monitoring?</h3>
+            <p class="faq-a">
+              A project is a dependency manifest you want Commit to monitor continuously —
+              typically a <code>package.json</code> or GitHub repository.
+              Pro covers 10 projects with daily scans. Enterprise covers unlimited projects with hourly scans.
+              Single-package audits via the API don't count toward your project limit.
+            </p>
+          </div>
+
+          <div class="faq-item reveal">
+            <h3 class="faq-q">Is the CLI really free forever?</h3>
+            <p class="faq-a">
+              Yes. The CLI (<code>npx proof-of-commitment</code>), the scoring algorithm, and the web audit tool
+              are MIT-licensed and free forever. Security tools that hide their methodology are asking for blind trust —
+              that's not how we want to operate. The value in Pro and Enterprise isn't the algorithm (it's public)
+              — it's the infrastructure: monitoring, alerts, historical data, and CI/CD integration.
+            </p>
+          </div>
+
+          <div class="faq-item reveal">
+            <h3 class="faq-q">What's the API rate limit on the free tier?</h3>
+            <p class="faq-a">
+              Free tier: 200 single-package requests per day, IP-based.
+              Batch requests (up to 20 packages at once) require a Pro API key.
+              If you hit the limit, the API returns HTTP 429 with a <code>Retry-After</code> header and an upgrade link.
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <hr class="section-divider" />
+
+  <!-- CTA -->
+  <section class="cta-section">
+    <div class="container">
+      <div class="editorial" style="max-width: var(--max-content); margin: 0 auto; text-align: center;">
+        <h2 class="cta-heading">Start with the free audit</h2>
+        <p class="cta-text">
+          Paste your dependencies. See which packages are structurally exposed.
+          No account required.
+        </p>
+        <div class="cta-buttons">
+          <a href="/audit" class="btn-primary">Run a free audit →</a>
+          <a href="mailto:support@getcommit.dev?subject=Commit Pro" class="btn-secondary">Talk to us about Pro</a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Email capture modal (shown before Stripe redirect) -->
+  <div id="checkout-modal" class="checkout-modal" hidden role="dialog" aria-modal="true" aria-labelledby="checkout-modal-title">
+    <div class="checkout-modal-overlay"></div>
+    <div class="checkout-modal-card">
+      <button type="button" id="checkout-modal-close" class="checkout-modal-close" aria-label="Close">✕</button>
+      <p class="checkout-modal-eyebrow">Almost there</p>
+      <h2 id="checkout-modal-title" class="checkout-modal-heading">Where should we send your API key?</h2>
+      <p class="checkout-modal-body">Enter your email to continue to payment. Your key is delivered immediately after checkout.</p>
+      <form id="checkout-email-form" novalidate>
+        <input
+          id="checkout-email"
+          type="email"
+          name="email"
+          placeholder="you@company.com"
+          autocomplete="email"
+          required
+          class="checkout-modal-input"
+        />
+        <p id="checkout-email-error" class="checkout-modal-error" hidden></p>
+        <button type="submit" id="checkout-submit-btn" class="checkout-modal-submit">Continue to payment →</button>
+      </form>
+      <p class="checkout-modal-fine">Secure checkout via Stripe. Cancel anytime.</p>
+    </div>
+  </div>
+
+  <footer>
+    <div class="container footer-inner">
+      <span class="footer-brand">Commit</span>
+      <span class="footer-copy">Behavioral trust for the software supply chain.</span>
+      <nav class="footer-links">
+        <a href="/audit">Audit</a>
+        <a href="/watchlist">Watchlist</a>
+        <a href="/pricing">Pricing</a>
+        <a href="/blog">Writing</a>
+        <a href="mailto:pico@amdal.dev">Contact</a>
+      </nav>
+    </div>
+  </footer>
+
+  <script>
+    // ── Checkout email modal ──
+    const modal = document.getElementById('checkout-modal') as HTMLDivElement | null;
+    const modalOverlay = modal?.querySelector('.checkout-modal-overlay');
+    const modalClose = document.getElementById('checkout-modal-close') as HTMLButtonElement | null;
+    const emailForm = document.getElementById('checkout-email-form') as HTMLFormElement | null;
+    const emailInput = document.getElementById('checkout-email') as HTMLInputElement | null;
+    const emailError = document.getElementById('checkout-email-error') as HTMLParagraphElement | null;
+    const submitBtn = document.getElementById('checkout-submit-btn') as HTMLButtonElement | null;
+    let pendingTier = '';
+
+    function openModal(tier: string) {
+      pendingTier = tier;
+      if (modal) {
+        modal.hidden = false;
+        document.body.style.overflow = 'hidden';
+        emailInput?.focus();
+      }
+    }
+
+    function closeModal() {
+      if (modal) {
+        modal.hidden = true;
+        document.body.style.overflow = '';
+        pendingTier = '';
+        emailForm?.reset();
+        if (emailError) emailError.hidden = true;
+        if (submitBtn) { submitBtn.textContent = 'Continue to payment →'; submitBtn.disabled = false; }
+      }
+    }
+
+    // Open modal on Subscribe button click
+    document.querySelectorAll<HTMLButtonElement>('.checkout-btn').forEach((btn) => {
+      btn.addEventListener('click', () => openModal(btn.dataset.tier ?? 'pro'));
+    });
+
+    // Close on overlay click or close button
+    modalOverlay?.addEventListener('click', closeModal);
+    modalClose?.addEventListener('click', closeModal);
+
+    // Close on Escape
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape' && modal && !modal.hidden) closeModal();
+    });
+
+    // Submit → redirect to Stripe with email pre-filled
+    emailForm?.addEventListener('submit', (e) => {
+      e.preventDefault();
+      const email = emailInput?.value.trim() ?? '';
+      if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+        if (emailError) { emailError.textContent = 'Enter a valid email address.'; emailError.hidden = false; }
+        return;
+      }
+      if (emailError) emailError.hidden = true;
+      if (submitBtn) { submitBtn.textContent = 'Redirecting…'; submitBtn.disabled = true; }
+      const url = `https://poc-backend.amdal-dev.workers.dev/api/checkout?tier=${encodeURIComponent(pendingTier)}&email=${encodeURIComponent(email)}`;
+      window.location.href = url;
+    });
+
+    // ── Waitlist form ──
+    const waitlistForm = document.getElementById('waitlist-form') as HTMLFormElement | null;
+    if (waitlistForm) {
+      waitlistForm.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const emailInput = document.getElementById('waitlist-email') as HTMLInputElement;
+        const submitBtn = document.getElementById('waitlist-btn') as HTMLButtonElement;
+        const successMsg = document.getElementById('waitlist-success') as HTMLParagraphElement;
+        const errorMsg = document.getElementById('waitlist-error') as HTMLParagraphElement;
+        const email = emailInput.value.trim();
+
+        if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+          errorMsg.textContent = 'Please enter a valid email address.';
+          errorMsg.hidden = false;
+          successMsg.hidden = true;
+          return;
+        }
+
+        submitBtn.disabled = true;
+        submitBtn.textContent = 'Sending…';
+        errorMsg.hidden = true;
+        successMsg.hidden = true;
+
+        try {
+          // POSTs to /api/keys/create — the same endpoint /get-started/ uses.
+          // Was previously /api/waitlist (returned 404, never deployed).
+          // Backend issues a free-tier key immediately and emails it to the user.
+          const res = await fetch('https://poc-backend.amdal-dev.workers.dev/api/keys/create', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ email }),
+          });
+          if (res.ok || res.status === 201) {
+            successMsg.hidden = false;
+            waitlistForm.reset();
+            submitBtn.textContent = 'Get free API key';
+          } else {
+            const data = await res.json() as any;
+            throw new Error(data?.error ?? `HTTP ${res.status}`);
+          }
+        } catch (err) {
+          errorMsg.textContent = err instanceof Error ? err.message : 'Something went wrong. Please try again.';
+          errorMsg.hidden = false;
+          submitBtn.textContent = 'Get free API key';
+        } finally {
+          submitBtn.disabled = false;
+        }
+      });
+    }
+  </script>
+
+  <style>
+    /* ── Nav ── */
+    nav {
+      border-bottom: 1px solid var(--border-light);
+      padding: 1rem 0;
+    }
+
+    .nav-inner {
+      display: flex;
+      align-items: center;
+      gap: 2rem;
+    }
+
+    .nav-brand {
+      font-family: var(--font-display);
+      font-size: 1.125rem;
+      color: var(--ink);
+      text-decoration: none;
+      letter-spacing: 0.05em;
+      flex-shrink: 0;
+    }
+
+    .nav-links {
+      display: flex;
+      list-style: none;
+      padding: 0;
+      margin: 0 0 0 auto;
+      gap: 2rem;
+    }
+
+    .nav-links a {
+      font-size: 0.875rem;
+      color: var(--ink-subtle);
+      text-decoration: none;
+      transition: color 0.15s;
+    }
+
+    .nav-links a:hover { color: var(--ink); }
+
+    /* ── Hero ── */
+    .pricing-hero {
+      padding: 6rem 0 3rem;
+      background: var(--paper);
+    }
+
+    .pricing-title {
+      font-family: var(--font-display);
+      font-size: clamp(2.2rem, 5vw, 3.5rem);
+      line-height: 1.12;
+      color: var(--ink);
+      margin: 1rem 0 1.5rem;
+      letter-spacing: -0.01em;
+      text-wrap: balance;
+    }
+
+    .pricing-title em {
+      font-style: italic;
+      color: var(--accent);
+    }
+
+    .pricing-lead {
+      font-size: 1.05rem;
+      line-height: 1.7;
+      color: var(--ink-muted);
+      max-width: 46rem;
+    }
+
+    .pricing-lead strong {
+      color: var(--ink);
+      font-weight: 600;
+    }
+
+    /* ── Hero eyebrow ── */
+    .hero-eyebrow {
+      display: inline-block;
+      font-size: 0.75rem;
+      font-weight: 500;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--accent);
+      margin-bottom: 1rem;
+    }
+
+    /* ── Tiers ── */
+    .tiers-section {
+      padding: 5rem 0;
+      background: var(--paper-dim);
+    }
+
+    .tiers-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 1.25rem;
+      align-items: start;
+    }
+
+    @media (max-width: 1100px) {
+      .tiers-grid { grid-template-columns: 1fr 1fr; max-width: 54rem; margin: 0 auto; }
+    }
+
+    @media (max-width: 640px) {
+      .tiers-grid { grid-template-columns: 1fr; max-width: 26rem; margin: 0 auto; }
+    }
+
+    .tier-card {
+      background: var(--paper);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 2rem;
+      position: relative;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .tier-card-dev {
+      border-color: #2563eb;
+      border-width: 1.5px;
+      background: var(--paper);
+      box-shadow: 0 2px 12px rgba(37, 99, 235, 0.06);
+    }
+
+    .tier-card-dev .price-amount {
+      color: #2563eb;
+    }
+
+    .tier-card-pro {
+      border-color: var(--accent);
+      border-width: 2px;
+      background: var(--paper);
+      box-shadow: 0 4px 24px rgba(209, 77, 65, 0.08);
+    }
+
+    .tier-recommended {
+      position: absolute;
+      top: -0.75rem;
+      left: 50%;
+      transform: translateX(-50%);
+      background: var(--accent);
+      color: white;
+      font-size: 0.7rem;
+      font-weight: 600;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      padding: 0.25rem 0.85rem;
+      border-radius: 99px;
+      white-space: nowrap;
+    }
+
+    .tier-new {
+      position: absolute;
+      top: -0.75rem;
+      left: 50%;
+      transform: translateX(-50%);
+      background: #2563eb;
+      color: white;
+      font-size: 0.7rem;
+      font-weight: 600;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      padding: 0.25rem 0.85rem;
+      border-radius: 99px;
+      white-space: nowrap;
+    }
+
+    .tier-cta-dev {
+      background: #2563eb;
+      color: white;
+      border: 2px solid #2563eb;
+    }
+
+    .tier-cta-dev:hover {
+      background: #1d4ed8;
+      border-color: #1d4ed8;
+    }
+
+    .tier-header {
+      margin-bottom: 1.5rem;
+    }
+
+    .tier-name {
+      font-family: var(--font-display);
+      font-size: 1.25rem;
+      color: var(--ink);
+      margin-bottom: 0.5rem;
+    }
+
+    .tier-price {
+      display: flex;
+      align-items: baseline;
+      gap: 0.4rem;
+      margin-bottom: 0.75rem;
+    }
+
+    .price-amount {
+      font-size: 2.5rem;
+      font-weight: 700;
+      color: var(--ink);
+      line-height: 1;
+    }
+
+    .tier-card-pro .price-amount {
+      color: var(--accent);
+    }
+
+    .price-period {
+      font-size: 0.875rem;
+      color: var(--ink-subtle);
+    }
+
+    .tier-tagline {
+      font-size: 0.875rem;
+      color: var(--ink-muted);
+      line-height: 1.55;
+      margin: 0;
+    }
+
+    .tier-cta {
+      display: block;
+      text-align: center;
+      padding: 0.85rem 1.5rem;
+      border-radius: 4px;
+      font-weight: 500;
+      font-size: 0.9rem;
+      text-decoration: none;
+      transition: background 0.15s, border-color 0.15s;
+      margin-bottom: 1.75rem;
+    }
+
+    button.tier-cta {
+      cursor: pointer;
+      font-family: inherit;
+      width: 100%;
+    }
+
+    button.tier-cta:disabled {
+      opacity: 0.65;
+      cursor: default;
+    }
+
+    .tier-cta-primary {
+      background: var(--accent);
+      color: white;
+      border: 2px solid var(--accent);
+    }
+
+    .tier-cta-primary:hover {
+      background: var(--accent-dim);
+      border-color: var(--accent-dim);
+    }
+
+    .tier-cta-ghost {
+      background: transparent;
+      color: var(--ink);
+      border: 1px solid var(--border);
+    }
+
+    .tier-cta-ghost:hover {
+      border-color: var(--ink-subtle);
+    }
+
+    .tier-features {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+      display: flex;
+      flex-direction: column;
+      gap: 0.6rem;
+      border-top: 1px solid var(--border-light);
+      padding-top: 1.5rem;
+    }
+
+    .feature-item {
+      display: flex;
+      gap: 0.6rem;
+      align-items: flex-start;
+      font-size: 0.875rem;
+      line-height: 1.5;
+      color: var(--ink-muted);
+    }
+
+    .feature-check {
+      color: var(--accent);
+      font-size: 0.8rem;
+      flex-shrink: 0;
+      margin-top: 0.15rem;
+    }
+
+    .feature-item code {
+      font-family: var(--font-mono);
+      font-size: 0.8rem;
+      background: var(--surface);
+      padding: 0.1rem 0.35rem;
+      border-radius: 3px;
+      color: var(--ink);
+    }
+
+    /* ── Waitlist ── */
+    .waitlist-section {
+      padding: 4rem 0;
+      background: var(--paper);
+    }
+
+    .waitlist-card {
+      background: var(--paper-dim);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 2.5rem 2rem;
+      display: flex;
+      align-items: flex-start;
+      gap: 2.5rem;
+      max-width: 56rem;
+      margin: 0 auto;
+    }
+
+    @media (max-width: 700px) {
+      .waitlist-card {
+        flex-direction: column;
+        gap: 1.5rem;
+        padding: 2rem 1.5rem;
+      }
+    }
+
+    .waitlist-text {
+      flex: 0 0 auto;
+      max-width: 22rem;
+    }
+
+    .waitlist-heading {
+      font-family: var(--font-display);
+      font-size: 1.35rem;
+      color: var(--ink);
+      margin-bottom: 0.5rem;
+    }
+
+    .waitlist-body {
+      font-size: 0.9rem;
+      color: var(--ink-muted);
+      line-height: 1.65;
+      margin: 0;
+    }
+
+    .waitlist-form {
+      flex: 1;
+    }
+
+    .waitlist-input-row {
+      display: flex;
+      gap: 0.5rem;
+      flex-wrap: wrap;
+    }
+
+    .waitlist-input {
+      flex: 1;
+      min-width: 0;
+      padding: 0.75rem 1rem;
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      font-family: inherit;
+      font-size: 0.9rem;
+      color: var(--ink);
+      background: var(--paper);
+      outline: none;
+      transition: border-color 0.15s;
+    }
+
+    .waitlist-input:focus {
+      border-color: var(--accent);
+    }
+
+    .waitlist-submit {
+      padding: 0.75rem 1.25rem;
+      background: var(--accent);
+      color: white;
+      border: none;
+      border-radius: 4px;
+      font-family: inherit;
+      font-size: 0.875rem;
+      font-weight: 500;
+      cursor: pointer;
+      white-space: nowrap;
+      transition: background 0.15s;
+    }
+
+    .waitlist-submit:hover { background: var(--accent-dim); }
+    .waitlist-submit:disabled { opacity: 0.65; cursor: default; }
+
+    .waitlist-cta-link {
+      display: inline-block;
+      margin-top: 1rem;
+      font-size: 0.9rem;
+      font-weight: 500;
+      color: var(--accent);
+      text-decoration: none;
+    }
+
+    .waitlist-cta-link:hover { text-decoration: underline; }
+
+    .waitlist-form-area { flex: 1; }
+
+    .waitlist-divider-text {
+      font-size: 0.8rem;
+      color: var(--ink-subtle);
+      margin: 0.75rem 0;
+      text-align: center;
+    }
+
+    .waitlist-getkey-btn {
+      display: inline-block;
+      padding: 0.65rem 1.25rem;
+      background: var(--paper);
+      color: var(--accent);
+      border: 1px solid var(--accent);
+      border-radius: 4px;
+      font-size: 0.875rem;
+      font-weight: 500;
+      text-decoration: none;
+      transition: background 0.15s;
+    }
+
+    .waitlist-getkey-btn:hover {
+      background: #fff8f5;
+    }
+
+    .waitlist-feedback {
+      margin: 0.75rem 0 0;
+      font-size: 0.875rem;
+      line-height: 1.5;
+    }
+
+    .waitlist-success { color: #166534; }
+    .waitlist-error   { color: var(--accent); }
+
+    /* ── Compare table ── */
+    .compare-section {
+      padding: 5rem 0;
+      background: var(--paper);
+    }
+
+    .section-label {
+      display: block;
+      font-size: 0.6875rem;
+      font-weight: 500;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--ink-subtle);
+      margin-bottom: 1rem;
+    }
+
+    .section-heading {
+      font-family: var(--font-display);
+      font-size: clamp(1.5rem, 3.5vw, 2.2rem);
+      color: var(--ink);
+      margin-bottom: 1rem;
+      line-height: 1.2;
+      letter-spacing: -0.01em;
+    }
+
+    .section-heading em {
+      font-style: italic;
+      color: var(--accent);
+    }
+
+    .compare-intro {
+      font-size: 1rem;
+      color: var(--ink-muted);
+      line-height: 1.7;
+      max-width: 46rem;
+    }
+
+    .table-wrapper {
+      overflow-x: auto;
+      margin-bottom: 1.25rem;
+    }
+
+    .compare-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.9rem;
+    }
+
+    .compare-table thead th {
+      padding: 0.875rem 1.25rem;
+      text-align: left;
+      font-weight: 500;
+      font-size: 0.75rem;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--ink-subtle);
+      border-bottom: 2px solid var(--border);
+      background: var(--paper-dim);
+    }
+
+    .compare-table thead th:last-child {
+      background: #fff8f5;
+      color: var(--accent);
+      border-bottom-color: var(--accent);
+    }
+
+    .compare-table tbody tr {
+      border-bottom: 1px solid var(--border-light);
+    }
+
+    .compare-table tbody tr:hover {
+      background: var(--paper-dim);
+    }
+
+    .col-scenario { width: 14rem; }
+    .col-tool { width: 10rem; }
+    .col-commit { width: 12rem; }
+
+    .scenario-cell {
+      padding: 1.25rem 1.25rem;
+      vertical-align: top;
+    }
+
+    .scenario-cell strong {
+      display: block;
+      color: var(--ink);
+      font-weight: 600;
+    }
+
+    .scenario-sub {
+      display: block;
+      font-size: 0.8rem;
+      color: var(--ink-subtle);
+      margin-top: 0.2rem;
+    }
+
+    .competitor-cell {
+      padding: 1.25rem 1.25rem;
+      color: var(--ink-muted);
+      vertical-align: middle;
+    }
+
+    .commit-cell-highlight {
+      padding: 1.25rem 1.25rem;
+      background: #fff8f5;
+      vertical-align: middle;
+    }
+
+    .commit-cell-highlight strong {
+      display: block;
+      color: var(--accent);
+      font-size: 1.05rem;
+      font-weight: 700;
+    }
+
+    .savings-badge {
+      display: inline-block;
+      margin-top: 0.25rem;
+      font-size: 0.72rem;
+      font-weight: 600;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+      background: #dcfce7;
+      color: #166534;
+      border: 1px solid #bbf7d0;
+      border-radius: 3px;
+      padding: 0.15rem 0.5rem;
+    }
+
+    .table-footnote {
+      font-size: 0.8rem;
+      color: var(--ink-subtle);
+      line-height: 1.6;
+      max-width: 56rem;
+    }
+
+    /* ── FAQ ── */
+    .faq-section {
+      padding: 5rem 0;
+      background: var(--paper-dim);
+    }
+
+    .faq-list {
+      display: flex;
+      flex-direction: column;
+      gap: 0;
+    }
+
+    .faq-item {
+      padding: 2rem 0;
+      border-top: 1px solid var(--border-light);
+    }
+
+    .faq-item:last-child {
+      border-bottom: 1px solid var(--border-light);
+    }
+
+    .faq-q {
+      font-family: var(--font-display);
+      font-size: 1.1rem;
+      font-weight: 400;
+      color: var(--ink);
+      margin-bottom: 0.75rem;
+      line-height: 1.3;
+    }
+
+    .faq-a {
+      font-size: 0.9375rem;
+      color: var(--ink-muted);
+      line-height: 1.7;
+      max-width: 58ch;
+      margin: 0;
+    }
+
+    .faq-a em { font-style: italic; }
+
+    .faq-a code {
+      font-family: var(--font-mono);
+      font-size: 0.85em;
+      background: var(--surface);
+      padding: 0.1rem 0.35rem;
+      border-radius: 3px;
+      color: var(--ink);
+    }
+
+    /* ── CTA ── */
+    .cta-section {
+      padding: 5rem 0;
+      background: var(--paper);
+    }
+
+    .cta-heading {
+      font-family: var(--font-display);
+      font-size: 2rem;
+      color: var(--ink);
+      margin-bottom: 0.75rem;
+    }
+
+    .cta-text {
+      font-size: 1rem;
+      color: var(--ink-muted);
+      line-height: 1.65;
+      margin-bottom: 2rem;
+    }
+
+    .cta-buttons {
+      display: flex;
+      gap: 1rem;
+      justify-content: center;
+      flex-wrap: wrap;
+    }
+
+    .btn-primary {
+      padding: 0.85rem 2rem;
+      background: var(--accent);
+      color: white;
+      text-decoration: none;
+      border-radius: 4px;
+      font-weight: 500;
+      font-size: 0.95rem;
+      transition: background 0.15s;
+    }
+
+    .btn-primary:hover { background: var(--accent-dim); }
+
+    .btn-secondary {
+      padding: 0.85rem 2rem;
+      background: transparent;
+      color: var(--ink);
+      text-decoration: none;
+      border-radius: 4px;
+      font-weight: 500;
+      font-size: 0.95rem;
+      border: 1px solid var(--border);
+      transition: border-color 0.15s;
+    }
+
+    .btn-secondary:hover { border-color: var(--ink-subtle); }
+
+    /* ── Footer ── */
+    footer {
+      border-top: 1px solid var(--border-light);
+    }
+
+    .footer-inner {
+      display: flex;
+      align-items: center;
+      gap: 1.5rem;
+      padding: 2rem 0;
+      flex-wrap: wrap;
+    }
+
+    .footer-brand {
+      font-family: var(--font-display);
+      font-size: 1.1rem;
+      color: var(--ink);
+    }
+
+    .footer-copy {
+      font-size: 0.85rem;
+      color: var(--ink-subtle);
+      flex: 1;
+    }
+
+    .footer-links {
+      display: flex;
+      gap: 1.25rem;
+    }
+
+    .footer-links a {
+      font-size: 0.85rem;
+      color: var(--ink-muted);
+      text-decoration: none;
+    }
+
+    .footer-links a:hover { color: var(--ink); }
+
+    /* ── Checkout modal ── */
+    .checkout-modal {
+      position: fixed;
+      inset: 0;
+      z-index: 1000;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 1rem;
+    }
+
+    .checkout-modal[hidden] { display: none; }
+
+    .checkout-modal-overlay {
+      position: absolute;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.5);
+    }
+
+    .checkout-modal-card {
+      position: relative;
+      background: var(--paper);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 2.5rem 2rem;
+      max-width: 28rem;
+      width: 100%;
+      box-shadow: 0 8px 40px rgba(0, 0, 0, 0.18);
+    }
+
+    .checkout-modal-close {
+      position: absolute;
+      top: 1rem;
+      right: 1rem;
+      background: none;
+      border: none;
+      font-size: 1rem;
+      color: var(--ink-subtle);
+      cursor: pointer;
+      padding: 0.25rem 0.5rem;
+      line-height: 1;
+    }
+
+    .checkout-modal-close:hover { color: var(--ink); }
+
+    .checkout-modal-eyebrow {
+      font-size: 0.7rem;
+      font-weight: 500;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--accent);
+      margin: 0 0 0.5rem;
+    }
+
+    .checkout-modal-heading {
+      font-family: var(--font-display);
+      font-size: 1.35rem;
+      color: var(--ink);
+      margin: 0 0 0.5rem;
+      line-height: 1.3;
+    }
+
+    .checkout-modal-body {
+      font-size: 0.9rem;
+      color: var(--ink-muted);
+      line-height: 1.6;
+      margin: 0 0 1.5rem;
+    }
+
+    .checkout-modal-input {
+      display: block;
+      width: 100%;
+      padding: 0.75rem 1rem;
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      font-family: inherit;
+      font-size: 0.9rem;
+      color: var(--ink);
+      background: var(--paper);
+      outline: none;
+      transition: border-color 0.15s;
+      margin-bottom: 0.5rem;
+      box-sizing: border-box;
+    }
+
+    .checkout-modal-input:focus { border-color: var(--accent); }
+
+    .checkout-modal-error {
+      font-size: 0.8rem;
+      color: var(--accent);
+      margin: 0 0 0.75rem;
+    }
+
+    .checkout-modal-submit {
+      display: block;
+      width: 100%;
+      padding: 0.85rem 1.5rem;
+      background: var(--accent);
+      color: white;
+      border: none;
+      border-radius: 4px;
+      font-family: inherit;
+      font-size: 0.95rem;
+      font-weight: 500;
+      cursor: pointer;
+      transition: background 0.15s;
+      margin-top: 0.25rem;
+    }
+
+    .checkout-modal-submit:hover { background: var(--accent-dim); }
+    .checkout-modal-submit:disabled { opacity: 0.65; cursor: default; }
+
+    .checkout-modal-fine {
+      font-size: 0.8rem;
+      color: var(--ink-subtle);
+      margin: 1rem 0 0;
+      text-align: center;
+    }
+
+    /* ── Mobile ── */
+    @media (max-width: 640px) {
+      .pricing-hero { padding: 4rem 0 2.5rem; }
+      .tiers-section { padding: 3rem 0; }
+      .compare-section { padding: 3rem 0; }
+      .faq-section { padding: 3rem 0; }
+      .cta-section { padding: 3rem 0; }
+
+      .nav-links { display: none; }
+
+      .compare-table td,
+      .compare-table th {
+        padding: 0.875rem 0.75rem;
+      }
+
+      .col-scenario { min-width: 8rem; }
+      .col-tool { min-width: 7rem; }
+    }
+  </style>
+</Layout>
