@@ -44,6 +44,17 @@ import Layout from '../layouts/Layout.astro';
 
   <hr class="section-divider" />
 
+  <!-- Social-proof banner (populated from /api/stats/teams-protected) -->
+  <!-- Hidden by default; revealed by inline script if count >= 5. -->
+  <section id="social-proof" class="social-proof-section" hidden>
+    <div class="container">
+      <p class="social-proof-line">
+        <span class="social-proof-dot" aria-hidden="true">●</span>
+        <span id="social-proof-text"></span>
+      </p>
+    </div>
+  </section>
+
   <!-- Pricing tiers -->
   <section class="tiers-section">
     <div class="container">
@@ -104,6 +115,7 @@ import Layout from '../layouts/Layout.astro';
             <p class="tier-tagline">Builders, open source maintainers, dev-stage projects wanting automation without team overhead.</p>
           </div>
           <button type="button" data-tier="developer" class="tier-cta tier-cta-dev checkout-btn">Subscribe — $15/mo →</button>
+          <p class="tier-reassurance">30-day money-back guarantee. Cancel anytime, no contract.</p>
           <ul class="tier-features">
             <li class="feature-item">
               <span class="feature-check">✓</span>
@@ -160,6 +172,7 @@ import Layout from '../layouts/Layout.astro';
             <p class="tier-tagline">Small teams, indie devs with multiple projects, security-conscious startups.</p>
           </div>
           <button type="button" data-tier="pro" class="tier-cta tier-cta-primary checkout-btn">Subscribe — $29/mo →</button>
+          <p class="tier-reassurance">30-day money-back guarantee. Cancel anytime, no contract.</p>
           <ul class="tier-features">
             <li class="feature-item">
               <span class="feature-check">✓</span>
@@ -268,6 +281,22 @@ import Layout from '../layouts/Layout.astro';
         </div>
 
       </div>
+
+      <!-- Trust signals -->
+      <div class="pricing-trust reveal" style="max-width: 640px; margin: 2.5rem auto 0; text-align: center;">
+        <div style="display: flex; justify-content: center; gap: 2rem; flex-wrap: wrap; font-size: 0.85rem; color: var(--ink-muted);">
+          <span>Cancel anytime — no lock-in</span>
+          <span>·</span>
+          <span>30-day money-back guarantee</span>
+          <span>·</span>
+          <span>Secure checkout via Stripe</span>
+        </div>
+        <p style="margin-top: 1rem; font-size: 0.8rem; color: var(--ink-subtle);">
+          Open source CLI and web audit are free forever. Paid tiers add batch API, CI automation, and monitoring.
+          Start free, upgrade when your pipeline needs it.
+        </p>
+      </div>
+
     </div>
   </section>
 
@@ -537,6 +566,30 @@ import Layout from '../layouts/Layout.astro';
   </footer>
 
   <script>
+    // ── Social-proof banner (populated from /api/stats/teams-protected) ──
+    // Suppressed if count < 5 (handled server-side in the endpoint: period="none").
+    (async () => {
+      try {
+        const resp = await fetch('https://poc-backend.amdal-dev.workers.dev/api/stats/teams-protected');
+        if (!resp.ok) return;
+        const data = await resp.json() as { ok?: boolean; count?: number; period?: string };
+        if (!data.ok || !data.count || !data.period || data.period === 'none') return;
+        const banner = document.getElementById('social-proof');
+        const text = document.getElementById('social-proof-text');
+        if (!banner || !text) return;
+        const periodLabel: Record<string, string> = {
+          '7d': 'this week',
+          '30d': 'this month',
+          'total': 'so far',
+        };
+        const label = periodLabel[data.period] ?? 'recently';
+        text.textContent = `${data.count} teams started using Commit ${label}.`;
+        banner.hidden = false;
+      } catch {
+        // Silent fail — social proof is non-critical.
+      }
+    })();
+
     // ── Checkout email modal ──
     const modal = document.getElementById('checkout-modal') as HTMLDivElement | null;
     const modalOverlay = modal?.querySelector('.checkout-modal-overlay');
@@ -743,6 +796,39 @@ import Layout from '../layouts/Layout.astro';
       text-transform: uppercase;
       color: var(--accent);
       margin-bottom: 1rem;
+    }
+
+    /* ── Social proof ── */
+    .social-proof-section {
+      padding: 1.25rem 0 0.25rem;
+      background: var(--paper);
+    }
+
+    .social-proof-line {
+      text-align: center;
+      font-size: 0.9rem;
+      color: var(--ink-muted);
+      margin: 0;
+      line-height: 1.5;
+    }
+
+    .social-proof-dot {
+      display: inline-block;
+      color: #166534;
+      font-size: 0.65rem;
+      vertical-align: middle;
+      margin-right: 0.4rem;
+      transform: translateY(-1px);
+    }
+
+    /* Reassurance line under paid-tier Subscribe buttons */
+    .tier-reassurance {
+      font-size: 0.78rem;
+      color: var(--ink-subtle);
+      line-height: 1.5;
+      text-align: center;
+      margin: -1rem 0 1.5rem;
+      padding: 0 0.25rem;
     }
 
     /* ── Tiers ── */
