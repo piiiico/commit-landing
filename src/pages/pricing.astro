@@ -581,8 +581,8 @@ import Layout from '../layouts/Layout.astro';
       if (e.key === 'Escape' && modal && !modal.hidden) closeModal();
     });
 
-    // Submit → redirect to Stripe with email pre-filled
-    emailForm?.addEventListener('submit', (e) => {
+    // Submit → POST checkout-intent (stores lead) then redirect to Stripe
+    emailForm?.addEventListener('submit', async (e) => {
       e.preventDefault();
       const email = emailInput?.value.trim() ?? '';
       if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
@@ -591,8 +591,24 @@ import Layout from '../layouts/Layout.astro';
       }
       if (emailError) emailError.hidden = true;
       if (submitBtn) { submitBtn.textContent = 'Redirecting…'; submitBtn.disabled = true; }
-      const url = `https://poc-backend.amdal-dev.workers.dev/api/checkout?tier=${encodeURIComponent(pendingTier)}&email=${encodeURIComponent(email)}`;
-      window.location.href = url;
+
+      try {
+        const resp = await fetch('https://poc-backend.amdal-dev.workers.dev/api/checkout-intent', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email, tier: pendingTier }),
+        });
+        const data = await resp.json() as { ok?: boolean; checkout_url?: string; error?: string };
+        if (data.ok && data.checkout_url) {
+          window.location.href = data.checkout_url;
+        } else {
+          // Fallback to GET checkout if intent fails
+          window.location.href = `https://poc-backend.amdal-dev.workers.dev/api/checkout?tier=${encodeURIComponent(pendingTier)}&email=${encodeURIComponent(email)}`;
+        }
+      } catch {
+        // Fallback to GET checkout on network error
+        window.location.href = `https://poc-backend.amdal-dev.workers.dev/api/checkout?tier=${encodeURIComponent(pendingTier)}&email=${encodeURIComponent(email)}`;
+      }
     });
 
     // ── Waitlist form ──
