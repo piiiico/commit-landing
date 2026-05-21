@@ -45,12 +45,12 @@ import Layout from '../layouts/Layout.astro';
   <hr class="section-divider" />
 
   <!-- Social-proof banner (populated from /api/stats/teams-protected) -->
-  <!-- Hidden by default; revealed by inline script if count >= 5. -->
-  <section id="social-proof" class="social-proof-section" hidden>
+  <!-- Visible by default with fallback; JS upgrades to live count if count >= 5. -->
+  <section id="social-proof" class="social-proof-section">
     <div class="container">
       <p class="social-proof-line">
         <span class="social-proof-dot" aria-hidden="true">●</span>
-        <span id="social-proof-text"></span>
+        <span id="social-proof-text">Teams shipping with Commit this week.</span>
       </p>
     </div>
   </section>
@@ -522,6 +522,14 @@ import Layout from '../layouts/Layout.astro';
           <a href="/audit" class="btn-primary">Run a free audit →</a>
           <a href="mailto:support@getcommit.dev?subject=Commit Pro" class="btn-secondary">Talk to us about Pro</a>
         </div>
+        <p class="cta-feedback">
+          Didn't upgrade. Why?
+          <a
+            class="cta-feedback-link"
+            href="mailto:pico@amdal.dev?subject=Commit%20upgrade%20blocker&body=What%20would%20make%20Commit%20worth%20%2415%2Fmo%20or%20%2429%2Fmo%20for%20me%3A%0A%0A%0A%E2%80%94%20Sent%20from%20getcommit.dev%2Fpricing"
+          >Email pico@amdal.dev</a>
+          — I'm trying to figure out what's missing. One sentence is enough.
+        </p>
       </div>
     </div>
   </section>
@@ -1418,6 +1426,22 @@ import Layout from '../layouts/Layout.astro';
     }
 
     .btn-secondary:hover { border-color: var(--ink-subtle); }
+
+    /* ── Feedback line below CTA ── */
+    .cta-feedback {
+      margin-top: 1.75rem;
+      font-size: 0.85rem;
+      color: var(--ink-subtle);
+      line-height: 1.6;
+    }
+
+    .cta-feedback-link {
+      color: var(--accent);
+      text-decoration: none;
+      font-weight: 500;
+    }
+
+    .cta-feedback-link:hover { text-decoration: underline; }
 
     /* ── Footer ── */
     footer {

@@ -1,0 +1,591 @@
+---
+import Layout from '../../layouts/Layout.astro';
+---
+
+<Layout
+  title="Commit — Welcome"
+  description="Your Commit subscription is active. Here is your API key."
+  canonical="https://getcommit.dev/checkout/success"
+>
+  <!-- Nav -->
+  <nav>
+    <div class="container nav-inner">
+      <a href="/" class="nav-brand">Commit</a>
+      <ul class="nav-links">
+        <li><a href="/#mcp">MCP</a></li>
+        <li><a href="/audit">Audit</a></li>
+        <li><a href="/watchlist">Watchlist</a></li>
+        <li><a href="/extension">Extension</a></li>
+        <li><a href="/blog">Writing</a></li>
+        <li><a href="/pricing">Pricing</a></li><li><a href="/docs">Docs</a></li><li><a href="https://github.com/piiiico/proof-of-commitment" target="_blank" rel="noopener">GitHub</a></li>
+        <li><a href="mailto:support@getcommit.dev">Contact</a></li>
+      </ul>
+    </div>
+  </nav>
+
+  <!-- Hero -->
+  <section class="success-hero">
+    <div class="container">
+      <div class="editorial" style="max-width: var(--max-content); margin: 0 auto;">
+        <span class="hero-eyebrow">Commit Pro</span>
+        <h1 class="success-title">
+          You're in. <em>Here's your API key.</em>
+        </h1>
+        <p class="success-lead">
+          Your Pro subscription is active. Save your API key — it won't be shown again.
+          Questions? Email <a href="mailto:support@getcommit.dev">support@getcommit.dev</a>.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <hr class="section-divider" />
+
+  <!-- Key display -->
+  <section class="key-section">
+    <div class="container">
+      <div class="key-card reveal" id="key-card">
+        <div class="key-loading" id="key-loading">
+          <div class="spinner"></div>
+          <p>Retrieving your API key…</p>
+        </div>
+
+        <div class="key-success" id="key-success" style="display:none">
+          <p class="key-label">Your API key</p>
+          <div class="key-display">
+            <code id="api-key-value"></code>
+            <button id="copy-btn" class="copy-btn" title="Copy to clipboard">Copy</button>
+          </div>
+          <p class="key-note">
+            Pass this as <code>Authorization: Bearer &lt;key&gt;</code> in API requests.
+            Store it securely — it won't be shown again.
+          </p>
+        </div>
+
+        <div class="key-error" id="key-error" style="display:none">
+          <p class="error-title">Couldn't retrieve your key</p>
+          <p class="error-body">
+            Your payment went through, but we couldn't load your key right now.
+            Email <a href="mailto:support@getcommit.dev">support@getcommit.dev</a> with your order details
+            and we'll send the key directly.
+          </p>
+        </div>
+      </div>
+
+      <!-- Quick start -->
+      <div class="quickstart reveal" id="quickstart" style="display:none">
+        <h2 class="qs-heading">Quick start</h2>
+        <div class="qs-grid">
+          <div class="qs-block">
+            <div class="qs-label">Batch audit (up to 20 packages)</div>
+            <pre class="qs-code"><code id="qs-batch"></code></pre>
+          </div>
+          <div class="qs-block">
+            <div class="qs-label">GitHub repo audit</div>
+            <pre class="qs-code"><code id="qs-github"></code></pre>
+          </div>
+        </div>
+        <p class="qs-docs">
+          Full API docs: <a href="https://poc-backend.amdal-dev.workers.dev/docs" target="_blank" rel="noopener">poc-backend.amdal-dev.workers.dev/docs</a>
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <hr class="section-divider" />
+
+  <!-- Next steps -->
+  <section class="nextsteps-section">
+    <div class="container">
+      <div class="editorial" style="max-width: var(--max-content); margin: 0 auto;">
+        <h2 class="section-heading">What's next</h2>
+        <div class="steps-list">
+          <div class="step-item reveal">
+            <div class="step-num">01</div>
+            <div class="step-body">
+              <h3 class="step-title">Run a batch audit</h3>
+              <p class="step-text">
+                Use the API to scan up to 20 packages at once. Compare against your <code>package.json</code>
+                and flag anything with a commitment score below your threshold.
+              </p>
+            </div>
+          </div>
+          <div class="step-item reveal">
+            <div class="step-num">02</div>
+            <div class="step-body">
+              <h3 class="step-title">Add to CI/CD</h3>
+              <p class="step-text">
+                The GitHub Action auto-triggers on pull requests. Set a minimum score threshold and block
+                merges when new dependencies fall below it.
+              </p>
+            </div>
+          </div>
+          <div class="step-item reveal">
+            <div class="step-num">03</div>
+            <div class="step-body">
+              <h3 class="step-title">Set up monitoring</h3>
+              <p class="step-text">
+                Add up to 10 projects for daily scans. Get alerts via Slack, email, or webhook when
+                a package's commitment score changes.
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <footer>
+    <div class="container footer-inner">
+      <span class="footer-brand">Commit</span>
+      <span class="footer-copy">Behavioral trust for the software supply chain.</span>
+      <nav class="footer-links">
+        <a href="/audit">Audit</a>
+        <a href="/watchlist">Watchlist</a>
+        <a href="/pricing">Pricing</a>
+        <a href="/blog">Writing</a>
+        <a href="mailto:support@getcommit.dev">Contact</a>
+      </nav>
+    </div>
+  </footer>
+
+  <script>
+    const API_BASE = 'https://poc-backend.amdal-dev.workers.dev';
+
+    async function init() {
+      const params = new URLSearchParams(window.location.search);
+      const sessionId = params.get('session_id');
+
+      const loadingEl = document.getElementById('key-loading')!;
+      const successEl = document.getElementById('key-success')!;
+      const errorEl   = document.getElementById('key-error')!;
+      const quickstart = document.getElementById('quickstart')!;
+
+      if (!sessionId) {
+        loadingEl.style.display = 'none';
+        errorEl.style.display = 'block';
+        return;
+      }
+
+      try {
+        const res = await fetch(`${API_BASE}/api/checkout/session?session_id=${encodeURIComponent(sessionId)}`);
+        if (!res.ok) throw new Error(`HTTP ${res.status}`);
+        const data = await res.json() as { email: string; tier: string; paid: boolean };
+
+        if (!data.paid) throw new Error('Payment not completed');
+
+        // Show success with email
+        loadingEl.style.display = 'none';
+        successEl.style.display = 'block';
+        const keyEl = document.getElementById('api-key-value')!;
+        const tierLabel = data.tier === 'developer' ? 'Developer' : 'Pro';
+        document.title = `Commit ${tierLabel} — Welcome`;
+        keyEl.innerHTML = `Your <strong>${tierLabel}</strong> API key was sent to <strong>${data.email}</strong>.<br>Check your inbox — it arrives within a minute.`;
+
+        // Hide copy button (no raw key to copy)
+        const copyBtn = document.getElementById('copy-btn')!;
+        copyBtn.style.display = 'none';
+
+        // Show quick start with placeholder
+        const qsBatch = document.getElementById('qs-batch')!;
+        const qsGithub = document.getElementById('qs-github')!;
+        qsBatch.textContent = `curl -X POST ${API_BASE}/api/audit \\\n  -H "Authorization: Bearer YOUR_API_KEY" \\\n  -H "Content-Type: application/json" \\\n  -d '{"packages":["express","lodash","axios"]}'`;
+        qsGithub.textContent = `curl -X POST ${API_BASE}/api/audit/github \\\n  -H "Authorization: Bearer YOUR_API_KEY" \\\n  -H "Content-Type: application/json" \\\n  -d '{"repo":"owner/repo"}'`;
+        quickstart.style.display = 'block';
+
+      } catch (err) {
+        console.error('Session lookup error:', err);
+        loadingEl.style.display = 'none';
+        errorEl.style.display = 'block';
+      }
+    }
+
+    init();
+  </script>
+
+  <style>
+    /* ── Nav ── */
+    nav {
+      border-bottom: 1px solid var(--border-light);
+      padding: 1rem 0;
+    }
+
+    .nav-inner {
+      display: flex;
+      align-items: center;
+      gap: 2rem;
+    }
+
+    .nav-brand {
+      font-family: var(--font-display);
+      font-size: 1.125rem;
+      color: var(--ink);
+      text-decoration: none;
+      letter-spacing: 0.05em;
+      flex-shrink: 0;
+    }
+
+    .nav-links {
+      display: flex;
+      list-style: none;
+      padding: 0;
+      margin: 0 0 0 auto;
+      gap: 2rem;
+    }
+
+    .nav-links a {
+      font-size: 0.875rem;
+      color: var(--ink-subtle);
+      text-decoration: none;
+      transition: color 0.15s;
+    }
+
+    .nav-links a:hover { color: var(--ink); }
+
+    /* ── Hero ── */
+    .success-hero {
+      padding: 6rem 0 3rem;
+      background: var(--paper);
+    }
+
+    .hero-eyebrow {
+      display: inline-block;
+      font-size: 0.75rem;
+      font-weight: 500;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--accent);
+      margin-bottom: 1rem;
+    }
+
+    .success-title {
+      font-family: var(--font-display);
+      font-size: clamp(2.2rem, 5vw, 3.5rem);
+      line-height: 1.12;
+      color: var(--ink);
+      margin: 1rem 0 1.5rem;
+      letter-spacing: -0.01em;
+      text-wrap: balance;
+    }
+
+    .success-title em {
+      font-style: italic;
+      color: var(--accent);
+    }
+
+    .success-lead {
+      font-size: 1.05rem;
+      line-height: 1.7;
+      color: var(--ink-muted);
+      max-width: 46rem;
+    }
+
+    .success-lead a {
+      color: var(--accent);
+      text-decoration: none;
+    }
+
+    .success-lead a:hover { text-decoration: underline; }
+
+    /* ── Key section ── */
+    .key-section {
+      padding: 5rem 0;
+      background: var(--paper-dim);
+    }
+
+    .key-card {
+      background: var(--paper);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 2.5rem;
+      max-width: 48rem;
+      margin: 0 auto 3rem;
+    }
+
+    /* Loading */
+    .key-loading {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 1rem;
+      padding: 2rem 0;
+      color: var(--ink-muted);
+      font-size: 0.9375rem;
+    }
+
+    .spinner {
+      width: 2rem;
+      height: 2rem;
+      border: 2px solid var(--border);
+      border-top-color: var(--accent);
+      border-radius: 50%;
+      animation: spin 0.7s linear infinite;
+    }
+
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    /* Success */
+    .key-label {
+      font-size: 0.75rem;
+      font-weight: 500;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--ink-subtle);
+      margin-bottom: 0.75rem;
+    }
+
+    .key-display {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      background: var(--surface, #1a1a1a);
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      padding: 1rem 1.25rem;
+      margin-bottom: 1rem;
+    }
+
+    .key-display code {
+      font-family: var(--font-mono);
+      font-size: 0.875rem;
+      color: #e2e8f0;
+      flex: 1;
+      word-break: break-all;
+    }
+
+    .copy-btn {
+      flex-shrink: 0;
+      padding: 0.35rem 0.85rem;
+      background: var(--accent);
+      color: white;
+      border: none;
+      border-radius: 3px;
+      font-size: 0.8rem;
+      font-weight: 500;
+      cursor: pointer;
+      font-family: inherit;
+      transition: background 0.15s;
+    }
+
+    .copy-btn:hover { background: var(--accent-dim); }
+
+    .key-note {
+      font-size: 0.875rem;
+      color: var(--ink-muted);
+      line-height: 1.6;
+    }
+
+    .key-note code {
+      font-family: var(--font-mono);
+      font-size: 0.82em;
+      background: var(--surface);
+      padding: 0.1rem 0.35rem;
+      border-radius: 3px;
+      color: var(--ink);
+    }
+
+    /* Error */
+    .key-error {
+      padding: 1rem 0;
+    }
+
+    .error-title {
+      font-family: var(--font-display);
+      font-size: 1.2rem;
+      color: var(--ink);
+      margin-bottom: 0.75rem;
+    }
+
+    .error-body {
+      font-size: 0.9375rem;
+      color: var(--ink-muted);
+      line-height: 1.7;
+    }
+
+    .error-body a {
+      color: var(--accent);
+      text-decoration: none;
+    }
+
+    /* Quick start */
+    .quickstart {
+      max-width: 48rem;
+      margin: 0 auto;
+    }
+
+    .qs-heading {
+      font-family: var(--font-display);
+      font-size: 1.3rem;
+      color: var(--ink);
+      margin-bottom: 1.5rem;
+    }
+
+    .qs-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1.25rem;
+      margin-bottom: 1rem;
+    }
+
+    @media (max-width: 640px) {
+      .qs-grid { grid-template-columns: 1fr; }
+    }
+
+    .qs-block {
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+    }
+
+    .qs-label {
+      font-size: 0.75rem;
+      font-weight: 500;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--ink-subtle);
+    }
+
+    .qs-code {
+      background: #0f1117;
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      padding: 1rem;
+      overflow-x: auto;
+      margin: 0;
+    }
+
+    .qs-code code {
+      font-family: var(--font-mono);
+      font-size: 0.78rem;
+      color: #a8b3c8;
+      white-space: pre;
+      display: block;
+    }
+
+    .qs-docs {
+      font-size: 0.875rem;
+      color: var(--ink-muted);
+    }
+
+    .qs-docs a {
+      color: var(--accent);
+      text-decoration: none;
+    }
+
+    /* ── Next steps ── */
+    .nextsteps-section {
+      padding: 5rem 0;
+      background: var(--paper);
+    }
+
+    .section-heading {
+      font-family: var(--font-display);
+      font-size: clamp(1.5rem, 3.5vw, 2.2rem);
+      color: var(--ink);
+      margin-bottom: 2.5rem;
+      line-height: 1.2;
+      letter-spacing: -0.01em;
+    }
+
+    .steps-list {
+      display: flex;
+      flex-direction: column;
+      gap: 0;
+    }
+
+    .step-item {
+      display: flex;
+      gap: 2rem;
+      padding: 2rem 0;
+      border-top: 1px solid var(--border-light);
+      align-items: flex-start;
+    }
+
+    .step-item:last-child {
+      border-bottom: 1px solid var(--border-light);
+    }
+
+    .step-num {
+      font-family: var(--font-display);
+      font-size: 2rem;
+      color: var(--border);
+      font-weight: 700;
+      line-height: 1;
+      flex-shrink: 0;
+      width: 3rem;
+    }
+
+    .step-title {
+      font-family: var(--font-display);
+      font-size: 1.1rem;
+      font-weight: 400;
+      color: var(--ink);
+      margin-bottom: 0.5rem;
+    }
+
+    .step-text {
+      font-size: 0.9375rem;
+      color: var(--ink-muted);
+      line-height: 1.7;
+      max-width: 52ch;
+      margin: 0;
+    }
+
+    .step-text code {
+      font-family: var(--font-mono);
+      font-size: 0.85em;
+      background: var(--surface);
+      padding: 0.1rem 0.35rem;
+      border-radius: 3px;
+      color: var(--ink);
+    }
+
+    /* ── Footer ── */
+    footer {
+      border-top: 1px solid var(--border-light);
+    }
+
+    .footer-inner {
+      display: flex;
+      align-items: center;
+      gap: 1.5rem;
+      padding: 2rem 0;
+      flex-wrap: wrap;
+    }
+
+    .footer-brand {
+      font-family: var(--font-display);
+      font-size: 1.1rem;
+      color: var(--ink);
+    }
+
+    .footer-copy {
+      font-size: 0.85rem;
+      color: var(--ink-subtle);
+      flex: 1;
+    }
+
+    .footer-links {
+      display: flex;
+      gap: 1.25rem;
+    }
+
+    .footer-links a {
+      font-size: 0.85rem;
+      color: var(--ink-muted);
+      text-decoration: none;
+    }
+
+    .footer-links a:hover { color: var(--ink); }
+
+    /* ── Mobile ── */
+    @media (max-width: 640px) {
+      .success-hero { padding: 4rem 0 2.5rem; }
+      .key-section { padding: 3rem 0; }
+      .nextsteps-section { padding: 3rem 0; }
+      .nav-links { display: none; }
+      .step-item { gap: 1rem; }
+      .step-num { font-size: 1.5rem; width: 2rem; }
+    }
+  </style>
+</Layout>
