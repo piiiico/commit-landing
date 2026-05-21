@@ -130,8 +130,10 @@ const ECOSYSTEM_CONFIG = {
 
 // ── Related articles mapping ────────────────────────────────────────
 
+// GENERATED-EDIT-OK: source-of-truth file — adding node-ipc + tanstack related articles for two-attacks post
 const PACKAGE_ARTICLES = {
   // npm packages with dedicated articles
+  "node-ipc": { slug: "two-attacks-one-week", title: "node-ipc Had a 69 Trust Score Before It Got Hacked. TanStack Had 91." },
   "hono": { slug: "hono-critical", title: "Hono Has 35M Weekly Downloads and One npm Publisher" },
   "axios": { slug: "the-axios-signal", title: "Why I Think axios Is the Next Supply Chain Attack Target" },
   "chalk": { slug: "invisible-critical-packages", title: "The Critical Packages Hiding in Your Lock File" },
