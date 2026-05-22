@@ -295,6 +295,32 @@ console.log(data.score); // 0–100 trust score</code></pre>
                 noteEl.textContent = 'Copy this key and use it in your requests as: Authorization: Bearer ' + data.key;
               }
             }
+
+            // Enhance upgrade buttons with email pre-fill so Stripe checkout
+            // doesn't ask the user to re-type the email they just gave us.
+            // Critical for webhook binding: checkout.session.completed uses
+            // session.customer_details.email to provision the paid key — if
+            // the user pays with a different email than they signed up with,
+            // the upgrade orphans the free key and creates a new paid key
+            // under a different identity. Pre-fill keeps both keys under one
+            // email, and matches the worker's /api/checkout?email= prefill
+            // path (worker.ts L5260).
+            const emailEnc = encodeURIComponent(email);
+            document.querySelectorAll<HTMLAnchorElement>('.upgrade-btn').forEach((btn) => {
+              const href = btn.getAttribute('href') ?? '';
+              if (href.includes('/api/checkout')) {
+                try {
+                  const url = new URL(href);
+                  url.searchParams.set('email', email);
+                  btn.setAttribute('href', url.toString());
+                } catch {
+                  // If URL parsing fails, fall back to naive append — don't
+                  // break the click target on edge cases.
+                  const sep = href.includes('?') ? '&' : '?';
+                  btn.setAttribute('href', href + sep + 'email=' + emailEnc);
+                }
+              }
+            });
           } else {
             const data = await res.json() as any;
             const msg = data?.error ?? data?.message ?? `Error ${res.status} — please try again.`;
