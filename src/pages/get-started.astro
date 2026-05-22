@@ -1,0 +1,777 @@
+---
+import Layout from '../layouts/Layout.astro';
+---
+
+<Layout
+  title="Get your API key — Commit"
+  description="Get a free Commit API key. 200 requests/day. No credit card required. Start auditing your supply chain in minutes."
+  canonical="https://getcommit.dev/get-started"
+>
+  <!-- Nav -->
+  <nav>
+    <div class="container nav-inner">
+      <a href="/" class="nav-brand">Commit</a>
+      <ul class="nav-links">
+        <li><a href="/#mcp">MCP</a></li>
+        <li><a href="/audit">Audit</a></li>
+        <li><a href="/watchlist">Watchlist</a></li>
+        <li><a href="/extension">Extension</a></li>
+        <li><a href="/blog">Writing</a></li>
+        <li><a href="/pricing">Pricing</a></li><li><a href="/docs">Docs</a></li>
+        <li><a href="https://github.com/piiiico/proof-of-commitment" target="_blank" rel="noopener">GitHub</a></li>
+        <li><a href="mailto:pico@amdal.dev">Contact</a></li>
+      </ul>
+    </div>
+  </nav>
+
+  <!-- Hero -->
+  <section class="gs-hero">
+    <div class="container">
+      <div class="editorial" style="max-width: var(--max-content); margin: 0 auto;">
+        <span class="hero-eyebrow">Get Started</span>
+        <h1 class="gs-title">Get your API key</h1>
+        <p class="gs-lead">
+          Free tier: 200 requests/day. No credit card required.<br />
+          Your key arrives by email — ready in under a minute.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <hr class="section-divider" />
+
+  <!-- Key request form -->
+  <section class="gs-form-section">
+    <div class="container">
+      <div class="gs-form-card reveal">
+        <div id="gs-form-view">
+          <h2 class="gs-form-heading">Start building with Commit</h2>
+          <p class="gs-form-sub">Enter your email and we'll send your API key instantly.</p>
+          <form id="gs-form" class="gs-form" novalidate>
+            <div class="gs-input-row">
+              <input
+                id="gs-email"
+                type="email"
+                name="email"
+                placeholder="you@company.com"
+                autocomplete="email"
+                required
+                class="gs-input"
+              />
+              <button type="submit" id="gs-btn" class="gs-submit">Get API Key →</button>
+            </div>
+            <p id="gs-error" class="gs-feedback gs-error" hidden></p>
+          </form>
+          <p class="gs-privacy">
+            We only use your email to deliver your API key.
+            No newsletter, no spam. See <a href="/privacy">privacy policy</a>.
+          </p>
+        </div>
+
+        <div id="gs-success-view" hidden>
+          <div class="gs-success-icon">✓</div>
+          <h2 class="gs-success-heading" id="gs-success-title">Check your email</h2>
+          <p class="gs-success-body" id="gs-success-body-text">
+            Your API key is on its way to <strong id="gs-success-email"></strong>.
+            It should arrive within a minute.
+          </p>
+          <div id="gs-key-display" hidden style="margin: 1rem 0; padding: 1rem; background: var(--bg-muted, #f5f5f5); border-radius: 8px; font-family: monospace; word-break: break-all; font-size: 0.95rem; border: 1px solid var(--border-light, #e0e0e0);"></div>
+          <p class="gs-success-note" id="gs-success-note">
+            Didn't get it? Check spam or <a href="mailto:pico@amdal.dev">contact us</a>.
+          </p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <hr class="section-divider" />
+
+  <!-- Quick-start -->
+  <section class="qs-section">
+    <div class="container">
+      <div class="editorial reveal" style="max-width: var(--max-content); margin: 0 auto;">
+        <span class="section-label">Quick start</span>
+        <h2 class="section-heading">Start in 60 seconds</h2>
+        <p class="qs-intro">
+          Once you have your key, authenticate every request with the
+          <code>Authorization</code> header.
+        </p>
+
+        <!-- cURL -->
+        <div class="qs-block">
+          <div class="qs-block-header">
+            <span class="qs-lang">curl</span>
+          </div>
+          <pre class="qs-code"><code>curl https://poc-backend.amdal-dev.workers.dev/api/audit \
+  -H "Authorization: Bearer sk_commit_YOUR_KEY_HERE" \
+  -H "Content-Type: application/json" \
+  -d '&#123;"name": "axios", "registry": "npm"&#125;'</code></pre>
+        </div>
+
+        <!-- npm / Node.js -->
+        <div class="qs-block">
+          <div class="qs-block-header">
+            <span class="qs-lang">Node.js</span>
+          </div>
+          <pre class="qs-code"><code>const res = await fetch(
+  'https://poc-backend.amdal-dev.workers.dev/api/audit',
+  &#123;
+    method: 'POST',
+    headers: &#123;
+      'Authorization': 'Bearer sk_commit_YOUR_KEY_HERE',
+      'Content-Type': 'application/json',
+    &#125;,
+    body: JSON.stringify(&#123; name: 'axios', registry: 'npm' &#125;),
+  &#125;
+);
+const data = await res.json();
+console.log(data.score); // 0–100 trust score</code></pre>
+        </div>
+
+        <!-- GitHub Action -->
+        <div class="qs-block">
+          <div class="qs-block-header">
+            <span class="qs-lang">GitHub Action</span>
+          </div>
+          <pre class="qs-code"><code>- name: Commit supply chain audit
+  uses: actions/github-script@v7
+  env:
+    COMMIT_API_KEY: $&#123;&#123; secrets.COMMIT_API_KEY &#125;&#125;
+  with:
+    script: |
+      const res = await fetch('https://poc-backend.amdal-dev.workers.dev/api/audit', &#123;
+        method: 'POST',
+        headers: &#123;
+          'Authorization': `Bearer $&#123;process.env.COMMIT_API_KEY&#125;`,
+          'Content-Type': 'application/json',
+        &#125;,
+        body: JSON.stringify(&#123; name: 'lodash', registry: 'npm' &#125;),
+      &#125;);
+      const &#123; score &#125; = await res.json();
+      if (score &lt; 40) core.setFailed(`Low trust score: $&#123;score&#125;`);</code></pre>
+        </div>
+
+        <p class="qs-hint">
+          Add <code>COMMIT_API_KEY</code> to your GitHub repository secrets under
+          <strong>Settings → Secrets and variables → Actions</strong>.
+          The free key gets 200 requests/day — enough for CI on most projects.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <hr class="section-divider" />
+
+  <!-- Upgrade nudge -->
+  <section class="upgrade-section">
+    <div class="container">
+      <div class="upgrade-card reveal">
+        <div class="upgrade-text">
+          <h2 class="upgrade-heading">Want more?</h2>
+          <p class="upgrade-body">
+            Pro gives you 10,000 requests/month, batch API (up to 20 packages per call),
+            dependency monitoring for 10 projects, and alert webhooks for $29/mo.
+          </p>
+        </div>
+        <div class="upgrade-action">
+          <a href="https://poc-backend.amdal-dev.workers.dev/api/checkout?tier=pro" class="upgrade-btn">Upgrade to Pro — $29/mo →</a>
+          <a href="https://poc-backend.amdal-dev.workers.dev/api/checkout?tier=developer" class="upgrade-btn" style="margin-top: 0.5rem; background: transparent; border: 1px solid var(--border); color: var(--ink);">Or Developer — $15/mo →</a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <hr class="section-divider" />
+
+  <!-- Dashboard link -->
+  <section class="dashboard-section">
+    <div class="container">
+      <div class="editorial reveal" style="max-width: var(--max-content); margin: 0 auto; text-align: center;">
+        <h2 class="dash-heading">Track your usage</h2>
+        <p class="dash-text">
+          Have your key? Visit the dashboard to see requests used, your daily limit, and reset time.
+        </p>
+        <a href="/dashboard" class="btn-secondary">Open Dashboard →</a>
+      </div>
+    </div>
+  </section>
+
+  <footer>
+    <div class="container footer-inner">
+      <span class="footer-brand">Commit</span>
+      <span class="footer-copy">Behavioral trust for the software supply chain.</span>
+      <nav class="footer-links">
+        <a href="/audit">Audit</a>
+        <a href="/watchlist">Watchlist</a>
+        <a href="/pricing">Pricing</a>
+        <a href="/blog">Writing</a>
+        <a href="mailto:pico@amdal.dev">Contact</a>
+      </nav>
+    </div>
+  </footer>
+
+  <script>
+    const form = document.getElementById('gs-form') as HTMLFormElement | null;
+    if (form) {
+      form.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const emailInput = document.getElementById('gs-email') as HTMLInputElement;
+        const submitBtn = document.getElementById('gs-btn') as HTMLButtonElement;
+        const errorMsg = document.getElementById('gs-error') as HTMLParagraphElement;
+        const email = emailInput.value.trim();
+
+        if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+          errorMsg.textContent = 'Please enter a valid email address.';
+          errorMsg.hidden = false;
+          return;
+        }
+
+        submitBtn.disabled = true;
+        submitBtn.textContent = 'Sending…';
+        errorMsg.hidden = true;
+
+        // Funnel attribution: map URL ?ref=… to backend `source`.
+        // Backend whitelist (worker.ts /api/keys/create): web | cli | api | mcp-soft-cta | audit-cli-429.
+        // Unknown refs are dropped so the backend records the default (web) — no
+        // silent garbage in api_keys.source.
+        const REF_TO_SOURCE: Record<string, string> = {
+          'mcp-cli': 'mcp-soft-cta',       // soft-CTA from MCP server (worker.ts MCP_SIGNUP_URL)
+          'cli': 'cli',                     // inline CLI signup
+          'audit-cli': 'cli',               // audit soft-CTA (worker.ts AUDIT_SIGNUP_URL)
+          'audit-cli-429': 'audit-cli-429', // CLI 429 rescue (npm-package v1.17.0 + worker.ts hard-limit branch)
+          'audit-web': 'audit-web',         // web /audit page post-result CTA (replaced dead waitlist 2026-05-22)
+        };
+        const params = new URLSearchParams(window.location.search);
+        const refParam = params.get('ref') ?? '';
+        const utmSource = params.get('utm_source') ?? '';
+        // utm_source=cli comes from v1.14.0 static help-line CTA — map it the same way
+        const UTM_TO_SOURCE: Record<string, string> = {
+          'cli': 'cli',
+        };
+        const source = REF_TO_SOURCE[refParam] ?? UTM_TO_SOURCE[utmSource];
+
+        try {
+          const body: { email: string; source?: string } = { email };
+          if (source) body.source = source;
+          const res = await fetch('https://poc-backend.amdal-dev.workers.dev/api/keys/create', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(body),
+          });
+
+          if (res.ok || res.status === 201) {
+            const data = await res.json() as any;
+            // Show success view
+            const formView = document.getElementById('gs-form-view') as HTMLElement;
+            const successView = document.getElementById('gs-success-view') as HTMLElement;
+            const successEmail = document.getElementById('gs-success-email') as HTMLElement;
+            formView.hidden = true;
+            successView.hidden = false;
+            successEmail.textContent = email;
+
+            // If the API returned the key directly (email unavailable), show it
+            if (data?.key) {
+              const titleEl = document.getElementById('gs-success-title') as HTMLElement;
+              const bodyEl = document.getElementById('gs-success-body-text') as HTMLElement;
+              const keyDisplay = document.getElementById('gs-key-display') as HTMLElement;
+              const noteEl = document.getElementById('gs-success-note') as HTMLElement;
+              titleEl.textContent = 'Your API key';
+              bodyEl.innerHTML = '<strong>Save this key now</strong> — it won\'t be shown again.';
+              keyDisplay.textContent = data.key;
+              keyDisplay.hidden = false;
+              // Source-specific next step. CLI sources just hit the 429 wall (or the
+              // help-line static CTA) — they're in a terminal and need to re-run the
+              // command. Showing them an `Authorization: Bearer` REST snippet adds
+              // friction (they have to translate it back to CLI usage). Web/API users
+              // get the standard REST instruction.
+              const CLI_SOURCES = new Set(['audit-cli-429', 'cli']);
+              if (source && CLI_SOURCES.has(source)) {
+                noteEl.innerHTML =
+                  'Run this in the same terminal to re-try with your key:<br>' +
+                  '<code style="display:inline-block;margin-top:0.4rem;padding:0.3rem 0.5rem;background:var(--bg-muted,#f5f5f5);border-radius:4px;font-size:0.85rem;">' +
+                  'export COMMIT_API_KEY=' + data.key +
+                  '</code>';
+              } else {
+                noteEl.textContent = 'Copy this key and use it in your requests as: Authorization: Bearer ' + data.key;
+              }
+            }
+          } else {
+            const data = await res.json() as any;
+            const msg = data?.error ?? data?.message ?? `Error ${res.status} — please try again.`;
+            throw new Error(msg);
+          }
+        } catch (err) {
+          errorMsg.textContent = err instanceof Error ? err.message : 'Something went wrong. Please try again.';
+          errorMsg.hidden = false;
+          submitBtn.disabled = false;
+          submitBtn.textContent = 'Get API Key →';
+        }
+      });
+    }
+  </script>
+
+  <style>
+    /* ── Nav ── */
+    nav {
+      border-bottom: 1px solid var(--border-light);
+      padding: 1rem 0;
+    }
+
+    .nav-inner {
+      display: flex;
+      align-items: center;
+      gap: 2rem;
+    }
+
+    .nav-brand {
+      font-family: var(--font-display);
+      font-size: 1.125rem;
+      color: var(--ink);
+      text-decoration: none;
+      letter-spacing: 0.05em;
+      flex-shrink: 0;
+    }
+
+    .nav-links {
+      display: flex;
+      list-style: none;
+      padding: 0;
+      margin: 0 0 0 auto;
+      gap: 2rem;
+    }
+
+    .nav-links a {
+      font-size: 0.875rem;
+      color: var(--ink-subtle);
+      text-decoration: none;
+      transition: color 0.15s;
+    }
+
+    .nav-links a:hover { color: var(--ink); }
+
+    /* ── Hero ── */
+    .gs-hero {
+      padding: 6rem 0 3rem;
+      background: var(--paper);
+    }
+
+    .hero-eyebrow {
+      display: inline-block;
+      font-size: 0.75rem;
+      font-weight: 500;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--accent);
+      margin-bottom: 1rem;
+    }
+
+    .gs-title {
+      font-family: var(--font-display);
+      font-size: clamp(2.2rem, 5vw, 3.5rem);
+      line-height: 1.12;
+      color: var(--ink);
+      margin: 1rem 0 1.5rem;
+      letter-spacing: -0.01em;
+    }
+
+    .gs-lead {
+      font-size: 1.05rem;
+      line-height: 1.7;
+      color: var(--ink-muted);
+    }
+
+    /* ── Form card ── */
+    .gs-form-section {
+      padding: 4rem 0;
+      background: var(--paper-dim);
+    }
+
+    .gs-form-card {
+      background: var(--paper);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 2.5rem;
+      max-width: 36rem;
+      margin: 0 auto;
+    }
+
+    .gs-form-heading {
+      font-family: var(--font-display);
+      font-size: 1.4rem;
+      color: var(--ink);
+      margin-bottom: 0.4rem;
+    }
+
+    .gs-form-sub {
+      font-size: 0.9rem;
+      color: var(--ink-muted);
+      margin-bottom: 1.5rem;
+    }
+
+    .gs-form { width: 100%; }
+
+    .gs-input-row {
+      display: flex;
+      gap: 0.5rem;
+      flex-wrap: wrap;
+    }
+
+    .gs-input {
+      flex: 1;
+      min-width: 0;
+      padding: 0.8rem 1rem;
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      font-family: inherit;
+      font-size: 0.9rem;
+      color: var(--ink);
+      background: var(--paper);
+      outline: none;
+      transition: border-color 0.15s;
+    }
+
+    .gs-input:focus { border-color: var(--accent); }
+
+    .gs-submit {
+      padding: 0.8rem 1.5rem;
+      background: var(--accent);
+      color: white;
+      border: none;
+      border-radius: 4px;
+      font-family: inherit;
+      font-size: 0.875rem;
+      font-weight: 500;
+      cursor: pointer;
+      white-space: nowrap;
+      transition: background 0.15s;
+    }
+
+    .gs-submit:hover { background: var(--accent-dim); }
+    .gs-submit:disabled { opacity: 0.65; cursor: default; }
+
+    .gs-feedback {
+      margin: 0.75rem 0 0;
+      font-size: 0.875rem;
+      line-height: 1.5;
+    }
+
+    .gs-error { color: var(--accent); }
+
+    .gs-privacy {
+      margin-top: 1rem;
+      font-size: 0.8rem;
+      color: var(--ink-subtle);
+      line-height: 1.5;
+    }
+
+    .gs-privacy a {
+      color: var(--ink-subtle);
+      text-decoration: underline;
+    }
+
+    /* ── Success state ── */
+    .gs-success-icon {
+      width: 3rem;
+      height: 3rem;
+      background: #dcfce7;
+      color: #166534;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.25rem;
+      font-weight: 600;
+      margin-bottom: 1.25rem;
+    }
+
+    .gs-success-heading {
+      font-family: var(--font-display);
+      font-size: 1.4rem;
+      color: var(--ink);
+      margin-bottom: 0.5rem;
+    }
+
+    .gs-success-body {
+      font-size: 1rem;
+      color: var(--ink-muted);
+      line-height: 1.65;
+      margin-bottom: 0.75rem;
+    }
+
+    .gs-success-body strong { color: var(--ink); }
+
+    .gs-success-note {
+      font-size: 0.85rem;
+      color: var(--ink-subtle);
+    }
+
+    .gs-success-note a {
+      color: var(--ink-subtle);
+      text-decoration: underline;
+    }
+
+    /* ── Quick-start ── */
+    .qs-section {
+      padding: 5rem 0;
+      background: var(--paper);
+    }
+
+    .section-label {
+      display: block;
+      font-size: 0.6875rem;
+      font-weight: 500;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--ink-subtle);
+      margin-bottom: 1rem;
+    }
+
+    .section-heading {
+      font-family: var(--font-display);
+      font-size: clamp(1.5rem, 3.5vw, 2.2rem);
+      color: var(--ink);
+      margin-bottom: 1rem;
+      line-height: 1.2;
+      letter-spacing: -0.01em;
+    }
+
+    .qs-intro {
+      font-size: 1rem;
+      color: var(--ink-muted);
+      line-height: 1.7;
+      margin-bottom: 2rem;
+    }
+
+    .qs-intro code {
+      font-family: var(--font-mono);
+      font-size: 0.85em;
+      background: var(--surface);
+      padding: 0.1rem 0.35rem;
+      border-radius: 3px;
+      color: var(--ink);
+    }
+
+    .qs-block {
+      margin-bottom: 1.75rem;
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      overflow: hidden;
+    }
+
+    .qs-block-header {
+      background: var(--paper-dim);
+      padding: 0.5rem 1rem;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .qs-lang {
+      font-family: var(--font-mono);
+      font-size: 0.75rem;
+      color: var(--ink-subtle);
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+    }
+
+    .qs-code {
+      margin: 0;
+      padding: 1.25rem 1.25rem;
+      background: var(--paper);
+      overflow-x: auto;
+      font-family: var(--font-mono);
+      font-size: 0.82rem;
+      line-height: 1.65;
+      color: var(--ink-muted);
+    }
+
+    .qs-code code {
+      font-family: inherit;
+      color: inherit;
+    }
+
+    .qs-hint {
+      font-size: 0.875rem;
+      color: var(--ink-muted);
+      line-height: 1.65;
+    }
+
+    .qs-hint code {
+      font-family: var(--font-mono);
+      font-size: 0.85em;
+      background: var(--surface);
+      padding: 0.1rem 0.35rem;
+      border-radius: 3px;
+      color: var(--ink);
+    }
+
+    .qs-hint strong { color: var(--ink); font-weight: 500; }
+
+    /* ── Upgrade ── */
+    .upgrade-section {
+      padding: 4rem 0;
+      background: var(--paper-dim);
+    }
+
+    .upgrade-card {
+      background: var(--paper);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 2.5rem;
+      max-width: 56rem;
+      margin: 0 auto;
+      display: flex;
+      align-items: flex-start;
+      gap: 2.5rem;
+    }
+
+    @media (max-width: 700px) {
+      .upgrade-card {
+        flex-direction: column;
+        gap: 1.5rem;
+      }
+    }
+
+    .upgrade-text { flex: 1; }
+
+    .upgrade-heading {
+      font-family: var(--font-display);
+      font-size: 1.35rem;
+      color: var(--ink);
+      margin-bottom: 0.5rem;
+    }
+
+    .upgrade-body {
+      font-size: 0.9rem;
+      color: var(--ink-muted);
+      line-height: 1.65;
+      margin: 0;
+    }
+
+    .upgrade-action {
+      flex: 0 0 auto;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .upgrade-btn {
+      padding: 0.8rem 1.5rem;
+      background: var(--accent);
+      color: white;
+      text-decoration: none;
+      border-radius: 4px;
+      font-weight: 500;
+      font-size: 0.9rem;
+      white-space: nowrap;
+      transition: background 0.15s;
+    }
+
+    .upgrade-btn:hover { background: var(--accent-dim); }
+
+    .upgrade-sub {
+      font-size: 0.78rem;
+      color: var(--ink-subtle);
+      text-align: center;
+      max-width: 14rem;
+      line-height: 1.4;
+    }
+
+    /* ── Dashboard link ── */
+    .dashboard-section {
+      padding: 4rem 0;
+      background: var(--paper);
+    }
+
+    .dash-heading {
+      font-family: var(--font-display);
+      font-size: 1.6rem;
+      color: var(--ink);
+      margin-bottom: 0.75rem;
+    }
+
+    .dash-text {
+      font-size: 0.95rem;
+      color: var(--ink-muted);
+      line-height: 1.65;
+      margin-bottom: 1.5rem;
+    }
+
+    .btn-secondary {
+      display: inline-block;
+      padding: 0.8rem 1.75rem;
+      background: transparent;
+      color: var(--ink);
+      text-decoration: none;
+      border-radius: 4px;
+      font-weight: 500;
+      font-size: 0.9rem;
+      border: 1px solid var(--border);
+      transition: border-color 0.15s;
+    }
+
+    .btn-secondary:hover { border-color: var(--ink-subtle); }
+
+    /* ── Footer ── */
+    footer {
+      border-top: 1px solid var(--border-light);
+    }
+
+    .footer-inner {
+      display: flex;
+      align-items: center;
+      gap: 1.5rem;
+      padding: 2rem 0;
+      flex-wrap: wrap;
+    }
+
+    .footer-brand {
+      font-family: var(--font-display);
+      font-size: 1.1rem;
+      color: var(--ink);
+    }
+
+    .footer-copy {
+      font-size: 0.85rem;
+      color: var(--ink-subtle);
+      flex: 1;
+    }
+
+    .footer-links {
+      display: flex;
+      gap: 1.25rem;
+    }
+
+    .footer-links a {
+      font-size: 0.85rem;
+      color: var(--ink-muted);
+      text-decoration: none;
+    }
+
+    .footer-links a:hover { color: var(--ink); }
+
+    /* ── Divider ── */
+    .section-divider {
+      border: none;
+      border-top: 1px solid var(--border-light);
+      margin: 0;
+    }
+
+    /* ── Container ── */
+    .container {
+      max-width: var(--max-page);
+      margin: 0 auto;
+      padding: 0 1.5rem;
+    }
+
+    /* ── Mobile ── */
+    @media (max-width: 640px) {
+      .gs-hero { padding: 4rem 0 2.5rem; }
+      .qs-section { padding: 3rem 0; }
+      .upgrade-section { padding: 3rem 0; }
+      .dashboard-section { padding: 3rem 0; }
+      .nav-links { display: none; }
+      .gs-input-row { flex-direction: column; }
+      .gs-submit { width: 100%; }
+    }
+  </style>
+</Layout>
