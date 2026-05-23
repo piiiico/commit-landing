@@ -1,0 +1,824 @@
+---
+import Layout from '../layouts/Layout.astro';
+---
+
+<Layout
+  title="Quickstart — Commit Supply Chain Audit"
+  description="Audit your npm dependencies for supply chain risk in 30 seconds. Zero install. See which packages are CRITICAL before the next attack."
+  canonical="https://getcommit.dev/quickstart/"
+>
+  <!-- Nav -->
+  <nav>
+    <div class="container nav-inner">
+      <a href="/" class="nav-brand">Commit</a>
+      <ul class="nav-links">
+        <li><a href="/#mcp">MCP</a></li>
+        <li><a href="/audit">Audit</a></li>
+        <li><a href="/watchlist">Watchlist</a></li>
+        <li><a href="/pricing">Pricing</a></li><li><a href="/docs">Docs</a></li>
+        <li><a href="/blog">Writing</a></li>
+        <li><a href="https://github.com/piiiico/proof-of-commitment" target="_blank" rel="noopener">GitHub</a></li>
+        <li><a href="mailto:pico@amdal.dev">Contact</a></li>
+      </ul>
+    </div>
+  </nav>
+
+  <!-- Header -->
+  <section class="qs-header">
+    <div class="container">
+      <div class="editorial" style="max-width: var(--max-content); margin: 0 auto;">
+        <div class="qs-badge">Quickstart · 5 minutes</div>
+        <h1 class="qs-title">From zero to <em>risk report</em></h1>
+        <p class="qs-lead">
+          Proof of Commitment audits your npm and PyPI dependencies for supply chain risk —
+          the exact attack profile that preceded ua-parser-js (October 2021) and event-stream (2018).
+          Both were CRITICAL by these metrics <em>before</em> the attacks.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <hr class="section-divider" />
+
+  <!-- Step 1: Install & Run -->
+  <section class="qs-section">
+    <div class="container">
+      <div class="editorial" style="max-width: var(--max-content); margin: 0 auto;">
+        <span class="qs-section-number">01</span>
+        <h2 class="qs-section-title">Run it now</h2>
+        <p class="qs-intro">
+          Zero install. One command. Results in seconds.
+        </p>
+
+        <div class="snippet-group">
+          <div class="snippet-tab-row">
+            <button class="snippet-tab active" data-group="install" data-lang="named">Named packages</button>
+            <button class="snippet-tab" data-group="install" data-lang="file">Your package.json</button>
+            <button class="snippet-tab" data-group="install" data-lang="lockfile">Lock file (all deps)</button>
+            <button class="snippet-tab" data-group="install" data-lang="pypi">PyPI</button>
+          </div>
+
+          <div class="snippet-block" data-group="install" data-lang="named">
+            <pre><code><span class="c-comment"># Audit specific packages</span>
+npx proof-of-commitment axios zod chalk</code></pre>
+          </div>
+
+          <div class="snippet-block hidden" data-group="install" data-lang="file">
+            <pre><code><span class="c-comment"># Scan your project's direct dependencies</span>
+npx proof-of-commitment --file package.json</code></pre>
+          </div>
+
+          <div class="snippet-block hidden" data-group="install" data-lang="lockfile">
+            <pre><code><span class="c-comment"># Scan ALL transitive dependencies via lock file</span>
+npx proof-of-commitment --file package-lock.json   <span class="c-comment"># npm</span>
+npx proof-of-commitment --file yarn.lock           <span class="c-comment"># yarn</span>
+npx proof-of-commitment --file pnpm-lock.yaml      <span class="c-comment"># pnpm</span></code></pre>
+          </div>
+
+          <div class="snippet-block hidden" data-group="install" data-lang="pypi">
+            <pre><code><span class="c-comment"># PyPI packages work too</span>
+npx proof-of-commitment --pypi litellm langchain requests</code></pre>
+          </div>
+        </div>
+
+        <p class="qs-note">
+          No global install. <code>npx</code> fetches and runs it once, cached for next time.
+          <strong>The web demo</strong> also works if you prefer a browser:
+          <a href="/audit">getcommit.dev/audit</a>
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <hr class="section-divider" />
+
+  <!-- Step 2: Reading the report -->
+  <section class="qs-section qs-section-alt">
+    <div class="container">
+      <div class="editorial" style="max-width: var(--max-content); margin: 0 auto;">
+        <span class="qs-section-number">02</span>
+        <h2 class="qs-section-title">Reading your report</h2>
+        <p class="qs-intro">
+          Each package is scored 0–100. Lower is higher risk. Four signals drive the score.
+        </p>
+
+        <div class="response-example">
+          <span class="response-label">Example output</span>
+          <pre><code>┌─────────────────────────────────────────────────────────────────┐
+│  Supply Chain Audit — 3 packages                                │
+├──────────┬──────────┬───────┬─────────────┬──────────┬─────────┤
+│ Package  │ Risk     │ Score │ Maintainers │ Dls/week │ Age     │
+├──────────┼──────────┼───────┼─────────────┼──────────┼─────────┤
+│ axios    │ CRITICAL │  86   │ 1           │ 100M     │ 11.6y   │
+│ zod      │ CRITICAL │  83   │ 1           │ 159M     │  6.1y   │
+│ chalk    │ CRITICAL │  75   │ 1           │ 411M     │ 12.7y   │
+└──────────┴──────────┴───────┴─────────────┴──────────┴─────────┘
+
+⚠  3 CRITICAL packages found
+   Single maintainer + >10M weekly downloads = the ua-parser-js attack profile</code></pre>
+        </div>
+
+        <div class="score-signals">
+          <h3 class="signals-heading">What the score measures</h3>
+          <div class="signals-grid">
+            <div class="signal-card">
+              <span class="signal-name">Longevity</span>
+              <span class="signal-weight">0–25 pts</span>
+              <p class="signal-desc">How long has the package existed? Abandoned packages get reactivated for attacks.</p>
+            </div>
+            <div class="signal-card">
+              <span class="signal-name">Maintainer depth</span>
+              <span class="signal-weight">0–15 pts</span>
+              <p class="signal-desc">Single maintainer + millions of weekly downloads = the ua-parser-js/event-stream attack surface.</p>
+            </div>
+            <div class="signal-card">
+              <span class="signal-name">Release consistency</span>
+              <span class="signal-weight">0–20 pts</span>
+              <p class="signal-desc">Regular releases signal active oversight. Long gaps = vulnerability accumulation.</p>
+            </div>
+            <div class="signal-card">
+              <span class="signal-name">Download trend</span>
+              <span class="signal-weight">0–25 pts</span>
+              <p class="signal-desc">Growing packages attract more scrutiny and attacks. Rapid adoption + single maintainer = high risk.</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="risk-flags">
+          <h3 class="signals-heading">Risk flags</h3>
+          <div class="flag-list">
+            <div class="flag-row">
+              <span class="flag-badge flag-critical">CRITICAL</span>
+              <span class="flag-desc">Single maintainer + &gt;10M weekly downloads — the exact profile that preceded the ua-parser-js and event-stream attacks.</span>
+            </div>
+            <div class="flag-row">
+              <span class="flag-badge flag-high">HIGH</span>
+              <span class="flag-desc">Single maintainer + &gt;1M downloads, or package &lt;1 year old with rapid adoption.</span>
+            </div>
+            <div class="flag-row">
+              <span class="flag-badge flag-warn">WARN</span>
+              <span class="flag-desc">No release in 12+ months — vulnerability window is open.</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <hr class="section-divider" />
+
+  <!-- Step 3: CI Integration -->
+  <section class="qs-section">
+    <div class="container">
+      <div class="editorial" style="max-width: var(--max-content); margin: 0 auto;">
+        <span class="qs-section-number">03</span>
+        <h2 class="qs-section-title">Add to CI</h2>
+        <p class="qs-intro">
+          One workflow file. Auto-detects your dependencies. Posts the audit table as a
+          PR comment — updated on re-run, no comment spam.
+        </p>
+
+        <div class="snippet-group">
+          <div class="snippet-tab-row">
+            <button class="snippet-tab active" data-group="ci" data-lang="yaml">.github/workflows/audit.yml</button>
+          </div>
+          <div class="snippet-block" data-group="ci" data-lang="yaml">
+            <pre><code>name: Supply Chain Audit
+
+on:
+  push:
+    branches: [main]
+    paths: [package.json, requirements.txt]
+  pull_request:
+    paths: [package.json, requirements.txt]
+
+jobs:
+  audit:
+    runs-on: ubuntu-latest
+    permissions:
+      pull-requests: write   <span class="c-comment"># needed for PR comments</span>
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Commit Supply Chain Audit
+        uses: piiiico/proof-of-commitment@main
+        with:
+          fail-on-critical: false   <span class="c-comment"># set true to block merges on CRITICAL</span>
+          comment-on-pr: true       <span class="c-comment"># posts audit table on the PR, updates on re-run</span></code></pre>
+          </div>
+        </div>
+
+        <div class="ci-outputs">
+          <h3 class="signals-heading">What you get</h3>
+          <ul class="output-list">
+            <li>PR comment with the full audit table — auto-updated on re-run</li>
+            <li>GitHub Step Summary with risk breakdown</li>
+            <li>Output variables: <code>has-critical</code>, <code>critical-count</code>, <code>audit-summary</code></li>
+            <li>Optional: <code>fail-on-critical: true</code> blocks merges when CRITICAL packages are found</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <hr class="section-divider" />
+
+  <!-- Step 4: MCP Integration -->
+  <section class="qs-section qs-section-alt">
+    <div class="container">
+      <div class="editorial" style="max-width: var(--max-content); margin: 0 auto;">
+        <span class="qs-section-number">04</span>
+        <h2 class="qs-section-title">Use with Claude, Cursor, or Windsurf</h2>
+        <p class="qs-intro">
+          The MCP server lets your AI assistant audit dependencies on demand — no install,
+          no API key. Add it once to your MCP config, then ask naturally.
+        </p>
+
+        <div class="mcp-config-block">
+          <span class="response-label">Claude Desktop / Cursor / Windsurf config</span>
+          <pre class="mcp-config-pre"><code>&#123;
+  "mcpServers": &#123;
+    "proof-of-commitment": &#123;
+      "type": "streamable-http",
+      "url": "https://poc-backend.amdal-dev.workers.dev/mcp"
+    &#125;
+  &#125;
+&#125;</code></pre>
+        </div>
+
+        <div class="mcp-examples">
+          <h3 class="signals-heading">Then ask:</h3>
+          <div class="mcp-prompt-list">
+            <div class="mcp-prompt">"Audit my package.json for supply chain risk"</div>
+            <div class="mcp-prompt">"Which of axios, zod, chalk is highest risk?"</div>
+            <div class="mcp-prompt">"Is vercel/ai actively maintained?"</div>
+          </div>
+        </div>
+
+        <p class="qs-note mcp-note-bottom">
+          12 MCP tools — dependency auditing (npm, PyPI, Cargo, Go), GitHub repo scoring,
+          dependency-tree graph analysis, and Norwegian business registry.
+          Free anonymous tier is rate-limited to 100 calls/day per IP.
+          <a href="/get-started?ref=mcp-quickstart">Get a free API key</a> to lift the wall,
+          or <a href="/pricing">upgrade to Developer/Pro</a> for batch tools and team monitoring.
+          <a href="/docs">Full reference →</a>
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <hr class="section-divider" />
+
+  <!-- CTA -->
+  <section class="cta-section">
+    <div class="container">
+      <div class="editorial" style="max-width: var(--max-content); margin: 0 auto; text-align: center;">
+        <h2 class="cta-heading">Ready to go deeper?</h2>
+        <p class="cta-text" style="margin: 0 auto 2rem; max-width: 40ch;">
+          Full API reference, response schema, rate limits, and REST examples.
+        </p>
+        <div class="cta-buttons">
+          <a href="/audit" class="btn-primary">Try the web demo</a>
+          <a href="https://github.com/piiiico/proof-of-commitment" class="btn-ghost" target="_blank" rel="noopener">Full README on GitHub</a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <footer>
+    <div class="container footer-inner">
+      <span class="footer-brand">Commit</span>
+      <span class="footer-copy">Behavioral trust for the software supply chain.</span>
+      <nav class="footer-links">
+        <a href="/audit">Audit</a>
+        <a href="/watchlist">Watchlist</a>
+        <a href="/docs">Docs</a>
+        <a href="/blog">Writing</a>
+        <a href="mailto:pico@amdal.dev">Contact</a>
+      </nav>
+    </div>
+  </footer>
+
+  <script>
+    // Tab switching for code snippets
+    document.querySelectorAll('.snippet-tab').forEach((tab) => {
+      tab.addEventListener('click', () => {
+        const group = (tab as HTMLElement).dataset.group!;
+        const lang = (tab as HTMLElement).dataset.lang!;
+
+        document.querySelectorAll(`.snippet-tab[data-group="${group}"]`).forEach((t) => {
+          t.classList.remove('active');
+        });
+        document.querySelectorAll(`.snippet-block[data-group="${group}"]`).forEach((b) => {
+          b.classList.add('hidden');
+        });
+        tab.classList.add('active');
+        const block = document.querySelector(`.snippet-block[data-group="${group}"][data-lang="${lang}"]`);
+        block?.classList.remove('hidden');
+      });
+    });
+  </script>
+
+  <style>
+    /* ── Header ── */
+    .qs-header {
+      padding: 6rem 0 3rem;
+      background: var(--paper);
+    }
+
+    .qs-badge {
+      display: inline-block;
+      padding: 0.3rem 0.8rem;
+      background: var(--paper-dim);
+      border: 1px solid var(--border);
+      border-radius: 3px;
+      font-family: var(--font-mono);
+      font-size: 0.75rem;
+      font-weight: 500;
+      color: var(--ink-subtle);
+      letter-spacing: 0.04em;
+      margin-bottom: 1.5rem;
+    }
+
+    .qs-title {
+      font-family: var(--font-display);
+      font-size: clamp(2.2rem, 5vw, 3.5rem);
+      line-height: 1.12;
+      color: var(--ink);
+      margin-bottom: 1.5rem;
+    }
+
+    .qs-title em {
+      font-style: italic;
+      color: var(--accent);
+    }
+
+    .qs-lead {
+      font-size: 1.05rem;
+      line-height: 1.7;
+      color: var(--ink-muted);
+      max-width: 55ch;
+    }
+
+    /* ── Sections ── */
+    .qs-section {
+      padding: 4rem 0;
+      background: var(--paper);
+    }
+
+    .qs-section-alt {
+      background: var(--paper-dim);
+    }
+
+    .qs-section-number {
+      display: block;
+      font-family: var(--font-mono);
+      font-size: 0.75rem;
+      color: var(--accent);
+      letter-spacing: 0.08em;
+      margin-bottom: 0.5rem;
+    }
+
+    .qs-section-title {
+      font-family: var(--font-display);
+      font-size: clamp(1.5rem, 3vw, 2rem);
+      color: var(--ink);
+      margin-bottom: 1.5rem;
+    }
+
+    .qs-intro {
+      font-size: 0.95rem;
+      line-height: 1.7;
+      color: var(--ink-muted);
+      max-width: 55ch;
+      margin-bottom: 2rem;
+    }
+
+    .qs-note {
+      margin-top: 1.25rem;
+      font-size: 0.875rem;
+      color: var(--ink-muted);
+      line-height: 1.6;
+    }
+
+    .qs-note code {
+      font-family: var(--font-mono);
+      font-size: 0.85em;
+      background: var(--paper-dim);
+      padding: 0.1rem 0.35rem;
+      border-radius: 3px;
+      border: 1px solid var(--border);
+      color: var(--ink);
+    }
+
+    .qs-note a {
+      color: var(--accent);
+      text-decoration: none;
+    }
+
+    .qs-note a:hover { text-decoration: underline; }
+
+    /* ── Code snippets (reuse from docs) ── */
+    .snippet-group {
+      margin-bottom: 1.5rem;
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      overflow: hidden;
+    }
+
+    .snippet-tab-row {
+      display: flex;
+      background: var(--paper-dim);
+      border-bottom: 1px solid var(--border);
+      flex-wrap: wrap;
+    }
+
+    .qs-section-alt .snippet-tab-row {
+      background: var(--surface);
+    }
+
+    .snippet-tab {
+      padding: 0.5rem 1rem;
+      font-family: var(--font-mono);
+      font-size: 0.75rem;
+      font-weight: 500;
+      color: var(--ink-subtle);
+      background: transparent;
+      border: none;
+      cursor: pointer;
+      border-right: 1px solid var(--border-light);
+      transition: color 0.15s;
+    }
+
+    .snippet-tab:hover { color: var(--ink); }
+    .snippet-tab.active {
+      color: var(--ink);
+      background: var(--paper);
+      border-bottom: 2px solid var(--accent);
+      margin-bottom: -1px;
+    }
+
+    .qs-section-alt .snippet-tab.active {
+      background: var(--paper-dim);
+    }
+
+    .snippet-block {
+      background: var(--paper);
+      overflow-x: auto;
+    }
+
+    .qs-section-alt .snippet-block {
+      background: var(--paper-dim);
+    }
+
+    .snippet-block pre {
+      padding: 1.25rem;
+      margin: 0;
+    }
+
+    .snippet-block code {
+      font-family: var(--font-mono);
+      font-size: 0.8125rem;
+      line-height: 1.65;
+      color: var(--ink);
+      white-space: pre;
+    }
+
+    .hidden { display: none; }
+    .c-comment { color: var(--ink-subtle); font-style: italic; }
+
+    /* ── Response example ── */
+    .response-example {
+      margin-bottom: 2rem;
+    }
+
+    .response-label {
+      display: inline-block;
+      font-family: var(--font-mono);
+      font-size: 0.7rem;
+      font-weight: 500;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--ink-subtle);
+      margin-bottom: 0.4rem;
+    }
+
+    .response-example pre {
+      background: var(--paper);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      padding: 1.25rem;
+      overflow-x: auto;
+    }
+
+    .qs-section-alt .response-example pre {
+      background: var(--surface);
+    }
+
+    .response-example code {
+      font-family: var(--font-mono);
+      font-size: 0.8125rem;
+      line-height: 1.65;
+      color: var(--ink);
+      white-space: pre;
+    }
+
+    /* ── Score signals ── */
+    .score-signals {
+      margin-top: 2.5rem;
+    }
+
+    .signals-heading {
+      font-family: var(--font-mono);
+      font-size: 0.75rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--ink-subtle);
+      margin-bottom: 1rem;
+    }
+
+    .signals-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 0.75rem;
+      margin-bottom: 2rem;
+    }
+
+    @media (max-width: 640px) {
+      .signals-grid { grid-template-columns: 1fr; }
+    }
+
+    .signal-card {
+      padding: 1rem 1.25rem;
+      background: var(--paper);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+    }
+
+    .signal-name {
+      display: block;
+      font-family: var(--font-display);
+      font-size: 0.9rem;
+      font-weight: 600;
+      color: var(--ink);
+      margin-bottom: 0.15rem;
+    }
+
+    .signal-weight {
+      display: block;
+      font-family: var(--font-mono);
+      font-size: 0.7rem;
+      color: var(--accent);
+      margin-bottom: 0.5rem;
+    }
+
+    .signal-desc {
+      font-size: 0.85rem;
+      line-height: 1.55;
+      color: var(--ink-muted);
+      margin: 0;
+    }
+
+    /* ── Risk flags ── */
+    .risk-flags {
+      margin-top: 1.5rem;
+    }
+
+    .flag-list {
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+    }
+
+    .flag-row {
+      display: flex;
+      align-items: flex-start;
+      gap: 1rem;
+      padding: 0.75rem 1rem;
+      background: var(--paper);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+    }
+
+    .flag-badge {
+      display: inline-block;
+      flex-shrink: 0;
+      padding: 0.15rem 0.5rem;
+      border-radius: 3px;
+      font-family: var(--font-mono);
+      font-size: 0.7rem;
+      font-weight: 700;
+      letter-spacing: 0.04em;
+      margin-top: 0.1rem;
+    }
+
+    .flag-critical { background: #1a1a1a; color: #fff; }
+    .flag-high     { background: #fe7d37; color: #fff; }
+    .flag-warn     { background: #dfb317; color: #fff; }
+
+    .flag-desc {
+      font-size: 0.875rem;
+      line-height: 1.55;
+      color: var(--ink-muted);
+    }
+
+    /* ── CI Outputs ── */
+    .ci-outputs {
+      margin-top: 1.5rem;
+    }
+
+    .output-list {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+      display: flex;
+      flex-direction: column;
+      gap: 0.4rem;
+    }
+
+    .output-list li {
+      font-size: 0.9rem;
+      color: var(--ink-muted);
+      line-height: 1.55;
+      padding-left: 1.25rem;
+      position: relative;
+    }
+
+    .output-list li::before {
+      content: '→';
+      position: absolute;
+      left: 0;
+      color: var(--accent);
+      font-size: 0.85rem;
+    }
+
+    .output-list code {
+      font-family: var(--font-mono);
+      font-size: 0.82em;
+      background: var(--paper-dim);
+      padding: 0.1rem 0.35rem;
+      border-radius: 3px;
+      border: 1px solid var(--border);
+      color: var(--ink);
+    }
+
+    /* ── MCP ── */
+    .mcp-config-block {
+      margin-bottom: 1.5rem;
+    }
+
+    .mcp-config-pre {
+      background: var(--paper);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      padding: 1.25rem;
+      overflow-x: auto;
+      margin-top: 0.4rem;
+    }
+
+    .mcp-config-pre code {
+      font-family: var(--font-mono);
+      font-size: 0.8125rem;
+      line-height: 1.65;
+      color: var(--ink);
+      white-space: pre;
+    }
+
+    .mcp-examples {
+      margin-bottom: 1.5rem;
+    }
+
+    .mcp-prompt-list {
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+    }
+
+    .mcp-prompt {
+      display: inline-block;
+      padding: 0.6rem 1rem;
+      background: var(--paper);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      font-size: 0.9rem;
+      color: var(--ink-muted);
+      font-style: italic;
+    }
+
+    .mcp-prompt::before {
+      content: '"';
+      color: var(--accent);
+    }
+
+    .mcp-prompt::after {
+      content: '"';
+      color: var(--accent);
+    }
+
+    .mcp-note-bottom a {
+      color: var(--accent);
+      text-decoration: none;
+    }
+
+    .mcp-note-bottom a:hover { text-decoration: underline; }
+
+    /* ── CTA ── */
+    .cta-section {
+      padding: 5rem 0;
+      background: var(--paper);
+    }
+
+    .cta-heading {
+      font-family: var(--font-display);
+      font-size: 2rem;
+      color: var(--ink);
+      margin-bottom: 0.75rem;
+    }
+
+    .cta-text {
+      font-size: 1rem;
+      color: var(--ink-muted);
+      margin-bottom: 2rem;
+    }
+
+    .cta-buttons {
+      display: flex;
+      gap: 1rem;
+      justify-content: center;
+      flex-wrap: wrap;
+    }
+
+    .btn-primary {
+      display: inline-flex;
+      align-items: center;
+      padding: 0.75rem 1.5rem;
+      background: var(--accent);
+      color: #fff;
+      font-size: 0.9rem;
+      font-weight: 500;
+      border-radius: 4px;
+      text-decoration: none;
+      transition: background 0.2s;
+    }
+
+    .btn-primary:hover { background: var(--accent-dim); color: #fff; }
+
+    .btn-ghost {
+      display: inline-flex;
+      align-items: center;
+      padding: 0.75rem 1.5rem;
+      background: transparent;
+      border: 1px solid var(--border);
+      color: var(--ink-muted);
+      font-size: 0.9rem;
+      border-radius: 4px;
+      text-decoration: none;
+      transition: border-color 0.2s, color 0.2s;
+    }
+
+    .btn-ghost:hover { border-color: var(--ink); color: var(--ink); }
+
+    /* ── Footer ── */
+    .footer-inner {
+      display: flex;
+      align-items: center;
+      gap: 1.5rem;
+      padding: 2rem 0;
+      flex-wrap: wrap;
+      border-top: 1px solid var(--border);
+    }
+
+    .footer-brand {
+      font-family: var(--font-display);
+      font-size: 1.1rem;
+      color: var(--ink);
+    }
+
+    .footer-copy {
+      font-size: 0.85rem;
+      color: var(--ink-subtle);
+      flex: 1;
+    }
+
+    .footer-links {
+      display: flex;
+      gap: 1.25rem;
+    }
+
+    .footer-links a {
+      font-size: 0.85rem;
+      color: var(--ink-muted);
+      text-decoration: none;
+    }
+
+    .footer-links a:hover { color: var(--ink); }
+
+    /* ── Section divider ── */
+    .section-divider {
+      border: none;
+      border-top: 1px solid var(--border-light);
+      margin: 0;
+    }
+  </style>
+</Layout>
