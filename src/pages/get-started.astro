@@ -211,6 +211,50 @@ console.log(data.score); // 0–100 trust score</code></pre>
   </footer>
 
   <script>
+    // Copy adaptation for inline-key sources (CLI 429 rescue, MCP soft-CTA,
+    // audit-web post-result, etc.). The backend returns the key directly in
+    // the JSON response for these refs (worker.ts INLINE_KEY_SOURCES) instead
+    // of routing through email. The default hero copy says "arrives by email
+    // — ready in under a minute" which contradicts the CLI's 30-second
+    // promise and the audit-web post-result expectation. Swap to truthful
+    // inline-delivery copy before the user reads it.
+    //
+    // Source list MUST stay in sync with the REF_TO_SOURCE map below and the
+    // backend INLINE_KEY_SOURCES set. If a ref is added there but not here,
+    // the user sees a mismatched promise — same failure mode as the lying
+    // priser-banner caught 2026-05-22.
+    (function adaptHeroCopyForInlineSources() {
+      const INLINE_REFS = new Set([
+        'audit-cli-429',  // CLI 429 rescue
+        'cli',            // inline CLI signup (v1.14.0+)
+        'audit-cli',      // audit soft-CTA from CLI
+        'mcp-cli',        // MCP server soft-CTA
+        'audit-web',      // web /audit post-result CTA
+      ]);
+      try {
+        const params = new URLSearchParams(window.location.search);
+        const refParam = params.get('ref') ?? '';
+        const utmSource = params.get('utm_source') ?? '';
+        const isInlineSource =
+          INLINE_REFS.has(refParam) || utmSource === 'cli';
+        if (!isInlineSource) return;
+        const lead = document.querySelector('.gs-lead') as HTMLElement | null;
+        if (lead) {
+          lead.innerHTML =
+            'Free tier: 200 requests/day. No credit card required.<br>' +
+            'Your key appears on this page in seconds — no email round-trip.';
+        }
+        const sub = document.querySelector('.gs-form-sub') as HTMLElement | null;
+        if (sub) {
+          sub.textContent =
+            'Enter your email so we can bind usage to your account. ' +
+            'Your key appears below the moment you submit.';
+        }
+      } catch {
+        // Never break the form on a copy-adaptation failure.
+      }
+    })();
+
     const form = document.getElementById('gs-form') as HTMLFormElement | null;
     if (form) {
       form.addEventListener('submit', async (e) => {
