@@ -5,7 +5,7 @@ import Layout from '../layouts/Layout.astro';
 <Layout
   title="Get your API key — Commit"
   description="Get a free Commit API key. 200 requests/day. No credit card required. Start auditing your supply chain in minutes."
-  canonical="https://getcommit.dev/get-started"
+  canonical="https://getcommit.dev/get-started/"
 >
   <!-- Nav -->
   <nav>
@@ -32,7 +32,7 @@ import Layout from '../layouts/Layout.astro';
         <h1 class="gs-title">Get your API key</h1>
         <p class="gs-lead">
           Free tier: 200 requests/day. No credit card required.<br />
-          Your key arrives by email — ready in under a minute.
+          Your key appears on this page in seconds — no email round-trip.
         </p>
       </div>
     </div>
@@ -46,7 +46,7 @@ import Layout from '../layouts/Layout.astro';
       <div class="gs-form-card reveal">
         <div id="gs-form-view">
           <h2 class="gs-form-heading">Start building with Commit</h2>
-          <p class="gs-form-sub">Enter your email and we'll send your API key instantly.</p>
+          <p class="gs-form-sub">Enter your email so we can bind usage to your account. Your key appears below the moment you submit.</p>
           <form id="gs-form" class="gs-form" novalidate>
             <div class="gs-input-row">
               <input
@@ -211,49 +211,13 @@ console.log(data.score); // 0–100 trust score</code></pre>
   </footer>
 
   <script>
-    // Copy adaptation for inline-key sources (CLI 429 rescue, MCP soft-CTA,
-    // audit-web post-result, etc.). The backend returns the key directly in
-    // the JSON response for these refs (worker.ts INLINE_KEY_SOURCES) instead
-    // of routing through email. The default hero copy says "arrives by email
-    // — ready in under a minute" which contradicts the CLI's 30-second
-    // promise and the audit-web post-result expectation. Swap to truthful
-    // inline-delivery copy before the user reads it.
-    //
-    // Source list MUST stay in sync with the REF_TO_SOURCE map below and the
-    // backend INLINE_KEY_SOURCES set. If a ref is added there but not here,
-    // the user sees a mismatched promise — same failure mode as the lying
-    // priser-banner caught 2026-05-22.
-    (function adaptHeroCopyForInlineSources() {
-      const INLINE_REFS = new Set([
-        'audit-cli-429',  // CLI 429 rescue
-        'cli',            // inline CLI signup (v1.14.0+)
-        'audit-cli',      // audit soft-CTA from CLI
-        'mcp-cli',        // MCP server soft-CTA
-        'audit-web',      // web /audit post-result CTA
-      ]);
-      try {
-        const params = new URLSearchParams(window.location.search);
-        const refParam = params.get('ref') ?? '';
-        const utmSource = params.get('utm_source') ?? '';
-        const isInlineSource =
-          INLINE_REFS.has(refParam) || utmSource === 'cli';
-        if (!isInlineSource) return;
-        const lead = document.querySelector('.gs-lead') as HTMLElement | null;
-        if (lead) {
-          lead.innerHTML =
-            'Free tier: 200 requests/day. No credit card required.<br>' +
-            'Your key appears on this page in seconds — no email round-trip.';
-        }
-        const sub = document.querySelector('.gs-form-sub') as HTMLElement | null;
-        if (sub) {
-          sub.textContent =
-            'Enter your email so we can bind usage to your account. ' +
-            'Your key appears below the moment you submit.';
-        }
-      } catch {
-        // Never break the form on a copy-adaptation failure.
-      }
-    })();
+    // Hero/sub copy is now static-inline because the backend always returns
+    // the key in the JSON response when email delivery succeeds (worker.ts
+    // /api/keys/create — formerly INLINE_KEY_SOURCES, removed 2026-05-23).
+    // Email is the backup, not the gate. The 3-keys-per-IP-per-day limit
+    // already prevents abuse, so the email round-trip provided zero
+    // verification value and just added friction. The success-view JS below
+    // handles inline display when `data.key` is present.
 
     const form = document.getElementById('gs-form') as HTMLFormElement | null;
     if (form) {
