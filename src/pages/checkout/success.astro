@@ -3,8 +3,8 @@ import Layout from '../../layouts/Layout.astro';
 ---
 
 <Layout
-  title="Commit — Welcome"
-  description="Your Commit subscription is active. Here is your API key."
+  title="Commit — Checkout"
+  description="Checkout return page. After a successful Stripe checkout, your Commit API key is shown here."
   canonical="https://getcommit.dev/checkout/success/"
 >
   <!-- Nav -->
@@ -28,12 +28,11 @@ import Layout from '../../layouts/Layout.astro';
     <div class="container">
       <div class="editorial" style="max-width: var(--max-content); margin: 0 auto;">
         <span class="hero-eyebrow" id="hero-eyebrow">Commit</span>
-        <h1 class="success-title">
-          You're in. <em>Here's your API key.</em>
+        <h1 class="success-title" id="success-title">
+          Finalizing your account<em>…</em>
         </h1>
         <p class="success-lead" id="success-lead">
-          Your subscription is active. Save your API key — it won't be shown again.
-          Questions? Email <a href="mailto:support@getcommit.dev">support@getcommit.dev</a>.
+          One moment while we look up your checkout session.
         </p>
       </div>
     </div>
@@ -63,11 +62,13 @@ import Layout from '../../layouts/Layout.astro';
         </div>
 
         <div class="key-error" id="key-error" style="display:none">
-          <p class="error-title">Couldn't retrieve your key</p>
-          <p class="error-body">
-            Your payment went through, but we couldn't load your key right now.
+          <p class="error-title" id="error-title">Something went wrong</p>
+          <p class="error-body" id="error-body">
             Email <a href="mailto:support@getcommit.dev">support@getcommit.dev</a> with your order details
-            and we'll send the key directly.
+            and we'll sort it out.
+          </p>
+          <p class="error-cta" style="margin-top: 1rem;">
+            <a href="/pricing" id="error-cta-link" style="color: var(--accent); text-decoration: none; font-weight: 500;" hidden>Back to pricing →</a>
           </p>
         </div>
       </div>
@@ -159,10 +160,62 @@ import Layout from '../../layouts/Layout.astro';
       key?: string | null;
     };
 
-    async function fetchSession(sessionId: string): Promise<SessionData> {
+    type FetchResult =
+      | { kind: 'ok'; data: SessionData }
+      | { kind: 'not_found' }
+      | { kind: 'invalid' }
+      | { kind: 'error'; status: number };
+
+    async function fetchSession(sessionId: string): Promise<FetchResult> {
       const res = await fetch(`${API_BASE}/api/checkout/session?session_id=${encodeURIComponent(sessionId)}`);
-      if (!res.ok) throw new Error(`HTTP ${res.status}`);
-      return res.json() as Promise<SessionData>;
+      if (res.ok) return { kind: 'ok', data: await res.json() as SessionData };
+      if (res.status === 404) return { kind: 'not_found' };
+      if (res.status === 400) return { kind: 'invalid' };
+      return { kind: 'error', status: res.status };
+    }
+
+    /**
+     * Set the hero + error copy for a known failure mode. Keeps the page honest
+     * about what we DO and DON'T know — never claim payment succeeded when we
+     * can't verify it.
+     */
+    function renderFailure(mode: 'no_session' | 'not_found' | 'invalid' | 'not_paid' | 'fetch_error') {
+      const eyebrow = document.getElementById('hero-eyebrow');
+      const title   = document.getElementById('success-title');
+      const lead    = document.getElementById('success-lead');
+      const errTitle = document.getElementById('error-title');
+      const errBody  = document.getElementById('error-body');
+      const errCta   = document.getElementById('error-cta-link') as HTMLAnchorElement | null;
+
+      if (mode === 'no_session') {
+        if (eyebrow) eyebrow.textContent = 'No checkout session';
+        if (title) title.innerHTML = `Hmm — <em>we don't have a session for you.</em>`;
+        if (lead)  lead.innerHTML  = `This page is shown after a successful Stripe checkout. If you completed a purchase, the link in your confirmation email includes a <code>session_id</code> parameter — try opening that link instead.`;
+        if (errTitle) errTitle.textContent = 'Looking to sign up?';
+        if (errBody)  errBody.innerHTML  = `Pick a plan on the <a href="/pricing">pricing page</a>, or grab a free API key on <a href="/get-started">get started</a>. If you just paid and ended up here without a session ID, email <a href="mailto:support@getcommit.dev">support@getcommit.dev</a> with your Stripe receipt.`;
+        if (errCta) { errCta.hidden = false; errCta.href = '/pricing'; errCta.textContent = 'See pricing →'; }
+      } else if (mode === 'not_found' || mode === 'invalid') {
+        if (eyebrow) eyebrow.textContent = "We couldn't find that session";
+        if (title) title.innerHTML = `That checkout link <em>didn't resolve.</em>`;
+        if (lead)  lead.innerHTML  = `The session ID isn't one we recognize — links can expire if you opened it days after paying.`;
+        if (errTitle) errTitle.textContent = 'Already paid?';
+        if (errBody)  errBody.innerHTML  = `Email <a href="mailto:support@getcommit.dev">support@getcommit.dev</a> with the email you used at checkout and the approximate time of purchase. We'll resend your API key directly.`;
+        if (errCta) { errCta.hidden = false; errCta.href = '/pricing'; errCta.textContent = 'Back to pricing →'; }
+      } else if (mode === 'not_paid') {
+        if (eyebrow) eyebrow.textContent = 'Payment not completed';
+        if (title) title.innerHTML = `Your checkout <em>wasn't finalized.</em>`;
+        if (lead)  lead.innerHTML  = `Stripe didn't record a successful payment for that session. If the card was declined or you closed the window early, you can try again from pricing.`;
+        if (errTitle) errTitle.textContent = "What now?";
+        if (errBody)  errBody.innerHTML  = `<a href="/pricing">Re-open checkout from pricing</a>, or email <a href="mailto:support@getcommit.dev">support@getcommit.dev</a> if your card was charged but you're seeing this page.`;
+        if (errCta) { errCta.hidden = false; errCta.href = '/pricing'; errCta.textContent = 'Try checkout again →'; }
+      } else {
+        // fetch_error
+        if (eyebrow) eyebrow.textContent = "We hit a snag";
+        if (title) title.innerHTML = `We couldn't load your session <em>right now.</em>`;
+        if (lead)  lead.innerHTML  = `The lookup failed temporarily. If you just paid, refresh in a few seconds — Stripe's webhook usually catches up within 30s.`;
+        if (errTitle) errTitle.textContent = 'Still not loading?';
+        if (errBody)  errBody.innerHTML  = `Email <a href="mailto:support@getcommit.dev">support@getcommit.dev</a> with your order details and we'll send the key directly.`;
+      }
     }
 
     async function init() {
@@ -175,6 +228,7 @@ import Layout from '../../layouts/Layout.astro';
       const quickstart = document.getElementById('quickstart')!;
 
       if (!sessionId) {
+        renderFailure('no_session');
         loadingEl.style.display = 'none';
         errorEl.style.display = 'block';
         return;
@@ -182,26 +236,53 @@ import Layout from '../../layouts/Layout.astro';
 
       try {
         // First fetch.
-        let data = await fetchSession(sessionId);
-        if (!data.paid) throw new Error('Payment not completed');
+        let result = await fetchSession(sessionId);
+        if (result.kind === 'not_found') {
+          renderFailure('not_found');
+          loadingEl.style.display = 'none';
+          errorEl.style.display = 'block';
+          return;
+        }
+        if (result.kind === 'invalid') {
+          renderFailure('invalid');
+          loadingEl.style.display = 'none';
+          errorEl.style.display = 'block';
+          return;
+        }
+        if (result.kind === 'error') {
+          renderFailure('fetch_error');
+          loadingEl.style.display = 'none';
+          errorEl.style.display = 'block';
+          return;
+        }
+        let data = result.data;
+        if (!data.paid) {
+          renderFailure('not_paid');
+          loadingEl.style.display = 'none';
+          errorEl.style.display = 'block';
+          return;
+        }
 
         // Race: Stripe webhook may not have parked the raw key yet. Retry once
         // after a short delay if paid but no key — webhook usually finishes
         // within 1-3 seconds.
         if (!data.key) {
           await new Promise((r) => setTimeout(r, 2500));
-          data = await fetchSession(sessionId);
+          const retry = await fetchSession(sessionId);
+          if (retry.kind === 'ok') data = retry.data;
         }
 
         const tierLabel = data.tier === 'developer' ? 'Developer' : 'Pro';
         document.title = `Commit ${tierLabel} — Welcome`;
 
-        // Tier-aware hero copy. Different message depending on whether we
-        // were able to grab the raw key inline or the user needs to check
-        // their inbox.
+        // Now that we've verified paid=true, set the celebratory hero copy.
+        // Tier-aware: different message depending on whether we were able to
+        // grab the raw key inline or the user needs to check their inbox.
         const eyebrowEl = document.getElementById('hero-eyebrow');
-        const leadEl = document.getElementById('success-lead');
+        const titleEl   = document.getElementById('success-title');
+        const leadEl    = document.getElementById('success-lead');
         if (eyebrowEl) eyebrowEl.textContent = `Commit ${tierLabel}`;
+        if (titleEl) titleEl.innerHTML = `You're in. <em>Here's your API key.</em>`;
         if (leadEl) {
           leadEl.innerHTML = data.key
             ? `Your ${tierLabel} subscription is active. Copy your API key below — it won't be shown again. ` +
@@ -257,6 +338,7 @@ import Layout from '../../layouts/Layout.astro';
 
       } catch (err) {
         console.error('Session lookup error:', err);
+        renderFailure('fetch_error');
         loadingEl.style.display = 'none';
         errorEl.style.display = 'block';
       }
