@@ -5,7 +5,7 @@ import Layout from '../layouts/Layout.astro';
 <Layout
   title="Commit Pricing — Free for devs, $15/mo for builders, $29/mo for teams"
   description="Open source and free forever for individual developers. Developer at $15/month for builders. Pro at $29/month for teams — per project, not per seat. Enterprise at $199/month for compliance and unlimited scale."
-  canonical="https://getcommit.dev/pricing"
+  canonical="https://getcommit.dev/pricing/"
 >
   <!-- Nav -->
   <nav>
@@ -308,7 +308,7 @@ import Layout from '../layouts/Layout.astro';
           <h2 class="waitlist-heading">Get your free API key</h2>
           <p class="waitlist-body">
             Free tier: 200 req/day, no credit card required.
-            Ready to scale? Pro starts at $29/month — API key delivered by email.
+            Your key appears on this page in seconds — paid tiers ($15+/mo) work the same way.
           </p>
           <a href="/get-started" class="waitlist-cta-link">Get your API key →</a>
         </div>
@@ -328,9 +328,17 @@ import Layout from '../layouts/Layout.astro';
                 Get free API key
               </button>
             </div>
-            <p id="waitlist-success" class="waitlist-feedback waitlist-success" hidden>
-              ✓ Check your inbox — your API key is on its way.
-            </p>
+            <div id="waitlist-success" class="waitlist-feedback waitlist-success" hidden>
+              <p class="waitlist-success-title" id="waitlist-success-title">
+                ✓ Your free API key
+              </p>
+              <code id="waitlist-key-display" class="waitlist-key-display" hidden></code>
+              <p class="waitlist-success-note" id="waitlist-success-note" hidden>
+                Save this key — it won't be shown again. Use it as
+                <code class="waitlist-inline-code">Authorization: Bearer &lt;key&gt;</code>.
+              </p>
+              <p class="waitlist-success-backup" id="waitlist-success-backup" hidden></p>
+            </div>
             <p id="waitlist-error" class="waitlist-feedback waitlist-error" hidden></p>
           </form>
           <p class="waitlist-divider-text">— or —</p>
@@ -673,44 +681,89 @@ import Layout from '../layouts/Layout.astro';
     });
 
     // ── Waitlist form ──
+    // Inline-key reveal on success (parity with /get-started/, shipped 2026-05-23).
+    // Backend /api/keys/create returns { key, key_prefix } in JSON since the
+    // INLINE_KEY_SOURCES gate was removed — display the key on this page so the
+    // visitor doesn't have to context-switch to inbox. Email is a backup, not a
+    // gate. Source 'web-pricing' is whitelisted in worker.ts VALID_SOURCES so
+    // we can measure pricing-page conversions distinct from /get-started/ ones.
     const waitlistForm = document.getElementById('waitlist-form') as HTMLFormElement | null;
     if (waitlistForm) {
       waitlistForm.addEventListener('submit', async (e) => {
         e.preventDefault();
         const emailInput = document.getElementById('waitlist-email') as HTMLInputElement;
         const submitBtn = document.getElementById('waitlist-btn') as HTMLButtonElement;
-        const successMsg = document.getElementById('waitlist-success') as HTMLParagraphElement;
+        const successBox = document.getElementById('waitlist-success') as HTMLDivElement;
+        const successTitle = document.getElementById('waitlist-success-title') as HTMLParagraphElement;
+        const keyDisplay = document.getElementById('waitlist-key-display') as HTMLElement;
+        const successNote = document.getElementById('waitlist-success-note') as HTMLParagraphElement;
+        const successBackup = document.getElementById('waitlist-success-backup') as HTMLParagraphElement;
         const errorMsg = document.getElementById('waitlist-error') as HTMLParagraphElement;
         const email = emailInput.value.trim();
 
         if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
           errorMsg.textContent = 'Please enter a valid email address.';
           errorMsg.hidden = false;
-          successMsg.hidden = true;
+          successBox.hidden = true;
           return;
         }
 
         submitBtn.disabled = true;
-        submitBtn.textContent = 'Sending…';
+        submitBtn.textContent = 'Generating…';
         errorMsg.hidden = true;
-        successMsg.hidden = true;
+        successBox.hidden = true;
+        keyDisplay.hidden = true;
+        successNote.hidden = true;
+        successBackup.hidden = true;
 
         try {
-          // POSTs to /api/keys/create — the same endpoint /get-started/ uses.
-          // Was previously /api/waitlist (returned 404, never deployed).
-          // Backend issues a free-tier key immediately and emails it to the user.
+          // POSTs to /api/keys/create — same endpoint /get-started/ uses.
+          // source='web-pricing' so we can split funnel conversion vs the
+          // direct /get-started/ landing.
           const res = await fetch('https://poc-backend.amdal-dev.workers.dev/api/keys/create', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ email }),
+            body: JSON.stringify({ email, source: 'web-pricing' }),
           });
           if (res.ok || res.status === 201) {
-            successMsg.hidden = false;
+            const data = await res.json() as { key?: string; key_prefix?: string; message?: string };
+            successBox.hidden = false;
             waitlistForm.reset();
             submitBtn.textContent = 'Get free API key';
+
+            if (data?.key) {
+              // Inline reveal — primary path. Email is backup.
+              successTitle.textContent = '✓ Your free API key';
+              keyDisplay.textContent = data.key;
+              keyDisplay.hidden = false;
+              successNote.hidden = false;
+              successBackup.textContent = 'Backup also sent to ' + email + '.';
+              successBackup.hidden = false;
+            } else {
+              // Backup path — backend couldn't return key (RESEND failure?).
+              successTitle.textContent = '✓ API key sent to ' + email + ' — check your inbox.';
+            }
+
+            // Pre-fill upgrade buttons with the email so Stripe checkout doesn't
+            // ask the user to retype it (and so the paid key binds to the same
+            // address as the free key).
+            const emailEnc = encodeURIComponent(email);
+            document.querySelectorAll<HTMLAnchorElement>('.checkout-btn, .upgrade-btn').forEach((btn) => {
+              const href = btn.getAttribute('href') ?? '';
+              if (href.includes('/api/checkout')) {
+                try {
+                  const url = new URL(href);
+                  url.searchParams.set('email', email);
+                  btn.setAttribute('href', url.toString());
+                } catch {
+                  const sep = href.includes('?') ? '&' : '?';
+                  btn.setAttribute('href', href + sep + 'email=' + emailEnc);
+                }
+              }
+            });
           } else {
             const data = await res.json() as any;
-            throw new Error(data?.error ?? `HTTP ${res.status}`);
+            throw new Error(data?.message ?? data?.error ?? `HTTP ${res.status}`);
           }
         } catch (err) {
           errorMsg.textContent = err instanceof Error ? err.message : 'Something went wrong. Please try again.';
@@ -1187,6 +1240,45 @@ import Layout from '../layouts/Layout.astro';
 
     .waitlist-success { color: #166534; }
     .waitlist-error   { color: var(--accent); }
+
+    .waitlist-success-title {
+      margin: 0 0 0.5rem;
+      font-weight: 600;
+    }
+
+    .waitlist-key-display {
+      display: block;
+      padding: 0.6rem 0.75rem;
+      background: #f0fdf4;
+      border: 1px solid #bbf7d0;
+      border-radius: 4px;
+      font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+      font-size: 0.875rem;
+      color: #166534;
+      word-break: break-all;
+      user-select: all;
+      margin: 0 0 0.5rem;
+    }
+
+    .waitlist-success-note {
+      margin: 0 0 0.4rem;
+      font-size: 0.8rem;
+      color: var(--ink-muted);
+    }
+
+    .waitlist-inline-code {
+      padding: 0.05rem 0.3rem;
+      background: var(--bg-muted, #f5f5f5);
+      border-radius: 3px;
+      font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+      font-size: 0.8rem;
+    }
+
+    .waitlist-success-backup {
+      margin: 0;
+      font-size: 0.75rem;
+      color: var(--ink-subtle);
+    }
 
     /* ── Compare table ── */
     .compare-section {
