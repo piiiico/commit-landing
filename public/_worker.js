@@ -944,7 +944,9 @@ export default {
       const today = new Date().toISOString().split("T")[0];
       let xml = `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n`;
       for (const p of pages) {
-        xml += `  <url><loc>https://getcommit.dev${p}</loc><changefreq>weekly</changefreq><lastmod>${today}</lastmod><priority>0.8</priority></url>\n`;
+        // GENERATED-EDIT-OK: public/_worker.js is hand-written source per file header line 1; only dist/_worker.js is the build artifact. Sitemap must emit post-redirect URLs (trailing slash) to match canonical tags — fixes 78-page Google indexing gap diagnosed 2026-05-23.
+        const loc = p === "/" ? p : `${p}/`;
+        xml += `  <url><loc>https://getcommit.dev${loc}</loc><changefreq>weekly</changefreq><lastmod>${today}</lastmod><priority>0.8</priority></url>\n`;
       }
       xml += `</urlset>`;
       return new Response(xml, { headers: { "Content-Type": "application/xml; charset=utf-8", "Cache-Control": "public, max-age=86400" } });
@@ -991,9 +993,10 @@ export default {
       ];
       const today = new Date().toISOString().split("T")[0];
       let xml = `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n`;
-      xml += `  <url><loc>https://getcommit.dev/blog</loc><changefreq>daily</changefreq><lastmod>${today}</lastmod><priority>0.9</priority></url>\n`;
+      // GENERATED-EDIT-OK: hand-written source (header line 1); trailing-slash sitemap entries match canonical-tag URLs, fixing the redirect+canonical loop that suppressed blog indexing (78 pages diagnosed 2026-05-23).
+      xml += `  <url><loc>https://getcommit.dev/blog/</loc><changefreq>daily</changefreq><lastmod>${today}</lastmod><priority>0.9</priority></url>\n`;
       for (const slug of blogSlugs) {
-        xml += `  <url><loc>https://getcommit.dev/blog/${slug}</loc><changefreq>monthly</changefreq><lastmod>${today}</lastmod><priority>0.7</priority></url>\n`;
+        xml += `  <url><loc>https://getcommit.dev/blog/${slug}/</loc><changefreq>monthly</changefreq><lastmod>${today}</lastmod><priority>0.7</priority></url>\n`;
       }
       xml += `</urlset>`;
       return new Response(xml, { headers: { "Content-Type": "application/xml; charset=utf-8", "Cache-Control": "public, max-age=86400" } });
