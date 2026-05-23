@@ -1,0 +1,2274 @@
+---
+import Layout from '../layouts/Layout.astro';
+
+// Live npm stats for the hero claim. Hardcoded values drift fast:
+// chalk grew 418M → 438M, zod 158M → 178M, axios 99M → 109M, hono 34M → 39M
+// between deploys. Pull current numbers at build time so "right now" is true.
+// Falls back to last-known values if the npm API is unreachable mid-build.
+interface PkgStat { name: string; weekly: number; maintainers: number; }
+const FALLBACK: PkgStat[] = [
+  { name: 'chalk',  weekly: 438_000_000, maintainers: 1 },
+  { name: 'zod',    weekly: 178_000_000, maintainers: 1 },
+  { name: 'lodash', weekly: 155_000_000, maintainers: 1 },
+  { name: 'axios',  weekly: 109_000_000, maintainers: 1 },
+];
+const CANDIDATES = ['chalk', 'zod', 'axios', 'lodash', 'hono', 'dotenv', 'uuid'];
+let critical: PkgStat[] = FALLBACK;
+try {
+  const fetched = await Promise.all(CANDIDATES.map(async (name) => {
+    const [dl, reg] = await Promise.all([
+      fetch(`https://api.npmjs.org/downloads/point/last-week/${name}`).then(r => r.json()),
+      fetch(`https://registry.npmjs.org/${name}`).then(r => r.json()),
+    ]);
+    return { name, weekly: dl.downloads as number, maintainers: (reg.maintainers || []).length };
+  }));
+  // CRITICAL = single maintainer + >10M weekly downloads (page's own definition).
+  const fresh = fetched.filter(p => p.maintainers === 1 && p.weekly > 10_000_000)
+                       .sort((a, b) => b.weekly - a.weekly)
+                       .slice(0, 4);
+  if (fresh.length >= 4) critical = fresh;
+} catch (err) {
+  console.warn('[audit.astro] npm stats fetch failed, using fallback:', err);
+}
+const fmtM = (n: number) => Math.round(n / 1_000_000) + 'M';
+const numWord = ['Zero', 'One', 'Two', 'Three', 'Four', 'Five'][critical.length] ?? `${critical.length}`;
+const heroFirst  = `${critical[0].name} (${fmtM(critical[0].weekly)} downloads/week, ${critical[0].maintainers} maintainer)`;
+const heroOthers = critical.slice(1).map(p => `${p.name} (${fmtM(p.weekly)}, ${p.maintainers} maintainer)`).join(', ');
+const auditHeroClaim = `${numWord} packages in a typical project are CRITICAL right now: ${heroFirst}, ${heroOthers}.`;
+---
+
+<Layout
+  title="Dependency Audit — Commit"
+  description="Paste your npm or PyPI packages. Get behavioral risk scores in seconds. CRITICAL = single maintainer + 10M+ weekly downloads."
+  canonical="https://getcommit.dev/audit/"
+>
+  <!-- Nav -->
+  <nav>
+    <div class="container nav-inner">
+      <a href="/" class="nav-brand">Commit</a>
+      <ul class="nav-links">
+        <li><a href="/#mcp">MCP</a></li>
+        <li><a href="/audit" class="nav-active">Audit</a></li>
+        <li><a href="/watchlist">Watchlist</a></li>
+        <li><a href="/extension">Extension</a></li>
+        <li><a href="/badges">Badges</a></li>
+        <li><a href="/blog">Writing</a></li>
+        <li><a href="/pricing">Pricing</a></li><li><a href="/docs">Docs</a></li><li><a href="https://github.com/piiiico/proof-of-commitment" target="_blank" rel="noopener">GitHub</a></li>
+        <li><a href="mailto:pico@amdal.dev">Contact</a></li>
+      </ul>
+    </div>
+  </nav>
+
+  <section class="audit-hero">
+    <div class="container">
+      <div class="editorial" style="max-width: var(--max-content); margin: 0 auto;">
+        <span class="hero-eyebrow">Supply chain risk scanner</span>
+        <h1 class="audit-title">
+          Paste your dependencies.<br />
+          <em>See what's hiding.</em>
+        </h1>
+        <p class="audit-lead">
+          {auditHeroClaim}
+          Stars and READMEs don't show this. Behavioral signals do.
+        </p>
+        <p style="margin-top: 1rem; font-size: 0.95rem;">
+          Have a GitHub URL? <a href="/scan/repo" style="color: var(--accent); text-decoration: none; font-weight: 500;">Scan the whole repo in one click &rarr;</a>
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <section class="audit-tool">
+    <div class="container">
+      <div class="audit-card">
+        <!-- Ecosystem tabs -->
+        <div class="eco-tabs" role="tablist">
+          <button class="eco-tab active" data-eco="npm" role="tab" aria-selected="true">npm</button>
+          <button class="eco-tab" data-eco="pypi" role="tab" aria-selected="false">PyPI</button>
+          <button class="eco-tab" data-eco="cargo" role="tab" aria-selected="false">Cargo</button>
+          <button class="eco-tab" data-eco="golang" role="tab" aria-selected="false">Go</button>
+          <button class="eco-tab" data-eco="github" role="tab" aria-selected="false">GitHub repo</button>
+        </div>
+
+        <!-- Input area (npm/pypi) -->
+        <div id="pkg-input-area" class="input-area">
+          <label class="input-label" for="packages-input">
+            Package names — one per line, or comma-separated (max 20)
+          </label>
+          <textarea
+            id="packages-input"
+            class="packages-input"
+            rows="6"
+            placeholder="axios&#10;zod&#10;chalk&#10;lodash&#10;express&#10;dotenv&#10;uuid"
+            spellcheck="false"
+          >axios
+zod
+chalk
+lodash
+express
+dotenv
+uuid</textarea>
+        </div>
+
+        <!-- GitHub input area -->
+        <div id="github-input-area" class="input-area" hidden>
+          <label class="input-label" for="github-repo-input">
+            GitHub repo URL or owner/repo slug
+          </label>
+          <input
+            id="github-repo-input"
+            class="github-repo-input"
+            type="text"
+            placeholder="vercel/ai  or  https://github.com/langchain-ai/langchainjs"
+            autocomplete="off"
+            spellcheck="false"
+          />
+          <p class="github-input-hint">
+            Fetches <code>package.json</code> / <code>requirements.txt</code> directly — no copy-paste needed.
+            Try: <button class="example-repo" data-repo="vercel/ai">vercel/ai</button>
+            · <button class="example-repo" data-repo="anthropics/anthropic-sdk-python">anthropic SDK</button>
+            · <button class="example-repo" data-repo="facebook/react">react</button>
+          </p>
+        </div>
+
+        <!-- Drop zone (package/project files) -->
+        <div id="drop-zone" class="drop-zone">
+          <span class="drop-icon">↓</span>
+          <span class="drop-label">Drop <code>package.json</code>, <code>package-lock.json</code>, <code>yarn.lock</code>, <code>pnpm-lock.yaml</code>, <code>requirements.txt</code>, <code>Cargo.toml</code>, <code>go.mod</code>, or <code>go.sum</code></span>
+          <span class="drop-hint">Lock files scan ALL transitive dependencies — not just the top 20</span>
+        </div>
+
+        <button id="audit-btn" class="audit-submit">
+          Audit dependencies
+        </button>
+
+        <p class="audit-note">
+          No install. No API key. Lock files scan all transitive deps (top 20 shown).
+          <a href="https://github.com/piiiico/proof-of-commitment" target="_blank" rel="noopener">Source code →</a>
+        </p>
+      </div>
+
+      <!-- Results -->
+      <div id="results-area" class="results-area" hidden>
+        <div class="results-summary" id="results-summary"></div>
+        <div class="share-row" id="share-row">
+          <button id="share-btn" class="share-btn">↗ Copy link</button>
+          <span class="share-copied" id="share-copied" hidden>Link copied!</span>
+          <button id="download-btn" class="share-btn">↓ Download report</button>
+        </div>
+        <div class="results-table-wrap">
+          <table class="results-table" id="results-table">
+            <thead>
+              <tr>
+                <th>Package</th>
+                <th>Score</th>
+                <th>Risk</th>
+                <th id="th-maintainers">Maintainers</th>
+                <th>Weekly DL</th>
+                <th>Age</th>
+                <th>Trend</th>
+              </tr>
+            </thead>
+            <tbody id="results-body"></tbody>
+          </table>
+        </div>
+
+        <!-- Dynamic post-results CTA — shown when CRITICAL packages found -->
+        <div id="post-results-cta" class="post-results-cta" hidden></div>
+
+        <div class="mcp-cta">
+          <p class="mcp-cta-label">Want this in your AI assistant?</p>
+          <pre class="code-block">{`{
+  "mcpServers": {
+    "commit": {
+      "type": "streamable-http",
+      "url": "https://poc-backend.amdal-dev.workers.dev/mcp"
+    }
+  }
+}`}</pre>
+          <p class="mcp-cta-hint">Add to Claude Desktop, Cursor, or any MCP client. Then: <em>"Audit my package.json for supply chain risk"</em></p>
+        </div>
+      </div>
+
+      <!-- Loading state -->
+      <div id="loading-area" class="loading-area" hidden>
+        <div class="loading-spinner"></div>
+        <p>Scoring packages…</p>
+      </div>
+
+      <!-- Error state -->
+      <div id="error-area" class="error-area" hidden>
+        <p id="error-message"></p>
+      </div>
+    </div>
+  </section>
+
+  <!-- Dependency Tree Explorer -->
+  <section class="dep-tree-section">
+    <div class="container">
+      <div class="editorial" style="max-width: var(--max-content); margin: 0 auto;">
+        <span class="hero-eyebrow">Transitive risk</span>
+        <h2 class="section-heading dep-tree-heading">
+          The risks you don't see coming
+        </h2>
+        <p class="dep-tree-intro">
+          Your package may look fine. Its dependencies may not.
+          The Anthropic SDK scores healthy — but two of its transitive dependencies are CRITICAL.
+          Neither shows up in a direct audit.
+        </p>
+
+        <div class="dep-tree-card">
+          <div class="dep-tree-input-row">
+            <input
+              id="graph-pkg-input"
+              class="graph-pkg-input"
+              type="text"
+              placeholder="e.g. @anthropic-ai/sdk"
+              value="@anthropic-ai/sdk"
+              autocomplete="off"
+              spellcheck="false"
+            />
+            <div class="depth-selector">
+              <label class="depth-label">Depth</label>
+              <button class="depth-btn active" data-depth="1">1</button>
+              <button class="depth-btn" data-depth="2">2</button>
+            </div>
+            <button id="graph-btn" class="graph-submit">Explore tree</button>
+          </div>
+          <p class="dep-tree-note">npm only · max depth 2 · up to 20 nodes</p>
+        </div>
+
+        <!-- Tree loading -->
+        <div id="graph-loading" class="graph-loading" hidden>
+          <div class="loading-spinner"></div>
+          <p>Mapping dependency tree…</p>
+        </div>
+
+        <!-- Tree error -->
+        <div id="graph-error" class="error-area" hidden>
+          <p id="graph-error-msg"></p>
+        </div>
+
+        <!-- Tree output -->
+        <div id="graph-results" class="graph-results" hidden>
+          <div class="graph-summary" id="graph-summary"></div>
+          <div class="tree-output" id="tree-output"></div>
+          <div class="critical-paths" id="critical-paths"></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- How it works -->
+  <section class="how-it-works">
+    <div class="container">
+      <div class="editorial" style="max-width: var(--max-content); margin: 0 auto;">
+        <h2 class="section-heading">What the score measures</h2>
+        <div class="signal-grid">
+          <div class="signal-item">
+            <span class="signal-name">Longevity</span>
+            <span class="signal-desc">How long has this package existed? Abandoned projects get reactivated for attacks.</span>
+          </div>
+          <div class="signal-item">
+            <span class="signal-name">Maintainer depth</span>
+            <span class="signal-desc">Single maintainer + millions of weekly downloads = the attack surface LiteLLM exploited.</span>
+          </div>
+          <div class="signal-item">
+            <span class="signal-name">Release consistency</span>
+            <span class="signal-desc">Regular releases signal active oversight. Long gaps = vulnerability accumulation.</span>
+          </div>
+          <div class="signal-item">
+            <span class="signal-name">Download trend</span>
+            <span class="signal-desc">Growing packages attract more scrutiny (and attacks). Stable = lower profile.</span>
+          </div>
+        </div>
+        <p class="how-note">
+          Risk flags: <strong>CRITICAL</strong> = single maintainer + &gt;10M weekly downloads (the ua-parser-js/event-stream attack profile).
+          <strong>HIGH</strong> = package &lt;1yr old + rapid adoption.
+          <strong>WARN</strong> = no release in 12+ months.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <!-- Direct-to-revenue CTA (replaced dead /api/waitlist 404 form 2026-05-22) -->
+  <section class="audit-waitlist-section">
+    <div class="container">
+      <div class="audit-waitlist-inner reveal">
+        <p class="audit-waitlist-label">Run this in CI? Audit every push.</p>
+        <a href="/get-started?ref=audit-web" class="audit-waitlist-btn" data-cta="audit-get-key">
+          Get your free API key →
+        </a>
+        <span class="audit-waitlist-hint">200 audits/day · no credit card</span>
+      </div>
+    </div>
+  </section>
+
+  <style>
+    .nav-active {
+      color: var(--accent) !important;
+      font-weight: 500;
+    }
+
+    .audit-hero {
+      padding: 6rem 0 3rem;
+      background: var(--paper);
+    }
+
+    .audit-title {
+      font-family: var(--font-display);
+      font-size: clamp(2.2rem, 5vw, 3.5rem);
+      line-height: 1.12;
+      color: var(--ink);
+      margin: 1rem 0 1.5rem;
+    }
+
+    .audit-title em {
+      font-style: italic;
+      color: var(--accent);
+    }
+
+    .audit-lead {
+      font-size: 1.05rem;
+      line-height: 1.7;
+      color: var(--ink-muted);
+      max-width: 42rem;
+    }
+
+    /* ── Audit Card ── */
+    .audit-tool {
+      padding: 3rem 0 4rem;
+      background: var(--paper);
+    }
+
+    .audit-card {
+      background: var(--paper-dim);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 2rem;
+      max-width: 48rem;
+      margin: 0 auto 2rem;
+    }
+
+    .eco-tabs {
+      display: flex;
+      gap: 0.5rem;
+      margin-bottom: 1.5rem;
+    }
+
+    .eco-tab {
+      padding: 0.4rem 1rem;
+      border: 1px solid var(--border);
+      background: transparent;
+      color: var(--ink-muted);
+      font-family: var(--font-mono);
+      font-size: 0.85rem;
+      border-radius: 4px;
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+
+    .eco-tab.active {
+      background: var(--ink);
+      color: var(--paper);
+      border-color: var(--ink);
+    }
+
+    .input-label {
+      display: block;
+      font-size: 0.85rem;
+      color: var(--ink-muted);
+      margin-bottom: 0.5rem;
+    }
+
+    .packages-input {
+      width: 100%;
+      padding: 0.75rem 1rem;
+      font-family: var(--font-mono);
+      font-size: 0.9rem;
+      background: var(--paper);
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      color: var(--ink);
+      resize: vertical;
+      transition: border-color 0.15s;
+      line-height: 1.6;
+    }
+
+    .packages-input:focus {
+      outline: none;
+      border-color: var(--accent);
+    }
+
+    .audit-submit {
+      margin-top: 1rem;
+      padding: 0.75rem 2rem;
+      background: var(--accent);
+      color: white;
+      border: none;
+      border-radius: 4px;
+      font-family: var(--font-body);
+      font-size: 0.95rem;
+      font-weight: 500;
+      cursor: pointer;
+      transition: background 0.15s;
+    }
+
+    .audit-submit:hover {
+      background: var(--accent-dim);
+    }
+
+    .audit-submit:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+    }
+
+    .drop-zone {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 0.3rem;
+      margin: 0.75rem 0;
+      padding: 1rem;
+      border: 1.5px dashed var(--border);
+      border-radius: 6px;
+      cursor: pointer;
+      transition: all 0.15s;
+      text-align: center;
+    }
+
+    .drop-zone:hover,
+    .drop-zone.drag-over {
+      border-color: var(--accent);
+      background: #fff8f5;
+    }
+
+    .drop-icon {
+      font-size: 1.3rem;
+      color: var(--ink-muted);
+      line-height: 1;
+    }
+
+    .drop-label {
+      font-size: 0.85rem;
+      color: var(--ink-muted);
+    }
+
+    .drop-label code {
+      font-family: var(--font-mono);
+      font-size: 0.82rem;
+      background: var(--paper);
+      border: 1px solid var(--border);
+      border-radius: 3px;
+      padding: 0 0.3em;
+    }
+
+    .drop-hint {
+      font-size: 0.75rem;
+      color: var(--ink-subtle);
+    }
+
+    .audit-note {
+      margin-top: 0.75rem;
+      font-size: 0.8rem;
+      color: var(--ink-subtle);
+    }
+
+    .audit-note a {
+      color: var(--ink-muted);
+    }
+
+    /* ── Results ── */
+    .results-area {
+      max-width: 60rem;
+      margin: 0 auto;
+    }
+
+    .results-summary {
+      font-size: 0.95rem;
+      color: var(--ink-muted);
+      margin-bottom: 1rem;
+      padding: 0 0.5rem;
+    }
+
+    .results-table-wrap {
+      overflow-x: auto;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+    }
+
+    .results-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.9rem;
+    }
+
+    .results-table th {
+      padding: 0.7rem 1rem;
+      text-align: left;
+      font-size: 0.75rem;
+      font-weight: 500;
+      color: var(--ink-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      background: var(--paper-dim);
+      border-bottom: 1px solid var(--border);
+      white-space: nowrap;
+    }
+
+    .results-table td {
+      padding: 0.75rem 1rem;
+      border-bottom: 1px solid var(--border-light);
+      vertical-align: middle;
+    }
+
+    .results-table tr:last-child td {
+      border-bottom: none;
+    }
+
+    .results-table tr:hover td {
+      background: var(--paper-dim);
+    }
+
+    .result-row {
+      cursor: pointer;
+    }
+
+    .result-row td:first-child::after {
+      content: ' ▸';
+      font-size: 0.7rem;
+      color: var(--ink-subtle);
+      opacity: 0.6;
+    }
+
+    .result-row.expanded td:first-child::after {
+      content: ' ▾';
+    }
+
+    .breakdown-row td {
+      padding: 0 1rem 0.75rem 1rem !important;
+      background: var(--paper-dim);
+      border-bottom: 1px solid var(--border-light) !important;
+    }
+
+    .breakdown-grid {
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: 0.75rem;
+      padding: 0.75rem 0 0.25rem;
+    }
+
+    @media (max-width: 640px) {
+      .breakdown-grid {
+        grid-template-columns: repeat(2, 1fr);
+      }
+    }
+
+    .breakdown-dim {
+      display: flex;
+      flex-direction: column;
+      gap: 0.3rem;
+    }
+
+    .breakdown-label {
+      font-size: 0.68rem;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--ink-muted);
+      white-space: nowrap;
+    }
+
+    .breakdown-bar-wrap {
+      height: 5px;
+      background: var(--border);
+      border-radius: 3px;
+      overflow: hidden;
+    }
+
+    .breakdown-bar {
+      height: 100%;
+      border-radius: 3px;
+      background: #3d8b3d;
+      transition: width 0.3s ease;
+    }
+
+    .breakdown-bar.bar-warn {
+      background: #c47a0a;
+    }
+
+    .breakdown-bar.bar-low {
+      background: var(--accent);
+    }
+
+    .breakdown-score {
+      font-size: 0.75rem;
+      font-family: var(--font-mono);
+      color: var(--ink-muted);
+    }
+
+    .breakdown-max {
+      color: var(--ink-subtle);
+      font-size: 0.65rem;
+    }
+
+    .provenance-badge {
+      font-size: 0.72rem;
+      vertical-align: middle;
+      margin-left: 0.25rem;
+      cursor: help;
+    }
+
+    .provenance-summary {
+      color: #166534;
+      font-weight: 500;
+    }
+
+    .provenance-summary::before {
+      content: '🔒 ';
+      font-size: 0.8rem;
+    }
+
+    .provenance-note {
+      display: flex;
+      align-items: flex-start;
+      gap: 0.5rem;
+      margin-top: 0.75rem;
+      padding: 0.6rem 0.875rem;
+      border-radius: 0 4px 4px 0;
+      font-size: 0.8rem;
+      line-height: 1.5;
+    }
+
+    .provenance-verified {
+      background: #f0fdf4;
+      border-left: 3px solid #166534;
+      color: #14532d;
+    }
+
+    .provenance-none {
+      background: #fefce8;
+      border-left: 3px solid #a16207;
+      color: #713f12;
+    }
+
+    .provenance-icon {
+      font-size: 0.9rem;
+      flex-shrink: 0;
+      line-height: 1.5;
+    }
+
+    .provenance-note strong {
+      font-weight: 600;
+    }
+
+    .incident-note {
+      margin-top: 0.75rem;
+      padding: 0.6rem 0.875rem;
+      background: #fff1f2;
+      border-left: 3px solid #991b1b;
+      border-radius: 0 4px 4px 0;
+      font-size: 0.8rem;
+      color: #7f1d1d;
+      line-height: 1.5;
+    }
+    .incident-note a {
+      color: #991b1b;
+      font-weight: 600;
+      text-decoration: underline;
+    }
+    .incident-note strong {
+      color: #991b1b;
+    }
+
+    .pkg-name {
+      font-family: var(--font-mono);
+      font-size: 0.9rem;
+      color: var(--ink);
+      font-weight: 500;
+    }
+
+    .score-cell {
+      font-family: var(--font-mono);
+      font-weight: 600;
+    }
+
+    .score-high { color: #3d8b3d; }
+    .score-mid { color: #c47a0a; }
+    .score-low { color: var(--accent); }
+
+    .risk-badge {
+      display: inline-block;
+      padding: 0.2rem 0.5rem;
+      border-radius: 3px;
+      font-size: 0.75rem;
+      font-weight: 600;
+      letter-spacing: 0.03em;
+    }
+
+    .risk-critical {
+      background: #fee2e2;
+      color: #991b1b;
+    }
+
+    .risk-high {
+      background: #fef3c7;
+      color: #92400e;
+    }
+
+    .risk-warn {
+      background: #fef9c3;
+      color: #713f12;
+    }
+
+    .risk-ok {
+      background: #dcfce7;
+      color: #166534;
+    }
+
+    .trend-growing { color: #3d8b3d; }
+    .trend-stable { color: var(--ink-muted); }
+    .trend-declining { color: var(--accent); }
+
+    /* ── MCP CTA ── */
+    .mcp-cta {
+      margin-top: 2.5rem;
+      padding: 1.5rem;
+      background: var(--paper-dim);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+    }
+
+    .mcp-cta-label {
+      font-size: 0.85rem;
+      font-weight: 500;
+      color: var(--ink-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      margin-bottom: 0.75rem;
+    }
+
+    .code-block {
+      background: var(--ink);
+      color: #a8c6fa;
+      padding: 1rem;
+      border-radius: 4px;
+      font-family: var(--font-mono);
+      font-size: 0.8rem;
+      line-height: 1.6;
+      overflow-x: auto;
+      margin-bottom: 0.75rem;
+    }
+
+    .mcp-cta-hint {
+      font-size: 0.85rem;
+      color: var(--ink-muted);
+    }
+
+    .mcp-cta-hint em {
+      font-style: italic;
+      color: var(--ink);
+    }
+
+    /* ── Loading / Error ── */
+    .loading-area {
+      text-align: center;
+      padding: 3rem 0;
+      color: var(--ink-muted);
+    }
+
+    .loading-spinner {
+      width: 2rem;
+      height: 2rem;
+      border: 2px solid var(--border);
+      border-top-color: var(--accent);
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+      margin: 0 auto 1rem;
+    }
+
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+
+    .error-area {
+      max-width: 48rem;
+      margin: 1rem auto;
+      padding: 1rem 1.25rem;
+      background: #fee2e2;
+      border: 1px solid #fca5a5;
+      border-radius: 6px;
+      color: #991b1b;
+      font-size: 0.9rem;
+    }
+
+    /* ── Dep Tree Explorer ── */
+    .dep-tree-section {
+      padding: 4rem 0;
+      background: var(--paper);
+      border-top: 1px solid var(--border);
+    }
+
+    .dep-tree-heading {
+      margin-bottom: 1rem;
+    }
+
+    .dep-tree-intro {
+      font-size: 1rem;
+      color: var(--ink-muted);
+      line-height: 1.7;
+      max-width: 42rem;
+      margin-bottom: 2rem;
+    }
+
+    .dep-tree-card {
+      background: var(--paper-dim);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 1.5rem;
+      max-width: 48rem;
+      margin-bottom: 1.5rem;
+    }
+
+    .dep-tree-input-row {
+      display: flex;
+      gap: 0.75rem;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+
+    .graph-pkg-input {
+      flex: 1;
+      min-width: 14rem;
+      padding: 0.65rem 0.9rem;
+      font-family: var(--font-mono);
+      font-size: 0.9rem;
+      background: var(--paper);
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      color: var(--ink);
+      transition: border-color 0.15s;
+    }
+
+    .graph-pkg-input:focus {
+      outline: none;
+      border-color: var(--accent);
+    }
+
+    .depth-selector {
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+    }
+
+    .depth-label {
+      font-size: 0.8rem;
+      color: var(--ink-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    .depth-btn {
+      width: 2rem;
+      height: 2rem;
+      border: 1px solid var(--border);
+      background: transparent;
+      color: var(--ink-muted);
+      font-family: var(--font-mono);
+      font-size: 0.85rem;
+      border-radius: 4px;
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+
+    .depth-btn.active {
+      background: var(--ink);
+      color: var(--paper);
+      border-color: var(--ink);
+    }
+
+    .graph-submit {
+      padding: 0.65rem 1.5rem;
+      background: var(--accent);
+      color: white;
+      border: none;
+      border-radius: 4px;
+      font-family: var(--font-body);
+      font-size: 0.9rem;
+      font-weight: 500;
+      cursor: pointer;
+      transition: background 0.15s;
+      white-space: nowrap;
+    }
+
+    .graph-submit:hover { background: var(--accent-dim); }
+    .graph-submit:disabled { opacity: 0.6; cursor: not-allowed; }
+
+    .dep-tree-note {
+      margin-top: 0.6rem;
+      font-size: 0.75rem;
+      color: var(--ink-subtle);
+    }
+
+    /* ── Graph Results ── */
+    .graph-results {
+      max-width: 48rem;
+    }
+
+    .graph-summary {
+      font-size: 0.9rem;
+      color: var(--ink-muted);
+      margin-bottom: 1rem;
+    }
+
+    .tree-output {
+      background: var(--ink);
+      color: #e2e8f0;
+      border-radius: 6px;
+      padding: 1.25rem 1.5rem;
+      font-family: var(--font-mono);
+      font-size: 0.85rem;
+      line-height: 1.8;
+      overflow-x: auto;
+      margin-bottom: 1rem;
+    }
+
+    .tree-node { display: block; }
+    .tree-node-prefix { color: #64748b; }
+    .tree-node-name { color: #a8c6fa; }
+    .tree-node-score { color: #94a3b8; font-size: 0.8rem; }
+    .tree-node-critical { color: #f87171; font-weight: 600; }
+    .tree-node-high { color: #fbbf24; }
+    .tree-node-warn { color: #d1d5db; }
+    .tree-node-ok { color: #86efac; }
+
+    .critical-paths {
+      background: #fff5f5;
+      border: 1px solid #fca5a5;
+      border-radius: 6px;
+      padding: 1rem 1.25rem;
+      font-size: 0.85rem;
+      line-height: 1.7;
+      color: #991b1b;
+    }
+
+    .critical-paths strong { display: block; margin-bottom: 0.4rem; color: #7f1d1d; font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.05em; }
+    .critical-path-item { font-family: var(--font-mono); font-size: 0.8rem; }
+
+    .graph-loading {
+      text-align: center;
+      padding: 2rem 0;
+      color: var(--ink-muted);
+    }
+
+    /* ── How it works ── */
+    .how-it-works {
+      padding: 4rem 0 6rem;
+      background: var(--paper-dim);
+    }
+
+    .section-heading {
+      font-family: var(--font-display);
+      font-size: 1.8rem;
+      color: var(--ink);
+      margin-bottom: 2rem;
+    }
+
+    .signal-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(16rem, 1fr));
+      gap: 1.5rem;
+      margin-bottom: 1.5rem;
+    }
+
+    .signal-item {
+      display: flex;
+      flex-direction: column;
+      gap: 0.4rem;
+    }
+
+    .signal-name {
+      font-size: 0.85rem;
+      font-weight: 500;
+      color: var(--ink);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    .signal-desc {
+      font-size: 0.9rem;
+      color: var(--ink-muted);
+      line-height: 1.5;
+    }
+
+    .how-note {
+      font-size: 0.85rem;
+      color: var(--ink-muted);
+      line-height: 1.6;
+      padding-top: 1rem;
+      border-top: 1px solid var(--border);
+    }
+
+    /* ── Post-results dynamic CTA ── */
+    .post-results-cta {
+      margin-top: 1.5rem;
+      padding: 1.25rem 1.5rem;
+      border: 1px solid #D14D4140;
+      border-radius: 8px;
+      background: #D14D4108;
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      flex-wrap: wrap;
+    }
+    .post-results-cta .cta-text {
+      flex: 1;
+      min-width: 200px;
+      font-size: 0.9rem;
+      color: var(--ink);
+      line-height: 1.5;
+    }
+    .post-results-cta .cta-text strong {
+      color: #991b1b;
+    }
+    .post-results-cta .cta-btn {
+      display: inline-block;
+      padding: 0.6rem 1.25rem;
+      background: var(--accent);
+      color: #fff;
+      border-radius: 4px;
+      text-decoration: none;
+      font-size: 0.85rem;
+      font-weight: 500;
+      white-space: nowrap;
+    }
+    .post-results-cta .cta-btn:hover {
+      background: var(--accent-hover);
+      text-decoration: none;
+    }
+    .post-results-cta .cta-hint {
+      font-size: 0.75rem;
+      color: var(--ink-subtle);
+    }
+
+    /* Inline email-capture form embedded in the post-results CTA.
+       Mirrors the CLI inlineSignup() (npm-package v1.16) — collapses the
+       previous audit→click→navigate→email funnel into one inline submit.
+       Same /api/keys/create endpoint as /get-started, just no page hop. */
+    .post-results-cta .cta-form {
+      display: flex;
+      gap: 0.5rem;
+      flex-wrap: wrap;
+      align-items: center;
+      width: 100%;
+      margin-top: 0.25rem;
+    }
+    .post-results-cta .cta-input {
+      flex: 1 1 220px;
+      min-width: 0;
+      padding: 0.6rem 0.85rem;
+      border: 1px solid var(--border, #d8d4cf);
+      border-radius: 4px;
+      font-size: 0.9rem;
+      font-family: inherit;
+      background: #fff;
+      color: var(--ink);
+    }
+    .post-results-cta .cta-input:focus {
+      outline: none;
+      border-color: var(--accent);
+      box-shadow: 0 0 0 2px #D14D4126;
+    }
+    .post-results-cta .cta-form-btn {
+      padding: 0.6rem 1.1rem;
+      background: var(--accent);
+      color: #fff;
+      border: none;
+      border-radius: 4px;
+      font-size: 0.85rem;
+      font-weight: 500;
+      cursor: pointer;
+      font-family: inherit;
+      white-space: nowrap;
+    }
+    .post-results-cta .cta-form-btn:hover {
+      background: var(--accent-hover);
+    }
+    .post-results-cta .cta-form-btn:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+    }
+    .post-results-cta .cta-success {
+      width: 100%;
+      padding: 0.5rem 0;
+      font-size: 0.9rem;
+      color: #166534;
+    }
+    .post-results-cta .cta-success code {
+      display: inline-block;
+      padding: 0.2rem 0.45rem;
+      background: #f5f5f5;
+      border-radius: 3px;
+      font-size: 0.82rem;
+      margin: 0 0.2rem;
+    }
+    .post-results-cta .cta-error {
+      width: 100%;
+      padding: 0.4rem 0;
+      font-size: 0.85rem;
+      color: #991b1b;
+    }
+
+    /* ── Audit waitlist CTA ── */
+    .audit-waitlist-section {
+      padding: 2.5rem 0 3rem;
+      background: var(--paper-dim);
+      border-top: 1px solid var(--border-light);
+    }
+
+    .audit-waitlist-inner {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      flex-wrap: wrap;
+      max-width: var(--max-content);
+      margin: 0 auto;
+    }
+
+    .audit-waitlist-label {
+      font-size: 0.9rem;
+      color: var(--ink-muted);
+      white-space: nowrap;
+      margin: 0;
+    }
+
+    .audit-waitlist-btn {
+      display: inline-block;
+      padding: 0.6rem 1rem;
+      background: var(--accent);
+      color: #fff;
+      border: 1px solid var(--accent);
+      border-radius: 4px;
+      font-family: inherit;
+      font-size: 0.875rem;
+      font-weight: 500;
+      cursor: pointer;
+      white-space: nowrap;
+      text-decoration: none;
+      transition: background 0.15s, color 0.15s, opacity 0.15s;
+    }
+
+    .audit-waitlist-btn:hover {
+      background: var(--accent-dim, var(--accent));
+      opacity: 0.92;
+    }
+
+    .audit-waitlist-hint { font-size: 0.8rem; color: var(--ink-subtle); }
+
+    /* ── GitHub input ── */
+    .github-repo-input {
+      width: 100%;
+      padding: 0.65rem 0.9rem;
+      font-family: var(--font-mono);
+      font-size: 0.9rem;
+      background: var(--paper);
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      color: var(--ink);
+      transition: border-color 0.15s;
+      box-sizing: border-box;
+    }
+
+    .github-repo-input:focus {
+      outline: none;
+      border-color: var(--accent);
+    }
+
+    .github-input-hint {
+      margin-top: 0.5rem;
+      font-size: 0.8rem;
+      color: var(--ink-subtle);
+      line-height: 1.5;
+    }
+
+    .github-input-hint code {
+      font-family: var(--font-mono);
+      background: var(--border);
+      padding: 0.1em 0.3em;
+      border-radius: 3px;
+    }
+
+    .example-repo {
+      background: none;
+      border: none;
+      padding: 0;
+      color: var(--accent);
+      font-size: 0.8rem;
+      font-family: var(--font-mono);
+      cursor: pointer;
+      text-decoration: underline;
+      text-underline-offset: 2px;
+    }
+
+    .example-repo:hover { opacity: 0.7; }
+
+    /* ── Share row ── */
+    .share-row {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      padding: 0.25rem 0.5rem 0.75rem;
+    }
+    .share-btn {
+      background: none;
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      padding: 0.3rem 0.7rem;
+      font-size: 0.8rem;
+      color: var(--ink-muted);
+      cursor: pointer;
+      font-family: var(--font-sans);
+      transition: border-color 0.15s, color 0.15s;
+    }
+    .share-btn:hover { border-color: var(--ink-subtle); color: var(--ink); }
+    .share-copied {
+      font-size: 0.8rem;
+      color: #166534;
+      font-weight: 500;
+    }
+  </style>
+
+  <script>
+    const API = 'https://poc-backend.amdal-dev.workers.dev/api/audit';
+    const GITHUB_API = 'https://poc-backend.amdal-dev.workers.dev/api/audit/github';
+    const KEYS_API = 'https://poc-backend.amdal-dev.workers.dev/api/keys/create';
+
+    // localStorage flag — true if the visitor already created a key via the
+    // inline post-results form. Suppresses the email prompt for returning
+    // users (they get a "you're monitoring N packages" pat-on-back instead).
+    const HAS_KEY_LS_KEY = 'commit_inline_key_created';
+    function hasInlineKey(): boolean {
+      try { return localStorage.getItem(HAS_KEY_LS_KEY) === '1'; } catch { return false; }
+    }
+    function markInlineKey() {
+      try { localStorage.setItem(HAS_KEY_LS_KEY, '1'); } catch {}
+    }
+
+    // Share state — updated after each audit
+    let _lastPackages: string[] = [];
+    let _lastEco = 'npm';
+    let _lastRepo = '';
+    let _lastResults: AuditResult[] = [];
+    let _lastRepoLabel = '';
+
+    // Ecosystem tabs
+    let activeEco = 'npm';
+    const pkgInputArea = document.getElementById('pkg-input-area')!;
+    const githubInputArea = document.getElementById('github-input-area')!;
+    const dropZoneEl = document.getElementById('drop-zone')!;
+
+    document.querySelectorAll('.eco-tab').forEach(btn => {
+      btn.addEventListener('click', () => {
+        document.querySelectorAll('.eco-tab').forEach(b => {
+          b.classList.remove('active');
+          b.setAttribute('aria-selected', 'false');
+        });
+        btn.classList.add('active');
+        btn.setAttribute('aria-selected', 'true');
+        activeEco = (btn as HTMLButtonElement).dataset.eco ?? 'npm';
+
+        const isGitHub = activeEco === 'github';
+        pkgInputArea.hidden = isGitHub;
+        dropZoneEl.hidden = isGitHub;
+        githubInputArea.hidden = !isGitHub;
+
+        const auditBtn = document.getElementById('audit-btn') as HTMLButtonElement;
+        auditBtn.textContent = isGitHub ? 'Audit repo' : 'Audit dependencies';
+
+        // Update placeholder and label
+        const ta = document.getElementById('packages-input') as HTMLTextAreaElement;
+        const inputLabel = document.querySelector('.input-label') as HTMLLabelElement;
+        if (activeEco === 'pypi') {
+          ta.placeholder = 'langchain\nlitellm\nopenai\nanthropicai\nrequests\nfastapi\npydantic';
+          inputLabel.textContent = 'Package names — one per line, or comma-separated (max 20)';
+        } else if (activeEco === 'cargo') {
+          ta.placeholder = 'serde\ntokio\nreqwest\nrand\nclap\nactix-web\nhyper';
+          inputLabel.textContent = 'Crate names — one per line, or comma-separated (max 20)';
+        } else if (activeEco === 'golang') {
+          ta.placeholder = 'github.com/gin-gonic/gin\ngithub.com/spf13/cobra\ngolang.org/x/net\ngithub.com/gorilla/mux\ngithub.com/stretchr/testify';
+          inputLabel.textContent = 'Full module paths — one per line (max 20)';
+        } else if (activeEco === 'npm') {
+          ta.placeholder = 'axios\nzod\nchalk\nlodash\nexpress\ndotenv\nuuid';
+          inputLabel.textContent = 'Package names — one per line, or comma-separated (max 20)';
+        }
+
+        // Update column header for ecosystem
+        const thMaint = document.getElementById('th-maintainers');
+        if (thMaint) {
+          const labels: Record<string, string> = { npm: 'Publishers', pypi: 'Maintainers', cargo: 'Owners', golang: 'Contributors', github: 'Maintainers' };
+          thMaint.textContent = labels[activeEco] ?? 'Maintainers';
+        }
+      });
+    });
+
+    // Format numbers
+    function fmtNum(n: number | null): string {
+      if (n === null || n === undefined) return '—';
+      if (n >= 1_000_000_000) return (n / 1_000_000_000).toFixed(1) + 'B';
+      if (n >= 1_000_000) return (n / 1_000_000).toFixed(1) + 'M';
+      if (n >= 1_000) return (n / 1_000).toFixed(0) + 'K';
+      return n.toString();
+    }
+
+    function scoreClass(score: number | null): string {
+      if (score === null) return '';
+      if (score >= 75) return 'score-high';
+      if (score >= 50) return 'score-mid';
+      return 'score-low';
+    }
+
+    function renderRisk(flags: string[]): string {
+      if (!flags || flags.length === 0) return '<span class="risk-badge risk-ok">OK</span>';
+      return flags.map(f => {
+        const level = f.startsWith('CRITICAL') ? 'risk-critical' : f.startsWith('HIGH') ? 'risk-high' : 'risk-warn';
+        const label = f.startsWith('CRITICAL') ? 'CRITICAL' : f.startsWith('HIGH') ? 'HIGH' : f.startsWith('WARN') ? 'WARN' : f;
+        return `<span class="risk-badge ${level}" title="${f}">${label}</span>`;
+      }).join(' ');
+    }
+
+    function renderTrend(t: string | null): string {
+      if (!t) return '—';
+      const cls = t === 'growing' ? 'trend-growing' : t === 'declining' ? 'trend-declining' : 'trend-stable';
+      return `<span class="${cls}">${t}</span>`;
+    }
+
+    // ── Drag-and-drop package.json / requirements.txt ──
+    const dropZone = document.getElementById('drop-zone')!;
+
+    type ExtractResult = { packages: string[]; totalInFile: number; isLockfile: boolean; };
+
+    function parseLockNpm(text: string): string[] {
+      try {
+        const lock = JSON.parse(text) as Record<string, unknown>;
+        const pkgs = new Set<string>();
+        const packages = lock.packages as Record<string, unknown> | undefined;
+        const dependencies = lock.dependencies as Record<string, unknown> | undefined;
+        if (packages) {
+          for (const key of Object.keys(packages)) {
+            if (!key || key === '') continue;
+            const parts = key.split('node_modules/');
+            const pkgPath = parts[parts.length - 1];
+            if (pkgPath) pkgs.add(pkgPath);
+          }
+        } else if (dependencies) {
+          for (const name of Object.keys(dependencies)) pkgs.add(name);
+        }
+        return [...pkgs];
+      } catch { return []; }
+    }
+
+    function parseLockYarn(text: string): string[] {
+      const pkgs = new Set<string>();
+      const headerRe = /^"?(@?[^@\s"]+)@/gm;
+      let match;
+      while ((match = headerRe.exec(text)) !== null) pkgs.add(match[1]);
+      return [...pkgs];
+    }
+
+    function parseLockPnpm(text: string): string[] {
+      const pkgs = new Set<string>();
+      const pkgRe = /^\s+\/?(@?[^@\s/]+(?:\/[^@\s]+)?)@/gm;
+      let match;
+      while ((match = pkgRe.exec(text)) !== null) pkgs.add(match[1]);
+      return [...pkgs];
+    }
+
+    function parseCargoToml(text: string): string[] {
+      const pkgs = new Set<string>();
+      // Match [dependencies] and [dev-dependencies] sections
+      const depSections = text.matchAll(/\[((?:dev-)?dependencies)\]([\s\S]*?)(?=\n\[|$)/g);
+      for (const m of depSections) {
+        const lines = m[2].split('\n');
+        for (const line of lines) {
+          const match = line.match(/^(\S+)\s*=/);
+          if (match && match[1]) pkgs.add(match[1]);
+        }
+      }
+      // Also match [dependencies.X] style
+      const depDot = text.matchAll(/\[(?:dev-)?dependencies\.(\S+)\]/g);
+      for (const m of depDot) {
+        if (m[1]) pkgs.add(m[1]);
+      }
+      return [...pkgs];
+    }
+
+    function parseGoMod(text: string): string[] {
+      const pkgs = new Set<string>();
+      const lines = text.split('\n');
+      let inRequire = false;
+      for (const line of lines) {
+        const trimmed = line.trim();
+        if (trimmed === 'require (') { inRequire = true; continue; }
+        if (trimmed === ')') { inRequire = false; continue; }
+        if (inRequire) {
+          const match = trimmed.match(/^(\S+)\s/);
+          if (match && match[1]) pkgs.add(match[1]);
+        }
+        // Single-line require
+        const singleMatch = trimmed.match(/^require\s+(\S+)\s/);
+        if (singleMatch && singleMatch[1]) pkgs.add(singleMatch[1]);
+      }
+      return [...pkgs];
+    }
+
+    function parseGoSum(text: string): string[] {
+      const pkgs = new Set<string>();
+      for (const line of text.split('\n')) {
+        const match = line.match(/^(\S+)\s/);
+        if (match && match[1]) pkgs.add(match[1]);
+      }
+      return [...pkgs];
+    }
+
+    function extractPackages(text: string, filename: string): ExtractResult & { detectedEco?: string } {
+      const base = filename.toLowerCase().split('/').pop() ?? filename.toLowerCase();
+
+      // Lock files — scan ALL transitive deps
+      if (base === 'package-lock.json') {
+        const pkgs = parseLockNpm(text);
+        return { packages: pkgs.slice(0, 20), totalInFile: pkgs.length, isLockfile: true, detectedEco: 'npm' };
+      }
+      if (base === 'yarn.lock') {
+        const pkgs = parseLockYarn(text);
+        return { packages: pkgs.slice(0, 20), totalInFile: pkgs.length, isLockfile: true, detectedEco: 'npm' };
+      }
+      if (base === 'pnpm-lock.yaml' || base === 'pnpm-lock.yml') {
+        const pkgs = parseLockPnpm(text);
+        return { packages: pkgs.slice(0, 20), totalInFile: pkgs.length, isLockfile: true, detectedEco: 'npm' };
+      }
+      if (base.endsWith('.txt') || base === 'requirements.txt') {
+        const pkgs = text.split('\n')
+          .map(l => l.split(/[>=<!\[#]/)[0].trim())
+          .filter(Boolean);
+        return { packages: pkgs.slice(0, 20), totalInFile: pkgs.length, isLockfile: false, detectedEco: 'pypi' };
+      }
+      // Cargo.toml
+      if (base === 'cargo.toml') {
+        const pkgs = parseCargoToml(text);
+        return { packages: pkgs.slice(0, 20), totalInFile: pkgs.length, isLockfile: false, detectedEco: 'cargo' };
+      }
+      // go.mod
+      if (base === 'go.mod') {
+        const pkgs = parseGoMod(text);
+        return { packages: pkgs.slice(0, 20), totalInFile: pkgs.length, isLockfile: false, detectedEco: 'golang' };
+      }
+      // go.sum (transitive)
+      if (base === 'go.sum') {
+        const pkgs = parseGoSum(text);
+        return { packages: pkgs.slice(0, 20), totalInFile: pkgs.length, isLockfile: true, detectedEco: 'golang' };
+      }
+      // package.json
+      try {
+        const json = JSON.parse(text) as Record<string, unknown>;
+        const deps = {
+          ...(typeof json.dependencies === 'object' && json.dependencies ? json.dependencies as Record<string, string> : {}),
+          ...(typeof json.devDependencies === 'object' && json.devDependencies ? json.devDependencies as Record<string, string> : {}),
+        };
+        const pkgs = Object.keys(deps);
+        return { packages: pkgs.slice(0, 20), totalInFile: pkgs.length, isLockfile: false, detectedEco: 'npm' };
+      } catch {
+        return { packages: [], totalInFile: 0, isLockfile: false };
+      }
+    }
+
+    dropZone.addEventListener('dragover', (e) => {
+      e.preventDefault();
+      dropZone.classList.add('drag-over');
+    });
+
+    dropZone.addEventListener('dragleave', () => {
+      dropZone.classList.remove('drag-over');
+    });
+
+    function applyFileResult(result: ExtractResult & { detectedEco?: string }, filename: string) {
+      if (result.packages.length === 0) {
+        const errArea = document.getElementById('error-area')!;
+        document.getElementById('error-message')!.textContent = 'Could not extract packages from file. Paste them manually.';
+        errArea.hidden = false;
+        return;
+      }
+
+      const ta = document.getElementById('packages-input') as HTMLTextAreaElement;
+      ta.value = result.packages.join('\n');
+
+      // Auto-detect ecosystem from filename
+      if (result.detectedEco && result.detectedEco !== activeEco) {
+        const tab = document.querySelector(`[data-eco="${result.detectedEco}"]`) as HTMLButtonElement;
+        tab?.click();
+      } else {
+        const npmTab = document.querySelector('[data-eco="npm"]') as HTMLButtonElement;
+        npmTab?.click();
+      }
+
+      // Flash the drop zone with meaningful feedback
+      const label = dropZone.querySelector('.drop-label')!;
+      const originalHtml = label.innerHTML;
+      const hint = dropZone.querySelector('.drop-hint')!;
+      const originalHint = hint.textContent;
+      if (result.isLockfile && result.totalInFile > 20) {
+        label.innerHTML = `✓ ${filename} — ${result.totalInFile} transitive deps found`;
+        hint.textContent = `Auditing top 20. Run npx proof-of-commitment --file ${filename} for full scan.`;
+      } else {
+        label.innerHTML = `✓ ${result.packages.length} packages loaded from ${filename}`;
+        hint.textContent = originalHint ?? '';
+      }
+      setTimeout(() => {
+        label.innerHTML = originalHtml;
+        if (originalHint) hint.textContent = originalHint;
+      }, 4000);
+    }
+
+    dropZone.addEventListener('drop', (e) => {
+      e.preventDefault();
+      dropZone.classList.remove('drag-over');
+      const file = e.dataTransfer?.files?.[0];
+      if (!file) return;
+
+      const reader = new FileReader();
+      reader.onload = (evt) => {
+        const text = evt.target?.result as string;
+        const result = extractPackages(text, file.name);
+        applyFileResult(result, file.name);
+      };
+      reader.readAsText(file);
+    });
+
+    // Also allow clicking the drop zone to open file picker
+    dropZone.addEventListener('click', () => {
+      const input = document.createElement('input');
+      input.type = 'file';
+      input.accept = '.json,.txt,.yaml,.yml,.toml,.mod,.sum,application/json,text/plain';
+      input.onchange = (e) => {
+        const file = (e.target as HTMLInputElement).files?.[0];
+        if (!file) return;
+        const reader = new FileReader();
+        reader.onload = (evt) => {
+          const text = evt.target?.result as string;
+          const result = extractPackages(text, file.name);
+          applyFileResult(result, file.name);
+        };
+        reader.readAsText(file);
+      };
+      input.click();
+    });
+
+    // Example repo buttons
+    document.querySelectorAll('.example-repo').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const repo = (btn as HTMLButtonElement).dataset.repo ?? '';
+        (document.getElementById('github-repo-input') as HTMLInputElement).value = repo;
+      });
+    });
+
+    type ScoreBreakdown = {
+      longevity?: number;
+      downloadMomentum?: number;
+      releaseConsistency?: number;
+      maintainerDepth?: number;
+      publisherDepth?: number;
+      githubBacking?: number;
+      popularityProxy?: number;
+      trustedPublishing?: number;
+    };
+
+    type AuditResult = {
+      name: string;
+      ecosystem: string;
+      score: number | null;
+      maintainers: number | null;
+      weeklyDownloads: number | null;
+      ageYears: number | null;
+      trend: string | null;
+      riskFlags: string[];
+      scoreBreakdown?: ScoreBreakdown;
+      hasProvenance?: boolean | null;
+      daysSinceLastPublish?: number | null;
+      githubContributors?: number | null;
+      error?: string;
+    };
+
+    function renderAuditResults(results: AuditResult[], count: number, repoLabel?: string) {
+      const critCount = results.filter(r => r.riskFlags?.some(f => f.startsWith('CRITICAL'))).length;
+      const highCount = results.filter(r => r.riskFlags?.some(f => f.startsWith('HIGH'))).length;
+      const provenanceCount = results.filter(r => r.hasProvenance === true).length;
+
+      const prefix = repoLabel ? `<strong>${repoLabel}</strong> — ` : '';
+      const provenanceSuffix = provenanceCount > 0
+        ? ` · <span class="provenance-summary" title="Packages using npm Trusted Publishing (OIDC provenance)">${provenanceCount} verified</span>`
+        : '';
+      document.getElementById('results-summary')!.innerHTML =
+        prefix +
+        `<strong>${count}</strong> packages scored. ` +
+        (critCount > 0 ? `<span style="color:#991b1b;font-weight:600">${critCount} CRITICAL</span>` : '') +
+        (highCount > 0 ? ` · <span style="color:#92400e;font-weight:600">${highCount} HIGH</span>` : '') +
+        (critCount === 0 && highCount === 0 ? '<span style="color:#166534;font-weight:600">No critical risk flags</span>' : '') +
+        provenanceSuffix;
+
+      const tbody = document.getElementById('results-body')!;
+
+      // All possible breakdown dimensions across ecosystems
+      const ALL_DIMS: Record<string, { max: number; label: string }> = {
+        longevity:          { max: 25, label: 'Longevity' },
+        downloadMomentum:   { max: 25, label: 'DL Trend' },
+        releaseConsistency: { max: 20, label: 'Releases' },
+        maintainerDepth:    { max: 15, label: 'Maintainers' },
+        publisherDepth:     { max: 15, label: 'Publishers' },
+        githubBacking:      { max: 15, label: 'GitHub' },
+        popularityProxy:    { max: 15, label: 'Popularity' },
+        trustedPublishing:  { max: 2,  label: 'Provenance' },
+      };
+
+      const INCIDENT_NOTES: Record<string, { date: string; text: string; url: string }> = {
+        'axios': {
+          date: 'Mar 2026',
+          text: '<strong>Compromised Mar 30–31, 2026</strong> — stolen npm token for sole maintainer jasonsaayman. Malicious versions <code>axios@1.14.1</code> and <code>axios@0.30.4</code> published, dropped a cross-platform RAT. npm audit showed 0 vulnerabilities before the attack.',
+          url: '/forensics/axios-2026',
+        },
+        'ua-parser-js': {
+          date: 'Oct 2021',
+          text: 'Compromised — npm token stolen, malicious versions (0.7.29, 0.8.0, 1.0.0) deployed cryptominer + credential stealer. Used by Facebook, Microsoft, Amazon, Google. Malicious code live for 4 hours.',
+          url: '/blog/three-npm-disasters-that-were-predictable',
+        },
+      };
+
+      function barClass(val: number, max: number): string {
+        const pct = val / max;
+        if (pct >= 0.66) return '';
+        if (pct >= 0.33) return 'bar-warn';
+        return 'bar-low';
+      }
+
+      function renderBreakdown(bd: ScoreBreakdown, pkgName?: string, result?: AuditResult): string {
+        // Show only the dimensions present in this result (ecosystems differ)
+        // Separate trustedPublishing — render as badge, not bar (max=2 is boolean-like)
+        const dims = Object.keys(bd).filter(k => ALL_DIMS[k] && k !== 'trustedPublishing' && bd[k as keyof ScoreBreakdown] !== undefined);
+        const grid = `<div class="breakdown-grid">${dims.map(dim => {
+          const val = bd[dim as keyof ScoreBreakdown] ?? 0;
+          const info = ALL_DIMS[dim];
+          const max = info.max;
+          const pct = Math.round((val / max) * 100);
+          const cls = barClass(val, max);
+          return `<div class="breakdown-dim">
+            <span class="breakdown-label">${info.label}</span>
+            <div class="breakdown-bar-wrap"><div class="breakdown-bar ${cls}" style="width:${pct}%"></div></div>
+            <span class="breakdown-score">${val}<span class="breakdown-max">/${max}</span></span>
+          </div>`;
+        }).join('')}</div>`;
+
+        // Provenance note (separate from bar grid — it's a boolean signal)
+        const hasTP = result?.hasProvenance === true;
+        const provenanceHtml = (bd.trustedPublishing !== undefined)
+          ? `<div class="provenance-note ${hasTP ? 'provenance-verified' : 'provenance-none'}">
+              <span class="provenance-icon">${hasTP ? '&#x1f512;' : '&#x1f513;'}</span>
+              <span>${hasTP
+                ? '<strong>Verified provenance</strong> — published via Trusted Publishing (OIDC). Build linked to source commit. +2 pts.'
+                : '<strong>No provenance</strong> — published with user credentials, not Trusted Publishing. Credential theft = supply chain attack.'
+              }</span>
+            </div>`
+          : '';
+
+        const normalizedName = (pkgName ?? '').toLowerCase().replace(/^(npm:|pypi:)/, '').trim();
+        const incident = INCIDENT_NOTES[normalizedName];
+        const incidentHtml = incident
+          ? `<div class="incident-note">🚨 <strong>${incident.date}:</strong> ${incident.text} <a href="${incident.url}" target="_blank">View forensics →</a></div>`
+          : '';
+        return grid + provenanceHtml + incidentHtml;
+      }
+
+      const rows = results.map((r, i) => {
+        const hasBreakdown = r.scoreBreakdown && !r.error;
+        const rowId = `row-${i}`;
+        const bdId = `bd-${i}`;
+        const rowCls = hasBreakdown ? 'result-row' : '';
+        const clickAttr = hasBreakdown ? `onclick="toggleBreakdown('${rowId}','${bdId}')"` : '';
+        const provenanceBadge = r.hasProvenance === true
+          ? ' <span class="provenance-badge" title="Verified provenance — published via Trusted Publishing (OIDC), not user credentials">&#x1f512;</span>'
+          : '';
+        const errorLabel = r.error ? ' <span style="color:var(--ink-subtle);font-weight:400">(not found)</span>' : '';
+        const mainRow = `<tr id="${rowId}" class="${rowCls}" ${clickAttr}>
+          <td><span class="pkg-name">${r.name}${provenanceBadge}${errorLabel}</span></td>
+          <td><span class="score-cell ${scoreClass(r.score)}">${r.score !== null ? r.score + '/100' : '—'}</span></td>
+          <td>${renderRisk(r.riskFlags ?? [])}</td>
+          <td>${r.maintainers !== null ? r.maintainers : '—'}</td>
+          <td>${fmtNum(r.weeklyDownloads)}</td>
+          <td>${r.ageYears !== null ? r.ageYears + 'y' : '—'}</td>
+          <td>${renderTrend(r.trend)}</td>
+        </tr>`;
+        const bdRow = hasBreakdown ? `<tr id="${bdId}" class="breakdown-row" hidden><td colspan="7">${renderBreakdown(r.scoreBreakdown!, r.name, r)}</td></tr>` : '';
+        return mainRow + bdRow;
+      });
+
+      tbody.innerHTML = rows.join('');
+
+      // Dynamic post-results CTA — contextual to what the user found.
+      //
+      // 2026-05-23: replaced anchor-to-/get-started with inline email form.
+      // Mirrors the CLI inlineSignup() (npm-package v1.16) which collapsed
+      // the 6-step funnel into a single prompt. Web flow was still 2-step
+      // (audit → click CTA → land on /get-started → enter email → submit).
+      // POST goes to the same /api/keys/create endpoint as /get-started,
+      // just no page hop. Returning users (localStorage marker) skip the
+      // prompt and see a "monitoring active" reassurance instead.
+      const ctaEl = document.getElementById('post-results-cta')!;
+      const alreadyHasKey = hasInlineKey();
+
+      function renderInlineForm(headline: string, fallbackHref: string, refTag: string, btnLabel: string, hintText: string) {
+        const formId = 'cta-inline-form';
+        const inputId = 'cta-inline-email';
+        const btnId = 'cta-inline-btn';
+        const errId = 'cta-inline-err';
+        const successId = 'cta-inline-success';
+        const noScriptHref = fallbackHref;
+        ctaEl.innerHTML = `
+          <div class="cta-text">${headline}</div>
+          <form class="cta-form" id="${formId}" data-source="audit-web-inline" data-fallback-ref="${refTag}">
+            <input type="email" id="${inputId}" class="cta-input"
+                   placeholder="you@company.com" required autocomplete="email"
+                   aria-label="Your email">
+            <button type="submit" id="${btnId}" class="cta-form-btn">${btnLabel}</button>
+            <noscript><a href="${noScriptHref}" class="cta-btn">${btnLabel} &rarr;</a></noscript>
+          </form>
+          <span class="cta-hint">${hintText}</span>
+          <p class="cta-error" id="${errId}" hidden></p>
+          <div class="cta-success" id="${successId}" hidden></div>
+        `;
+        ctaEl.hidden = false;
+
+        const form = document.getElementById(formId) as HTMLFormElement;
+        const input = document.getElementById(inputId) as HTMLInputElement;
+        const btn = document.getElementById(btnId) as HTMLButtonElement;
+        const errEl = document.getElementById(errId) as HTMLParagraphElement;
+        const successEl = document.getElementById(successId) as HTMLDivElement;
+
+        form.addEventListener('submit', async (e) => {
+          e.preventDefault();
+          errEl.hidden = true;
+          const email = input.value.trim();
+          if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+            errEl.textContent = 'Please enter a valid email address.';
+            errEl.hidden = false;
+            return;
+          }
+          btn.disabled = true;
+          btn.textContent = 'Saving…';
+          try {
+            const res = await fetch(KEYS_API, {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ email, source: 'audit-web-inline' }),
+            });
+            const data = await res.json().catch(() => ({})) as { key?: string; message?: string; error?: string };
+            if (res.ok || res.status === 201) {
+              markInlineKey();
+              form.hidden = true;
+              const hint = ctaEl.querySelector('.cta-hint') as HTMLElement | null;
+              if (hint) hint.hidden = true;
+              if (data.key) {
+                successEl.innerHTML =
+                  `<strong>✓ Your free API key</strong> — copy it now, backup sent to ${email}:<br>` +
+                  `<code>${data.key}</code><br>` +
+                  `<span style="font-size:0.82rem;color:var(--ink-muted);">` +
+                  `<strong>Next:</strong> fail PRs that introduce CRITICAL deps in this repo: ` +
+                  `<code>npx proof-of-commitment poc init</code> ` +
+                  `(paste your key when prompted) · ` +
+                  `<a href="/dashboard" style="color:var(--accent);">Dashboard</a> · ` +
+                  `<a href="/pricing?email=${encodeURIComponent(email)}" style="color:var(--accent);">Pricing</a></span>`;
+              } else {
+                successEl.innerHTML =
+                  `<strong>✓ Check your inbox.</strong> We sent your free API key to ${email}.` +
+                  ` <strong>Next:</strong> in this repo, run <code>npx proof-of-commitment poc init</code> ` +
+                  `to fail PRs that introduce CRITICAL deps.`;
+              }
+              successEl.hidden = false;
+            } else if (res.status === 429) {
+              errEl.textContent = data.message || 'Rate limit: max 3 keys per IP per day. Try again tomorrow.';
+              errEl.hidden = false;
+              btn.disabled = false;
+              btn.textContent = btnLabel;
+            } else {
+              errEl.textContent = data.message || data.error || `Request failed (${res.status}). Try the full form: ${fallbackHref}`;
+              errEl.hidden = false;
+              btn.disabled = false;
+              btn.textContent = btnLabel;
+            }
+          } catch (err) {
+            errEl.textContent = `Network error. Try the full form: ${fallbackHref}`;
+            errEl.hidden = false;
+            btn.disabled = false;
+            btn.textContent = btnLabel;
+          }
+        });
+      }
+
+      function renderMonitoringActive(headline: string) {
+        ctaEl.innerHTML = `
+          <div class="cta-text">${headline}</div>
+          <a href="/dashboard" class="cta-btn">Open dashboard &rarr;</a>
+          <span class="cta-hint">You're signed up · run <code>npx proof-of-commitment poc init</code> in this repo to gate PRs</span>
+        `;
+        ctaEl.hidden = false;
+      }
+
+      if (critCount > 0) {
+        const critNames = results
+          .filter(r => r.riskFlags?.some(f => f.startsWith('CRITICAL')))
+          .map(r => r.name)
+          .slice(0, 3);
+        const nameList = critNames.length > 2
+          ? critNames.slice(0, 2).join(', ') + ` + ${critCount - 2} more`
+          : critNames.join(' and ');
+        const headline = `<strong>${critCount} CRITICAL</strong> package${critCount > 1 ? 's' : ''} in your project (${nameList}). ` +
+          `Single-publisher packages get compromised — axios and node-ipc were both CRITICAL before their attacks. ` +
+          `Lock in weekly monitoring.`;
+        if (alreadyHasKey) {
+          renderMonitoringActive(headline + ' You already have a Commit key — gate this repo so a future CRITICAL flag fails the PR.');
+        } else {
+          renderInlineForm(headline, '/get-started?ref=audit-web-critical', 'audit-web-critical', 'Save audit + get alerts', 'Free · no card · 10 seconds');
+        }
+      } else if (count > 0) {
+        const headline = `No CRITICAL flags — your dependency tree looks healthy. ` +
+          `Lock in weekly checks so you catch risk changes early.`;
+        if (alreadyHasKey) {
+          renderMonitoringActive(headline + ' You already have a Commit key — gate this repo so a future CRITICAL flag fails the PR.');
+        } else {
+          renderInlineForm(headline, '/get-started?ref=audit-web-healthy', 'audit-web-healthy', 'Set up free monitoring', '200 audits/day · no card · 10 seconds');
+        }
+      } else {
+        ctaEl.hidden = true;
+      }
+    }
+
+    function toggleBreakdown(rowId: string, bdId: string) {
+      const row = document.getElementById(rowId);
+      const bd = document.getElementById(bdId);
+      if (!row || !bd) return;
+      const isHidden = bd.hidden;
+      bd.hidden = !isHidden;
+      row.classList.toggle('expanded', isHidden);
+    }
+
+    document.getElementById('audit-btn')!.addEventListener('click', async () => {
+      const btn = document.getElementById('audit-btn') as HTMLButtonElement;
+      const resultsArea = document.getElementById('results-area')!;
+      const loadingArea = document.getElementById('loading-area')!;
+      const errorArea = document.getElementById('error-area')!;
+
+      resultsArea.hidden = true;
+      errorArea.hidden = true;
+      loadingArea.hidden = false;
+      btn.disabled = true;
+
+      try {
+        if (activeEco === 'github') {
+          // ── GitHub repo audit ──
+          const repoInput = document.getElementById('github-repo-input') as HTMLInputElement;
+          const repo = repoInput.value.trim();
+          if (!repo) { loadingArea.hidden = true; btn.disabled = false; return; }
+
+          btn.textContent = 'Auditing repo…';
+
+          const res = await fetch(GITHUB_API, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ repo }),
+          });
+
+          if (!res.ok) {
+            const err = await res.json().catch(() => ({ error: 'Request failed' })) as { error?: string };
+            throw new Error((err as { error?: string }).error ?? `HTTP ${res.status}`);
+          }
+
+          const data = await res.json() as {
+            repo: string;
+            npmPackages: number;
+            pypiPackages: number;
+            count: number;
+            results: AuditResult[];
+          };
+
+          renderAuditResults(data.results, data.count, data.repo);
+          loadingArea.hidden = true;
+          resultsArea.hidden = false;
+          // Update share state
+          _lastRepo = repo;
+          _lastPackages = [];
+          _lastEco = 'github';
+          _lastResults = data.results;
+          _lastRepoLabel = data.repo;
+
+        } else {
+          // ── npm / PyPI package audit ──
+          const ta = document.getElementById('packages-input') as HTMLTextAreaElement;
+          const raw = ta.value.trim();
+          if (!raw) { loadingArea.hidden = true; btn.disabled = false; return; }
+
+          const packages = raw.split(/[\n,]+/).map(p => p.trim()).filter(Boolean).slice(0, 20);
+          if (packages.length === 0) { loadingArea.hidden = true; btn.disabled = false; return; }
+
+          btn.textContent = 'Auditing…';
+
+          const res = await fetch(API, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ packages, ecosystem: activeEco }),
+          });
+
+          if (!res.ok) {
+            const err = await res.json().catch(() => ({ error: 'Request failed' })) as { error?: string };
+            throw new Error((err as { error?: string }).error ?? `HTTP ${res.status}`);
+          }
+
+          const data = await res.json() as { count: number; results: AuditResult[] };
+          renderAuditResults(data.results, data.count);
+          loadingArea.hidden = true;
+          resultsArea.hidden = false;
+          // Update share state
+          _lastPackages = packages;
+          _lastEco = activeEco;
+          _lastRepo = '';
+          _lastResults = data.results;
+          _lastRepoLabel = '';
+        }
+      } catch (err) {
+        loadingArea.hidden = true;
+        document.getElementById('error-message')!.textContent =
+          'Error: ' + (err instanceof Error ? err.message : 'Unknown error');
+        errorArea.hidden = false;
+      } finally {
+        btn.disabled = false;
+        btn.textContent = activeEco === 'github' ? 'Audit repo' : 'Audit dependencies';
+      }
+    });
+    // ── Dependency Tree Explorer ──
+    const GRAPH_API = 'https://poc-backend.amdal-dev.workers.dev/api/graph/npm';
+    let activeDepth = 1;
+
+    document.querySelectorAll('.depth-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        document.querySelectorAll('.depth-btn').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        activeDepth = parseInt((btn as HTMLButtonElement).dataset.depth ?? '1', 10);
+      });
+    });
+
+    function fmtNumShort(n: number | null): string {
+      if (n === null || n === undefined) return '';
+      if (n >= 1_000_000) return (n / 1_000_000).toFixed(1) + 'M/wk';
+      if (n >= 1_000) return (n / 1_000).toFixed(0) + 'K/wk';
+      return n + '/wk';
+    }
+
+    function treePrefix(depth: number, isLast: boolean, parentPrefixes: boolean[]): string {
+      if (depth === 0) return '';
+      let prefix = '';
+      for (let i = 1; i < depth; i++) {
+        prefix += parentPrefixes[i] ? '    ' : '│   ';
+      }
+      prefix += isLast ? '└── ' : '├── ';
+      return prefix;
+    }
+
+    interface GraphNode {
+      name: string;
+      score: number | null;
+      maintainers: number | null;
+      weeklyDownloads: number | null;
+      ageYears: number | null;
+      riskFlags: string[];
+      depth: number;
+    }
+
+    interface GraphEdge { from: string; to: string; }
+
+    interface GraphData {
+      root: string;
+      depth: number;
+      nodes: GraphNode[];
+      edges: GraphEdge[];
+      summary: {
+        totalNodes: number;
+        criticalCount: number;
+        highCount: number;
+        warnCount: number;
+        worstScore: number;
+        criticalTransitivePaths: string[];
+      };
+    }
+
+    function renderTree(data: GraphData): string {
+      // Build adjacency list
+      const children: Record<string, string[]> = {};
+      data.nodes.forEach(n => { children[n.name] = []; });
+      data.edges.forEach(e => {
+        if (!children[e.from]) children[e.from] = [];
+        children[e.from].push(e.to);
+      });
+
+      const nodeMap: Record<string, GraphNode> = {};
+      data.nodes.forEach(n => { nodeMap[n.name] = n; });
+
+      const lines: string[] = [];
+
+      function renderNode(name: string, depth: number, isLast: boolean, parentIsLast: boolean[]): void {
+        const node = nodeMap[name];
+        if (!node) return;
+        const prefix = depth === 0 ? '' : treePrefix(depth, isLast, parentIsLast);
+        const isCritical = node.riskFlags?.some(f => f.startsWith('CRITICAL'));
+        const isHigh = node.riskFlags?.includes('HIGH');
+        const isWarn = node.riskFlags?.some(f => f.startsWith('WARN'));
+
+        const riskLabel = isCritical
+          ? `<span class="tree-node-critical"> ⚑ CRITICAL</span>`
+          : isHigh
+          ? `<span class="tree-node-high"> ⚠ HIGH</span>`
+          : isWarn
+          ? `<span class="tree-node-warn"> ↓ WARN</span>`
+          : `<span class="tree-node-ok"> ✓</span>`;
+
+        const scoreStr = node.score !== null ? ` [${node.score}/100]` : '';
+        const dlStr = node.weeklyDownloads ? ` · ${fmtNumShort(node.weeklyDownloads)}` : '';
+        const maintStr = node.maintainers !== null ? ` · ${node.maintainers} maintainer${node.maintainers !== 1 ? 's' : ''}` : '';
+
+        lines.push(
+          `<span class="tree-node">` +
+          `<span class="tree-node-prefix">${prefix}</span>` +
+          `<span class="tree-node-name">${name}</span>` +
+          `<span class="tree-node-score">${scoreStr}${dlStr}${maintStr}</span>` +
+          riskLabel +
+          `</span>`
+        );
+
+        const kids = children[name] ?? [];
+        kids.forEach((child, i) => {
+          renderNode(child, depth + 1, i === kids.length - 1, [...parentIsLast, isLast]);
+        });
+      }
+
+      renderNode(data.root, 0, true, []);
+      return lines.join('\n');
+    }
+
+    document.getElementById('graph-btn')!.addEventListener('click', async () => {
+      const input = document.getElementById('graph-pkg-input') as HTMLInputElement;
+      const pkg = input.value.trim();
+      if (!pkg) return;
+
+      const btn = document.getElementById('graph-btn') as HTMLButtonElement;
+      btn.disabled = true;
+      btn.textContent = 'Mapping…';
+
+      const graphResults = document.getElementById('graph-results')!;
+      const graphLoading = document.getElementById('graph-loading')!;
+      const graphError = document.getElementById('graph-error')!;
+
+      graphResults.hidden = true;
+      graphError.hidden = true;
+      graphLoading.hidden = false;
+
+      try {
+        const res = await fetch(GRAPH_API, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ package: pkg, depth: activeDepth }),
+        });
+
+        if (!res.ok) {
+          const err = await res.json().catch(() => ({ error: 'Request failed' })) as { error?: string };
+          throw new Error((err as { error?: string }).error ?? `HTTP ${res.status}`);
+        }
+
+        const data = await res.json() as GraphData;
+        const s = data.summary;
+
+        // Summary line
+        document.getElementById('graph-summary')!.innerHTML =
+          `<strong>${s.totalNodes}</strong> packages in tree. ` +
+          (s.criticalCount > 0 ? `<span style="color:#991b1b;font-weight:600">${s.criticalCount} CRITICAL</span>` : '') +
+          (s.highCount > 0 ? ` · <span style="color:#92400e">${s.highCount} HIGH</span>` : '') +
+          (s.criticalCount === 0 && s.highCount === 0 ? '<span style="color:#166534">No critical flags in tree</span>' : '');
+
+        // Tree
+        document.getElementById('tree-output')!.innerHTML = renderTree(data);
+
+        // Critical paths
+        const pathsEl = document.getElementById('critical-paths')!;
+        if (s.criticalTransitivePaths && s.criticalTransitivePaths.length > 0) {
+          pathsEl.innerHTML =
+            `<strong>Critical transitive paths</strong>` +
+            s.criticalTransitivePaths.map(p =>
+              `<div class="critical-path-item">⚑ ${p}</div>`
+            ).join('');
+          pathsEl.hidden = false;
+        } else {
+          pathsEl.hidden = true;
+        }
+
+        graphLoading.hidden = true;
+        graphResults.hidden = false;
+      } catch (err) {
+        graphLoading.hidden = true;
+        document.getElementById('graph-error-msg')!.textContent =
+          'Error: ' + (err instanceof Error ? err.message : 'Unknown error');
+        graphError.hidden = false;
+      } finally {
+        btn.disabled = false;
+        btn.textContent = 'Explore tree';
+      }
+    });
+
+    // ── URL param pre-fill + auto-run ──
+    // Supports:
+    //   ?packages=axios,zod,chalk          → pre-fill npm tab, auto-run
+    //   ?pypi=langchain,litellm            → pre-fill pypi tab, auto-run
+    //   ?cargo=serde,tokio                 → pre-fill Cargo tab, auto-run
+    //   ?go=github.com/gin-gonic/gin       → pre-fill Go tab, auto-run
+    //   ?repo=vercel/ai                    → switch to GitHub tab, pre-fill, auto-run
+    (function initFromUrlParams() {
+      const params = new URLSearchParams(window.location.search);
+      const pkgParam = params.get('packages');
+      const pypiParam = params.get('pypi');
+      const cargoParam = params.get('cargo');
+      const goParam = params.get('go');
+      const repoParam = params.get('repo');
+
+      if (repoParam) {
+        const githubTab = document.querySelector('[data-eco="github"]') as HTMLButtonElement;
+        githubTab?.click();
+        const repoInput = document.getElementById('github-repo-input') as HTMLInputElement;
+        if (repoInput) repoInput.value = repoParam;
+        setTimeout(() => (document.getElementById('audit-btn') as HTMLButtonElement)?.click(), 100);
+      } else if (cargoParam) {
+        const cargoTab = document.querySelector('[data-eco="cargo"]') as HTMLButtonElement;
+        cargoTab?.click();
+        const ta = document.getElementById('packages-input') as HTMLTextAreaElement;
+        if (ta) ta.value = cargoParam.split(',').map(p => p.trim()).join('\n');
+        setTimeout(() => (document.getElementById('audit-btn') as HTMLButtonElement)?.click(), 100);
+      } else if (goParam) {
+        const goTab = document.querySelector('[data-eco="golang"]') as HTMLButtonElement;
+        goTab?.click();
+        const ta = document.getElementById('packages-input') as HTMLTextAreaElement;
+        if (ta) ta.value = goParam.split(',').map(p => p.trim()).join('\n');
+        setTimeout(() => (document.getElementById('audit-btn') as HTMLButtonElement)?.click(), 100);
+      } else if (pypiParam) {
+        const pypiTab = document.querySelector('[data-eco="pypi"]') as HTMLButtonElement;
+        pypiTab?.click();
+        const ta = document.getElementById('packages-input') as HTMLTextAreaElement;
+        if (ta) ta.value = pypiParam.split(',').map(p => p.trim()).join('\n');
+        setTimeout(() => (document.getElementById('audit-btn') as HTMLButtonElement)?.click(), 100);
+      } else if (pkgParam) {
+        const ta = document.getElementById('packages-input') as HTMLTextAreaElement;
+        if (ta) ta.value = pkgParam.split(',').map(p => p.trim()).join('\n');
+        setTimeout(() => (document.getElementById('audit-btn') as HTMLButtonElement)?.click(), 100);
+      }
+    })();
+
+    // ── Share button ──
+    document.getElementById('share-btn')?.addEventListener('click', () => {
+      let url: string;
+      if (_lastRepo) {
+        url = `https://getcommit.dev/audit?repo=${encodeURIComponent(_lastRepo)}`;
+      } else {
+        const paramMap: Record<string, string> = { npm: 'packages', pypi: 'pypi', cargo: 'cargo', golang: 'go' };
+        const paramName = paramMap[_lastEco] ?? 'packages';
+        url = `https://getcommit.dev/audit?${paramName}=${_lastPackages.map(p => encodeURIComponent(p)).join(',')}`;
+      }
+      navigator.clipboard.writeText(url).then(() => {
+        const copied = document.getElementById('share-copied')!;
+        copied.hidden = false;
+        setTimeout(() => { copied.hidden = true; }, 2500);
+      }).catch(() => {
+        // Fallback: select text in a temp input
+        const tmp = document.createElement('input');
+        tmp.value = url;
+        document.body.appendChild(tmp);
+        tmp.select();
+        document.execCommand('copy');
+        document.body.removeChild(tmp);
+        const copied = document.getElementById('share-copied')!;
+        copied.hidden = false;
+        setTimeout(() => { copied.hidden = true; }, 2500);
+      });
+    });
+
+    // ── Download report button ──
+    document.getElementById('download-btn')?.addEventListener('click', () => {
+      if (_lastResults.length === 0) return;
+      const label = _lastRepoLabel || (_lastEco === 'pypi' ? 'PyPI packages' : 'npm packages');
+      const date = new Date().toISOString().split('T')[0];
+
+      function riskColor(flags: string[]): string {
+        if (flags?.some(f => f.startsWith('CRITICAL'))) return '#991b1b';
+        if (flags?.some(f => f.startsWith('HIGH'))) return '#92400e';
+        if (flags?.length > 0) return '#713f12';
+        return '#166534';
+      }
+
+      function fmtDl(n: number | null): string {
+        if (n === null || n === undefined) return '—';
+        if (n >= 1_000_000) return (n / 1_000_000).toFixed(1) + 'M/wk';
+        if (n >= 1_000) return (n / 1_000).toFixed(0) + 'K/wk';
+        return n + '/wk';
+      }
+
+      const rows = _lastResults.map(r => `
+        <tr>
+          <td><strong>${r.name}</strong>${r.hasProvenance === true ? ' <span title="Verified provenance (Trusted Publishing)">&#x1f512;</span>' : ''}</td>
+          <td>${r.score !== null && r.score !== undefined ? r.score : '—'}</td>
+          <td style="color:${riskColor(r.riskFlags)};font-weight:600">${r.riskFlags?.length ? r.riskFlags.join(', ') : 'OK'}</td>
+          <td>${r.maintainers !== null && r.maintainers !== undefined ? r.maintainers : '—'}</td>
+          <td>${fmtDl(r.weeklyDownloads)}</td>
+          <td>${r.ageYears !== null && r.ageYears !== undefined ? r.ageYears.toFixed(1) + 'y' : '—'}</td>
+          <td>${r.trend ?? '—'}</td>
+        </tr>`).join('');
+
+      const html = `<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Commit Dependency Audit — ${label} — ${date}</title>
+<style>
+  body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; max-width: 900px; margin: 2rem auto; padding: 0 1rem; color: #111; }
+  h1 { font-size: 1.5rem; margin-bottom: 0.25rem; }
+  .meta { color: #666; font-size: 0.875rem; margin-bottom: 2rem; }
+  table { width: 100%; border-collapse: collapse; font-size: 0.9rem; }
+  th { text-align: left; border-bottom: 2px solid #e5e7eb; padding: 0.5rem 0.75rem; font-weight: 600; background: #f9fafb; }
+  td { padding: 0.5rem 0.75rem; border-bottom: 1px solid #f3f4f6; }
+  tr:hover td { background: #f9fafb; }
+  .footer { margin-top: 2rem; font-size: 0.8rem; color: #888; }
+</style>
+</head>
+<body>
+<h1>Dependency Audit Report</h1>
+<p class="meta">Source: ${label} · Generated by <a href="https://getcommit.dev/audit">getcommit.dev/audit</a> · ${date}</p>
+<table>
+  <thead><tr><th>Package</th><th>Score</th><th>Risk</th><th>Maintainers</th><th>Weekly DL</th><th>Age</th><th>Trend</th></tr></thead>
+  <tbody>${rows}</tbody>
+</table>
+<p class="footer">Scored by <a href="https://getcommit.dev">Commit</a> — behavioral supply chain signals. CRITICAL = high exposure + single maintainer. Score out of 100.</p>
+</body>
+</html>`;
+
+      const blob = new Blob([html], { type: 'text/html' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `commit-audit-${date}.html`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+    });
+
+    // ── Audit CTA is now a direct link to /get-started?ref=audit-web ──
+    // (removed dead /api/waitlist 404 form 2026-05-22 — 0 real signups in 6 weeks)
+  </script>
+</Layout>
