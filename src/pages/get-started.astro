@@ -63,7 +63,7 @@ import Layout from '../layouts/Layout.astro';
             <p id="gs-error" class="gs-feedback gs-error" hidden></p>
           </form>
           <p class="gs-privacy">
-            We only use your email to deliver your API key.
+            Email binds usage to your account and serves as a backup for the key.
             No newsletter, no spam. See <a href="/privacy">privacy policy</a>.
           </p>
         </div>
@@ -243,11 +243,14 @@ console.log(data.score); // 0–100 trust score</code></pre>
         // Unknown refs are dropped so the backend records the default (web) — no
         // silent garbage in api_keys.source.
         const REF_TO_SOURCE: Record<string, string> = {
-          'mcp-cli': 'mcp-soft-cta',       // soft-CTA from MCP server (worker.ts MCP_SIGNUP_URL)
-          'cli': 'cli',                     // inline CLI signup
-          'audit-cli': 'cli',               // audit soft-CTA (worker.ts AUDIT_SIGNUP_URL)
-          'audit-cli-429': 'audit-cli-429', // CLI 429 rescue (npm-package v1.17.0 + worker.ts hard-limit branch)
-          'audit-web': 'audit-web',         // web /audit page post-result CTA (replaced dead waitlist 2026-05-22)
+          'mcp-cli': 'mcp-soft-cta',                  // soft-CTA from MCP server (worker.ts MCP_SIGNUP_URL)
+          'cli': 'cli',                                // inline CLI signup
+          'audit-cli': 'cli',                          // audit soft-CTA (worker.ts AUDIT_SIGNUP_URL)
+          'audit-cli-429': 'audit-cli-429',            // CLI 429 rescue (npm-package v1.17.0 + worker.ts hard-limit branch)
+          'audit-web': 'audit-web',                    // web /audit page secondary CTA (audit-waitlist-btn, no result yet)
+          'audit-web-critical': 'audit-web-critical',  // post-result CTA on /audit when ≥1 CRITICAL — 2026-05-23
+          'audit-web-healthy': 'audit-web-healthy',    // post-result CTA on /audit when 0 CRITICAL + ≥1 HIGH — 2026-05-23
+          'pkg-profile': 'pkg-profile',                // package profile pages (/npm/:pkg etc) Monitor CTA — 2026-05-23
         };
         const params = new URLSearchParams(window.location.search);
         const refParam = params.get('ref') ?? '';

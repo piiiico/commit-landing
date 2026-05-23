@@ -227,17 +227,26 @@ function renderBreakdownBar(label, value, max) {
   return `<div class="bd-row"><span class="bd-label">${esc(label)}</span><div class="bd-track"><div class="bd-fill ${cls}" style="width:${pct}%"></div></div><span class="bd-val">${value}<span class="bd-max">/${max}</span></span></div>`;
 }
 
+// GENERATED-EDIT-OK: public/_worker.js IS the source of truth per its own header — adding pkg-profile source attribution + package-specific CTA copy
 function buildMonitorCta(pkg, ecosystem, isCritical) {
   const headline = isCritical ? "Monitor this package" : "Track this package";
   const body = isCritical
     ? `<strong>${esc(pkg)}</strong> has concentrated publish-access risk. Get alerted when its publisher count, release cadence, or risk score changes.`
     : `Monitor <strong>${esc(pkg)}</strong> in CI. Catch risk changes before they reach production.`;
+  // Package-specific CTA with source attribution. ?ref=pkg-profile lets the
+  // get-started page split package-profile-driven signups from default 'web'
+  // signups in the funnel; ?pkg=… &eco=… surface the in-context package on
+  // the destination. Backend whitelists 'pkg-profile' in VALID_SOURCES.
+  const ctaHref = `/get-started?ref=pkg-profile&pkg=${encodeURIComponent(pkg)}&eco=${encodeURIComponent(ecosystem)}`;
+  const ctaText = isCritical
+    ? `Get alerts for ${esc(pkg)} &rarr;`
+    : `Track ${esc(pkg)} &rarr;`;
   return `<section class="section"><div class="container">
 <div style="background:#F2F0E5;border:1px solid #CECDC3;border-radius:6px;padding:2rem">
 <h2 style="font-family:'Instrument Serif',Georgia,serif;font-size:1.5rem;margin-bottom:.75rem">${headline}</h2>
 <p class="context-note">${body}</p>
 <div class="cta-row" style="margin:1.5rem 0 .5rem">
-<a href="/get-started" class="btn btn-primary">Get free API key &rarr;</a>
+<a href="${ctaHref}" class="btn btn-primary">${ctaText}</a>
 <a href="/pricing" class="btn btn-ghost">Compare plans &rarr;</a>
 </div>
 <p style="font-size:.82rem;color:#878580;margin:0">Free: 200 requests/day &middot; Pro ($29/mo): monitoring, batch API, weekly risk reports</p>
