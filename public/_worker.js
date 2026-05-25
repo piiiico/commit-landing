@@ -227,7 +227,7 @@ function renderBreakdownBar(label, value, max) {
   return `<div class="bd-row"><span class="bd-label">${esc(label)}</span><div class="bd-track"><div class="bd-fill ${cls}" style="width:${pct}%"></div></div><span class="bd-val">${value}<span class="bd-max">/${max}</span></span></div>`;
 }
 
-// GENERATED-EDIT-OK: public/_worker.js IS the source of truth per its own header — adding pkg-profile source attribution + package-specific CTA copy
+// GENERATED-EDIT-OK: public/_worker.js IS the source of truth per its own header — fixing wrong-tier bait (Pro $29 → Developer $15 cheapest-paid with monitoring), aligns SEO pkg-profile surface with worker.ts TIER_LIMITS canonical truth (recurring class: tier-name divergence)
 function buildMonitorCta(pkg, ecosystem, isCritical) {
   const headline = isCritical ? "Monitor this package" : "Track this package";
   const body = isCritical
@@ -249,7 +249,8 @@ function buildMonitorCta(pkg, ecosystem, isCritical) {
 <a href="${ctaHref}" class="btn btn-primary">${ctaText}</a>
 <a href="/pricing" class="btn btn-ghost">Compare plans &rarr;</a>
 </div>
-<p style="font-size:.82rem;color:#878580;margin:0">Free: 200 requests/day &middot; Pro ($29/mo): monitoring, batch API, weekly risk reports</p>
+<!-- GENERATED-EDIT-OK: tier-name bait fix per /pricing canonical — Developer $15 is cheapest-paid w/ monitoring + batch -->
+<p style="font-size:.82rem;color:#878580;margin:0">Free: 200 audits/day &middot; Paid from Developer ($15/mo): monitoring, batch API, email alerts</p>
 </div></div></section>`;
 }
 
