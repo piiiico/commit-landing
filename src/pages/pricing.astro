@@ -650,11 +650,36 @@ import Layout from '../layouts/Layout.astro';
       return s ? `&${s}` : '';
     })();
 
+    // ── Email pre-fill from ?email= URL param ──
+    // Backend 402/429/422 upgrade URLs (worker.ts buildUpgradeUrl) carry the
+    // authenticated user's email so the CLI funnel (poc watch → 402 →
+    // /pricing?email=...) lands with the modal pre-filled. Single re-type
+    // step closed at the highest-stakes click in the funnel. Validated by
+    // exporting EMAIL_RE in lock-step with /api/checkout-intent's accepted
+    // shape (basic [^\s@]+@[^\s@]+\.[^\s@]+) — same regex used on submit
+    // below, so an invalid pre-fill cannot pass through to /api/checkout.
+    const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    const prefillEmailFromUrl = (() => {
+      try {
+        const sp = new URLSearchParams(window.location.search);
+        const v = sp.get('email');
+        if (v && v.length < 200 && EMAIL_RE.test(v)) return v;
+        return '';
+      } catch { return ''; }
+    })();
+
     function openModal(tier: string) {
       pendingTier = tier;
       if (modal) {
         modal.hidden = false;
         document.body.style.overflow = 'hidden';
+        // Apply URL pre-fill on each open (closeModal resets the form), so
+        // the user only has to type if the URL didn't carry their email or
+        // they want to override. Focus the input regardless — if pre-filled
+        // they can hit Enter; if empty they can type.
+        if (emailInput && prefillEmailFromUrl && !emailInput.value) {
+          emailInput.value = prefillEmailFromUrl;
+        }
         emailInput?.focus();
       }
     }
