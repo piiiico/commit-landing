@@ -616,6 +616,40 @@ import Layout from '../layouts/Layout.astro';
     const submitBtn = document.getElementById('checkout-submit-btn') as HTMLButtonElement | null;
     let pendingTier = '';
 
+    // ── UTM attribution capture (closes /pricing → /api/checkout-intent gap) ──
+    // CLI funnel sends ?utm_source=cli&utm_campaign=watch-cmd (v1.18.2). Before
+    // this, the API POST stripped UTMs at the body boundary, so paid Developer
+    // conversions weren't attributable to the funnel. We now snapshot UTMs at
+    // page load (URL is the canonical source — survives modal close/reopen)
+    // and forward them into both POST checkout-intent + GET checkout fallback.
+    const captureUtmSnapshot = (): {
+      utm_source?: string; utm_medium?: string; utm_campaign?: string;
+      utm_content?: string; utm_term?: string; referrer?: string;
+    } => {
+      try {
+        const sp = new URLSearchParams(window.location.search);
+        const out: Record<string, string> = {};
+        for (const k of ['utm_source','utm_medium','utm_campaign','utm_content','utm_term'] as const) {
+          const v = sp.get(k);
+          if (v && v.length > 0 && v.length < 200) out[k] = v;
+        }
+        if (document.referrer && document.referrer.length > 0 && document.referrer.length < 500) {
+          out.referrer = document.referrer;
+        }
+        return out;
+      } catch { return {}; }
+    };
+    const utmSnapshot = captureUtmSnapshot();
+
+    // Build query suffix for GET fallback URL. URLSearchParams handles
+    // encoding (so utm values with spaces/special chars don't break the URL).
+    const utmQuerySuffix = (() => {
+      const sp = new URLSearchParams();
+      for (const [k, v] of Object.entries(utmSnapshot)) sp.set(k, v);
+      const s = sp.toString();
+      return s ? `&${s}` : '';
+    })();
+
     function openModal(tier: string) {
       pendingTier = tier;
       if (modal) {
@@ -665,18 +699,18 @@ import Layout from '../layouts/Layout.astro';
         const resp = await fetch('https://poc-backend.amdal-dev.workers.dev/api/checkout-intent', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ email, tier: pendingTier }),
+          body: JSON.stringify({ email, tier: pendingTier, ...utmSnapshot }),
         });
         const data = await resp.json() as { ok?: boolean; checkout_url?: string; error?: string };
         if (data.ok && data.checkout_url) {
           window.location.href = data.checkout_url;
         } else {
           // Fallback to GET checkout if intent fails
-          window.location.href = `https://poc-backend.amdal-dev.workers.dev/api/checkout?tier=${encodeURIComponent(pendingTier)}&email=${encodeURIComponent(email)}`;
+          window.location.href = `https://poc-backend.amdal-dev.workers.dev/api/checkout?tier=${encodeURIComponent(pendingTier)}&email=${encodeURIComponent(email)}${utmQuerySuffix}`;
         }
       } catch {
         // Fallback to GET checkout on network error
-        window.location.href = `https://poc-backend.amdal-dev.workers.dev/api/checkout?tier=${encodeURIComponent(pendingTier)}&email=${encodeURIComponent(email)}`;
+        window.location.href = `https://poc-backend.amdal-dev.workers.dev/api/checkout?tier=${encodeURIComponent(pendingTier)}&email=${encodeURIComponent(email)}${utmQuerySuffix}`;
       }
     });
 
