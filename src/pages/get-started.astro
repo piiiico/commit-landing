@@ -24,13 +24,13 @@ import Layout from '../layouts/Layout.astro';
     </div>
   </nav>
 
-  <!-- Hero -->
+  <!-- Hero (ref-aware copy swap happens client-side — see script below) -->
   <section class="gs-hero">
     <div class="container">
       <div class="editorial" style="max-width: var(--max-content); margin: 0 auto;">
-        <span class="hero-eyebrow">Get Started</span>
-        <h1 class="gs-title">Get your API key</h1>
-        <p class="gs-lead">
+        <span class="hero-eyebrow" id="gs-hero-eyebrow">Get Started</span>
+        <h1 class="gs-title" id="gs-hero-title">Get your API key</h1>
+        <p class="gs-lead" id="gs-hero-lead">
           Free tier: 200 requests/day. No credit card required.<br />
           Your key appears on this page in seconds — no email round-trip.
         </p>
@@ -218,6 +218,44 @@ console.log(data.score); // 0–100 trust score</code></pre>
     // already prevents abuse, so the email round-trip provided zero
     // verification value and just added friction. The success-view JS below
     // handles inline display when `data.key` is present.
+
+    // Ref-aware hero swap. When the user arrives from a CLI footer that
+    // made a specific promise (e.g. "Lock in this baseline — get alerted
+    // if any package degrades"), restate that promise on the destination
+    // so the page doesn't look like the wrong page. Default (no ref or
+    // unknown ref) keeps the original static copy — no regression for
+    // direct visits or future ref tags. ABSORBS the orphaned CLI promise
+    // into the destination; not a new feature, completes a broken chain.
+    // Keep in sync with REF_TO_SOURCE below — every ref with a specific
+    // promise in its source surface should have a HERO_BY_REF entry.
+    (() => {
+      const params = new URLSearchParams(window.location.search);
+      const ref = params.get('ref') ?? '';
+      const HERO_BY_REF: Record<string, { eyebrow: string; title: string; lead: string }> = {
+        'audit-baseline': {
+          eyebrow: 'Lock in your baseline',
+          title: 'Get alerted if any package degrades',
+          lead:
+            'Your scan came back clean. A free key turns it into a daily check — we ping you the moment a package goes critical.<br />' +
+            '200 requests/day. No card.',
+        },
+        'audit-cli-429': {
+          eyebrow: 'Past the daily limit',
+          title: 'Get a free key, keep scanning',
+          lead:
+            'Anonymous CLI is rate-limited. A free key bumps you to 200 audits/day. No card, no email round-trip.<br />' +
+            'Paste it back in your terminal as <code>export COMMIT_API_KEY=…</code> and re-run.',
+        },
+      };
+      const variant = HERO_BY_REF[ref];
+      if (!variant) return;
+      const eyebrow = document.getElementById('gs-hero-eyebrow');
+      const title = document.getElementById('gs-hero-title');
+      const lead = document.getElementById('gs-hero-lead');
+      if (eyebrow) eyebrow.textContent = variant.eyebrow;
+      if (title) title.textContent = variant.title;
+      if (lead) lead.innerHTML = variant.lead;
+    })();
 
     const form = document.getElementById('gs-form') as HTMLFormElement | null;
     if (form) {
