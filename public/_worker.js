@@ -965,8 +965,9 @@ export default {
     // ── /sitemap-blog.xml — all blog articles ────────────────────────
     if (cleanPath === "/sitemap-blog.xml" || cleanPath === "/sitemap-blog") {
       // NOTE: Excludes slugs that 301-redirect to agentlair.dev — those belong in agentlair's sitemap
-      // GENERATED-EDIT-OK: adding 4 missing blog slugs to sitemap (stripe-google-cloud-critical, antv, checklist, two-attacks)
+      // GENERATED-EDIT-OK: adding 4 missing blog slugs to sitemap (stripe-google-cloud-critical, antv, checklist, two-attacks) + drizzle-kit-stale-transitive-dep (2026-05-25)
       const blogSlugs = [
+        "drizzle-kit-stale-transitive-dep",
         "stripe-google-cloud-critical",
         "antv-supply-chain-attack",
         "npm-supply-chain-audit-checklist",
