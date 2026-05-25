@@ -1,0 +1,1652 @@
+---
+import Layout from '../layouts/Layout.astro';
+---
+
+<Layout
+  title="Commit API Reference — Developer Documentation"
+  description="REST API reference for Commit. Audit npm and PyPI packages for supply chain risk, scan GitHub repos, build dependency graphs, and embed trust badges."
+  canonical="https://getcommit.dev/docs/"
+>
+  <!-- Nav -->
+  <nav>
+    <div class="container nav-inner">
+      <a href="/" class="nav-brand">Commit</a>
+      <ul class="nav-links">
+        <li><a href="/#mcp">MCP</a></li>
+        <li><a href="/audit">Audit</a></li>
+        <li><a href="/watchlist">Watchlist</a></li>
+        <li><a href="/badges">Badges</a></li>
+        <li><a href="/docs" class="nav-active">Docs</a></li>
+        <li><a href="/blog">Writing</a></li>
+        <li><a href="/pricing">Pricing</a></li><li><a href="/docs">Docs</a></li><li><a href="https://github.com/piiiico/proof-of-commitment" target="_blank" rel="noopener">GitHub</a></li>
+      </ul>
+    </div>
+  </nav>
+
+  <!-- Header -->
+  <section class="docs-header">
+    <div class="container">
+      <div class="editorial" style="max-width: var(--max-content); margin: 0 auto;">
+        <div class="docs-version-badge">REST API · v1</div>
+        <h1 class="docs-title">API <em>Reference</em></h1>
+        <p class="docs-lead">
+          Audit npm and PyPI packages for supply chain risk, scan GitHub repos,
+          build dependency graphs, and embed trust badges — from your CI pipeline,
+          scripts, or IDE.
+        </p>
+        <div class="base-url-box">
+          <span class="base-url-label">Base URL</span>
+          <code class="base-url-value">https://poc-backend.amdal-dev.workers.dev</code>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <hr class="section-divider" />
+
+  <!-- Quick Start -->
+  <section class="docs-section">
+    <div class="container">
+      <div class="editorial" style="max-width: var(--max-content); margin: 0 auto;">
+        <span class="docs-section-number">01</span>
+        <h2 class="docs-section-title">Quick Start</h2>
+        <p class="docs-intro">Audit a package in 30 seconds. No API key needed for single-package queries.</p>
+
+        <div class="snippet-group">
+          <div class="snippet-tab-row">
+            <button class="snippet-tab active" data-group="qs" data-lang="curl">curl</button>
+            <button class="snippet-tab" data-group="qs" data-lang="node">Node</button>
+            <button class="snippet-tab" data-group="qs" data-lang="python">Python</button>
+          </div>
+
+          <div class="snippet-block" data-group="qs" data-lang="curl">
+            <pre><code><span class="c-comment"># Audit a single npm package (free, no API key)</span>
+curl -X POST https://poc-backend.amdal-dev.workers.dev/api/audit \
+  -H "Content-Type: application/json" \
+  -d '&#123;"packages": ["chalk"]&#125;'</code></pre>
+          </div>
+
+          <div class="snippet-block hidden" data-group="qs" data-lang="node">
+            <pre><code><span class="c-comment">// Audit a single npm package (free, no API key)</span>
+const res = await fetch(
+  "https://poc-backend.amdal-dev.workers.dev/api/audit",
+  &#123;
+    method: "POST",
+    headers: &#123; "Content-Type": "application/json" &#125;,
+    body: JSON.stringify(&#123; packages: ["chalk"] &#125;),
+  &#125;
+);
+const data = await res.json();
+console.log(data.results[0]);</code></pre>
+          </div>
+
+          <div class="snippet-block hidden" data-group="qs" data-lang="python">
+            <pre><code><span class="c-comment"># Audit a single npm package (free, no API key)</span>
+import requests
+
+resp = requests.post(
+    "https://poc-backend.amdal-dev.workers.dev/api/audit",
+    json=&#123;"packages": ["chalk"]&#125;,
+)
+print(resp.json()["results"][0])</code></pre>
+          </div>
+        </div>
+
+        <div class="response-example">
+          <span class="response-label">Response</span>
+          <pre><code>&#123;
+  "count": 1,
+  "results": [
+    &#123;
+      "name": "chalk",
+      "ecosystem": "npm",
+      "score": 74,
+      "maintainers": 1,
+      "weeklyDownloads": 411000000,
+      "ageYears": 12.3,
+      "trend": "stable",
+      "daysSinceLastPublish": 420,
+      "riskFlags": ["CRITICAL"],
+      "scoreBreakdown": &#123;
+        "longevity": 25,
+        "downloadMomentum": 25,
+        "releaseConsistency": 14,
+        "maintainerDepth": 4,
+        "githubBacking": 6
+      &#125;
+    &#125;
+  ]
+&#125;</code></pre>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <hr class="section-divider" />
+
+  <!-- Authentication -->
+  <section class="docs-section docs-section-alt">
+    <div class="container">
+      <div class="editorial" style="max-width: var(--max-content); margin: 0 auto;">
+        <span class="docs-section-number">02</span>
+        <h2 class="docs-section-title">Authentication</h2>
+        <p class="docs-intro">
+          All endpoints work without authentication. Free tier uses IP-based rate limiting.
+          Any paid tier — starting at <strong>Developer ($15/mo)</strong> — issues an
+          API key with higher limits, batch audits, and CI/CD automation.
+        </p>
+
+        <div class="auth-tiers">
+          <div class="auth-tier">
+            <div class="auth-tier-header">
+              <span class="auth-tier-name">Free</span>
+              <span class="auth-tier-desc">No setup required</span>
+            </div>
+            <p class="auth-tier-body">
+              Requests are rate-limited per IP address. No header required.
+              Single-package audit per request.
+            </p>
+          </div>
+          <div class="auth-tier auth-tier-paid">
+            <div class="auth-tier-header">
+              <span class="auth-tier-name">Developer</span>
+              <span class="auth-tier-badge">$15/mo</span>
+            </div>
+            <p class="auth-tier-body">
+              Pass your API key as a Bearer token. Unlocks batch audits
+              (up to 5 packages/request), 1,000 audits/day, dependency monitoring,
+              and CI/CD auto-trigger.
+            </p>
+            <div class="auth-example">
+              <code>Authorization: Bearer sk_commit_a3f9b2...</code>
+            </div>
+          </div>
+          <div class="auth-tier">
+            <div class="auth-tier-header">
+              <span class="auth-tier-name">Pro</span>
+              <span class="auth-tier-badge">$29/mo</span>
+            </div>
+            <p class="auth-tier-body">
+              Everything in Developer, plus larger batches (up to 20 packages/request),
+              10,000 audits/month, webhooks, and 10 monitored projects — flat fee per
+              project, not per seat.
+            </p>
+          </div>
+        </div>
+
+        <div class="auth-key-format">
+          <span class="auth-key-label">API key format</span>
+          <code>sk_commit_</code> followed by 32 hex characters.
+          Keys are issued after checkout at <a href="/pricing">getcommit.dev/pricing</a> —
+          the cheapest tier with an API key is Developer at $15/mo.
+          Store them securely — they are shown once.
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <hr class="section-divider" />
+
+  <!-- Rate Limits -->
+  <section class="docs-section">
+    <div class="container">
+      <div class="editorial" style="max-width: var(--max-content); margin: 0 auto;">
+        <span class="docs-section-number">03</span>
+        <h2 class="docs-section-title">Rate Limits</h2>
+        <p class="docs-intro">
+          Rate limit headers are returned on every response:
+          <code>X-RateLimit-Limit</code>, <code>X-RateLimit-Remaining</code>,
+          <code>X-RateLimit-Reset</code>.
+        </p>
+
+        <div class="rate-table-wrapper">
+          <table class="rate-table">
+            <thead>
+              <tr>
+                <th>Endpoint</th>
+                <th>Free</th>
+                <th>Developer<br /><span class="rate-note">$15/mo</span></th>
+                <th>Pro<br /><span class="rate-note">$29/mo</span></th>
+                <th>Enterprise</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><code>POST /api/audit</code></td>
+                <td>200 / day<br /><span class="rate-note">1 pkg/request</span></td>
+                <td>1,000 / day<br /><span class="rate-note">5 pkgs/request</span></td>
+                <td>10,000 / month<br /><span class="rate-note">20 pkgs/request</span></td>
+                <td>Unlimited</td>
+              </tr>
+              <tr>
+                <td><code>POST /api/audit/github</code></td>
+                <td>10 / day</td>
+                <td>200 / day</td>
+                <td>500 / month</td>
+                <td>Unlimited</td>
+              </tr>
+              <tr>
+                <td><code>POST /api/graph/npm</code></td>
+                <td>5 / day</td>
+                <td>50 / day</td>
+                <td>200 / month</td>
+                <td>Unlimited</td>
+              </tr>
+              <tr>
+                <td><code>GET /badge/npm/:pkg</code></td>
+                <td colspan="4">Unlimited (24h CDN cache)</td>
+              </tr>
+              <tr>
+                <td><code>GET /badge/pypi/:pkg</code></td>
+                <td colspan="4">Unlimited (24h CDN cache)</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <p class="rate-reset-note">
+          Free and Developer tiers reset daily at midnight UTC.
+          Pro tier resets on the first day of each calendar month.
+          When a limit is exceeded, the API returns <code>429 Too Many Requests</code>
+          with a <code>Retry-After</code> header.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <hr class="section-divider" />
+
+  <!-- Endpoints -->
+  <section class="docs-section docs-section-alt">
+    <div class="container">
+      <div class="editorial" style="max-width: var(--max-content); margin: 0 auto;">
+        <span class="docs-section-number">04</span>
+        <h2 class="docs-section-title">Endpoints</h2>
+
+        <!-- POST /api/audit -->
+        <div class="endpoint">
+          <div class="endpoint-header">
+            <span class="method method-post">POST</span>
+            <code class="endpoint-path">/api/audit</code>
+          </div>
+          <p class="endpoint-desc">
+            Score npm or PyPI packages for supply chain risk.
+            Results sorted by score ascending (highest risk first).
+          </p>
+
+          <h4 class="param-heading">Request body</h4>
+          <table class="param-table">
+            <thead><tr><th>Field</th><th>Type</th><th>Required</th><th>Description</th></tr></thead>
+            <tbody>
+              <tr>
+                <td><code>packages</code></td>
+                <td>string[]</td>
+                <td>Yes</td>
+                <td>Package names. Max 1 (free), 5 (Developer), 20 (Pro/Enterprise). Mix npm and PyPI names freely when ecosystem is "auto".</td>
+              </tr>
+              <tr>
+                <td><code>ecosystem</code></td>
+                <td>string</td>
+                <td>No</td>
+                <td><code>"npm"</code> | <code>"pypi"</code> | <code>"auto"</code> (default). Auto defaults to npm.</td>
+              </tr>
+            </tbody>
+          </table>
+
+          <div class="snippet-group">
+            <div class="snippet-tab-row">
+              <button class="snippet-tab active" data-group="audit" data-lang="curl">curl</button>
+              <button class="snippet-tab" data-group="audit" data-lang="node">Node</button>
+              <button class="snippet-tab" data-group="audit" data-lang="python">Python</button>
+            </div>
+            <div class="snippet-block" data-group="audit" data-lang="curl">
+              <pre><code><span class="c-comment"># Batch audit — requires API key (Developer $15/mo or higher)</span>
+curl -X POST https://poc-backend.amdal-dev.workers.dev/api/audit \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer sk_commit_..." \
+  -d '&#123;
+    "packages": ["axios", "lodash", "express", "chalk"],
+    "ecosystem": "npm"
+  &#125;'</code></pre>
+            </div>
+            <div class="snippet-block hidden" data-group="audit" data-lang="node">
+              <pre><code>const res = await fetch(
+  "https://poc-backend.amdal-dev.workers.dev/api/audit",
+  &#123;
+    method: "POST",
+    headers: &#123;
+      "Content-Type": "application/json",
+      "Authorization": "Bearer sk_commit_...",
+    &#125;,
+    body: JSON.stringify(&#123;
+      packages: ["axios", "lodash", "express", "chalk"],
+      ecosystem: "npm",
+    &#125;),
+  &#125;
+);
+const &#123; results &#125; = await res.json();
+const critical = results.filter(r => r.riskFlags.includes("CRITICAL"));
+console.log("Critical packages:", critical.map(r => r.name));</code></pre>
+            </div>
+            <div class="snippet-block hidden" data-group="audit" data-lang="python">
+              <pre><code>import requests
+
+resp = requests.post(
+    "https://poc-backend.amdal-dev.workers.dev/api/audit",
+    headers=&#123;"Authorization": "Bearer sk_commit_..."&#125;,
+    json=&#123;
+        "packages": ["requests", "flask", "django"],
+        "ecosystem": "pypi",
+    &#125;,
+)
+data = resp.json()
+for pkg in data["results"]:
+    print(f"&#123;pkg['name']&#125;: &#123;pkg['score']&#125; &#123;pkg['riskFlags']&#125;")</code></pre>
+            </div>
+          </div>
+        </div>
+
+        <!-- POST /api/audit/github -->
+        <div class="endpoint">
+          <div class="endpoint-header">
+            <span class="method method-post">POST</span>
+            <code class="endpoint-path">/api/audit/github</code>
+          </div>
+          <p class="endpoint-desc">
+            Fetch dependencies from a GitHub repository and run supply chain risk scoring.
+            Reads <code>package.json</code> and <code>requirements.txt</code> automatically.
+          </p>
+
+          <h4 class="param-heading">Request body</h4>
+          <table class="param-table">
+            <thead><tr><th>Field</th><th>Type</th><th>Required</th><th>Description</th></tr></thead>
+            <tbody>
+              <tr>
+                <td><code>repo</code></td>
+                <td>string</td>
+                <td>Yes</td>
+                <td>GitHub repo as <code>"owner/repo"</code> or full URL. E.g. <code>"facebook/react"</code> or <code>"https://github.com/expressjs/express"</code>.</td>
+              </tr>
+            </tbody>
+          </table>
+
+          <div class="snippet-group">
+            <div class="snippet-tab-row">
+              <button class="snippet-tab active" data-group="gh" data-lang="curl">curl</button>
+              <button class="snippet-tab" data-group="gh" data-lang="node">Node</button>
+            </div>
+            <div class="snippet-block" data-group="gh" data-lang="curl">
+              <pre><code>curl -X POST https://poc-backend.amdal-dev.workers.dev/api/audit/github \
+  -H "Content-Type: application/json" \
+  -d '&#123;"repo": "vercel/next.js"&#125;'</code></pre>
+            </div>
+            <div class="snippet-block hidden" data-group="gh" data-lang="node">
+              <pre><code>const res = await fetch(
+  "https://poc-backend.amdal-dev.workers.dev/api/audit/github",
+  &#123;
+    method: "POST",
+    headers: &#123; "Content-Type": "application/json" &#125;,
+    body: JSON.stringify(&#123; repo: "vercel/next.js" &#125;),
+  &#125;
+);
+const data = await res.json();
+// data.repo, data.npmPackages, data.pypiPackages, data.results</code></pre>
+            </div>
+          </div>
+
+          <div class="response-example">
+            <span class="response-label">Response shape</span>
+            <pre><code>&#123;
+  "repo": "vercel/next.js",
+  "npmPackages": 18,
+  "pypiPackages": 0,
+  "count": 18,
+  "results": [ <span class="c-comment">/* same shape as /api/audit results */</span> ]
+&#125;</code></pre>
+          </div>
+        </div>
+
+        <!-- POST /api/graph/npm -->
+        <div class="endpoint">
+          <div class="endpoint-header">
+            <span class="method method-post">POST</span>
+            <code class="endpoint-path">/api/graph/npm</code>
+          </div>
+          <p class="endpoint-desc">
+            Build a dependency risk graph for an npm package. Returns nodes (packages with scores)
+            and edges (dependency relationships). <code>depth=2</code> traverses transitive dependencies
+            of risky packages.
+          </p>
+
+          <h4 class="param-heading">Request body</h4>
+          <table class="param-table">
+            <thead><tr><th>Field</th><th>Type</th><th>Required</th><th>Description</th></tr></thead>
+            <tbody>
+              <tr>
+                <td><code>package</code></td>
+                <td>string</td>
+                <td>Yes</td>
+                <td>Root npm package name. E.g. <code>"express"</code>.</td>
+              </tr>
+              <tr>
+                <td><code>depth</code></td>
+                <td>1 | 2</td>
+                <td>No</td>
+                <td>Default 1 (root + direct deps). Depth 2 adds transitive deps of risky packages.</td>
+              </tr>
+            </tbody>
+          </table>
+
+          <div class="snippet-group">
+            <div class="snippet-tab-row">
+              <button class="snippet-tab active" data-group="graph" data-lang="curl">curl</button>
+              <button class="snippet-tab" data-group="graph" data-lang="node">Node</button>
+            </div>
+            <div class="snippet-block" data-group="graph" data-lang="curl">
+              <pre><code>curl -X POST https://poc-backend.amdal-dev.workers.dev/api/graph/npm \
+  -H "Content-Type: application/json" \
+  -d '&#123;"package": "express", "depth": 1&#125;'</code></pre>
+            </div>
+            <div class="snippet-block hidden" data-group="graph" data-lang="node">
+              <pre><code>const res = await fetch(
+  "https://poc-backend.amdal-dev.workers.dev/api/graph/npm",
+  &#123;
+    method: "POST",
+    headers: &#123; "Content-Type": "application/json" &#125;,
+    body: JSON.stringify(&#123; package: "express", depth: 1 &#125;),
+  &#125;
+);
+const &#123; nodes, edges, summary &#125; = await res.json();
+console.log(`&#123;summary.criticalCount&#125; CRITICAL packages in tree`);</code></pre>
+            </div>
+          </div>
+
+          <div class="response-example">
+            <span class="response-label">Response shape</span>
+            <pre><code>&#123;
+  "root": "express",
+  "depth": 1,
+  "nodes": [
+    &#123;
+      "name": "express",
+      "score": 97,
+      "maintainers": 5,
+      "weeklyDownloads": 93000000,
+      "ageYears": 15.2,
+      "trend": "growing",
+      "riskFlags": [],
+      "depth": 0
+    &#125;,
+    <span class="c-comment">/* direct deps at depth: 1 */</span>
+  ],
+  "edges": [&#123; "from": "express", "to": "body-parser" &#125;, ...],
+  "summary": &#123;
+    "totalNodes": 12,
+    "criticalCount": 0,
+    "highCount": 1,
+    "warnCount": 2,
+    "worstScore": 42,
+    "criticalTransitivePaths": []
+  &#125;
+&#125;</code></pre>
+          </div>
+        </div>
+
+        <!-- Badges -->
+        <div class="endpoint">
+          <div class="endpoint-header">
+            <span class="method method-get">GET</span>
+            <code class="endpoint-path">/badge/npm/:package</code>
+          </div>
+          <div class="endpoint-header" style="margin-top: 0.5rem;">
+            <span class="method method-get">GET</span>
+            <code class="endpoint-path">/badge/pypi/:package</code>
+          </div>
+          <p class="endpoint-desc">
+            Returns a shields.io-compatible SVG badge with the trust score.
+            CDN-cached for 24 hours. Handles scoped npm packages: <code>/badge/npm/@scope/name</code>.
+          </p>
+
+          <div class="snippet-group">
+            <div class="snippet-tab-row">
+              <button class="snippet-tab active" data-group="badge" data-lang="markdown">Markdown</button>
+              <button class="snippet-tab" data-group="badge" data-lang="html">HTML</button>
+            </div>
+            <div class="snippet-block" data-group="badge" data-lang="markdown">
+              <pre><code><span class="c-comment"># Add to your README.md</span>
+[![Commit Score](https://poc-backend.amdal-dev.workers.dev/badge/npm/express)](https://getcommit.dev/scan/express)
+
+[![Commit Score](https://poc-backend.amdal-dev.workers.dev/badge/pypi/requests)](https://getcommit.dev)</code></pre>
+            </div>
+            <div class="snippet-block hidden" data-group="badge" data-lang="html">
+              <pre><code>&lt;a href="https://getcommit.dev/scan/express"&gt;
+  &lt;img src="https://poc-backend.amdal-dev.workers.dev/badge/npm/express"
+       alt="Commit Score" /&gt;
+&lt;/a&gt;</code></pre>
+            </div>
+          </div>
+
+          <div class="badge-colors-mini">
+            <div class="badge-color-row">
+              <span class="mini-badge" style="background:#222;color:#fff;">⚠ CRITICAL</span>
+              <span class="mini-badge" style="background:#fe7d37;color:#fff;">&lt; 40 high risk</span>
+              <span class="mini-badge" style="background:#dfb317;color:#fff;">40–59 moderate</span>
+              <span class="mini-badge" style="background:#97ca00;color:#fff;">60–74 good</span>
+              <span class="mini-badge" style="background:#44cc11;color:#fff;">75+ healthy</span>
+              <span class="mini-badge" style="background:#9f9f9f;color:#fff;">not found</span>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <hr class="section-divider" />
+
+  <!-- Response Schema -->
+  <section class="docs-section">
+    <div class="container">
+      <div class="editorial" style="max-width: var(--max-content); margin: 0 auto;">
+        <span class="docs-section-number">05</span>
+        <h2 class="docs-section-title">Response Schema</h2>
+        <p class="docs-intro">Every package result from <code>/api/audit</code> and <code>/api/audit/github</code> has the same shape.</p>
+
+        <table class="schema-table">
+          <thead>
+            <tr>
+              <th>Field</th>
+              <th>Type</th>
+              <th>Description</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><code>name</code></td>
+              <td>string</td>
+              <td>Package name as returned by the registry.</td>
+            </tr>
+            <tr>
+              <td><code>ecosystem</code></td>
+              <td>"npm" | "pypi"</td>
+              <td>Package registry.</td>
+            </tr>
+            <tr>
+              <td><code>score</code></td>
+              <td>number | null</td>
+              <td>Trust score 0–100. <code>null</code> if package not found or error.</td>
+            </tr>
+            <tr>
+              <td><code>maintainers</code></td>
+              <td>number | null</td>
+              <td>Number of publish-authorized maintainers.</td>
+            </tr>
+            <tr>
+              <td><code>weeklyDownloads</code></td>
+              <td>number | null</td>
+              <td>Weekly download count (npm) or weekly equivalent for PyPI.</td>
+            </tr>
+            <tr>
+              <td><code>ageYears</code></td>
+              <td>number | null</td>
+              <td>Package age in years, rounded to 1 decimal.</td>
+            </tr>
+            <tr>
+              <td><code>trend</code></td>
+              <td>"growing" | "stable" | "declining" | null</td>
+              <td>90-day download trend. Growing if ratio &gt; 1.15, declining if &lt; 0.85.</td>
+            </tr>
+            <tr>
+              <td><code>daysSinceLastPublish</code></td>
+              <td>number | null</td>
+              <td>Days since most recent version was published.</td>
+            </tr>
+            <tr>
+              <td><code>riskFlags</code></td>
+              <td>string[]</td>
+              <td>
+                <code>"CRITICAL"</code> — sole maintainer + &gt;10M downloads/wk.<br />
+                <code>"HIGH"</code> — sole maintainer + &gt;1M, or &lt;1yr old + &gt;1M.<br />
+                <code>"WARN"</code> — no publish in 365+ days.
+              </td>
+            </tr>
+            <tr>
+              <td><code>scoreBreakdown</code></td>
+              <td>object | null</td>
+              <td>
+                Component scores per the <a href="/spec">scoring specification</a>:
+                <code>longevity</code> (0–25),
+                <code>downloadMomentum</code> (0–25),
+                <code>releaseConsistency</code> (0–20),
+                <code>maintainerDepth</code> (0–15),
+                <code>githubBacking</code> (0–15).
+              </td>
+            </tr>
+            <tr>
+              <td><code>error</code></td>
+              <td>string | undefined</td>
+              <td>Present only if the individual package lookup failed (e.g. "not found").</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+
+  <hr class="section-divider" />
+
+  <!-- Integrations -->
+  <section class="docs-section docs-section-alt">
+    <div class="container">
+      <div class="editorial" style="max-width: var(--max-content); margin: 0 auto;">
+        <span class="docs-section-number">06</span>
+        <h2 class="docs-section-title">Integrations</h2>
+
+        <!-- GitHub Action -->
+        <div class="integration-block">
+          <h3 class="integration-title">GitHub Action</h3>
+          <p class="integration-desc">
+            Drop into any repo. Auto-detects dependencies from <code>package.json</code>
+            and <code>requirements.txt</code>. Posts results as a PR comment on every
+            dependency change.
+          </p>
+          <div class="snippet-group" style="margin-top: 1rem;">
+            <div class="snippet-tab-row">
+              <button class="snippet-tab active" data-group="gha" data-lang="yaml">workflow.yml</button>
+            </div>
+            <div class="snippet-block" data-group="gha" data-lang="yaml">
+              <pre><code><span class="c-comment"># .github/workflows/commit-audit.yml</span>
+name: Supply Chain Audit
+
+on:
+  push:
+    branches: [main]
+    paths: [package.json, requirements.txt]
+  pull_request:
+    paths: [package.json, requirements.txt]
+
+jobs:
+  audit:
+    runs-on: ubuntu-latest
+    permissions:
+      pull-requests: write
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Commit Supply Chain Audit
+        uses: piiiico/proof-of-commitment@main
+        with:
+          fail-on-critical: false   <span class="c-comment"># set true to block merges</span>
+          max-packages: '20'
+          comment-on-pr: true       <span class="c-comment"># posts PR comment, updates on re-run</span></code></pre>
+            </div>
+          </div>
+          <div class="integration-note">
+            Source: <a href="https://github.com/piiiico/proof-of-commitment" target="_blank" rel="noopener">github.com/piiiico/proof-of-commitment</a>
+          </div>
+        </div>
+
+        <!-- MCP Server -->
+        <div class="integration-block">
+          <h3 class="integration-title">MCP Server</h3>
+          <p class="integration-desc">
+            Use Commit directly from Claude, Cursor, or any MCP-compatible AI tool.
+            The remote server is stateless and requires no local setup.
+          </p>
+
+          <div class="mcp-options">
+            <div class="mcp-option">
+              <div class="mcp-option-header">
+                <span class="mcp-option-name">Remote (no install)</span>
+                <span class="mcp-option-badge">Streamable HTTP</span>
+              </div>
+              <pre class="mcp-url"><code>https://poc-backend.amdal-dev.workers.dev/mcp</code></pre>
+              <p class="mcp-note">Add to your MCP client config. Compatible with Claude Desktop, Continue, and any client supporting Streamable HTTP transport.</p>
+            </div>
+            <div class="mcp-option">
+              <div class="mcp-option-header">
+                <span class="mcp-option-name">Claude Desktop config</span>
+              </div>
+              <pre class="mcp-config"><code>&#123;
+  "mcpServers": &#123;
+    "commit": &#123;
+      "url": "https://poc-backend.amdal-dev.workers.dev/mcp",
+      "transport": "http"
+    &#125;
+  &#125;
+&#125;</code></pre>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <hr class="section-divider" />
+
+  <!-- Error Reference -->
+  <section class="docs-section">
+    <div class="container">
+      <div class="editorial" style="max-width: var(--max-content); margin: 0 auto;">
+        <span class="docs-section-number">07</span>
+        <h2 class="docs-section-title">Errors</h2>
+        <p class="docs-intro">All errors return JSON with an <code>error</code> field. HTTP status codes follow REST conventions.</p>
+
+        <table class="schema-table">
+          <thead>
+            <tr><th>Status</th><th>Meaning</th><th>Common cause</th></tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><code>400</code></td>
+              <td>Bad Request</td>
+              <td>Missing required field, invalid repo format, empty packages array.</td>
+            </tr>
+            <tr>
+              <td><code>401</code></td>
+              <td>Unauthorized</td>
+              <td>Invalid, revoked, or unknown API key.</td>
+            </tr>
+            <tr>
+              <td><code>402</code></td>
+              <td>Payment Required</td>
+              <td>Endpoint requires a paid tier (Developer $15/mo or higher). Free keys cannot call <code>/api/watchlist</code> or other monitoring routes.</td>
+            </tr>
+            <tr>
+              <td><code>404</code></td>
+              <td>Not Found</td>
+              <td>No dependencies found in the target GitHub repo.</td>
+            </tr>
+            <tr>
+              <td><code>429</code></td>
+              <td>Too Many Requests</td>
+              <td>Rate limit exceeded. Check <code>Retry-After</code> header.</td>
+            </tr>
+          </tbody>
+        </table>
+
+        <div class="error-example">
+          <span class="response-label">402 response body</span>
+          <pre><code>&#123;
+  "error": "upgrade_required",
+  "message": "Monitoring + alerts start on Developer ($15/mo). Upgrade at https://getcommit.dev/pricing",
+  "current_tier": "free",
+  "upgrade": &#123;
+    "url": "https://getcommit.dev/pricing",
+    "plan": "developer",
+    "price": "$15/month"
+  &#125;
+&#125;</code></pre>
+        </div>
+
+        <div class="error-example" style="margin-top: 1.25rem;">
+          <span class="response-label">429 response body</span>
+          <pre><code>&#123;
+  "error": "rate_limit_exceeded",
+  "message": "You've used 200/200 requests this period. Resets in 8h 32m.",
+  "tier": "free",
+  "upgrade": &#123;
+    "url": "https://getcommit.dev/pricing",
+    "plan": "developer",
+    "price": "$15/month",
+    "limit": "1,000 requests/day",
+    "message": "Upgrade to Developer for 5x more requests, batch API, and CI auto-trigger."
+  &#125;,
+  "retry_after": 30720
+&#125;</code></pre>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <hr class="section-divider" />
+
+  <!-- CTA -->
+  <section class="cta-section">
+    <div class="container">
+      <div class="editorial" style="max-width: var(--max-content); margin: 0 auto; text-align: center;">
+        <h2 class="cta-heading">Ready to integrate?</h2>
+        <p class="cta-text" style="margin: 0 auto 2rem;">Start with the free tier. When you need batch audits, monitoring, or higher limits, Developer is $15/mo.</p>
+        <div class="cta-buttons">
+          <a href="/audit" class="btn-primary">Try it in the browser</a>
+          <a href="/pricing?utm_experiment=pricing-friction-v1&utm_source=docs&utm_medium=cta" class="btn-ghost">Get an API key</a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <footer>
+    <div class="container footer-inner">
+      <span class="footer-brand">Commit</span>
+      <span class="footer-copy">Behavioral trust for the software supply chain.</span>
+      <nav class="footer-links">
+        <a href="/audit">Audit</a>
+        <a href="/watchlist">Watchlist</a>
+        <a href="/docs">Docs</a>
+        <a href="/blog">Writing</a>
+        <a href="mailto:pico@amdal.dev">Contact</a>
+      </nav>
+    </div>
+  </footer>
+
+  <script>
+    // Tab switching for code snippets
+    document.querySelectorAll('.snippet-tab').forEach((tab) => {
+      tab.addEventListener('click', () => {
+        const group = (tab as HTMLElement).dataset.group!;
+        const lang = (tab as HTMLElement).dataset.lang!;
+
+        // Deactivate all tabs in this group
+        document.querySelectorAll(`.snippet-tab[data-group="${group}"]`).forEach((t) => {
+          t.classList.remove('active');
+        });
+        // Hide all blocks in this group
+        document.querySelectorAll(`.snippet-block[data-group="${group}"]`).forEach((b) => {
+          b.classList.add('hidden');
+        });
+        // Activate selected
+        tab.classList.add('active');
+        const block = document.querySelector(`.snippet-block[data-group="${group}"][data-lang="${lang}"]`);
+        block?.classList.remove('hidden');
+      });
+    });
+  </script>
+
+  <style>
+    /* ── Docs Header ── */
+    .docs-header {
+      padding: 6rem 0 3rem;
+      background: var(--paper);
+    }
+
+    .docs-version-badge {
+      display: inline-block;
+      padding: 0.3rem 0.8rem;
+      background: var(--paper-dim);
+      border: 1px solid var(--border);
+      border-radius: 3px;
+      font-family: var(--font-mono);
+      font-size: 0.75rem;
+      font-weight: 500;
+      color: var(--ink-subtle);
+      letter-spacing: 0.04em;
+      margin-bottom: 1.5rem;
+    }
+
+    .docs-title {
+      font-family: var(--font-display);
+      font-size: clamp(2.2rem, 5vw, 3.5rem);
+      line-height: 1.12;
+      color: var(--ink);
+      margin-bottom: 1.5rem;
+    }
+
+    .docs-title em {
+      font-style: italic;
+      color: var(--accent);
+    }
+
+    .docs-lead {
+      font-size: 1.05rem;
+      line-height: 1.7;
+      color: var(--ink-muted);
+      max-width: 50rem;
+      margin-bottom: 2rem;
+    }
+
+    .base-url-box {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.75rem;
+      padding: 0.75rem 1rem;
+      background: var(--paper-dim);
+      border: 1px solid var(--border);
+      border-radius: 4px;
+    }
+
+    .base-url-label {
+      font-size: 0.7rem;
+      font-weight: 500;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: var(--ink-subtle);
+      flex-shrink: 0;
+    }
+
+    .base-url-value {
+      font-family: var(--font-mono);
+      font-size: 0.875rem;
+      color: var(--ink);
+    }
+
+    /* ── Nav active state ── */
+    .nav-active {
+      color: var(--ink) !important;
+      font-weight: 500 !important;
+    }
+
+    /* ── Section structure (mirrors spec.astro) ── */
+    .docs-section {
+      padding: 4rem 0;
+      background: var(--paper);
+    }
+
+    .docs-section-alt {
+      background: var(--paper-dim);
+    }
+
+    .docs-section-number {
+      display: block;
+      font-family: var(--font-mono);
+      font-size: 0.75rem;
+      color: var(--accent);
+      letter-spacing: 0.08em;
+      margin-bottom: 0.5rem;
+    }
+
+    .docs-section-title {
+      font-family: var(--font-display);
+      font-size: clamp(1.5rem, 3vw, 2rem);
+      color: var(--ink);
+      margin-bottom: 1.5rem;
+    }
+
+    .docs-intro {
+      font-size: 0.95rem;
+      line-height: 1.7;
+      color: var(--ink-muted);
+      max-width: 55ch;
+      margin-bottom: 2rem;
+    }
+
+    .docs-intro code {
+      font-family: var(--font-mono);
+      font-size: 0.85em;
+      background: var(--paper);
+      padding: 0.1rem 0.35rem;
+      border-radius: 3px;
+      border: 1px solid var(--border);
+      color: var(--ink);
+    }
+
+    .docs-section-alt .docs-intro code {
+      background: var(--paper-dim);
+    }
+
+    /* ── Code snippets ── */
+    .snippet-group {
+      margin-bottom: 1.5rem;
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      overflow: hidden;
+    }
+
+    .snippet-tab-row {
+      display: flex;
+      background: var(--paper-dim);
+      border-bottom: 1px solid var(--border);
+    }
+
+    .docs-section-alt .snippet-tab-row {
+      background: var(--surface);
+    }
+
+    .snippet-tab {
+      padding: 0.5rem 1rem;
+      font-family: var(--font-mono);
+      font-size: 0.75rem;
+      font-weight: 500;
+      color: var(--ink-subtle);
+      background: transparent;
+      border: none;
+      cursor: pointer;
+      border-right: 1px solid var(--border-light);
+      transition: color 0.15s;
+    }
+
+    .snippet-tab:hover { color: var(--ink); }
+    .snippet-tab.active {
+      color: var(--ink);
+      background: var(--paper);
+      border-bottom: 2px solid var(--accent);
+      margin-bottom: -1px;
+    }
+
+    .docs-section-alt .snippet-tab.active {
+      background: var(--paper-dim);
+    }
+
+    .snippet-block {
+      background: var(--paper);
+      overflow-x: auto;
+    }
+
+    .docs-section-alt .snippet-block {
+      background: var(--paper-dim);
+    }
+
+    .snippet-block pre {
+      padding: 1.25rem;
+      margin: 0;
+    }
+
+    .snippet-block code,
+    .response-example code,
+    .mcp-config code,
+    .mcp-url code {
+      font-family: var(--font-mono);
+      font-size: 0.8125rem;
+      line-height: 1.65;
+      color: var(--ink);
+      white-space: pre;
+    }
+
+    .hidden { display: none; }
+
+    .c-comment { color: var(--ink-subtle); font-style: italic; }
+
+    /* ── Response example ── */
+    .response-example {
+      margin-top: 1rem;
+    }
+
+    .response-label {
+      display: inline-block;
+      font-family: var(--font-mono);
+      font-size: 0.7rem;
+      font-weight: 500;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--ink-subtle);
+      margin-bottom: 0.4rem;
+    }
+
+    .response-example pre {
+      background: var(--paper-dim);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      padding: 1.25rem;
+      overflow-x: auto;
+    }
+
+    .docs-section-alt .response-example pre {
+      background: var(--surface);
+    }
+
+    /* ── Authentication ── */
+    .auth-tiers {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 1rem;
+      margin-bottom: 1.5rem;
+    }
+
+    @media (max-width: 900px) {
+      .auth-tiers { grid-template-columns: 1fr 1fr; }
+    }
+
+    @media (max-width: 640px) {
+      .auth-tiers { grid-template-columns: 1fr; }
+    }
+
+    .auth-tier {
+      padding: 1.25rem;
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      background: var(--paper);
+    }
+
+    .docs-section-alt .auth-tier {
+      background: var(--paper-dim);
+    }
+
+    .auth-tier-pro,
+    .auth-tier-paid {
+      border-color: var(--accent);
+    }
+
+    .auth-tier-header {
+      display: flex;
+      align-items: baseline;
+      gap: 0.5rem;
+      margin-bottom: 0.75rem;
+    }
+
+    .auth-tier-name {
+      font-family: var(--font-display);
+      font-size: 1.1rem;
+      color: var(--ink);
+    }
+
+    .auth-tier-desc {
+      font-size: 0.8rem;
+      color: var(--ink-subtle);
+    }
+
+    .auth-tier-badge {
+      font-family: var(--font-mono);
+      font-size: 0.75rem;
+      color: var(--accent);
+      font-weight: 500;
+    }
+
+    .auth-tier-body {
+      font-size: 0.875rem;
+      line-height: 1.6;
+      color: var(--ink-muted);
+      max-width: 100%;
+      margin-bottom: 0.75rem;
+    }
+
+    .auth-example {
+      padding: 0.5rem 0.75rem;
+      background: var(--paper-dim);
+      border: 1px solid var(--border);
+      border-radius: 3px;
+    }
+
+    .auth-example code {
+      font-family: var(--font-mono);
+      font-size: 0.8rem;
+      color: var(--ink);
+    }
+
+    .auth-key-format {
+      font-size: 0.875rem;
+      line-height: 1.6;
+      color: var(--ink-muted);
+      padding: 1rem;
+      background: var(--paper-dim);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+    }
+
+    .auth-key-label {
+      display: block;
+      font-family: var(--font-mono);
+      font-size: 0.7rem;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--ink-subtle);
+      margin-bottom: 0.4rem;
+    }
+
+    .auth-key-format code {
+      font-family: var(--font-mono);
+      font-size: 0.85em;
+      background: var(--paper);
+      padding: 0.1rem 0.35rem;
+      border-radius: 3px;
+      border: 1px solid var(--border);
+      color: var(--ink);
+    }
+
+    /* ── Rate limits ── */
+    .rate-table-wrapper {
+      overflow-x: auto;
+      margin-bottom: 1.25rem;
+    }
+
+    .rate-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.85rem;
+    }
+
+    .rate-table thead th {
+      padding: 0.6rem 0.75rem;
+      text-align: left;
+      font-size: 0.7rem;
+      font-weight: 500;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--ink-subtle);
+      border-bottom: 2px solid var(--border);
+      white-space: nowrap;
+    }
+
+    .rate-table tbody td {
+      padding: 0.7rem 0.75rem;
+      border-bottom: 1px solid var(--border-light);
+      color: var(--ink-muted);
+      vertical-align: top;
+    }
+
+    .rate-table tbody td:first-child {
+      font-family: var(--font-mono);
+      font-size: 0.8rem;
+      color: var(--ink);
+      white-space: nowrap;
+    }
+
+    .rate-table code {
+      font-family: var(--font-mono);
+      font-size: 0.85em;
+      background: var(--paper-dim);
+      padding: 0.1rem 0.35rem;
+      border-radius: 3px;
+      border: 1px solid var(--border);
+      color: var(--ink);
+    }
+
+    .rate-note {
+      font-size: 0.75rem;
+      color: var(--ink-subtle);
+      display: block;
+    }
+
+    .rate-reset-note {
+      font-size: 0.85rem;
+      color: var(--ink-muted);
+      line-height: 1.6;
+      max-width: 55ch;
+    }
+
+    .rate-reset-note code {
+      font-family: var(--font-mono);
+      font-size: 0.85em;
+      background: var(--paper-dim);
+      padding: 0.1rem 0.3rem;
+      border-radius: 3px;
+      border: 1px solid var(--border);
+      color: var(--ink);
+    }
+
+    /* ── Endpoints ── */
+    .endpoint {
+      margin-bottom: 3rem;
+      padding-bottom: 3rem;
+      border-bottom: 1px solid var(--border-light);
+    }
+
+    .endpoint:last-of-type {
+      border-bottom: none;
+      margin-bottom: 0;
+      padding-bottom: 0;
+    }
+
+    .endpoint-header {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      margin-bottom: 0.75rem;
+    }
+
+    .method {
+      display: inline-flex;
+      align-items: center;
+      padding: 0.2rem 0.55rem;
+      border-radius: 3px;
+      font-family: var(--font-mono);
+      font-size: 0.75rem;
+      font-weight: 700;
+      letter-spacing: 0.04em;
+      flex-shrink: 0;
+    }
+
+    .method-post { background: #dbeafe; color: #1d4ed8; }
+    .method-get  { background: #dcfce7; color: #166534; }
+
+    .endpoint-path {
+      font-family: var(--font-mono);
+      font-size: 0.9375rem;
+      font-weight: 500;
+      color: var(--ink);
+    }
+
+    .endpoint-desc {
+      font-size: 0.9375rem;
+      line-height: 1.65;
+      color: var(--ink-muted);
+      max-width: 55ch;
+      margin-bottom: 1.25rem;
+    }
+
+    .endpoint-desc code {
+      font-family: var(--font-mono);
+      font-size: 0.85em;
+      background: var(--paper);
+      padding: 0.1rem 0.35rem;
+      border-radius: 3px;
+      border: 1px solid var(--border);
+      color: var(--ink);
+    }
+
+    .param-heading {
+      font-family: var(--font-mono);
+      font-size: 0.75rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--ink-subtle);
+      margin-bottom: 0.5rem;
+      margin-top: 1.25rem;
+    }
+
+    .param-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.85rem;
+      margin-bottom: 1.25rem;
+    }
+
+    .param-table thead th {
+      padding: 0.5rem 0.75rem;
+      text-align: left;
+      font-size: 0.7rem;
+      font-weight: 500;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--ink-subtle);
+      border-bottom: 2px solid var(--border);
+    }
+
+    .param-table tbody td {
+      padding: 0.6rem 0.75rem;
+      border-bottom: 1px solid var(--border-light);
+      color: var(--ink-muted);
+      vertical-align: top;
+      line-height: 1.5;
+    }
+
+    .param-table tbody td:first-child,
+    .param-table tbody td:second-child {
+      white-space: nowrap;
+    }
+
+    .param-table code {
+      font-family: var(--font-mono);
+      font-size: 0.85em;
+      background: var(--paper);
+      padding: 0.1rem 0.35rem;
+      border-radius: 3px;
+      border: 1px solid var(--border);
+      color: var(--ink);
+    }
+
+    /* ── Badge colors ── */
+    .badge-colors-mini {
+      margin-top: 1rem;
+    }
+
+    .badge-color-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+    }
+
+    .mini-badge {
+      display: inline-block;
+      padding: 0.2rem 0.5rem;
+      border-radius: 3px;
+      font-family: var(--font-mono);
+      font-size: 0.75rem;
+      font-weight: 600;
+    }
+
+    /* ── Schema table ── */
+    .schema-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.875rem;
+    }
+
+    .schema-table thead th {
+      padding: 0.5rem 0.75rem;
+      text-align: left;
+      font-size: 0.7rem;
+      font-weight: 500;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--ink-subtle);
+      border-bottom: 2px solid var(--border);
+    }
+
+    .schema-table tbody td {
+      padding: 0.65rem 0.75rem;
+      border-bottom: 1px solid var(--border-light);
+      color: var(--ink-muted);
+      vertical-align: top;
+      line-height: 1.55;
+    }
+
+    .schema-table tbody td:first-child {
+      white-space: nowrap;
+    }
+
+    .schema-table code {
+      font-family: var(--font-mono);
+      font-size: 0.82em;
+      background: var(--paper-dim);
+      padding: 0.1rem 0.35rem;
+      border-radius: 3px;
+      border: 1px solid var(--border);
+      color: var(--ink);
+    }
+
+    /* ── Integrations ── */
+    .integration-block {
+      margin-bottom: 3rem;
+      padding-bottom: 3rem;
+      border-bottom: 1px solid var(--border-light);
+    }
+
+    .integration-block:last-child {
+      border-bottom: none;
+      margin-bottom: 0;
+      padding-bottom: 0;
+    }
+
+    .integration-title {
+      font-family: var(--font-display);
+      font-size: 1.25rem;
+      color: var(--ink);
+      margin-bottom: 0.75rem;
+    }
+
+    .integration-desc {
+      font-size: 0.9375rem;
+      line-height: 1.65;
+      color: var(--ink-muted);
+      max-width: 55ch;
+      margin-bottom: 0.5rem;
+    }
+
+    .integration-desc code {
+      font-family: var(--font-mono);
+      font-size: 0.85em;
+      background: var(--paper);
+      padding: 0.1rem 0.35rem;
+      border-radius: 3px;
+      border: 1px solid var(--border);
+      color: var(--ink);
+    }
+
+    .integration-note {
+      margin-top: 0.75rem;
+      font-size: 0.85rem;
+      color: var(--ink-subtle);
+    }
+
+    .integration-note a {
+      color: var(--ink-muted);
+    }
+
+    /* ── MCP ── */
+    .mcp-options {
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+      margin-top: 1rem;
+    }
+
+    .mcp-option {
+      padding: 1.25rem;
+      background: var(--paper);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+    }
+
+    .mcp-option-header {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      margin-bottom: 0.75rem;
+    }
+
+    .mcp-option-name {
+      font-family: var(--font-mono);
+      font-size: 0.85rem;
+      font-weight: 600;
+      color: var(--ink);
+    }
+
+    .mcp-option-badge {
+      font-size: 0.7rem;
+      font-family: var(--font-mono);
+      padding: 0.15rem 0.5rem;
+      border-radius: 3px;
+      background: var(--surface);
+      color: var(--ink-subtle);
+      border: 1px solid var(--border);
+    }
+
+    .mcp-url {
+      background: var(--paper-dim);
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      padding: 0.65rem 0.85rem;
+      margin-bottom: 0.75rem;
+      overflow-x: auto;
+    }
+
+    .mcp-config {
+      background: var(--paper-dim);
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      padding: 1rem;
+      overflow-x: auto;
+    }
+
+    .mcp-note {
+      font-size: 0.85rem;
+      color: var(--ink-muted);
+      line-height: 1.5;
+      max-width: 100%;
+      margin: 0;
+    }
+
+    /* ── Error example ── */
+    .error-example {
+      margin-top: 1.5rem;
+    }
+
+    .error-example pre {
+      background: var(--paper-dim);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      padding: 1.25rem;
+      overflow-x: auto;
+      margin-top: 0.4rem;
+    }
+
+    /* ── CTA ── */
+    .cta-section {
+      padding: 5rem 0;
+      background: var(--paper);
+    }
+
+    .cta-heading {
+      font-family: var(--font-display);
+      font-size: 2rem;
+      color: var(--ink);
+      margin-bottom: 0.75rem;
+    }
+
+    .cta-text {
+      font-size: 1rem;
+      color: var(--ink-muted);
+      margin-bottom: 2rem;
+    }
+
+    .cta-buttons {
+      display: flex;
+      gap: 1rem;
+      justify-content: center;
+      flex-wrap: wrap;
+    }
+
+    .btn-primary {
+      display: inline-flex;
+      align-items: center;
+      padding: 0.75rem 1.5rem;
+      background: var(--accent);
+      color: #fff;
+      font-size: 0.9rem;
+      font-weight: 500;
+      border-radius: 4px;
+      text-decoration: none;
+      transition: background 0.2s;
+    }
+
+    .btn-primary:hover { background: var(--accent-dim); color: #fff; }
+
+    .btn-ghost {
+      display: inline-flex;
+      align-items: center;
+      padding: 0.75rem 1.5rem;
+      background: transparent;
+      border: 1px solid var(--border);
+      color: var(--ink-muted);
+      font-size: 0.9rem;
+      border-radius: 4px;
+      text-decoration: none;
+      transition: border-color 0.2s, color 0.2s;
+    }
+
+    .btn-ghost:hover { border-color: var(--ink); color: var(--ink); }
+
+    /* ── Footer ── */
+    .footer-inner {
+      display: flex;
+      align-items: center;
+      gap: 1.5rem;
+      padding: 2rem 0;
+      flex-wrap: wrap;
+      border-top: 1px solid var(--border);
+    }
+
+    .footer-brand {
+      font-family: var(--font-display);
+      font-size: 1.1rem;
+      color: var(--ink);
+    }
+
+    .footer-copy {
+      font-size: 0.85rem;
+      color: var(--ink-subtle);
+      flex: 1;
+    }
+
+    .footer-links {
+      display: flex;
+      gap: 1.25rem;
+    }
+
+    .footer-links a {
+      font-size: 0.85rem;
+      color: var(--ink-muted);
+      text-decoration: none;
+    }
+
+    .footer-links a:hover { color: var(--ink); }
+
+    /* ── Section divider ── */
+    .section-divider {
+      border: none;
+      border-top: 1px solid var(--border-light);
+      margin: 0;
+    }
+  </style>
+</Layout>
