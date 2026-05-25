@@ -1,0 +1,791 @@
+---
+import Layout from '../layouts/Layout.astro';
+---
+
+<Layout
+  title="Dashboard — Commit API Usage"
+  description="Check your Commit API key usage, tier, and reset date."
+  canonical="https://getcommit.dev/dashboard/"
+>
+  <!-- Nav -->
+  <nav>
+    <div class="container nav-inner">
+      <a href="/" class="nav-brand">Commit</a>
+      <ul class="nav-links">
+        <li><a href="/#mcp">MCP</a></li>
+        <li><a href="/audit">Audit</a></li>
+        <li><a href="/watchlist">Watchlist</a></li>
+        <li><a href="/extension">Extension</a></li>
+        <li><a href="/blog">Writing</a></li>
+        <li><a href="/pricing">Pricing</a></li><li><a href="/docs">Docs</a></li>
+        <li><a href="https://github.com/piiiico/proof-of-commitment" target="_blank" rel="noopener">GitHub</a></li>
+        <li><a href="mailto:pico@amdal.dev">Contact</a></li>
+      </ul>
+    </div>
+  </nav>
+
+  <!-- Hero -->
+  <section class="db-hero">
+    <div class="container">
+      <div class="editorial" style="max-width: var(--max-content); margin: 0 auto;">
+        <span class="hero-eyebrow">Dashboard</span>
+        <h1 class="db-title">API Usage</h1>
+        <p class="db-lead">
+          Enter your API key to view your usage stats, tier, and reset date.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <hr class="section-divider" />
+
+  <!-- Key lookup form -->
+  <section class="db-lookup-section">
+    <div class="container">
+      <div class="db-card reveal">
+
+        <!-- Input view -->
+        <div id="db-input-view">
+          <h2 class="db-card-heading">Enter your API key</h2>
+          <p class="db-card-sub">
+            Your key starts with <code>sk_commit_</code> and was emailed to you.
+          </p>
+          <form id="db-form" class="db-form" novalidate>
+            <div class="db-input-row">
+              <input
+                id="db-key"
+                type="text"
+                name="apikey"
+                placeholder="sk_commit_..."
+                autocomplete="off"
+                spellcheck="false"
+                class="db-input"
+              />
+              <button type="submit" id="db-btn" class="db-submit">Check Usage →</button>
+            </div>
+            <p id="db-error" class="db-feedback db-error" hidden></p>
+          </form>
+          <p class="db-hint">
+            Don't have a key yet? <a href="/get-started">Get your free API key →</a>
+          </p>
+        </div>
+
+        <!-- Usage view (hidden until loaded) -->
+        <div id="db-usage-view" hidden>
+          <!-- Header row -->
+          <div class="usage-header">
+            <div>
+              <span class="usage-key-label">API Key</span>
+              <span id="usage-key-prefix" class="usage-key-prefix"></span>
+            </div>
+            <div id="usage-tier-badge" class="tier-badge"></div>
+          </div>
+
+          <!-- Usage bar -->
+          <div class="usage-block">
+            <div class="usage-bar-row">
+              <span class="usage-bar-label">Requests</span>
+              <span id="usage-numbers" class="usage-numbers"></span>
+            </div>
+            <div class="usage-bar-track">
+              <div id="usage-bar-fill" class="usage-bar-fill"></div>
+            </div>
+            <div class="usage-meta-row">
+              <span id="usage-period" class="usage-period"></span>
+              <span id="usage-reset" class="usage-reset"></span>
+            </div>
+          </div>
+
+          <!-- Upgrade CTA (free tier only) -->
+          <div id="usage-upgrade" class="usage-upgrade" hidden>
+            <p class="upgrade-msg">
+              Need more? Developer ($15/mo) gives you 1,000 requests/day and batch up to 5
+              packages per call. Pro ($29/mo) adds 10,000 requests/month, batch up to 20, and monitoring.
+            </p>
+            <a href="/pricing?utm_experiment=pricing-friction-v1&utm_source=dashboard&utm_medium=upgrade-cta" class="upgrade-btn">See plans →</a>
+          </div>
+
+          <!-- Feedback prompt (free tier only) — opt-in customer-dev channel -->
+          <div id="usage-feedback" class="usage-feedback" hidden>
+            <p class="feedback-msg">
+              Didn't upgrade. Why?
+              <a
+                class="feedback-link"
+                href="mailto:pico@amdal.dev?subject=Commit%20upgrade%20blocker&body=What%20would%20make%20Commit%20worth%20%2415%2Fmo%20or%20%2429%2Fmo%20for%20me%3A%0A%0A%0A%E2%80%94%20Sent%20from%20getcommit.dev%2Fdashboard"
+              >Email pico@amdal.dev</a>
+              — I'm trying to figure out what's missing. One sentence is enough.
+            </p>
+          </div>
+
+          <!-- Check another key -->
+          <button id="db-reset-btn" class="db-reset-btn">Check a different key</button>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <hr class="section-divider" />
+
+  <!-- Help -->
+  <section class="db-help-section">
+    <div class="container">
+      <div class="editorial reveal" style="max-width: var(--max-content); margin: 0 auto;">
+        <h2 class="section-heading">Common questions</h2>
+
+        <div class="help-list">
+          <div class="help-item">
+            <h3 class="help-q">When does my usage reset?</h3>
+            <p class="help-a">
+              Free (200/day) and Developer (1,000/day) both reset daily at midnight UTC.
+              Pro (10,000/month, pooled) and Enterprise reset on the 1st of each month.
+              The dashboard shows your exact reset time.
+            </p>
+          </div>
+          <div class="help-item">
+            <h3 class="help-q">Where do I find my API key?</h3>
+            <p class="help-a">
+              Check the email you used when signing up at <a href="/get-started">getcommit.dev/get-started</a>.
+              The key starts with <code>sk_commit_</code>.
+              If you can't find it, <a href="mailto:pico@amdal.dev">contact us</a> and we'll resend it.
+            </p>
+          </div>
+          <div class="help-item">
+            <h3 class="help-q">What counts as a request?</h3>
+            <p class="help-a">
+              Each call to <code>/api/audit</code> counts as one request, regardless of the package size.
+              Batch API calls count as one request per batch, not per package — Developer batches up
+              to 5 packages per call, Pro up to 20.
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <footer>
+    <div class="container footer-inner">
+      <span class="footer-brand">Commit</span>
+      <span class="footer-copy">Behavioral trust for the software supply chain.</span>
+      <nav class="footer-links">
+        <a href="/audit">Audit</a>
+        <a href="/watchlist">Watchlist</a>
+        <a href="/pricing">Pricing</a>
+        <a href="/blog">Writing</a>
+        <a href="mailto:pico@amdal.dev">Contact</a>
+      </nav>
+    </div>
+  </footer>
+
+  <script>
+    const form = document.getElementById('db-form') as HTMLFormElement | null;
+    const resetBtn = document.getElementById('db-reset-btn') as HTMLButtonElement | null;
+
+    function showInputView() {
+      const inputView = document.getElementById('db-input-view') as HTMLElement;
+      const usageView = document.getElementById('db-usage-view') as HTMLElement;
+      inputView.hidden = false;
+      usageView.hidden = true;
+      const keyInput = document.getElementById('db-key') as HTMLInputElement;
+      keyInput.value = '';
+    }
+
+    function formatResetDate(iso: string): string {
+      try {
+        const d = new Date(iso);
+        const now = new Date();
+        const diffMs = d.getTime() - now.getTime();
+        const diffH = Math.round(diffMs / (1000 * 60 * 60));
+        if (diffH < 24 && diffH >= 0) {
+          return `Resets in ${diffH}h`;
+        }
+        return `Resets ${d.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}`;
+      } catch {
+        return '';
+      }
+    }
+
+    function renderUsage(data: any) {
+      const inputView = document.getElementById('db-input-view') as HTMLElement;
+      const usageView = document.getElementById('db-usage-view') as HTMLElement;
+      inputView.hidden = true;
+      usageView.hidden = false;
+
+      // Key prefix
+      const keyPrefixEl = document.getElementById('usage-key-prefix') as HTMLElement;
+      keyPrefixEl.textContent = data.key_prefix ?? 'sk_commit_…';
+
+      // Tier badge
+      const tierBadge = document.getElementById('usage-tier-badge') as HTMLElement;
+      const tier = data.tier ?? 'free';
+      const TIER_LABELS: Record<string, string> = {
+        free: 'Free',
+        developer: 'Developer',
+        pro: 'Pro',
+        enterprise: 'Enterprise',
+      };
+      tierBadge.textContent = TIER_LABELS[tier] ?? 'Free';
+      tierBadge.className = `tier-badge tier-badge-${tier}`;
+
+      // Numbers
+      const used = data.requests_used ?? 0;
+      const limit = data.requests_limit ?? 200;
+      const numbersEl = document.getElementById('usage-numbers') as HTMLElement;
+      numbersEl.textContent = `${used.toLocaleString()} / ${limit.toLocaleString()}`;
+
+      // Bar
+      const pct = Math.min(100, Math.round((used / limit) * 100));
+      const barFill = document.getElementById('usage-bar-fill') as HTMLElement;
+      barFill.style.width = `${pct}%`;
+      if (pct >= 90) barFill.classList.add('bar-warning');
+
+      // Period
+      const periodEl = document.getElementById('usage-period') as HTMLElement;
+      periodEl.textContent = data.period === 'monthly' ? 'Monthly quota' : 'Daily quota';
+
+      // Reset
+      const resetEl = document.getElementById('usage-reset') as HTMLElement;
+      resetEl.textContent = data.period_reset_at ? formatResetDate(data.period_reset_at) : '';
+
+      // Upgrade CTA + feedback prompt (free tier only)
+      const upgradeEl = document.getElementById('usage-upgrade') as HTMLElement;
+      upgradeEl.hidden = tier !== 'free';
+      const feedbackEl = document.getElementById('usage-feedback') as HTMLElement;
+      feedbackEl.hidden = tier !== 'free';
+    }
+
+    if (form) {
+      form.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const keyInput = document.getElementById('db-key') as HTMLInputElement;
+        const submitBtn = document.getElementById('db-btn') as HTMLButtonElement;
+        const errorMsg = document.getElementById('db-error') as HTMLParagraphElement;
+        const key = keyInput.value.trim();
+
+        if (!key || !key.startsWith('sk_commit_')) {
+          errorMsg.textContent = 'Please enter a valid API key starting with sk_commit_';
+          errorMsg.hidden = false;
+          return;
+        }
+
+        submitBtn.disabled = true;
+        submitBtn.textContent = 'Loading…';
+        errorMsg.hidden = true;
+
+        try {
+          const res = await fetch('https://poc-backend.amdal-dev.workers.dev/api/keys/usage', {
+            headers: { 'Authorization': `Bearer ${key}` },
+          });
+
+          if (res.status === 401) {
+            throw new Error('Invalid API key. Check your email for the correct key.');
+          }
+
+          if (!res.ok) {
+            const data = await res.json() as any;
+            throw new Error(data?.error ?? `Error ${res.status}`);
+          }
+
+          const data = await res.json() as any;
+          renderUsage(data);
+        } catch (err) {
+          errorMsg.textContent = err instanceof Error ? err.message : 'Something went wrong. Please try again.';
+          errorMsg.hidden = false;
+          submitBtn.disabled = false;
+          submitBtn.textContent = 'Check Usage →';
+        }
+      });
+    }
+
+    if (resetBtn) {
+      resetBtn.addEventListener('click', showInputView);
+    }
+  </script>
+
+  <style>
+    /* ── Nav ── */
+    nav {
+      border-bottom: 1px solid var(--border-light);
+      padding: 1rem 0;
+    }
+
+    .nav-inner {
+      display: flex;
+      align-items: center;
+      gap: 2rem;
+    }
+
+    .nav-brand {
+      font-family: var(--font-display);
+      font-size: 1.125rem;
+      color: var(--ink);
+      text-decoration: none;
+      letter-spacing: 0.05em;
+      flex-shrink: 0;
+    }
+
+    .nav-links {
+      display: flex;
+      list-style: none;
+      padding: 0;
+      margin: 0 0 0 auto;
+      gap: 2rem;
+    }
+
+    .nav-links a {
+      font-size: 0.875rem;
+      color: var(--ink-subtle);
+      text-decoration: none;
+      transition: color 0.15s;
+    }
+
+    .nav-links a:hover { color: var(--ink); }
+
+    /* ── Hero ── */
+    .db-hero {
+      padding: 6rem 0 3rem;
+      background: var(--paper);
+    }
+
+    .hero-eyebrow {
+      display: inline-block;
+      font-size: 0.75rem;
+      font-weight: 500;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--accent);
+      margin-bottom: 1rem;
+    }
+
+    .db-title {
+      font-family: var(--font-display);
+      font-size: clamp(2.2rem, 5vw, 3.5rem);
+      line-height: 1.12;
+      color: var(--ink);
+      margin: 1rem 0 1.5rem;
+      letter-spacing: -0.01em;
+    }
+
+    .db-lead {
+      font-size: 1.05rem;
+      line-height: 1.7;
+      color: var(--ink-muted);
+    }
+
+    /* ── Lookup card ── */
+    .db-lookup-section {
+      padding: 4rem 0;
+      background: var(--paper-dim);
+    }
+
+    .db-card {
+      background: var(--paper);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 2.5rem;
+      max-width: 36rem;
+      margin: 0 auto;
+    }
+
+    .db-card-heading {
+      font-family: var(--font-display);
+      font-size: 1.4rem;
+      color: var(--ink);
+      margin-bottom: 0.4rem;
+    }
+
+    .db-card-sub {
+      font-size: 0.9rem;
+      color: var(--ink-muted);
+      margin-bottom: 1.5rem;
+    }
+
+    .db-card-sub code {
+      font-family: var(--font-mono);
+      font-size: 0.85em;
+      background: var(--surface);
+      padding: 0.1rem 0.35rem;
+      border-radius: 3px;
+      color: var(--ink);
+    }
+
+    .db-form { width: 100%; }
+
+    .db-input-row {
+      display: flex;
+      gap: 0.5rem;
+      flex-wrap: wrap;
+    }
+
+    .db-input {
+      flex: 1;
+      min-width: 0;
+      padding: 0.8rem 1rem;
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      font-family: var(--font-mono);
+      font-size: 0.85rem;
+      color: var(--ink);
+      background: var(--paper);
+      outline: none;
+      transition: border-color 0.15s;
+    }
+
+    .db-input:focus { border-color: var(--accent); }
+
+    .db-submit {
+      padding: 0.8rem 1.25rem;
+      background: var(--accent);
+      color: white;
+      border: none;
+      border-radius: 4px;
+      font-family: inherit;
+      font-size: 0.875rem;
+      font-weight: 500;
+      cursor: pointer;
+      white-space: nowrap;
+      transition: background 0.15s;
+    }
+
+    .db-submit:hover { background: var(--accent-dim); }
+    .db-submit:disabled { opacity: 0.65; cursor: default; }
+
+    .db-feedback {
+      margin: 0.75rem 0 0;
+      font-size: 0.875rem;
+      line-height: 1.5;
+    }
+
+    .db-error { color: var(--accent); }
+
+    .db-hint {
+      margin-top: 1rem;
+      font-size: 0.82rem;
+      color: var(--ink-subtle);
+    }
+
+    .db-hint a {
+      color: var(--accent);
+      text-decoration: none;
+    }
+
+    .db-hint a:hover { text-decoration: underline; }
+
+    /* ── Usage view ── */
+    .usage-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 1.5rem;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+    }
+
+    .usage-key-label {
+      display: block;
+      font-size: 0.7rem;
+      font-weight: 500;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--ink-subtle);
+      margin-bottom: 0.25rem;
+    }
+
+    .usage-key-prefix {
+      font-family: var(--font-mono);
+      font-size: 0.95rem;
+      color: var(--ink);
+    }
+
+    .tier-badge {
+      padding: 0.25rem 0.75rem;
+      border-radius: 99px;
+      font-size: 0.72rem;
+      font-weight: 600;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+    }
+
+    .tier-badge-free {
+      background: var(--paper-dim);
+      color: var(--ink-subtle);
+      border: 1px solid var(--border);
+    }
+
+    .tier-badge-developer {
+      background: #fefce8;
+      color: #854d0e;
+      border: 1px solid #fde68a;
+    }
+
+    .tier-badge-pro {
+      background: #fff8f5;
+      color: var(--accent);
+      border: 1px solid #fecaca;
+    }
+
+    .tier-badge-enterprise {
+      background: #f0f9ff;
+      color: #0369a1;
+      border: 1px solid #bae6fd;
+    }
+
+    .usage-block {
+      background: var(--paper-dim);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      padding: 1.25rem;
+      margin-bottom: 1.25rem;
+    }
+
+    .usage-bar-row {
+      display: flex;
+      align-items: baseline;
+      justify-content: space-between;
+      margin-bottom: 0.75rem;
+    }
+
+    .usage-bar-label {
+      font-size: 0.8rem;
+      font-weight: 500;
+      color: var(--ink-subtle);
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+    }
+
+    .usage-numbers {
+      font-size: 1rem;
+      font-weight: 600;
+      color: var(--ink);
+      font-family: var(--font-mono);
+    }
+
+    .usage-bar-track {
+      height: 8px;
+      background: var(--surface);
+      border-radius: 4px;
+      overflow: hidden;
+      margin-bottom: 0.5rem;
+    }
+
+    .usage-bar-fill {
+      height: 100%;
+      background: var(--accent);
+      border-radius: 4px;
+      transition: width 0.4s ease;
+      min-width: 4px;
+    }
+
+    .usage-bar-fill.bar-warning {
+      background: #dc2626;
+    }
+
+    .usage-meta-row {
+      display: flex;
+      justify-content: space-between;
+      font-size: 0.8rem;
+      color: var(--ink-subtle);
+    }
+
+    /* ── Upgrade ── */
+    .usage-upgrade {
+      background: #fff8f5;
+      border: 1px solid #fecaca;
+      border-radius: 6px;
+      padding: 1.25rem;
+      margin-bottom: 1.25rem;
+      display: flex;
+      align-items: center;
+      gap: 1.25rem;
+      flex-wrap: wrap;
+    }
+
+    .upgrade-msg {
+      flex: 1;
+      font-size: 0.875rem;
+      color: var(--ink-muted);
+      line-height: 1.55;
+      margin: 0;
+    }
+
+    .upgrade-btn {
+      padding: 0.6rem 1.1rem;
+      background: var(--accent);
+      color: white;
+      text-decoration: none;
+      border-radius: 4px;
+      font-size: 0.825rem;
+      font-weight: 500;
+      white-space: nowrap;
+      transition: background 0.15s;
+    }
+
+    .upgrade-btn:hover { background: var(--accent-dim); }
+
+    /* ── Feedback prompt (free tier) ── */
+    .usage-feedback {
+      background: var(--paper-dim);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      padding: 1rem 1.25rem;
+      margin-bottom: 1.25rem;
+    }
+
+    .feedback-msg {
+      font-size: 0.85rem;
+      color: var(--ink-muted);
+      line-height: 1.6;
+      margin: 0;
+    }
+
+    .feedback-link {
+      color: var(--accent);
+      text-decoration: none;
+      font-weight: 500;
+    }
+
+    .feedback-link:hover { text-decoration: underline; }
+
+    .db-reset-btn {
+      display: block;
+      width: 100%;
+      padding: 0.65rem;
+      background: transparent;
+      color: var(--ink-subtle);
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      font-family: inherit;
+      font-size: 0.85rem;
+      cursor: pointer;
+      transition: border-color 0.15s, color 0.15s;
+      text-align: center;
+    }
+
+    .db-reset-btn:hover {
+      border-color: var(--ink-subtle);
+      color: var(--ink);
+    }
+
+    /* ── Help ── */
+    .db-help-section {
+      padding: 5rem 0;
+      background: var(--paper);
+    }
+
+    .section-heading {
+      font-family: var(--font-display);
+      font-size: clamp(1.5rem, 3.5vw, 2.2rem);
+      color: var(--ink);
+      margin-bottom: 2rem;
+      line-height: 1.2;
+      letter-spacing: -0.01em;
+    }
+
+    .help-list {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .help-item {
+      padding: 1.75rem 0;
+      border-top: 1px solid var(--border-light);
+    }
+
+    .help-item:last-child {
+      border-bottom: 1px solid var(--border-light);
+    }
+
+    .help-q {
+      font-family: var(--font-display);
+      font-size: 1.05rem;
+      font-weight: 400;
+      color: var(--ink);
+      margin-bottom: 0.5rem;
+    }
+
+    .help-a {
+      font-size: 0.9375rem;
+      color: var(--ink-muted);
+      line-height: 1.7;
+      margin: 0;
+    }
+
+    .help-a code {
+      font-family: var(--font-mono);
+      font-size: 0.85em;
+      background: var(--surface);
+      padding: 0.1rem 0.35rem;
+      border-radius: 3px;
+      color: var(--ink);
+    }
+
+    .help-a a {
+      color: var(--accent);
+      text-decoration: none;
+    }
+
+    .help-a a:hover { text-decoration: underline; }
+
+    /* ── Footer ── */
+    footer {
+      border-top: 1px solid var(--border-light);
+    }
+
+    .footer-inner {
+      display: flex;
+      align-items: center;
+      gap: 1.5rem;
+      padding: 2rem 0;
+      flex-wrap: wrap;
+    }
+
+    .footer-brand {
+      font-family: var(--font-display);
+      font-size: 1.1rem;
+      color: var(--ink);
+    }
+
+    .footer-copy {
+      font-size: 0.85rem;
+      color: var(--ink-subtle);
+      flex: 1;
+    }
+
+    .footer-links {
+      display: flex;
+      gap: 1.25rem;
+    }
+
+    .footer-links a {
+      font-size: 0.85rem;
+      color: var(--ink-muted);
+      text-decoration: none;
+    }
+
+    .footer-links a:hover { color: var(--ink); }
+
+    /* ── Divider ── */
+    .section-divider {
+      border: none;
+      border-top: 1px solid var(--border-light);
+      margin: 0;
+    }
+
+    /* ── Container ── */
+    .container {
+      max-width: var(--max-page);
+      margin: 0 auto;
+      padding: 0 1.5rem;
+    }
+
+    /* ── Mobile ── */
+    @media (max-width: 640px) {
+      .db-hero { padding: 4rem 0 2.5rem; }
+      .db-help-section { padding: 3rem 0; }
+      .nav-links { display: none; }
+      .db-input-row { flex-direction: column; }
+      .db-submit { width: 100%; }
+      .usage-upgrade { flex-direction: column; }
+    }
+  </style>
+</Layout>
