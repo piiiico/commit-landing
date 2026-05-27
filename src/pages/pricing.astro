@@ -44,6 +44,27 @@ import Layout from '../layouts/Layout.astro';
 
   <hr class="section-divider" />
 
+  <!-- CLI-context banner — shown when utm_campaign matches a CLI-cmd campaign. -->
+  <!-- Visitor hit a 402 wall in the terminal (watch/watchlist/unwatch); generic -->
+  <!-- pricing page loses that context, which kills CLI→paid conversion. Banner -->
+  <!-- restores the "you tried to enable monitoring" moment and opens checkout -->
+  <!-- modal pre-set to Developer tier. Hidden by default — zero regression for -->
+  <!-- direct visitors. See JS handler near openModal() below. -->
+  <section id="cli-context-banner" class="cli-context-section" hidden>
+    <div class="container">
+      <div class="cli-context-card">
+        <p class="cli-context-eyebrow" id="cli-context-eyebrow">From your terminal</p>
+        <p class="cli-context-msg" id="cli-context-msg"></p>
+        <button type="button" id="cli-context-cta" class="cli-context-btn" data-tier="developer">
+          Continue with Developer — $15/mo →
+        </button>
+        <p class="cli-context-sub">
+          30-day money-back · Cancel anytime · No card to keep using the free key
+        </p>
+      </div>
+    </div>
+  </section>
+
   <!-- Social-proof banner (populated from /api/stats/teams-protected) -->
   <!-- Visible by default with fallback; JS upgrades to live count if count >= 5. -->
   <section id="social-proof" class="social-proof-section">
@@ -700,6 +721,46 @@ import Layout from '../layouts/Layout.astro';
       btn.addEventListener('click', () => openModal(btn.dataset.tier ?? 'pro'));
     });
 
+    // ── CLI-context banner (visitor came from CLI 402 wall) ──
+    // CLI sends utm_campaign in {watch-cmd, watchlist-cmd, unwatch-cmd} after
+    // 402 from /api/watchlist (npm-package/index.js printUpgradeRequired:1079/1111/1193).
+    // Generic pricing page = lost context = 0 conversions from cli funnel. This
+    // banner restores the "you tried to enable monitoring" moment and routes
+    // to checkout modal with Developer pre-selected in one click. Hidden when
+    // utm_campaign doesn't match — no regression for direct visitors. Banner
+    // includes utm_campaign in its CTA → modal flow (utmSnapshot already
+    // captures it for the POST to /api/checkout-intent above, so attribution
+    // preserves through to Stripe metadata).
+    (() => {
+      const sp = new URLSearchParams(window.location.search);
+      const campaign = sp.get('utm_campaign') ?? '';
+      const CONTEXT_BY_CAMPAIGN: Record<string, { eyebrow: string; msg: string }> = {
+        'watch-cmd': {
+          eyebrow: 'From your terminal',
+          msg: 'You tried to add a package to your watchlist. Continuous monitoring + email alerts unlock on Developer ($15/mo) — 3 projects, daily scans.',
+        },
+        'watchlist-cmd': {
+          eyebrow: 'From your terminal',
+          msg: 'Listing or syncing your watchlist needs Developer ($15/mo) — 3 projects, daily scans, email alerts when something degrades.',
+        },
+        'unwatch-cmd': {
+          eyebrow: 'From your terminal',
+          msg: 'Managing watchlists needs Developer ($15/mo) — 3 projects, daily scans, email alerts when something degrades.',
+        },
+      };
+      const variant = CONTEXT_BY_CAMPAIGN[campaign];
+      if (!variant) return;
+      const banner = document.getElementById('cli-context-banner') as HTMLElement | null;
+      const eyebrowEl = document.getElementById('cli-context-eyebrow') as HTMLElement | null;
+      const msgEl = document.getElementById('cli-context-msg') as HTMLElement | null;
+      const ctaEl = document.getElementById('cli-context-cta') as HTMLButtonElement | null;
+      if (!banner || !eyebrowEl || !msgEl || !ctaEl) return;
+      eyebrowEl.textContent = variant.eyebrow;
+      msgEl.textContent = variant.msg;
+      banner.hidden = false;
+      ctaEl.addEventListener('click', () => openModal('developer'));
+    })();
+
     // Close on overlay click or close button
     modalOverlay?.addEventListener('click', closeModal);
     modalClose?.addEventListener('click', closeModal);
@@ -916,6 +977,55 @@ import Layout from '../layouts/Layout.astro';
       text-transform: uppercase;
       color: var(--accent);
       margin-bottom: 1rem;
+    }
+
+    /* ── CLI-context banner (CLI 402 funnel) ── */
+    /* Hidden until JS detects matching utm_campaign — collapses cleanly via hidden attr. */
+    .cli-context-section {
+      padding: 2rem 0 0.5rem;
+      background: var(--paper);
+    }
+    .cli-context-card {
+      max-width: 640px;
+      margin: 0 auto;
+      background: var(--paper-dim);
+      border: 1.5px solid #2563eb;
+      border-radius: 8px;
+      padding: 1.5rem 1.75rem;
+      text-align: center;
+      box-shadow: 0 2px 12px rgba(37, 99, 235, 0.06);
+    }
+    .cli-context-eyebrow {
+      font-size: 0.72rem;
+      font-weight: 600;
+      color: #2563eb;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      margin: 0 0 0.5rem;
+    }
+    .cli-context-msg {
+      font-size: 1rem;
+      color: var(--ink);
+      margin: 0 0 1.25rem;
+      line-height: 1.55;
+    }
+    .cli-context-btn {
+      background: #2563eb;
+      color: white;
+      border: none;
+      padding: 0.7rem 1.4rem;
+      border-radius: 6px;
+      font-size: 0.95rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background 0.15s;
+      font-family: inherit;
+    }
+    .cli-context-btn:hover { background: #1d4ed8; }
+    .cli-context-sub {
+      margin: 0.85rem 0 0;
+      font-size: 0.78rem;
+      color: var(--ink-subtle);
     }
 
     /* ── Social proof ── */
