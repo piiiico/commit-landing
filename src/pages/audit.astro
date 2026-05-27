@@ -1045,6 +1045,26 @@ uuid</textarea>
       background: var(--accent-hover);
       text-decoration: none;
     }
+    /* Secondary action when an upgrade CTA sits next to it — keeps the
+       "Open dashboard" action visible without out-shouting the paid CTA. */
+    .post-results-cta .cta-btn-secondary {
+      background: #fff;
+      color: var(--ink);
+      border: 1px solid var(--border, #d8d4cf);
+    }
+    .post-results-cta .cta-btn-secondary:hover {
+      background: var(--paper-dim, #f5f1ea);
+      color: var(--ink);
+    }
+    /* Developer-tier upgrade CTA rendered on CRITICAL audit results for
+       returning visitors with a free key. Distinct color so the upgrade
+       moment reads as the new action, not a repeat of the dashboard link. */
+    .post-results-cta .cta-btn-upgrade {
+      background: #991b1b;
+    }
+    .post-results-cta .cta-btn-upgrade:hover {
+      background: #7f1d1d;
+    }
     .post-results-cta .cta-hint {
       font-size: 0.75rem;
       color: var(--ink-subtle);
@@ -1809,10 +1829,20 @@ uuid</textarea>
         });
       }
 
-      function renderMonitoringActive(headline: string) {
+      function renderMonitoringActive(headline: string, developerCtaUrl?: string) {
+        // Returning visitors with a key see "open dashboard + CLI gate". For
+        // CRITICAL findings we additionally surface a Developer upsell — free
+        // tier has 0 monitored packages (worker.ts PACKAGE_LIMITS), so the
+        // audit moment is the highest-urgency upsell surface (58 free keys,
+        // 0 paid as of 2026-05-27). Banner copy on /pricing is keyed off
+        // utm_campaign=audit-critical-key.
+        const upgradeBlock = developerCtaUrl
+          ? `<a href="${developerCtaUrl}" class="cta-btn cta-btn-upgrade">Watch these on Developer · $15/mo &rarr;</a>`
+          : '';
         ctaEl.innerHTML = `
           <div class="cta-text">${headline}</div>
-          <a href="/dashboard" class="cta-btn">Open dashboard &rarr;</a>
+          <a href="/dashboard" class="cta-btn cta-btn-secondary">Open dashboard &rarr;</a>
+          ${upgradeBlock}
           <span class="cta-hint">You're signed up · run <code>npx proof-of-commitment poc init</code> in this repo to gate PRs</span>
         `;
         ctaEl.hidden = false;
@@ -1830,7 +1860,22 @@ uuid</textarea>
           `Single-publisher packages get compromised — axios and node-ipc were both CRITICAL before their attacks. ` +
           `Lock in weekly monitoring.`;
         if (alreadyHasKey) {
-          renderMonitoringActive(headline + ' You already have a Commit key — gate this repo so a future CRITICAL flag fails the PR.');
+          // Pre-load up to 5 CRITICAL names into the upgrade URL so the
+          // post-payment dashboard ship can offer "add these from your last
+          // audit" in one click (future). Truncate to keep URL <2KB.
+          const critNamesForUrl = results
+            .filter(r => r.riskFlags?.some(f => f.startsWith('CRITICAL')))
+            .map(r => r.name)
+            .slice(0, 5)
+            .join(',');
+          const developerCtaUrl =
+            `/pricing/?utm_source=audit-results&utm_medium=critical-cta` +
+            `&utm_campaign=audit-critical-key` +
+            (critNamesForUrl ? `&packages=${encodeURIComponent(critNamesForUrl)}` : '');
+          renderMonitoringActive(
+            headline + ' You already have a Commit key — gate this repo so a future CRITICAL flag fails the PR, or watch these packages continuously and get email alerts when scores drop.',
+            developerCtaUrl
+          );
         } else {
           renderInlineForm(headline, '/get-started?ref=audit-web-critical', 'audit-web-critical', 'Save audit + get alerts', 'Free · no card · 10 seconds');
         }
@@ -1840,7 +1885,7 @@ uuid</textarea>
         if (alreadyHasKey) {
           renderMonitoringActive(headline + ' You already have a Commit key — gate this repo so a future CRITICAL flag fails the PR.');
         } else {
-          renderInlineForm(headline, '/get-started?ref=audit-web-healthy', 'audit-web-healthy', 'Set up free monitoring', '200 audits/day · no card · 10 seconds');
+          renderInlineForm(headline, '/get-started?ref=audit-web-healthy', 'audit-web-healthy', 'Save audit + weekly digest', '200 audits/day · no card · 10 seconds');
         }
       } else {
         ctaEl.hidden = true;

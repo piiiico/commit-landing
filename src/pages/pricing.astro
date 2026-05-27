@@ -747,6 +747,10 @@ import Layout from '../layouts/Layout.astro';
           eyebrow: 'From your terminal',
           msg: 'Managing watchlists needs Developer ($15/mo) — 3 projects, daily scans, email alerts when something degrades.',
         },
+        'audit-critical-key': {
+          eyebrow: 'From your audit results',
+          msg: 'You audited CRITICAL packages with a free key. Free tier scores packages on demand but does not monitor them. Developer ($15/mo) adds daily re-scans + email alerts when any watched package drops a tier.',
+        },
       };
       const variant = CONTEXT_BY_CAMPAIGN[campaign];
       if (!variant) return;
