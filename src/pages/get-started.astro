@@ -105,7 +105,7 @@ import Layout from '../layouts/Layout.astro';
           <pre class="qs-code"><code>curl https://poc-backend.amdal-dev.workers.dev/api/audit \
   -H "Authorization: Bearer sk_commit_YOUR_KEY_HERE" \
   -H "Content-Type: application/json" \
-  -d '&#123;"name": "axios", "registry": "npm"&#125;'</code></pre>
+  -d '&#123;"packages":["axios"],"ecosystem":"npm"&#125;'</code></pre>
         </div>
 
         <!-- npm / Node.js -->
@@ -121,11 +121,11 @@ import Layout from '../layouts/Layout.astro';
       'Authorization': 'Bearer sk_commit_YOUR_KEY_HERE',
       'Content-Type': 'application/json',
     &#125;,
-    body: JSON.stringify(&#123; name: 'axios', registry: 'npm' &#125;),
+    body: JSON.stringify(&#123; packages: ['axios'], ecosystem: 'npm' &#125;),
   &#125;
 );
 const data = await res.json();
-console.log(data.score); // 0–100 trust score</code></pre>
+console.log(data.results[0].score); // 0–100 trust score</code></pre>
         </div>
 
         <!-- GitHub Action -->
@@ -145,9 +145,10 @@ console.log(data.score); // 0–100 trust score</code></pre>
           'Authorization': `Bearer $&#123;process.env.COMMIT_API_KEY&#125;`,
           'Content-Type': 'application/json',
         &#125;,
-        body: JSON.stringify(&#123; name: 'lodash', registry: 'npm' &#125;),
+        body: JSON.stringify(&#123; packages: ['lodash'], ecosystem: 'npm' &#125;),
       &#125;);
-      const &#123; score &#125; = await res.json();
+      const data = await res.json();
+      const score = data.results[0].score;
       if (score &lt; 40) core.setFailed(`Low trust score: $&#123;score&#125;`);</code></pre>
         </div>
 
