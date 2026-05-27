@@ -849,6 +849,49 @@ export default {
       }
     }
 
+    // GENERATED-EDIT-OK: _worker.js IS the source of truth per its own file header — adding /api/checkout proxy to fix conversion friction (bare workers.dev URL shown to buyers right before Stripe checkout, plus silent 200-homepage fallthrough for stale /api/checkout links on the brand domain)
+    // ── /api/checkout proxy ──────────────────────────────────────────
+    // Buyers clicking "Upgrade to Developer/Pro" should NOT see the bare
+    // poc-backend.amdal-dev.workers.dev URL in their URL bar moments before
+    // entering card details. Proxy here, follow the upstream 302 manually,
+    // then re-emit the redirect from getcommit.dev → checkout.stripe.com.
+    // Net effect: URL bar goes getcommit.dev/api/checkout → checkout.stripe.com.
+    // Diagnosed 2026-05-27 in dogfood: direct workers.dev exposure breaks trust
+    // on a product whose pitch IS trust, and unaddressed /api/checkout calls
+    // on getcommit.dev (e.g. typos, stale links, this fix's path) were silently
+    // falling through to the homepage (200 + 54KB of HTML, no error).
+    if (path === "/api/checkout") {
+      try {
+        const targetUrl = `${API_BASE}${path}${url.search}`;
+        const upstream = await fetch(targetUrl, {
+          method: request.method,
+          headers: request.headers,
+          body: request.method === "GET" || request.method === "HEAD" ? undefined : request.body,
+          redirect: "manual",
+        });
+        // Upstream produces 302 → Stripe. Forward the Location header from our domain.
+        if (upstream.status >= 300 && upstream.status < 400) {
+          const loc = upstream.headers.get("location");
+          if (loc) {
+            return new Response(null, {
+              status: 302,
+              headers: { location: loc, "cache-control": "no-store" },
+            });
+          }
+        }
+        // Non-redirect response (error from upstream) — pass it through.
+        return new Response(upstream.body, {
+          status: upstream.status,
+          headers: upstream.headers,
+        });
+      } catch (e) {
+        return new Response(
+          JSON.stringify({ ok: false, error: "checkout_proxy_failed" }),
+          { status: 502, headers: { "Content-Type": "application/json" } },
+        );
+      }
+    }
+
     // ── /api/subscribe proxy ─────────────────────────────────────────
     if (path === "/api/subscribe") {
       if (request.method === "OPTIONS") {
