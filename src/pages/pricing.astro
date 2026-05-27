@@ -792,11 +792,11 @@ import Layout from '../layouts/Layout.astro';
           window.location.href = data.checkout_url;
         } else {
           // Fallback to GET checkout if intent fails
-          window.location.href = `https://poc-backend.amdal-dev.workers.dev/api/checkout?tier=${encodeURIComponent(pendingTier)}&email=${encodeURIComponent(email)}${utmQuerySuffix}`;
+          window.location.href = `/api/checkout?tier=${encodeURIComponent(pendingTier)}&email=${encodeURIComponent(email)}${utmQuerySuffix}`;
         }
       } catch {
         // Fallback to GET checkout on network error
-        window.location.href = `https://poc-backend.amdal-dev.workers.dev/api/checkout?tier=${encodeURIComponent(pendingTier)}&email=${encodeURIComponent(email)}${utmQuerySuffix}`;
+        window.location.href = `/api/checkout?tier=${encodeURIComponent(pendingTier)}&email=${encodeURIComponent(email)}${utmQuerySuffix}`;
       }
     });
 
