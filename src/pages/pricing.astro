@@ -65,6 +65,23 @@ import Layout from '../layouts/Layout.astro';
     </div>
   </section>
 
+  <!-- Checkout-error banner — surfaces ?error= from URL after Stripe redirect failure -->
+  <!-- Previously: backend 429 or 5xx on /api/checkout-intent → modal fell through to -->
+  <!-- GET /api/checkout → that also failed → 302 to /pricing/?error=... → page rendered -->
+  <!-- with no UI for the error. Visitor saw nothing and bounced. This banner restores -->
+  <!-- the failure feedback loop. Errors handled: rate_limit_exceeded, checkout_failed, -->
+  <!-- tier_unavailable. JS handler reads URL, replaces history state (so refresh clears -->
+  <!-- the banner), and reveals the section. -->
+  <section id="checkout-error-banner" class="checkout-error-section" hidden>
+    <div class="container">
+      <div class="checkout-error-card">
+        <p class="checkout-error-eyebrow">Checkout interrupted</p>
+        <p class="checkout-error-msg" id="checkout-error-msg"></p>
+        <p class="checkout-error-sub" id="checkout-error-sub"></p>
+      </div>
+    </div>
+  </section>
+
   <!-- Social-proof banner (populated from /api/stats/teams-protected) -->
   <!-- Visible by default with fallback; JS upgrades to live count if count >= 5. -->
   <section id="social-proof" class="social-proof-section">
@@ -785,24 +802,121 @@ import Layout from '../layouts/Layout.astro';
       if (emailError) emailError.hidden = true;
       if (submitBtn) { submitBtn.textContent = 'Redirecting…'; submitBtn.disabled = true; }
 
+      // ── Helper: surface a clear error in the modal instead of silently redirecting ──
+      // Previously, any non-ok JSON response fell through to the GET /api/checkout
+      // fallback, which often ALSO failed (same rate limiter, same Stripe outage) and
+      // redirected to /pricing/?error=... with no UI for it. Visitor saw nothing and
+      // bounced. Now: show the message in-modal, reset the button so they can retry.
+      const showModalError = (msg: string) => {
+        if (emailError) { emailError.textContent = msg; emailError.hidden = false; }
+        if (submitBtn) { submitBtn.textContent = 'Continue to payment →'; submitBtn.disabled = false; }
+      };
+
       try {
         const resp = await fetch('https://poc-backend.amdal-dev.workers.dev/api/checkout-intent', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ email, tier: pendingTier, ...utmSnapshot }),
         });
-        const data = await resp.json() as { ok?: boolean; checkout_url?: string; error?: string };
-        if (data.ok && data.checkout_url) {
+
+        let data: { ok?: boolean; checkout_url?: string; error?: string; message?: string } | null = null;
+        try { data = await resp.json(); } catch { data = null; }
+
+        if (resp.ok && data?.ok && data.checkout_url) {
+          // Happy path → Stripe.
           window.location.href = data.checkout_url;
-        } else {
-          // Fallback to GET checkout if intent fails
-          window.location.href = `/api/checkout?tier=${encodeURIComponent(pendingTier)}&email=${encodeURIComponent(email)}${utmQuerySuffix}`;
+          return;
         }
+
+        // Known structured errors from the backend (or edge 429): show in modal.
+        // Strings short on purpose — modal real estate is tight, and the
+        // surface should be "actionable hint, not a wall of text."
+        const errCode = data?.error ?? '';
+        if (resp.status === 429 || errCode === 'rate_limit_exceeded') {
+          showModalError('Checkout is busy right now. Please retry in a few minutes — or grab a free API key below to start using Commit immediately.');
+          return;
+        }
+        if (resp.status === 400 && errCode === 'invalid_email') {
+          showModalError('Please enter a valid email address.');
+          return;
+        }
+        if (resp.status === 400 && errCode === 'invalid_tier') {
+          showModalError('That plan is not available. Please refresh the page and try again.');
+          return;
+        }
+        if (resp.status === 502 || errCode === 'checkout_failed') {
+          showModalError('Could not reach our payment provider. Please retry in a few minutes — or email pico@amdal.dev if it persists.');
+          return;
+        }
+        if (resp.status === 503 || errCode === 'tier_unavailable' || errCode === 'stripe_not_configured') {
+          showModalError('That plan is temporarily unavailable. Please retry in a few minutes — or email pico@amdal.dev.');
+          return;
+        }
+
+        // Genuinely unexpected status with no structured error: fall back to
+        // the GET /api/checkout path (preserves prior behavior for edge cases
+        // outside the known error matrix above).
+        window.location.href = `/api/checkout?tier=${encodeURIComponent(pendingTier)}&email=${encodeURIComponent(email)}${utmQuerySuffix}`;
       } catch {
-        // Fallback to GET checkout on network error
+        // True network failure (DNS, offline, CORS denial) — try the GET path
+        // which avoids the JSON contract entirely and ends in a Stripe 302.
         window.location.href = `/api/checkout?tier=${encodeURIComponent(pendingTier)}&email=${encodeURIComponent(email)}${utmQuerySuffix}`;
       }
     });
+
+    // ── URL ?error= surfacing — restores the failure feedback after a Stripe redirect ──
+    // The GET /api/checkout fallback redirects back to /pricing/?error=... when
+    // the Stripe call fails. Before this handler, the page rendered with no UI
+    // for that error and the visitor bounced. Now: read the param, populate the
+    // banner above the tiers, and replaceState so a refresh clears it.
+    (() => {
+      try {
+        const sp = new URLSearchParams(window.location.search);
+        const err = sp.get('error');
+        if (!err) return;
+
+        const banner = document.getElementById('checkout-error-banner') as HTMLElement | null;
+        const msgEl = document.getElementById('checkout-error-msg') as HTMLElement | null;
+        const subEl = document.getElementById('checkout-error-sub') as HTMLElement | null;
+        if (!banner || !msgEl || !subEl) return;
+
+        const variants: Record<string, { msg: string; sub: string }> = {
+          rate_limit_exceeded: {
+            msg: 'Checkout is busy right now. Please retry in a few minutes.',
+            sub: 'You can also grab a free API key below — no card required — and upgrade later.',
+          },
+          checkout_failed: {
+            msg: 'We could not reach the payment provider just now.',
+            sub: 'Please retry in a few minutes. If it keeps happening, email <a href="mailto:pico@amdal.dev">pico@amdal.dev</a> and we will sort it out.',
+          },
+          tier_unavailable: {
+            msg: 'That plan is temporarily unavailable.',
+            sub: 'Please retry in a few minutes or email <a href="mailto:pico@amdal.dev">pico@amdal.dev</a> if you need it now.',
+          },
+        };
+        const variant = variants[err] ?? {
+          msg: 'Something interrupted your checkout.',
+          sub: 'Please try the Subscribe button again. If it keeps happening, email <a href="mailto:pico@amdal.dev">pico@amdal.dev</a>.',
+        };
+
+        msgEl.textContent = variant.msg;
+        subEl.innerHTML = variant.sub;
+        banner.hidden = false;
+
+        // Clean the URL so refresh does not re-show the banner. Preserves
+        // any utm_* / referrer params already captured by the snapshot above.
+        try {
+          sp.delete('error');
+          const cleaned = sp.toString();
+          const newUrl = window.location.pathname + (cleaned ? '?' + cleaned : '') + window.location.hash;
+          window.history.replaceState({}, '', newUrl);
+        } catch {
+          // replaceState can fail in rare cases (file://, certain extensions) — non-fatal.
+        }
+      } catch {
+        // Defensive: do not break the page if URL parsing/DOM lookup fails.
+      }
+    })();
 
     // ── Waitlist form ──
     // Inline-key reveal on success (parity with /get-started/, shipped 2026-05-23).
@@ -1030,6 +1144,48 @@ import Layout from '../layouts/Layout.astro';
       margin: 0.85rem 0 0;
       font-size: 0.78rem;
       color: var(--ink-subtle);
+    }
+
+    /* ── Checkout-error banner ── */
+    /* Surfaces ?error=rate_limit_exceeded / checkout_failed / tier_unavailable after */
+    /* a failed Stripe redirect. Hidden until JS detects matching URL param. */
+    .checkout-error-section {
+      padding: 1.75rem 0 0.5rem;
+      background: var(--paper);
+    }
+    .checkout-error-card {
+      max-width: 640px;
+      margin: 0 auto;
+      background: #fff8eb;
+      border: 1.5px solid #d97706;
+      border-radius: 8px;
+      padding: 1.25rem 1.5rem;
+      text-align: center;
+      box-shadow: 0 2px 12px rgba(217, 119, 6, 0.08);
+    }
+    .checkout-error-eyebrow {
+      font-size: 0.72rem;
+      font-weight: 600;
+      color: #b45309;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      margin: 0 0 0.5rem;
+    }
+    .checkout-error-msg {
+      font-size: 1rem;
+      color: var(--ink);
+      margin: 0 0 0.5rem;
+      line-height: 1.5;
+    }
+    .checkout-error-sub {
+      margin: 0;
+      font-size: 0.85rem;
+      color: var(--ink-subtle);
+      line-height: 1.5;
+    }
+    .checkout-error-sub a {
+      color: #b45309;
+      text-decoration: underline;
     }
 
     /* ── Social proof ── */
