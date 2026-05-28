@@ -1,0 +1,1466 @@
+---
+import Layout from '../../layouts/Layout.astro';
+---
+
+<Layout
+  title="Scan Any GitHub Repo — Supply Chain Risk | Commit"
+  description="Enter a GitHub repo URL. Get trust scores for every dependency instantly. See which packages are CRITICAL supply chain risk."
+  canonical="https://getcommit.dev/scan/repo/"
+>
+  <!-- Nav -->
+  <nav>
+    <div class="container nav-inner">
+      <a href="/" class="nav-brand">Commit</a>
+      <ul class="nav-links">
+        <li><a href="/#mcp">MCP</a></li>
+        <li><a href="/audit">Audit</a></li>
+        <li><a href="/watchlist">Watchlist</a></li>
+        <li><a href="/extension">Extension</a></li>
+        <li><a href="/blog">Writing</a></li>
+        <li><a href="/pricing">Pricing</a></li><li><a href="/docs">Docs</a></li>
+        <li><a href="https://github.com/piiiico/proof-of-commitment" target="_blank" rel="noopener">GitHub</a></li>
+        <li><a href="mailto:pico@amdal.dev">Contact</a></li>
+      </ul>
+    </div>
+  </nav>
+
+  <!-- Hero -->
+  <section class="hero">
+    <div class="container">
+      <div class="editorial">
+        <span class="hero-eyebrow">Project scanner</span>
+        <h1 class="hero-title">
+          Scan any GitHub repo.<br />
+          <em>See every risk.</em>
+        </h1>
+        <p class="hero-lead">
+          Enter a repo URL or paste a dependency file. Scores every dependency on behavioral signals —
+          publisher depth, release consistency, project longevity.
+          Flags the packages that match real supply chain attack profiles.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <!-- Input card -->
+  <section class="scan-tool">
+    <div class="container">
+      <!-- GitHub URL input -->
+      <div class="scan-card" id="github-card">
+        <label class="input-label" for="github-url-input">
+          GitHub repository URL
+        </label>
+        <div class="github-input-row">
+          <input
+            type="text"
+            id="github-url-input"
+            class="github-url-input"
+            placeholder="github.com/vercel/next.js"
+            spellcheck="false"
+            autocomplete="off"
+          />
+          <button id="github-scan-btn" class="scan-submit">
+            Scan repo →
+          </button>
+        </div>
+        <div id="github-status" class="github-status" hidden></div>
+        <p class="scan-note" style="margin-top:0.6rem">
+          Prefers lockfiles (<code>package-lock.json</code>, <code>yarn.lock</code>, <code>pnpm-lock.yaml</code>) for transitive deps;
+          falls back to <code>package.json</code>, <code>requirements.txt</code>, <code>Cargo.toml</code>, <code>go.mod</code>.
+          Monorepos: paste the subdirectory URL. Public repos only. <a href="/docs">How scores work →</a>
+        </p>
+      </div>
+
+      <!-- Divider -->
+      <div class="method-divider">
+        <span>or paste a dependency file directly</span>
+      </div>
+
+      <div class="scan-card" id="scan-card">
+        <label class="input-label" for="pkg-json-input">
+          Paste your <code>package.json</code> below
+        </label>
+        <textarea
+          id="pkg-json-input"
+          class="pkg-json-input"
+          rows="8"
+          placeholder='{
+  "dependencies": {
+    "axios": "^1.7.0",
+    "zod": "^3.22.0",
+    "chalk": "^5.3.0"
+  }
+}'
+          spellcheck="false"
+          autocomplete="off"
+        ></textarea>
+
+        <div class="card-footer">
+          <button id="scan-btn" class="scan-submit">
+            Scan project →
+          </button>
+          <p class="scan-note">
+            Scans <code>dependencies</code> + <code>devDependencies</code>.
+            No data stored. <a href="/docs">How scores work →</a>
+          </p>
+        </div>
+      </div>
+
+      <!-- Progress state -->
+      <div id="progress-area" class="progress-area" hidden>
+        <div class="progress-header">
+          <div class="loading-spinner"></div>
+          <p id="progress-text">Scanning packages…</p>
+        </div>
+        <div class="progress-bar-track">
+          <div class="progress-bar-fill" id="progress-bar" style="width: 0%"></div>
+        </div>
+      </div>
+
+      <!-- Error state -->
+      <div id="error-area" class="error-area" hidden>
+        <p id="error-message"></p>
+      </div>
+
+      <!-- Results -->
+      <div id="results-area" class="results-area" hidden>
+        <div class="results-header">
+          <div class="results-summary" id="results-summary"></div>
+          <div class="share-row">
+            <button id="share-btn" class="share-btn">↗ Share these results</button>
+            <span class="share-copied" id="share-copied" hidden>Link copied!</span>
+          </div>
+        </div>
+
+        <div class="results-table-wrap">
+          <table class="results-table">
+            <thead>
+              <tr>
+                <th>Package</th>
+                <th>Score</th>
+                <th>Risk</th>
+                <th>Maintainers</th>
+                <th>Weekly DL</th>
+                <th>Age</th>
+                <th>Trend</th>
+              </tr>
+            </thead>
+            <tbody id="results-body"></tbody>
+          </table>
+        </div>
+
+        <!-- MCP CTA -->
+        <div class="mcp-cta">
+          <p class="mcp-cta-label">Get this in your AI assistant</p>
+          <pre class="code-block">{`{
+  "mcpServers": {
+    "commit": {
+      "type": "streamable-http",
+      "url": "https://poc-backend.amdal-dev.workers.dev/mcp"
+    }
+  }
+}`}</pre>
+          <p class="mcp-cta-hint">Add to Claude Desktop or Cursor. Then: <em>"Audit my package.json for supply chain risk"</em></p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <style>
+    code {
+      font-family: var(--font-mono);
+      font-size: 0.9em;
+      background: var(--paper-dim);
+      border: 1px solid var(--border);
+      border-radius: 3px;
+      padding: 0.05em 0.3em;
+    }
+
+    /* ── GitHub URL input ── */
+    .github-input-row {
+      display: flex;
+      gap: 0.75rem;
+      align-items: stretch;
+    }
+
+    .github-url-input {
+      flex: 1;
+      padding: 0.75rem 1rem;
+      font-family: var(--font-mono);
+      font-size: 0.9rem;
+      background: var(--paper);
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      color: var(--ink);
+      transition: border-color 0.15s;
+      box-sizing: border-box;
+    }
+
+    .github-url-input:focus {
+      outline: none;
+      border-color: var(--accent);
+    }
+
+    .github-status {
+      margin-top: 0.6rem;
+      font-size: 0.85rem;
+      color: var(--ink-muted);
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .github-status .mini-spinner {
+      width: 0.9rem;
+      height: 0.9rem;
+      border: 2px solid var(--border);
+      border-top-color: var(--accent);
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+      flex-shrink: 0;
+    }
+
+    .github-status.status-error {
+      color: #991b1b;
+    }
+
+    .github-status.status-found {
+      color: #166534;
+    }
+
+    .method-divider {
+      max-width: 48rem;
+      margin: 0 auto;
+      padding: 1.5rem 0;
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+    }
+
+    .method-divider::before,
+    .method-divider::after {
+      content: '';
+      flex: 1;
+      height: 1px;
+      background: var(--border);
+    }
+
+    .method-divider span {
+      font-size: 0.8rem;
+      color: var(--ink-subtle);
+      white-space: nowrap;
+    }
+
+    /* ── Hero ── */
+    .hero {
+      padding: 5rem 0 3rem;
+      background: var(--paper);
+    }
+
+    .editorial {
+      max-width: var(--max-content, 48rem);
+      margin: 0 auto;
+    }
+
+    .hero-eyebrow {
+      display: block;
+      font-size: 0.75rem;
+      font-weight: 500;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: var(--ink-muted);
+      margin-bottom: 0.75rem;
+    }
+
+    .hero-title {
+      font-family: var(--font-display);
+      font-size: clamp(2rem, 5vw, 3.2rem);
+      line-height: 1.12;
+      color: var(--ink);
+      margin: 0 0 1.25rem;
+    }
+
+    .hero-title em {
+      font-style: italic;
+      color: var(--accent);
+    }
+
+    .hero-title code {
+      font-size: 0.85em;
+      background: none;
+      border: none;
+      padding: 0;
+      color: inherit;
+    }
+
+    .hero-lead {
+      font-size: 1rem;
+      line-height: 1.7;
+      color: var(--ink-muted);
+      max-width: 42rem;
+      margin: 0;
+    }
+
+    /* ── Scan Tool ── */
+    .scan-tool {
+      padding: 2rem 0 5rem;
+      background: var(--paper);
+    }
+
+    .scan-card {
+      background: var(--paper-dim);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 2rem;
+      max-width: 48rem;
+      margin: 0 auto 2rem;
+    }
+
+    .input-label {
+      display: block;
+      font-size: 0.85rem;
+      color: var(--ink-muted);
+      margin-bottom: 0.6rem;
+    }
+
+    .input-label code {
+      background: none;
+      border: none;
+      padding: 0;
+      font-size: inherit;
+    }
+
+    .pkg-json-input {
+      width: 100%;
+      padding: 0.9rem 1rem;
+      font-family: var(--font-mono);
+      font-size: 0.82rem;
+      background: var(--paper);
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      color: var(--ink);
+      resize: vertical;
+      transition: border-color 0.15s;
+      line-height: 1.6;
+      box-sizing: border-box;
+    }
+
+    .pkg-json-input:focus {
+      outline: none;
+      border-color: var(--accent);
+    }
+
+    .card-footer {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      margin-top: 1rem;
+      flex-wrap: wrap;
+    }
+
+    .scan-submit {
+      padding: 0.75rem 2rem;
+      background: var(--accent);
+      color: white;
+      border: none;
+      border-radius: 4px;
+      font-family: var(--font-body);
+      font-size: 0.95rem;
+      font-weight: 500;
+      cursor: pointer;
+      transition: background 0.15s;
+      white-space: nowrap;
+    }
+
+    .scan-submit:hover { background: var(--accent-dim); }
+    .scan-submit:disabled { opacity: 0.6; cursor: not-allowed; }
+
+    .scan-note {
+      font-size: 0.8rem;
+      color: var(--ink-subtle);
+      margin: 0;
+    }
+
+    .scan-note a { color: var(--ink-muted); }
+    .scan-note code { background: none; border: none; padding: 0; font-size: inherit; }
+
+    /* ── Progress ── */
+    .progress-area {
+      max-width: 48rem;
+      margin: 0 auto 2rem;
+      padding: 1.5rem;
+      background: var(--paper-dim);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+    }
+
+    .progress-header {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      margin-bottom: 0.75rem;
+    }
+
+    .progress-header p {
+      margin: 0;
+      font-size: 0.9rem;
+      color: var(--ink-muted);
+    }
+
+    .loading-spinner {
+      width: 1.25rem;
+      height: 1.25rem;
+      border: 2px solid var(--border);
+      border-top-color: var(--accent);
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+      flex-shrink: 0;
+    }
+
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+
+    .progress-bar-track {
+      height: 4px;
+      background: var(--border);
+      border-radius: 2px;
+      overflow: hidden;
+    }
+
+    .progress-bar-fill {
+      height: 100%;
+      background: var(--accent);
+      border-radius: 2px;
+      transition: width 0.3s ease;
+    }
+
+    /* ── Error ── */
+    .error-area {
+      max-width: 48rem;
+      margin: 0 auto 1rem;
+      padding: 1rem 1.25rem;
+      background: #fee2e2;
+      border: 1px solid #fca5a5;
+      border-radius: 6px;
+      color: #991b1b;
+      font-size: 0.9rem;
+    }
+
+    /* ── Results ── */
+    .results-area {
+      max-width: 60rem;
+      margin: 0 auto;
+    }
+
+    .results-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 1rem;
+      margin-bottom: 0.75rem;
+      padding: 0 0.25rem;
+      flex-wrap: wrap;
+    }
+
+    .results-summary {
+      font-size: 0.95rem;
+      color: var(--ink-muted);
+    }
+
+    .share-row {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+    }
+
+    .share-btn {
+      background: none;
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      padding: 0.3rem 0.7rem;
+      font-size: 0.8rem;
+      color: var(--ink-muted);
+      cursor: pointer;
+      font-family: var(--font-sans);
+      transition: border-color 0.15s, color 0.15s;
+      white-space: nowrap;
+    }
+
+    .share-btn:hover { border-color: var(--ink-subtle); color: var(--ink); }
+
+    .share-copied {
+      font-size: 0.8rem;
+      color: #166534;
+      font-weight: 500;
+    }
+
+    .results-table-wrap {
+      overflow-x: auto;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+    }
+
+    .results-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.9rem;
+    }
+
+    .results-table th {
+      padding: 0.7rem 1rem;
+      text-align: left;
+      font-size: 0.75rem;
+      font-weight: 500;
+      color: var(--ink-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      background: var(--paper-dim);
+      border-bottom: 1px solid var(--border);
+      white-space: nowrap;
+    }
+
+    .results-table td {
+      padding: 0.75rem 1rem;
+      border-bottom: 1px solid var(--border-light);
+      vertical-align: middle;
+    }
+
+    .results-table tr:last-child td {
+      border-bottom: none;
+    }
+
+    .results-table tr:hover td {
+      background: var(--paper-dim);
+    }
+
+    .result-row {
+      cursor: pointer;
+    }
+
+    .result-row td:first-child::after {
+      content: ' ▸';
+      font-size: 0.7rem;
+      color: var(--ink-subtle);
+      opacity: 0.6;
+    }
+
+    .result-row.expanded td:first-child::after {
+      content: ' ▾';
+    }
+
+    .breakdown-row td {
+      padding: 0 1rem 0.75rem 1rem !important;
+      background: var(--paper-dim);
+      border-bottom: 1px solid var(--border-light) !important;
+    }
+
+    .breakdown-grid {
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: 0.75rem;
+      padding: 0.75rem 0 0.25rem;
+    }
+
+    @media (max-width: 640px) {
+      .breakdown-grid { grid-template-columns: repeat(2, 1fr); }
+    }
+
+    .breakdown-dim {
+      display: flex;
+      flex-direction: column;
+      gap: 0.3rem;
+    }
+
+    .breakdown-label {
+      font-size: 0.68rem;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--ink-muted);
+      white-space: nowrap;
+    }
+
+    .breakdown-bar-wrap {
+      height: 5px;
+      background: var(--border);
+      border-radius: 3px;
+      overflow: hidden;
+    }
+
+    .breakdown-bar {
+      height: 100%;
+      border-radius: 3px;
+      background: #3d8b3d;
+      transition: width 0.3s ease;
+    }
+
+    .breakdown-bar.bar-warn { background: #c47a0a; }
+    .breakdown-bar.bar-low { background: var(--accent); }
+
+    .breakdown-score {
+      font-size: 0.75rem;
+      font-family: var(--font-mono);
+      color: var(--ink-muted);
+    }
+
+    .breakdown-max {
+      color: var(--ink-subtle);
+      font-size: 0.65rem;
+    }
+
+    .pkg-name {
+      font-family: var(--font-mono);
+      font-size: 0.88rem;
+      color: var(--ink);
+      font-weight: 500;
+    }
+
+    .pkg-type {
+      font-size: 0.72rem;
+      color: var(--ink-subtle);
+      margin-left: 0.3rem;
+      font-family: var(--font-mono);
+    }
+
+    .score-cell {
+      font-family: var(--font-mono);
+      font-weight: 600;
+    }
+
+    .score-high { color: #3d8b3d; }
+    .score-mid { color: #c47a0a; }
+    .score-low { color: var(--accent); }
+
+    .risk-badge {
+      display: inline-block;
+      padding: 0.2rem 0.5rem;
+      border-radius: 3px;
+      font-size: 0.75rem;
+      font-weight: 600;
+      letter-spacing: 0.03em;
+    }
+
+    .risk-critical { background: #fee2e2; color: #991b1b; }
+    .risk-high { background: #fef3c7; color: #92400e; }
+    .risk-warn { background: #fef9c3; color: #713f12; }
+    .risk-ok { background: #dcfce7; color: #166534; }
+
+    .trend-growing { color: #3d8b3d; }
+    .trend-stable { color: var(--ink-muted); }
+    .trend-declining { color: var(--accent); }
+
+    /* ── MCP CTA ── */
+    .mcp-cta {
+      margin-top: 2.5rem;
+      padding: 1.5rem;
+      background: var(--paper-dim);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+    }
+
+    .mcp-cta-label {
+      font-size: 0.85rem;
+      font-weight: 500;
+      color: var(--ink-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      margin-bottom: 0.75rem;
+    }
+
+    .code-block {
+      background: var(--ink);
+      color: #a8c6fa;
+      padding: 1rem;
+      border-radius: 4px;
+      font-family: var(--font-mono);
+      font-size: 0.8rem;
+      line-height: 1.6;
+      overflow-x: auto;
+      margin-bottom: 0.75rem;
+    }
+
+    .mcp-cta-hint {
+      font-size: 0.85rem;
+      color: var(--ink-muted);
+      margin: 0;
+    }
+
+    .mcp-cta-hint em {
+      font-style: italic;
+      color: var(--ink);
+    }
+  </style>
+
+  <script>
+    const API = 'https://poc-backend.amdal-dev.workers.dev/api/audit';
+    const BATCH_SIZE = 20; // Backend caps at 20 per request — match to minimize audit-count usage.
+    // Lockfile scans can yield 1000s of transitive deps. Cap to MAX_LOCKFILE_PKGS
+    // with unscoped packages prioritized first: most CRITICAL flags are sole-
+    // publisher utility packages (isexe, ms, chalk, fast-copy…) — they sit
+    // unscoped. Scoped @org/* packages are usually multi-maintainer org infra.
+    // 500-cap → ~25 audit-counts per scan (under 100/day free-tier limit).
+    const MAX_LOCKFILE_PKGS = 500;
+
+    type ScoreBreakdown = {
+      longevity: number;
+      downloadMomentum: number;
+      releaseConsistency: number;
+      maintainerDepth: number;
+      githubBacking: number;
+    };
+
+    type AuditResult = {
+      name: string;
+      ecosystem: string;
+      score: number | null;
+      maintainers: number | null;
+      weeklyDownloads: number | null;
+      ageYears: number | null;
+      trend: string | null;
+      riskFlags: string[];
+      scoreBreakdown?: ScoreBreakdown;
+      error?: string;
+    };
+
+    const BREAKDOWN_MAXES: Record<keyof ScoreBreakdown, number> = {
+      longevity: 25,
+      downloadMomentum: 25,
+      releaseConsistency: 20,
+      maintainerDepth: 15,
+      githubBacking: 15,
+    };
+
+    const BREAKDOWN_LABELS: Record<keyof ScoreBreakdown, string> = {
+      longevity: 'Longevity',
+      downloadMomentum: 'DL Trend',
+      releaseConsistency: 'Releases',
+      maintainerDepth: 'Maintainers',
+      githubBacking: 'GitHub',
+    };
+
+    // State
+    let _allPackages: string[] = [];
+    let _allResults: AuditResult[] = [];
+    let _rowCounter = 0;
+
+    // ── Utilities ──
+
+    function fmtNum(n: number | null): string {
+      if (n === null || n === undefined) return '—';
+      if (n >= 1_000_000_000) return (n / 1_000_000_000).toFixed(1) + 'B';
+      if (n >= 1_000_000) return (n / 1_000_000).toFixed(1) + 'M';
+      if (n >= 1_000) return (n / 1_000).toFixed(0) + 'K';
+      return n.toString();
+    }
+
+    function scoreClass(score: number | null): string {
+      if (score === null) return '';
+      if (score >= 75) return 'score-high';
+      if (score >= 50) return 'score-mid';
+      return 'score-low';
+    }
+
+    function renderRisk(flags: string[]): string {
+      if (!flags || flags.length === 0) return '<span class="risk-badge risk-ok">OK</span>';
+      return flags.map(f => {
+        const cls = f === 'CRITICAL' ? 'risk-critical' : f === 'HIGH' ? 'risk-high' : 'risk-warn';
+        return `<span class="risk-badge ${cls}">${f}</span>`;
+      }).join(' ');
+    }
+
+    function renderTrend(t: string | null): string {
+      if (!t) return '—';
+      const cls = t === 'growing' ? 'trend-growing' : t === 'declining' ? 'trend-declining' : 'trend-stable';
+      return `<span class="${cls}">${t}</span>`;
+    }
+
+    function barClass(val: number, max: number): string {
+      const pct = val / max;
+      if (pct >= 0.66) return '';
+      if (pct >= 0.33) return 'bar-warn';
+      return 'bar-low';
+    }
+
+    function renderBreakdown(bd: ScoreBreakdown): string {
+      const dims = (Object.keys(BREAKDOWN_MAXES) as (keyof ScoreBreakdown)[]);
+      return `<div class="breakdown-grid">${dims.map(dim => {
+        const val = bd[dim] ?? 0;
+        const max = BREAKDOWN_MAXES[dim];
+        const pct = Math.round((val / max) * 100);
+        const cls = barClass(val, max);
+        return `<div class="breakdown-dim">
+          <span class="breakdown-label">${BREAKDOWN_LABELS[dim]}</span>
+          <div class="breakdown-bar-wrap"><div class="breakdown-bar ${cls}" style="width:${pct}%"></div></div>
+          <span class="breakdown-score">${val}<span class="breakdown-max">/${max}</span></span>
+        </div>`;
+      }).join('')}</div>`;
+    }
+
+    // ── package.json parsing ──
+
+    function extractDeps(jsonText: string): { name: string; isDev: boolean }[] {
+      let parsed: Record<string, unknown>;
+      try {
+        parsed = JSON.parse(jsonText) as Record<string, unknown>;
+      } catch {
+        throw new Error('Invalid JSON — check your package.json syntax.');
+      }
+
+      const deps = typeof parsed.dependencies === 'object' && parsed.dependencies
+        ? (parsed.dependencies as Record<string, string>)
+        : {};
+      const devDeps = typeof parsed.devDependencies === 'object' && parsed.devDependencies
+        ? (parsed.devDependencies as Record<string, string>)
+        : {};
+
+      const result: { name: string; isDev: boolean }[] = [];
+      for (const name of Object.keys(deps)) {
+        result.push({ name, isDev: false });
+      }
+      for (const name of Object.keys(devDeps)) {
+        result.push({ name, isDev: true });
+      }
+
+      if (result.length === 0) {
+        throw new Error('No dependencies or devDependencies found in package.json.');
+      }
+
+      return result;
+    }
+
+    // ── Table rendering ──
+
+    function appendRow(result: AuditResult, isDev: boolean) {
+      const tbody = document.getElementById('results-body')!;
+      const i = _rowCounter++;
+      const rowId = `row-${i}`;
+      const bdId = `bd-${i}`;
+      const hasBreakdown = !!(result.scoreBreakdown && !result.error);
+      const rowCls = hasBreakdown ? 'result-row' : '';
+      const clickAttr = hasBreakdown
+        ? `onclick="window.__toggleBreakdown('${rowId}','${bdId}')"` : '';
+
+      const typeLabel = isDev ? '<span class="pkg-type">dev</span>' : '';
+      const notFound = result.error ? ' <span style="color:var(--ink-subtle);font-weight:400">(not found)</span>' : '';
+
+      const mainRow = document.createElement('tr');
+      mainRow.id = rowId;
+      mainRow.className = rowCls;
+      if (hasBreakdown) mainRow.setAttribute('onclick', `window.__toggleBreakdown('${rowId}','${bdId}')`);
+      mainRow.innerHTML = `
+        <td><span class="pkg-name">${result.name}${notFound}${typeLabel}</span></td>
+        <td><span class="score-cell ${scoreClass(result.score)}">${result.score !== null ? result.score + '/100' : '—'}</span></td>
+        <td>${renderRisk(result.riskFlags ?? [])}</td>
+        <td>${result.maintainers !== null ? result.maintainers : '—'}</td>
+        <td>${fmtNum(result.weeklyDownloads)}</td>
+        <td>${result.ageYears !== null ? result.ageYears + 'y' : '—'}</td>
+        <td>${renderTrend(result.trend)}</td>
+      `;
+      tbody.appendChild(mainRow);
+
+      if (hasBreakdown) {
+        const bdRow = document.createElement('tr');
+        bdRow.id = bdId;
+        bdRow.className = 'breakdown-row';
+        bdRow.hidden = true;
+        bdRow.innerHTML = `<td colspan="7">${renderBreakdown(result.scoreBreakdown!)}</td>`;
+        tbody.appendChild(bdRow);
+      }
+    }
+
+    (window as unknown as Record<string, unknown>).__toggleBreakdown = function(rowId: string, bdId: string) {
+      const row = document.getElementById(rowId);
+      const bd = document.getElementById(bdId);
+      if (!row || !bd) return;
+      bd.hidden = !bd.hidden;
+      row.classList.toggle('expanded', !bd.hidden);
+    };
+
+    // Per-scan source context populated by scanProjectWithEcosystem; lets the
+    // summary call out lockfile vs direct-dep mode + capped-deps clarification.
+    let _sourceCtx: { sourceLabel: string; isLockfile: boolean; totalFound: number } | null = null;
+
+    function updateSummary(results: AuditResult[], total: number) {
+      const flagged = results.filter(r => r.riskFlags?.some(f => f.startsWith('CRITICAL')));
+      const high = results.filter(r => r.riskFlags?.some(f => f.startsWith('HIGH')));
+      const crit = flagged.length;
+      const highN = high.length;
+      const scored = results.filter(r => r.score !== null).length;
+
+      let html = `<strong>${scored}</strong> of ${total} packages scored`;
+      if (_sourceCtx?.isLockfile && _sourceCtx.totalFound > total) {
+        html += ` <span style="color:var(--ink-subtle);font-size:0.85em">(top ${total} of ${_sourceCtx.totalFound} from ${_sourceCtx.sourceLabel})</span>`;
+      } else if (_sourceCtx?.sourceLabel) {
+        const mode = _sourceCtx.isLockfile ? 'lockfile — transitive' : 'direct only';
+        html += ` <span style="color:var(--ink-subtle);font-size:0.85em">(${_sourceCtx.sourceLabel}, ${mode})</span>`;
+      }
+      html += '. ';
+      if (crit > 0) html += `<span style="color:#991b1b;font-weight:600">${crit} CRITICAL</span>`;
+      if (highN > 0) html += (crit > 0 ? ' · ' : '') + `<span style="color:#92400e;font-weight:600">${highN} HIGH</span>`;
+      if (crit === 0 && highN === 0 && scored > 0) html += '<span style="color:#166534;font-weight:600">No critical risk flags</span>';
+
+      document.getElementById('results-summary')!.innerHTML = html;
+    }
+
+    // ── Main scan logic ──
+
+    async function scanProject(packages: { name: string; isDev: boolean }[]) {
+      const btn = document.getElementById('scan-btn') as HTMLButtonElement;
+      const progressArea = document.getElementById('progress-area')!;
+      const progressBar = document.getElementById('progress-bar') as HTMLElement;
+      const progressText = document.getElementById('progress-text')!;
+      const errorArea = document.getElementById('error-area')!;
+      const resultsArea = document.getElementById('results-area')!;
+      const resultsBody = document.getElementById('results-body')!;
+
+      // Reset state
+      _allResults = [];
+      _rowCounter = 0;
+      resultsBody.innerHTML = '';
+      errorArea.hidden = true;
+      resultsArea.hidden = true;
+      btn.disabled = true;
+      btn.textContent = 'Scanning…';
+
+      // Show progress
+      progressArea.hidden = false;
+      progressBar.style.width = '0%';
+      progressText.textContent = `Scanning 0/${packages.length} packages…`;
+
+      const total = packages.length;
+      let done = 0;
+
+      try {
+        // Sort: prod first, then dev (so critical prod deps appear first)
+        const sorted = [...packages.filter(p => !p.isDev), ...packages.filter(p => p.isDev)];
+
+        // Show results area early (table builds incrementally)
+        resultsArea.hidden = false;
+        updateSummary([], total);
+
+        // Process in batches of BATCH_SIZE
+        for (let i = 0; i < sorted.length; i += BATCH_SIZE) {
+          const batch = sorted.slice(i, i + BATCH_SIZE);
+          const names = batch.map(p => p.name);
+
+          const res = await fetch(API, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ packages: names, ecosystem: 'npm' }),
+          });
+
+          if (!res.ok) {
+            const err = await res.json().catch(() => ({ error: 'Request failed' })) as { error?: string };
+            throw new Error(err.error ?? `HTTP ${res.status}`);
+          }
+
+          const data = await res.json() as { count: number; results: AuditResult[] };
+          const batchResults = data.results ?? [];
+
+          // Append results to table as they arrive
+          batchResults.forEach((result, j) => {
+            const pkg = batch[j];
+            const isDev = pkg ? pkg.isDev : false;
+            _allResults.push(result);
+            appendRow(result, isDev);
+          });
+
+          done += batch.length;
+          const pct = Math.round((done / total) * 100);
+          progressBar.style.width = `${pct}%`;
+          progressText.textContent = `Scanning ${Math.min(done, total)}/${total} packages…`;
+          updateSummary(_allResults, total);
+
+          // Small delay between batches to be kind to the API
+          if (i + BATCH_SIZE < sorted.length) {
+            await new Promise(resolve => setTimeout(resolve, 300));
+          }
+        }
+
+        // Done!
+        progressArea.hidden = true;
+        progressText.textContent = `Done!`;
+        updateSummary(_allResults, total);
+        _allPackages = sorted.map(p => p.name);
+
+      } catch (err) {
+        progressArea.hidden = true;
+        document.getElementById('error-message')!.textContent =
+          'Error: ' + (err instanceof Error ? err.message : 'Unknown error');
+        errorArea.hidden = false;
+      } finally {
+        btn.disabled = false;
+        btn.textContent = 'Scan project →';
+      }
+    }
+
+    // ── Event listeners ──
+
+    document.getElementById('scan-btn')!.addEventListener('click', async () => {
+      const ta = document.getElementById('pkg-json-input') as HTMLTextAreaElement;
+      const raw = ta.value.trim();
+      if (!raw) return;
+
+      let packages: { name: string; isDev: boolean }[];
+      try {
+        packages = extractDeps(raw);
+      } catch (err) {
+        const errorArea = document.getElementById('error-area')!;
+        document.getElementById('error-message')!.textContent =
+          (err instanceof Error ? err.message : 'Invalid package.json');
+        errorArea.hidden = false;
+        return;
+      }
+
+      await scanProject(packages);
+    });
+
+    // ── Share button ──
+    document.getElementById('share-btn')!.addEventListener('click', () => {
+      // Use the current URL (which already has ?repo= if from GitHub scan)
+      let url = window.location.href;
+      // Fall back to packages URL if no repo param
+      if (!url.includes('?repo=') && !url.includes('?packages=')) {
+        const pkgs = _allPackages.slice(0, 50);
+        url = `https://getcommit.dev/scan/repo?packages=${pkgs.map(p => encodeURIComponent(p)).join(',')}`;
+      }
+      navigator.clipboard.writeText(url).catch(() => {
+        const tmp = document.createElement('input');
+        tmp.value = url;
+        document.body.appendChild(tmp);
+        tmp.select();
+        document.execCommand('copy');
+        document.body.removeChild(tmp);
+      }).finally(() => {
+        const copied = document.getElementById('share-copied')!;
+        copied.hidden = false;
+        setTimeout(() => { copied.hidden = true; }, 2500);
+      });
+    });
+
+    // ── GitHub repo scanning ──
+
+    const GITHUB_API = 'https://api.github.com/repos';
+
+    // Files to probe, in priority order. Lockfiles first — they include transitive
+    // deps, which is where the real supply-chain risk lives (the npm-package CLI
+    // already encodes this preference; this page now matches it).
+    const MANIFEST_FILES: { path: string; ecosystem: string; parser: (content: string) => string[]; lockfile?: boolean }[] = [
+      { path: 'package-lock.json', ecosystem: 'npm', parser: parsePackageLock, lockfile: true },
+      { path: 'yarn.lock', ecosystem: 'npm', parser: parseYarnLock, lockfile: true },
+      { path: 'pnpm-lock.yaml', ecosystem: 'npm', parser: parsePnpmLock, lockfile: true },
+      { path: 'package.json', ecosystem: 'npm', parser: parsePackageJson },
+      { path: 'requirements.txt', ecosystem: 'pypi', parser: parseRequirementsTxt },
+      { path: 'Cargo.toml', ecosystem: 'cargo', parser: parseCargoToml },
+      { path: 'go.mod', ecosystem: 'golang', parser: parseGoMod },
+    ];
+
+    function parsePackageJson(content: string): string[] {
+      const parsed = JSON.parse(content);
+      const deps = Object.keys(parsed.dependencies ?? {});
+      const devDeps = Object.keys(parsed.devDependencies ?? {});
+      return [...deps, ...devDeps];
+    }
+
+    // Parse package-lock.json (npm lockfileVersion 1, 2, or 3) — extracts
+    // every transitive dep, deduped. v2/v3 use the flat `packages` map keyed
+    // by node_modules path; v1 nests under `dependencies` recursively.
+    function parsePackageLock(content: string): string[] {
+      const lock = JSON.parse(content);
+      const pkgs = new Set<string>();
+      if (lock.packages && typeof lock.packages === 'object') {
+        for (const key of Object.keys(lock.packages)) {
+          if (!key) continue; // root entry is keyed by ""
+          const parts = key.split('node_modules/');
+          const pkgPath = parts[parts.length - 1];
+          if (pkgPath) pkgs.add(pkgPath);
+        }
+      }
+      if (pkgs.size === 0 && lock.dependencies && typeof lock.dependencies === 'object') {
+        const walk = (deps: Record<string, unknown>) => {
+          for (const name of Object.keys(deps)) {
+            pkgs.add(name);
+            const sub = deps[name];
+            if (sub && typeof sub === 'object' && (sub as Record<string, unknown>).dependencies) {
+              walk((sub as Record<string, unknown>).dependencies as Record<string, unknown>);
+            }
+          }
+        };
+        walk(lock.dependencies as Record<string, unknown>);
+      }
+      return Array.from(pkgs).sort();
+    }
+
+    // Parse yarn.lock (v1 berry-compatible) — matches header lines like
+    // `pkg@version:` or `"pkg@version":` and extracts the package name.
+    function parseYarnLock(content: string): string[] {
+      const pkgs = new Set<string>();
+      const headerRe = /^"?(@?[a-zA-Z0-9_./-]+)@/gm;
+      let m;
+      while ((m = headerRe.exec(content)) !== null) {
+        pkgs.add(m[1]);
+      }
+      return Array.from(pkgs).sort();
+    }
+
+    // Parse pnpm-lock.yaml (v6+ flat package map under `packages:`). Entries
+    // look like `/pkg-name@version:` or `/@scope/pkg-name@version:`.
+    function parsePnpmLock(content: string): string[] {
+      const pkgs = new Set<string>();
+      // Match indented entries starting with `/` then a name then `@`
+      const pkgRe = /^\s+\/(@?[a-zA-Z0-9_./-]+)@[\d\w]/gm;
+      let m;
+      while ((m = pkgRe.exec(content)) !== null) {
+        pkgs.add(m[1]);
+      }
+      return Array.from(pkgs).sort();
+    }
+
+    function parseRequirementsTxt(content: string): string[] {
+      return content.split('\n')
+        .map(line => line.trim())
+        .filter(line => line && !line.startsWith('#') && !line.startsWith('-'))
+        .map(line => line.split(/[>=<!\[;@\s]/)[0].trim())
+        .filter(Boolean);
+    }
+
+    function parseCargoToml(content: string): string[] {
+      const deps: string[] = [];
+      let inDeps = false;
+      for (const line of content.split('\n')) {
+        const trimmed = line.trim();
+        if (/^\[(.*dependencies.*)\]/.test(trimmed)) { inDeps = true; continue; }
+        if (trimmed.startsWith('[')) { inDeps = false; continue; }
+        if (inDeps && trimmed.includes('=')) {
+          const name = trimmed.split('=')[0].trim();
+          if (name && !name.startsWith('#')) deps.push(name);
+        }
+      }
+      return deps;
+    }
+
+    function parseGoMod(content: string): string[] {
+      const deps: string[] = [];
+      let inRequire = false;
+      for (const line of content.split('\n')) {
+        const trimmed = line.trim();
+        if (trimmed === 'require (') { inRequire = true; continue; }
+        if (trimmed === ')') { inRequire = false; continue; }
+        if (trimmed.startsWith('require ') && !trimmed.includes('(')) {
+          const mod = trimmed.replace('require ', '').split(/\s/)[0];
+          if (mod) deps.push(mod);
+        }
+        if (inRequire && trimmed && !trimmed.startsWith('//')) {
+          const mod = trimmed.split(/\s/)[0];
+          if (mod) deps.push(mod);
+        }
+      }
+      return deps;
+    }
+
+    // Parse a GitHub repo URL, optionally extracting a subdirectory or file path.
+    // Accepts shapes like:
+    //   github.com/owner/repo
+    //   https://github.com/owner/repo
+    //   github.com/owner/repo/tree/main/sub/dir
+    //   github.com/owner/repo/blob/main/sub/dir/package-lock.json
+    // For monorepos (Umbraco-CMS etc.) the subdir is where the lockfile lives.
+    function parseRepoUrl(input: string): { owner: string; repo: string; subdir?: string } | null {
+      const cleaned = input.trim()
+        .replace(/^https?:\/\//, '')
+        .replace(/^github\.com\//, '')
+        .replace(/\.git$/, '')
+        .replace(/\/$/, '');
+      const parts = cleaned.split('/');
+      if (parts.length < 2 || !parts[0] || !parts[1]) return null;
+      const result: { owner: string; repo: string; subdir?: string } = {
+        owner: parts[0],
+        repo: parts[1],
+      };
+      // /blob/<ref>/<path...> or /tree/<ref>/<path...>
+      if (parts.length >= 4 && (parts[2] === 'blob' || parts[2] === 'tree')) {
+        const rest = parts.slice(4); // drop owner, repo, blob|tree, ref
+        // For /blob/<ref>/path/to/file.json, drop the final filename.
+        if (parts[2] === 'blob' && rest.length > 0) {
+          const last = rest[rest.length - 1];
+          // Only pop if it looks like a file (has an extension or matches known names)
+          const KNOWN_FILES = ['package.json', 'package-lock.json', 'yarn.lock', 'pnpm-lock.yaml', 'requirements.txt', 'Cargo.toml', 'go.mod'];
+          if (KNOWN_FILES.includes(last) || /\.[a-z]+$/i.test(last)) {
+            rest.pop();
+          }
+        }
+        if (rest.length > 0) result.subdir = rest.join('/');
+      }
+      return result;
+    }
+
+    async function fetchGithubFile(owner: string, repo: string, path: string): Promise<string | null> {
+      // Use raw.githubusercontent.com — no API rate limit, no auth needed,
+      // handles large lockfiles (Contents API rejects files >1MB).
+      // Tries HEAD (default branch) then main, then master.
+      for (const ref of ['HEAD', 'main', 'master']) {
+        const url = `https://raw.githubusercontent.com/${owner}/${repo}/${ref}/${path}`;
+        try {
+          const res = await fetch(url);
+          if (res.ok) return await res.text();
+        } catch {}
+      }
+      return null;
+    }
+
+    async function scanGithubRepo(owner: string, repo: string, subdir?: string) {
+      const statusEl = document.getElementById('github-status')!;
+      const btn = document.getElementById('github-scan-btn') as HTMLButtonElement;
+      btn.disabled = true;
+      btn.textContent = 'Scanning…';
+
+      const subdirLabel = subdir ? ` (path: ${subdir})` : '';
+      statusEl.hidden = false;
+      statusEl.className = 'github-status';
+      statusEl.innerHTML = `<span class="mini-spinner"></span> Checking ${owner}/${repo}${subdirLabel} for dependency files…`;
+
+      let foundFile: typeof MANIFEST_FILES[0] | null = null;
+      let fileContent: string | null = null;
+
+      const prefix = subdir ? `${subdir.replace(/\/+$/, '')}/` : '';
+      for (const manifest of MANIFEST_FILES) {
+        const fullPath = `${prefix}${manifest.path}`;
+        statusEl.innerHTML = `<span class="mini-spinner"></span> Looking for ${fullPath}…`;
+        const content = await fetchGithubFile(owner, repo, fullPath);
+        if (content) {
+          foundFile = manifest;
+          fileContent = content;
+          break;
+        }
+      }
+
+      if (!foundFile || !fileContent) {
+        statusEl.className = 'github-status status-error';
+        const checked = MANIFEST_FILES.map(m => prefix + m.path).join(', ');
+        statusEl.innerHTML = `No dependency file found at ${owner}/${repo}${subdirLabel}. Checked: ${checked}.` +
+          (subdir ? '' : ' For monorepos, paste the subdirectory URL or add <code>?path=src/your-pkg</code>.');
+        btn.disabled = false;
+        btn.textContent = 'Scan repo →';
+        return;
+      }
+
+      const displayPath = prefix + foundFile.path;
+      statusEl.className = 'github-status status-found';
+      statusEl.innerHTML = `Found <strong>${displayPath}</strong> — extracting dependencies…`;
+
+      let packageNames: string[];
+      try {
+        packageNames = foundFile.parser(fileContent);
+      } catch {
+        statusEl.className = 'github-status status-error';
+        statusEl.innerHTML = `Failed to parse ${displayPath}. Check file format.`;
+        btn.disabled = false;
+        btn.textContent = 'Scan repo →';
+        return;
+      }
+
+      if (packageNames.length === 0) {
+        statusEl.className = 'github-status status-error';
+        statusEl.innerHTML = `No dependencies found in ${displayPath}.`;
+        btn.disabled = false;
+        btn.textContent = 'Scan repo →';
+        return;
+      }
+
+      const totalFound = packageNames.length;
+      const isLockfile = !!foundFile.lockfile;
+      // Lockfile mode: prioritize unscoped utilities (where sole-publisher
+      // CRITICAL flags concentrate) over @scoped org packages. Verified against
+      // umbraco/Umbraco-CMS: this ordering surfaces isexe, is-wsl, and
+      // is-inside-container within MAX_LOCKFILE_PKGS = 500 (otherwise they
+      // sit at index 637+ after 400+ @babel/@types entries).
+      if (isLockfile) {
+        const unscoped = packageNames.filter(n => !n.startsWith('@'));
+        const scoped = packageNames.filter(n => n.startsWith('@'));
+        packageNames = [...unscoped, ...scoped];
+        if (packageNames.length > MAX_LOCKFILE_PKGS) {
+          packageNames = packageNames.slice(0, MAX_LOCKFILE_PKGS);
+        }
+      }
+
+      const sourceLabel = isLockfile
+        ? `<strong>${displayPath}</strong> (lockfile — transitive deps)`
+        : `<strong>${displayPath}</strong> (direct deps only)`;
+      const countLabel = isLockfile && totalFound > packageNames.length
+        ? `${packageNames.length} of ${totalFound} deps`
+        : `${packageNames.length} deps`;
+      statusEl.innerHTML = `Found ${sourceLabel}. Scoring ${countLabel}…`;
+
+      // Update URL for shareability — include path so deep links to monorepos work
+      const params = new URLSearchParams();
+      params.set('repo', owner + '/' + repo);
+      if (subdir) params.set('path', subdir);
+      const newUrl = `${window.location.pathname}?${params.toString()}`;
+      window.history.replaceState({}, '', newUrl);
+
+      // Run the scan using existing infrastructure, but with correct ecosystem
+      const packages = packageNames.map(name => ({ name, isDev: false }));
+
+      await scanProjectWithEcosystem(packages, foundFile.ecosystem, {
+        sourceLabel: displayPath,
+        isLockfile,
+        totalFound,
+      });
+
+      statusEl.hidden = true;
+      btn.disabled = false;
+      btn.textContent = 'Scan repo →';
+    }
+
+    async function scanProjectWithEcosystem(
+      packages: { name: string; isDev: boolean }[],
+      ecosystem: string,
+      sourceCtx?: { sourceLabel: string; isLockfile: boolean; totalFound: number },
+    ) {
+      _sourceCtx = sourceCtx ?? null;
+      const btn = document.getElementById('scan-btn') as HTMLButtonElement;
+      const progressArea = document.getElementById('progress-area')!;
+      const progressBar = document.getElementById('progress-bar') as HTMLElement;
+      const progressText = document.getElementById('progress-text')!;
+      const errorArea = document.getElementById('error-area')!;
+      const resultsArea = document.getElementById('results-area')!;
+      const resultsBody = document.getElementById('results-body')!;
+
+      // Reset state
+      _allResults = [];
+      _rowCounter = 0;
+      resultsBody.innerHTML = '';
+      errorArea.hidden = true;
+      resultsArea.hidden = true;
+      btn.disabled = true;
+
+      progressArea.hidden = false;
+      progressBar.style.width = '0%';
+      progressText.textContent = `Scanning 0/${packages.length} packages…`;
+
+      const total = packages.length;
+      let done = 0;
+
+      try {
+        resultsArea.hidden = false;
+        updateSummary([], total);
+
+        for (let i = 0; i < packages.length; i += BATCH_SIZE) {
+          const batch = packages.slice(i, i + BATCH_SIZE);
+          const names = batch.map(p => p.name);
+
+          const res = await fetch(API, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ packages: names, ecosystem }),
+          });
+
+          if (!res.ok) {
+            const err = await res.json().catch(() => ({ error: 'Request failed' })) as { error?: string };
+            throw new Error(err.error ?? `HTTP ${res.status}`);
+          }
+
+          const data = await res.json() as { count: number; results: AuditResult[] };
+          const batchResults = data.results ?? [];
+
+          batchResults.forEach((result, j) => {
+            const pkg = batch[j];
+            const isDev = pkg ? pkg.isDev : false;
+            _allResults.push(result);
+            appendRow(result, isDev);
+          });
+
+          done += batch.length;
+          const pct = Math.round((done / total) * 100);
+          progressBar.style.width = `${pct}%`;
+          progressText.textContent = `Scanning ${Math.min(done, total)}/${total} packages…`;
+          updateSummary(_allResults, total);
+
+          if (i + BATCH_SIZE < packages.length) {
+            await new Promise(resolve => setTimeout(resolve, 300));
+          }
+        }
+
+        progressArea.hidden = true;
+        updateSummary(_allResults, total);
+        _allPackages = packages.map(p => p.name);
+
+      } catch (err) {
+        progressArea.hidden = true;
+        document.getElementById('error-message')!.textContent =
+          'Error: ' + (err instanceof Error ? err.message : 'Unknown error');
+        errorArea.hidden = false;
+      } finally {
+        btn.disabled = false;
+        btn.textContent = 'Scan project →';
+      }
+    }
+
+    // ── GitHub scan event listener ──
+    document.getElementById('github-scan-btn')!.addEventListener('click', async () => {
+      const input = document.getElementById('github-url-input') as HTMLInputElement;
+      const raw = input.value.trim();
+      if (!raw) return;
+
+      const parsed = parseRepoUrl(raw);
+      if (!parsed) {
+        const statusEl = document.getElementById('github-status')!;
+        statusEl.hidden = false;
+        statusEl.className = 'github-status status-error';
+        statusEl.innerHTML = 'Enter a valid GitHub URL: <code>github.com/owner/repo</code> or just <code>owner/repo</code>';
+        return;
+      }
+
+      await scanGithubRepo(parsed.owner, parsed.repo, parsed.subdir);
+    });
+
+    // Allow Enter key in GitHub URL input
+    document.getElementById('github-url-input')!.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') {
+        e.preventDefault();
+        document.getElementById('github-scan-btn')!.click();
+      }
+    });
+
+    // ── URL param auto-run ──
+    // Supports ?packages=axios,zod,chalk  and  ?repo=owner/repo
+    (function initFromUrlParams() {
+      const params = new URLSearchParams(window.location.search);
+
+      // GitHub repo mode — supports ?repo=owner/repo and ?path=src/sub/dir
+      const repoParam = params.get('repo');
+      if (repoParam) {
+        const parsed = parseRepoUrl(repoParam);
+        if (parsed) {
+          // ?path= takes precedence; otherwise use any subdir parsed from the repo URL
+          const explicitPath = params.get('path');
+          const subdir = explicitPath || parsed.subdir;
+          const input = document.getElementById('github-url-input') as HTMLInputElement;
+          const displaySubdir = subdir ? `/tree/HEAD/${subdir}` : '';
+          input.value = `github.com/${parsed.owner}/${parsed.repo}${displaySubdir}`;
+          setTimeout(() => scanGithubRepo(parsed.owner, parsed.repo, subdir), 100);
+          return;
+        }
+      }
+
+      // Legacy packages mode
+      const pkgParam = params.get('packages');
+      if (!pkgParam) return;
+
+      const names = pkgParam.split(',').map(p => decodeURIComponent(p.trim())).filter(Boolean);
+      if (names.length === 0) return;
+
+      const syntheticJson = JSON.stringify({
+        dependencies: Object.fromEntries(names.map(n => [n, 'latest']))
+      }, null, 2);
+
+      const ta = document.getElementById('pkg-json-input') as HTMLTextAreaElement;
+      ta.value = syntheticJson;
+
+      setTimeout(() => {
+        const packages = names.map(n => ({ name: n, isDev: false }));
+        scanProject(packages);
+      }, 100);
+    })();
+  </script>
+</Layout>
