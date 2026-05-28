@@ -1741,7 +1741,7 @@ uuid</textarea>
       const ctaEl = document.getElementById('post-results-cta')!;
       const alreadyHasKey = hasInlineKey();
 
-      function renderInlineForm(headline: string, fallbackHref: string, refTag: string, btnLabel: string, hintText: string) {
+      function renderInlineForm(headline: string, fallbackHref: string, refTag: string, btnLabel: string, hintText: string, upgradeCtxUrl?: string) {
         const formId = 'cta-inline-form';
         const inputId = 'cta-inline-email';
         const btnId = 'cta-inline-btn';
@@ -1792,6 +1792,24 @@ uuid</textarea>
               form.hidden = true;
               const hint = ctaEl.querySelector('.cta-hint') as HTMLElement | null;
               if (hint) hint.hidden = true;
+              // If caller passed a CRITICAL-context upgrade URL (audit found
+              // ≥1 CRITICAL package), append &email= and render a prominent
+              // Developer-tier CTA in the success view. Free tier scores once
+              // but does not monitor — the audit-critical-key banner on
+              // /pricing then renders the user's actual package names. This
+              // closes the new-user gap: previously only returning users
+              // (alreadyHasKey branch) got the personalized banner, but new
+              // users — peak intent right after seeing CRITICAL findings —
+              // saw only a generic "Pricing" inline link.
+              const upgradeUrlWithEmail = upgradeCtxUrl
+                ? upgradeCtxUrl + (upgradeCtxUrl.includes('?') ? '&' : '?') + `email=${encodeURIComponent(email)}`
+                : '';
+              const developerUpgradeBlock = upgradeCtxUrl
+                ? `<div style="margin-top:1rem;padding-top:1rem;border-top:1px solid var(--border-light,#e5e0d0);">` +
+                  `<a href="${upgradeUrlWithEmail}" class="cta-btn cta-btn-upgrade" style="display:inline-block;font-size:0.95rem;">Watch these CRITICAL packages — Developer $15/mo &rarr;</a> ` +
+                  `<span style="font-size:0.78rem;color:var(--ink-subtle);margin-left:0.5rem;">Daily re-scans · email alerts · cancel anytime</span>` +
+                  `</div>`
+                : '';
               if (data.key) {
                 successEl.innerHTML =
                   `<strong>✓ Your free API key</strong> — copy it now, backup sent to ${email}:<br>` +
@@ -1801,12 +1819,14 @@ uuid</textarea>
                   `<code>npx proof-of-commitment poc init</code> ` +
                   `(paste your key when prompted) · ` +
                   `<a href="/dashboard" style="color:var(--accent);">Dashboard</a> · ` +
-                  `<a href="/pricing?email=${encodeURIComponent(email)}" style="color:var(--accent);">Pricing</a></span>`;
+                  `<a href="/pricing?email=${encodeURIComponent(email)}" style="color:var(--accent);">Pricing</a></span>` +
+                  developerUpgradeBlock;
               } else {
                 successEl.innerHTML =
                   `<strong>✓ Check your inbox.</strong> We sent your free API key to ${email}.` +
                   ` <strong>Next:</strong> in this repo, run <code>npx proof-of-commitment poc init</code> ` +
-                  `to fail PRs that introduce CRITICAL deps.`;
+                  `to fail PRs that introduce CRITICAL deps.` +
+                  developerUpgradeBlock;
               }
               successEl.hidden = false;
             } else if (res.status === 429) {
@@ -1859,25 +1879,28 @@ uuid</textarea>
         const headline = `<strong>${critCount} CRITICAL</strong> package${critCount > 1 ? 's' : ''} in your project (${nameList}). ` +
           `Single-publisher packages get compromised — axios and node-ipc were both CRITICAL before their attacks. ` +
           `Lock in weekly monitoring.`;
+        // Pre-load up to 5 CRITICAL names into the upgrade URL so /pricing
+        // can render `audit-critical-key` banner with the user's actual
+        // package names. Used by BOTH branches: returning users see the
+        // upsell on the "monitoring active" card; new users see it on the
+        // inline-form success state after their free key is issued.
+        // Truncate to keep URL <2KB.
+        const critNamesForUrl = results
+          .filter(r => r.riskFlags?.some(f => f.startsWith('CRITICAL')))
+          .map(r => r.name)
+          .slice(0, 5)
+          .join(',');
+        const developerCtaUrl =
+          `/pricing/?utm_source=audit-results&utm_medium=critical-cta` +
+          `&utm_campaign=audit-critical-key` +
+          (critNamesForUrl ? `&packages=${encodeURIComponent(critNamesForUrl)}` : '');
         if (alreadyHasKey) {
-          // Pre-load up to 5 CRITICAL names into the upgrade URL so the
-          // post-payment dashboard ship can offer "add these from your last
-          // audit" in one click (future). Truncate to keep URL <2KB.
-          const critNamesForUrl = results
-            .filter(r => r.riskFlags?.some(f => f.startsWith('CRITICAL')))
-            .map(r => r.name)
-            .slice(0, 5)
-            .join(',');
-          const developerCtaUrl =
-            `/pricing/?utm_source=audit-results&utm_medium=critical-cta` +
-            `&utm_campaign=audit-critical-key` +
-            (critNamesForUrl ? `&packages=${encodeURIComponent(critNamesForUrl)}` : '');
           renderMonitoringActive(
             headline + ' You already have a Commit key — gate this repo so a future CRITICAL flag fails the PR, or watch these packages continuously and get email alerts when scores drop.',
             developerCtaUrl
           );
         } else {
-          renderInlineForm(headline, '/get-started?ref=audit-web-critical', 'audit-web-critical', 'Save audit + get alerts', 'Free · no card · 10 seconds');
+          renderInlineForm(headline, '/get-started?ref=audit-web-critical', 'audit-web-critical', 'Save audit + get alerts', 'Free · no card · 10 seconds', developerCtaUrl);
         }
       } else if (count > 0) {
         const headline = `No CRITICAL flags — your dependency tree looks healthy. ` +
