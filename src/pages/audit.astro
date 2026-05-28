@@ -1890,10 +1890,15 @@ uuid</textarea>
           .map(r => r.name)
           .slice(0, 5)
           .join(',');
+        // Include eco so the post-payment /checkout/success page can call
+        // /api/watchlist with the correct ecosystem (default npm if audit
+        // was github — github audit returns the npm deps it found in the repo).
+        const ecoForUrl = (activeEco === 'github' || activeEco === 'npm') ? 'npm' : activeEco;
         const developerCtaUrl =
           `/pricing/?utm_source=audit-results&utm_medium=critical-cta` +
           `&utm_campaign=audit-critical-key` +
-          (critNamesForUrl ? `&packages=${encodeURIComponent(critNamesForUrl)}` : '');
+          (critNamesForUrl ? `&packages=${encodeURIComponent(critNamesForUrl)}` : '') +
+          (critNamesForUrl ? `&eco=${encodeURIComponent(ecoForUrl)}` : '');
         if (alreadyHasKey) {
           renderMonitoringActive(
             headline + ' You already have a Commit key — gate this repo so a future CRITICAL flag fails the PR, or watch these packages continuously and get email alerts when scores drop.',

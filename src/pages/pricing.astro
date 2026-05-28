@@ -679,11 +679,47 @@ import Layout from '../layouts/Layout.astro';
     };
     const utmSnapshot = captureUtmSnapshot();
 
+    // ── Audit-context capture (closes audit→pay→watchlist loop) ──
+    // /audit page builds developerCtaUrl with &packages=axios,lodash,react&eco=npm.
+    // Snapshot here so the post-payment /checkout/success page can offer a
+    // one-click "watch these N packages from your audit" button — the
+    // alternative is the user paying for Developer/Pro then manually
+    // re-adding to /watchlist what they just audited 30s ago. We thread
+    // packages + eco through /api/checkout-intent → Stripe metadata →
+    // /api/checkout/session response. Snapshot at page load mirrors UTM
+    // pattern (URL is canonical source, survives modal close/reopen).
+    const captureAuditCtxSnapshot = (): { packages?: string; eco?: string } => {
+      try {
+        const sp = new URLSearchParams(window.location.search);
+        const out: Record<string, string> = {};
+        const rawPkgs = sp.get('packages') ?? '';
+        // Validate: comma-separated package names, each matching shape used in
+        // audit.astro (loose match for npm + pypi + cargo + golang). Cap total
+        // length so a hostile URL can't bloat Stripe metadata (500-char limit
+        // per metadata value).
+        if (rawPkgs && rawPkgs.length > 0 && rawPkgs.length < 480) {
+          const names = rawPkgs.split(',').map((n) => n.trim()).filter(Boolean);
+          const valid = names.filter((n) => /^[@a-zA-Z0-9._/-]+$/.test(n) && n.length <= 214);
+          if (valid.length > 0 && valid.length <= 10) {
+            out.packages = valid.slice(0, 5).join(',');
+          }
+        }
+        const rawEco = (sp.get('eco') ?? '').toLowerCase();
+        if (rawEco && /^(npm|pypi|cargo|golang)$/.test(rawEco)) {
+          out.eco = rawEco;
+        }
+        return out;
+      } catch { return {}; }
+    };
+    const auditCtxSnapshot = captureAuditCtxSnapshot();
+
     // Build query suffix for GET fallback URL. URLSearchParams handles
     // encoding (so utm values with spaces/special chars don't break the URL).
     const utmQuerySuffix = (() => {
       const sp = new URLSearchParams();
       for (const [k, v] of Object.entries(utmSnapshot)) sp.set(k, v);
+      // Forward audit-context to GET fallback too — symmetry with POST.
+      for (const [k, v] of Object.entries(auditCtxSnapshot)) sp.set(k, v);
       const s = sp.toString();
       return s ? `&${s}` : '';
     })();
@@ -847,7 +883,7 @@ import Layout from '../layouts/Layout.astro';
         const resp = await fetch('https://poc-backend.amdal-dev.workers.dev/api/checkout-intent', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ email, tier: pendingTier, ...utmSnapshot }),
+          body: JSON.stringify({ email, tier: pendingTier, ...utmSnapshot, ...auditCtxSnapshot }),
         });
 
         let data: { ok?: boolean; checkout_url?: string; error?: string; message?: string } | null = null;
