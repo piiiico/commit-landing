@@ -73,6 +73,23 @@ import Layout from '../../layouts/Layout.astro';
         </div>
       </div>
 
+      <!-- Audit→watchlist closer (one-click for visitors who came via /audit
+           CRITICAL flow). Hidden by default — JS reveals it only when the
+           Stripe session metadata carries audit_packages. -->
+      <div class="audit-watch reveal" id="audit-watch" style="display:none">
+        <p class="aw-label" id="aw-label">From your audit</p>
+        <h2 class="aw-heading" id="aw-heading">Watch these packages now</h2>
+        <p class="aw-body" id="aw-body">
+          You audited <span id="aw-pkg-list"></span>. Add them to your watchlist for
+          daily re-scans + email alerts when any drops a tier.
+        </p>
+        <div class="aw-actions">
+          <button id="aw-btn" class="aw-btn" type="button">Add to watchlist →</button>
+          <a id="aw-manage" href="/watchlist" class="aw-link" style="display:none">Manage watchlist →</a>
+        </div>
+        <p class="aw-status" id="aw-status" style="display:none"></p>
+      </div>
+
       <!-- Quick start -->
       <div class="quickstart reveal" id="quickstart" style="display:none">
         <h2 class="qs-heading">Quick start</h2>
@@ -158,6 +175,8 @@ import Layout from '../../layouts/Layout.astro';
       tier: string;
       paid: boolean;
       key?: string | null;
+      audit_packages?: string | null;
+      audit_eco?: string | null;
     };
 
     type FetchResult =
@@ -325,6 +344,90 @@ import Layout from '../../layouts/Layout.astro';
             `Your <strong>${tierLabel}</strong> API key was sent to <strong>${data.email}</strong>.` +
             `<br>Check your inbox — it arrives within a minute.`;
           if (copyBtn) copyBtn.style.display = 'none';
+        }
+
+        // ── Audit→watchlist one-click closer ──
+        // Visitor came from /audit CRITICAL flow (developerCtaUrl carried
+        // packages= + eco= through Stripe metadata). Offer one-click watchlist
+        // add — alternative is the user paying for Developer/Pro then
+        // re-finding their audit results to manually add what they audited
+        // 60 seconds ago. Requires data.key (the watchlist POST needs auth);
+        // skipped silently otherwise (visitor will check inbox for key then
+        // add manually via /watchlist).
+        const auditPkgsRaw = data.audit_packages ?? '';
+        const auditEco = data.audit_eco ?? 'npm';
+        if (data.key && auditPkgsRaw && /^[@a-zA-Z0-9._/,-]+$/.test(auditPkgsRaw)) {
+          const auditPkgs = auditPkgsRaw.split(',').map((n) => n.trim()).filter(Boolean).slice(0, 5);
+          if (auditPkgs.length > 0) {
+            const awEl    = document.getElementById('audit-watch')!;
+            const awListEl = document.getElementById('aw-pkg-list')!;
+            const awBtn   = document.getElementById('aw-btn') as HTMLButtonElement;
+            const awStatus = document.getElementById('aw-status') as HTMLParagraphElement;
+            const awManage = document.getElementById('aw-manage') as HTMLAnchorElement;
+            const awHeading = document.getElementById('aw-heading') as HTMLHeadingElement;
+            const awBody = document.getElementById('aw-body') as HTMLParagraphElement;
+
+            // Render package list as inline code chips — same visual as the rest
+            // of the page.
+            awListEl.innerHTML = auditPkgs
+              .map((p) => `<code>${p.replace(/</g, '&lt;')}</code>`)
+              .join(', ');
+            const pkgsLabel = auditPkgs.length === 1 ? 'package' : 'packages';
+            awBtn.textContent = `Watch ${auditPkgs.length} ${pkgsLabel} now →`;
+            awEl.style.display = 'block';
+
+            awBtn.addEventListener('click', async () => {
+              awBtn.disabled = true;
+              awBtn.textContent = 'Adding…';
+              awStatus.style.display = 'none';
+              try {
+                const resp = await fetch(`${API_BASE}/api/watchlist`, {
+                  method: 'POST',
+                  headers: {
+                    'Authorization': `Bearer ${data.key}`,
+                    'Content-Type': 'application/json',
+                  },
+                  body: JSON.stringify({
+                    packages: auditPkgs.map((name) => ({ name, ecosystem: auditEco })),
+                  }),
+                });
+                let body: any = null;
+                try { body = await resp.json(); } catch { body = null; }
+                if (resp.ok && body?.ok) {
+                  const added = body.new_packages ?? body.added ?? auditPkgs.length;
+                  const already = body.already_watching ?? 0;
+                  awHeading.textContent = 'Watchlist active';
+                  awBody.innerHTML = already > 0
+                    ? `Added <strong>${added}</strong>, already watching <strong>${already}</strong>. First daily re-scan within 24 hours — you'll get an email if any drops a tier.`
+                    : `Watching <strong>${added}</strong> ${pkgsLabel} for you. First daily re-scan within 24 hours — you'll get an email if any drops a tier.`;
+                  awBtn.style.display = 'none';
+                  awManage.style.display = '';
+                } else if (resp.status === 422 && body?.error === 'package_limit_exceeded') {
+                  awStatus.textContent = body.message ?? 'Watchlist is at capacity for this tier. Upgrade for more, or manage your existing watchlist.';
+                  awStatus.style.display = 'block';
+                  awBtn.disabled = false;
+                  awBtn.textContent = `Watch ${auditPkgs.length} ${pkgsLabel} now →`;
+                } else if (resp.status === 402) {
+                  // Shouldn't happen — we just paid — but surface honestly.
+                  awStatus.innerHTML = `Couldn't add to watchlist (got ${resp.status}). <a href="/watchlist" style="color:var(--accent)">Add them manually →</a>`;
+                  awStatus.style.display = 'block';
+                  awBtn.disabled = false;
+                  awBtn.textContent = `Try again →`;
+                } else {
+                  const msg = body?.message ?? body?.error ?? `Request failed (${resp.status})`;
+                  awStatus.innerHTML = `${msg}. <a href="/watchlist" style="color:var(--accent)">Add them manually →</a>`;
+                  awStatus.style.display = 'block';
+                  awBtn.disabled = false;
+                  awBtn.textContent = `Try again →`;
+                }
+              } catch (err) {
+                awStatus.innerHTML = `Network error. <a href="/watchlist" style="color:var(--accent)">Add them manually →</a>`;
+                awStatus.style.display = 'block';
+                awBtn.disabled = false;
+                awBtn.textContent = `Try again →`;
+              }
+            });
+          }
         }
 
         // Quick start — substitute the live key when we have it, else leave
@@ -549,6 +652,77 @@ import Layout from '../../layouts/Layout.astro';
     .error-body a {
       color: var(--accent);
       text-decoration: none;
+    }
+
+    /* Audit→watchlist closer */
+    .audit-watch {
+      max-width: 48rem;
+      margin: 0 auto 2rem;
+      padding: 1.75rem 2rem;
+      background: var(--paper);
+      border: 1px solid var(--accent);
+      border-radius: 8px;
+    }
+    .aw-label {
+      font-size: 0.7rem;
+      font-weight: 600;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--accent);
+      margin: 0 0 0.5rem;
+    }
+    .aw-heading {
+      font-family: var(--font-display);
+      font-size: 1.35rem;
+      color: var(--ink);
+      margin: 0 0 0.65rem;
+    }
+    .aw-body {
+      font-size: 0.95rem;
+      color: var(--ink-muted);
+      line-height: 1.6;
+      margin: 0 0 1.25rem;
+    }
+    .aw-body code {
+      font-family: var(--font-mono);
+      font-size: 0.82em;
+      background: var(--surface, #f4f4f4);
+      padding: 0.1rem 0.4rem;
+      border-radius: 3px;
+      color: var(--ink);
+    }
+    .aw-body strong { color: var(--ink); font-weight: 600; }
+    .aw-actions {
+      display: flex;
+      gap: 1rem;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+    .aw-btn {
+      background: var(--accent);
+      color: white;
+      border: none;
+      border-radius: 4px;
+      padding: 0.7rem 1.25rem;
+      font-size: 0.9rem;
+      font-weight: 500;
+      cursor: pointer;
+      font-family: inherit;
+      transition: background 0.15s;
+    }
+    .aw-btn:hover:not(:disabled) { background: var(--accent-dim); }
+    .aw-btn:disabled { opacity: 0.55; cursor: not-allowed; }
+    .aw-link {
+      font-size: 0.9rem;
+      color: var(--accent);
+      text-decoration: none;
+    }
+    .aw-link:hover { text-decoration: underline; }
+    .aw-status {
+      font-size: 0.85rem;
+      color: var(--ink-muted);
+      line-height: 1.6;
+      margin: 1rem 0 0;
     }
 
     /* Quick start */
