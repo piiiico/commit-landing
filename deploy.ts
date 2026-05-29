@@ -129,6 +129,23 @@ const SKIP_IDENTIFIERS = new Set([
 ]);
 
 /**
+ * Normalize hashed asset references so that build-hash rotation doesn't
+ * trip the divergence check. Astro/Vite stamp `/_assets/<name>.<hash>.<ext>`
+ * on every build; the hash is meant to rotate. Preserve <name> and <ext>
+ * so genuine new/missing assets still show up in the diff.
+ *
+ * 5+ false positives in one session (2026-05-28) before this fix —
+ * pattern was documented in working memory under
+ * `commit-landing-deploy-friction`.
+ */
+function normalizeAssetHashes(source: string): string {
+  return source.replace(
+    /(\/_assets\/[a-zA-Z0-9_-]+\.)[a-zA-Z0-9_-]{6,20}(\.[a-zA-Z]+)/g,
+    "$1HASH$2",
+  );
+}
+
+/**
  * Extract meaningful tokens from HTML/JS source for divergence detection.
  * Focuses on string literals ≥6 chars and identifiers ≥8 chars.
  * Shorter thresholds pick up too much HTML noise; tighter keeps signal high.
@@ -199,8 +216,8 @@ async function checkLiveTokens(): Promise<boolean> {
       continue;
     }
 
-    const localTokens = extractMeaningfulTokens(localContent);
-    const liveTokens = extractMeaningfulTokens(liveContent);
+    const localTokens = extractMeaningfulTokens(normalizeAssetHashes(localContent));
+    const liveTokens = extractMeaningfulTokens(normalizeAssetHashes(liveContent));
 
     // Find tokens present in production but absent from local dist/
     const productionOnly: string[] = [];
