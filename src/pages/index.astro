@@ -441,17 +441,19 @@ $ npx proof-of-commitment --fail-on=critical
         <!-- C: IDE Hook (Cursor / Claude Code) -->
         <div class="gs-card reveal">
           <span class="gs-label">IDE hook</span>
-          <h3 class="gs-title">Cursor / Claude Code gate</h3>
-          <p class="gs-desc">Block CRITICAL packages before they install. The hook intercepts <code style="font-size:0.85em;">npm install</code>, <code style="font-size:0.85em;">pip install</code>, and <code style="font-size:0.85em;">cargo add</code> inside Cursor, Claude Code, or any IDE with hook support.</p>
+          <h3 class="gs-title">Cursor + Claude Code gate</h3>
+          <p class="gs-desc">One command, one gate, both agents. <code style="font-size:0.85em;">poc hook</code> installs to Cursor's <code style="font-size:0.85em;">beforeShellExecution</code> and Claude Code's <code style="font-size:0.85em;">PreToolUse</code> together — every <code style="font-size:0.85em;">npm install</code>, <code style="font-size:0.85em;">pip install</code>, <code style="font-size:0.85em;">cargo add</code>, and <code style="font-size:0.85em;">go get</code> is scored before it runs.</p>
           <div class="gs-code">
             <div class="gs-code-path">terminal</div>
             <pre style="margin: 0; line-height: 1.7; padding: 1rem; padding-top: 2rem; overflow-x: auto;"><code>$ npx proof-of-commitment hook
  wrote ~/.commit/cursor-hook.js
  configured .cursor/hooks.json
+ configured .claude/settings.json
 
-# Next install in Cursor triggers the gate.</code></pre>
+# Next install in Cursor or Claude Code triggers the gate.</code></pre>
           </div>
-          <a href="/blog/cursor-hook-supply-chain-gate" class="gs-cta">How the IDE hook works →</a>
+          <a href="/cursor" class="gs-cta">Cursor →</a>
+          <a href="/claude-code" class="gs-cta" style="margin-left: 0.75rem;">Claude Code →</a>
         </div>
 
         <!-- D: API + MCP -->
