@@ -247,6 +247,27 @@ console.log(data.results[0].score); // 0–100 trust score</code></pre>
             'Anonymous CLI is rate-limited. A free key bumps you to 200 audits/day — no card. Enter your email below; your key appears instantly on screen (email is just a backup).<br />' +
             'Then paste it back in your terminal as <code>export COMMIT_API_KEY=…</code> and re-run.',
         },
+        'cursor-hook-429': {
+          eyebrow: 'Cursor hook hit the daily limit',
+          title: 'Free key, full audits',
+          lead:
+            'The hook is doing its job. Today, the shared anonymous quota ran out and Commit started asking you to confirm before unscored packages run. A free key gives you 200 audits per day, bound to you, no card. Enter your email below; the key appears instantly.<br />' +
+            'Save it with <code>npx proof-of-commitment login</code>. The hook re-arms on the next install.',
+        },
+        'claude-code-hook-429': {
+          eyebrow: 'Claude Code hook hit the daily limit',
+          title: 'Free key, full audits',
+          lead:
+            'The hook is doing its job. Today, the shared anonymous quota ran out and Commit started asking you to confirm before unscored packages run. A free key gives you 200 audits per day, bound to you, no card. Enter your email below; the key appears instantly.<br />' +
+            'Save it with <code>npx proof-of-commitment login</code>. The hook re-arms on the next install.',
+        },
+        'poc-hook': {
+          eyebrow: 'Hook installed',
+          title: 'Bind it to you with a free key',
+          lead:
+            'The hook will audit every install going forward. Anonymous mode gives you 15 audits per day, shared across this network IP. A free key gives you 200 per day, bound to your account, no card. Enter your email below; the key appears instantly.<br />' +
+            'Save it with <code>npx proof-of-commitment login</code>. The hook reads it automatically on the next install.',
+        },
       };
       const variant = HERO_BY_REF[ref];
       if (!variant) return;
@@ -293,6 +314,9 @@ console.log(data.results[0].score); // 0–100 trust score</code></pre>
           'audit-web-critical': 'audit-web-critical',  // post-result CTA on /audit when ≥1 CRITICAL — 2026-05-23
           'audit-web-healthy': 'audit-web-healthy',    // post-result CTA on /audit when 0 CRITICAL + ≥1 HIGH — 2026-05-23
           'pkg-profile': 'pkg-profile',                // package profile pages (/npm/:pkg etc) Monitor CTA — 2026-05-23
+          'cursor-hook-429': 'cursor-hook-429',        // Cursor IDE hook 429 deny/ask (npm-package v1.21.0+) — 2026-05-29
+          'claude-code-hook-429': 'claude-code-hook-429', // Claude Code PreToolUse hook 429 (npm-package v1.22.0) — 2026-05-29
+          'poc-hook': 'poc-hook',                      // Fresh `poc hook` install with no API key configured (npm-package v1.21.0+) — 2026-05-29
         };
         const params = new URLSearchParams(window.location.search);
         const refParam = params.get('ref') ?? '';
@@ -338,7 +362,18 @@ console.log(data.results[0].score); // 0–100 trust score</code></pre>
               // friction (they have to translate it back to CLI usage). Web/API users
               // get the standard REST instruction.
               const CLI_SOURCES = new Set(['audit-cli-429', 'audit-baseline', 'cli']);
-              if (source && CLI_SOURCES.has(source)) {
+              const HOOK_SOURCES = new Set(['cursor-hook-429', 'claude-code-hook-429', 'poc-hook']);
+              if (source && HOOK_SOURCES.has(source)) {
+                // Hook users have the proof-of-commitment package already (it wrote the hook script).
+                // `poc login <key>` writes to ~/.commit/config which all hook paths read via readApiKey().
+                // That's persistent across terminals, unlike export COMMIT_API_KEY which only binds the
+                // current shell — wrong scope for an IDE hook fired by any future terminal session.
+                noteEl.innerHTML =
+                  'Run this once. The hook reads <code style="background:var(--bg-muted,#f5f5f5);padding:0.1rem 0.3rem;border-radius:3px;">~/.commit/config</code> on every install:<br>' +
+                  '<code style="display:inline-block;margin-top:0.4rem;padding:0.3rem 0.5rem;background:var(--bg-muted,#f5f5f5);border-radius:4px;font-size:0.85rem;">' +
+                  'npx proof-of-commitment login ' + data.key +
+                  '</code>';
+              } else if (source && CLI_SOURCES.has(source)) {
                 noteEl.innerHTML =
                   'Run this in the same terminal to re-try with your key:<br>' +
                   '<code style="display:inline-block;margin-top:0.4rem;padding:0.3rem 0.5rem;background:var(--bg-muted,#f5f5f5);border-radius:4px;font-size:0.85rem;">' +
