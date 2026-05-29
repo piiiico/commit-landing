@@ -223,11 +223,62 @@ jobs:
 
   <hr class="section-divider" />
 
-  <!-- Step 4: MCP Integration -->
-  <section class="qs-section qs-section-alt">
+  <!-- Step 4: IDE Hook (Cursor / Claude Code) -->
+  <section class="qs-section">
     <div class="container">
       <div class="editorial" style="max-width: var(--max-content); margin: 0 auto;">
         <span class="qs-section-number">04</span>
+        <h2 class="qs-section-title">Block bad installs in Cursor / Claude Code</h2>
+        <p class="qs-intro">
+          The IDE hook intercepts <code>npm install</code>, <code>pip install</code>, and <code>cargo add</code> commands
+          before they run — inside Cursor, Claude Code, or any IDE that supports tool hooks.
+          CRITICAL packages get blocked. HIGH triggers a confirmation prompt. Clean installs pass through silently.
+        </p>
+
+        <div class="snippet-group">
+          <div class="snippet-tab-row">
+            <button class="snippet-tab active" data-group="hook" data-lang="bash">terminal</button>
+          </div>
+          <div class="snippet-block" data-group="hook" data-lang="bash">
+            <pre><code>$ npx proof-of-commitment hook
+ wrote ~/.commit/cursor-hook.js
+ configured .cursor/hooks.json
+
+<span class="c-comment"># That's it. Next install attempt in Cursor will hit the gate.</span>
+<span class="c-comment"># Inside Cursor chat:</span>
+> Install lodash
+<span class="c-comment"># &#x2192; Hook intercepts &#x2192; lodash scores 81 / CRITICAL &#x2192; install blocked.</span>
+<span class="c-comment"># &#x2192; Cursor shows: "lodash blocked: single maintainer, 148M/wk downloads."</span></code></pre>
+          </div>
+        </div>
+
+        <div class="ci-outputs">
+          <h3 class="signals-heading">How the gate decides</h3>
+          <ul class="output-list">
+            <li><strong>CRITICAL</strong> &rarr; install blocked, reason shown to the model</li>
+            <li><strong>HIGH</strong> &rarr; user prompted to confirm before install proceeds</li>
+            <li><strong>OK / WARN</strong> &rarr; install proceeds silently, no friction</li>
+            <li><strong>Unscored package</strong> &rarr; flagged, optional confirm (catches typosquats)</li>
+            <li><strong>Rate-limited</strong> &rarr; CTA to claim a free API key — no silent allow</li>
+          </ul>
+        </div>
+
+        <p class="qs-note">
+          Works with any IDE supporting the Cursor IDE Hooks spec (v1.7+) — Cursor, Claude Code, Windsurf via compat layer.
+          The hook calls the same scoring API as the CLI, so rate limits and API keys are shared.
+          <a href="/blog/cursor-hook-supply-chain-gate">Full walkthrough &rarr;</a>
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <hr class="section-divider" />
+
+  <!-- Step 5: MCP Integration -->
+  <section class="qs-section qs-section-alt">
+    <div class="container">
+      <div class="editorial" style="max-width: var(--max-content); margin: 0 auto;">
+        <span class="qs-section-number">05</span>
         <h2 class="qs-section-title">Use with Claude, Cursor, or Windsurf</h2>
         <p class="qs-intro">
           The MCP server lets your AI assistant audit dependencies on demand — no install,

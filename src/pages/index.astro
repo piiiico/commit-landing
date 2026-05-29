@@ -1,0 +1,1177 @@
+---
+import Layout from '../layouts/Layout.astro';
+---
+
+<Layout
+  title="Commit — Supply chain trust scoring for npm, PyPI, Cargo, and Go"
+  description="Score your dependencies on behavioral signals — publisher depth, release patterns, maintenance consistency. Both axios and node-ipc scored CRITICAL before they got attacked. Free CLI, CI gate, API, MCP server, and Cursor IDE hook."
+>
+  <!-- Supply-chain blog visitor banner (hidden by default, shown via JS) -->
+  <div id="sc-banner" style="display:none; background: var(--ink); color: var(--paper); padding: 0.75rem 1rem; text-align: center; font-size: 0.875rem; position: relative;">
+    <span style="margin-right: 0.5rem;">Came from the supply chain article?</span>
+    <code style="background: rgba(255,255,255,0.12); padding: 0.1em 0.5em; border-radius: 3px; font-size: 0.82em; margin-right: 0.75rem;">npx proof-of-commitment --file package.json</code>
+    <a href="/quickstart" style="color: #fff; font-weight: 600; text-decoration: underline; margin-right: 0.5rem;">Quickstart →</a>
+    <a href="/audit" style="color: #fff; font-weight: 600; text-decoration: underline;">Audit online →</a>
+    <button id="sc-banner-close" aria-label="Dismiss" style="position:absolute; right:1rem; top:50%; transform:translateY(-50%); background:none; border:none; color:#fff; font-size:1.1rem; cursor:pointer; padding:0.2rem 0.4rem; line-height:1; opacity:0.7;">×</button>
+  </div>
+
+  <script>
+    (function() {
+      if (sessionStorage.getItem('sc-banner-closed')) return;
+      var ref = document.referrer || '';
+      var search = window.location.search || '';
+      var showBanner = ref.includes('/blog/') ||
+                       ref.includes('getcommit.dev/blog') ||
+                       search.includes('utm_source=blog') ||
+                       search.includes('utm_content=two-attacks') ||
+                       search.includes('utm_campaign=blog');
+      if (showBanner) {
+        var banner = document.getElementById('sc-banner');
+        if (banner) banner.style.display = 'block';
+        var close = document.getElementById('sc-banner-close');
+        if (close) close.addEventListener('click', function() {
+          sessionStorage.setItem('sc-banner-closed', '1');
+          banner.style.display = 'none';
+        });
+      }
+    })();
+  </script>
+
+  <!-- Nav -->
+  <nav>
+    <div class="container nav-inner">
+      <a href="/" class="nav-brand">Commit</a>
+      <ul class="nav-links">
+        <li><a href="/quickstart" style="font-weight:600;color:var(--accent)">Quickstart</a></li>
+        <li><a href="/#mcp">MCP</a></li>
+        <li><a href="/audit">Audit</a></li>
+        <li><a href="/rankings">Rankings</a></li>
+        <li><a href="/watchlist">Watchlist</a></li>
+        <li><a href="/extension">Extension</a></li>
+        <li><a href="/blog">Writing</a></li>
+        <li><a href="/pricing">Pricing</a></li><li><a href="/docs">Docs</a></li><li><a href="https://github.com/hawkaa/commit" target="_blank" rel="noopener">GitHub</a></li>
+        <li><a href="mailto:pico@amdal.dev">Contact</a></li>
+      </ul>
+    </div>
+  </nav>
+
+  <!-- Hero -->
+  <section class="hero">
+    <div class="container">
+      <div class="editorial">
+        <span class="hero-eyebrow animate-in delay-1">Supply chain trust scoring</span>
+
+        <h1 class="hero-title animate-in delay-2">
+          Both axios and node-ipc scored CRITICAL<br />
+          <em>before they got attacked.</em>
+        </h1>
+
+        <p class="hero-sub animate-in delay-2" style="font-size:1.15rem;font-weight:500;color:var(--ink-muted);margin-bottom:1.25rem;">
+          26 npm packages with 10M+ weekly downloads have a single publisher. <code style="font-size:0.9em;">npm audit</code> doesn't flag this. Commit does.
+        </p>
+
+        <p class="hero-lead animate-in delay-3">
+          Behavioral signals — publisher depth, release consistency, maintenance patterns — surface the risk that stars, READMEs, and vulnerability databases miss.
+          <strong>Scores npm, PyPI, Cargo, and Go packages. Free CLI, CI gate, API, MCP server, and Cursor IDE hook.</strong>
+        </p>
+
+        <div class="hero-cta animate-in delay-4">
+          <a href="/audit" class="btn-primary">Audit your dependencies →</a>
+          <a href="/get-started" class="btn-ghost">Get free API key →</a>
+          <a href="/pricing?utm_experiment=pricing-friction-v1&utm_source=homepage&utm_medium=hero-cta" class="btn-ghost">Pricing →</a>
+        </div>
+
+        <div class="animate-in delay-4" style="margin-top: 1.25rem;">
+          <div style="background: var(--paper-dim); border: 1px solid var(--border); border-radius: 8px; padding: 0.85rem 1.25rem; display: inline-block; font-family: var(--font-mono, 'JetBrains Mono', monospace); font-size: 0.85rem; color: var(--ink);">
+            <span style="color: var(--ink-subtle); user-select: none;">$</span> npx proof-of-commitment --file package.json
+          </div>
+          <span style="margin-left: 0.75rem; font-size: 0.8rem; color: var(--ink-subtle);">Zero install. Auto-detects lockfiles.</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <hr class="section-divider" />
+
+  <!-- Live proof: real packages, real scores -->
+  <section style="padding: var(--space-section) 0;">
+    <div class="container">
+      <p class="section-label">Live data</p>
+      <div class="editorial reveal" style="max-width: var(--max-content);">
+        <h2 style="margin-bottom: 0.5rem;">Packages you depend on, scored right now.</h2>
+        <p style="margin-bottom: 1.5rem; font-size: 1rem; color: var(--ink-muted);">
+          These are real scores from the live API. Single-publisher packages with massive download counts
+          are flagged CRITICAL — the exact profile exploited in the axios, LiteLLM, and node-ipc attacks.
+        </p>
+
+        <div style="background: var(--paper-dim); border: 1px solid var(--border); border-radius: 8px; padding: 1.5rem; font-family: var(--font-mono, 'JetBrains Mono', monospace); font-size: 0.8rem; color: var(--ink); line-height: 1.8; overflow-x: auto; margin-bottom: 1.5rem;">
+          <div style="font-size: 0.7rem; color: var(--ink-subtle); margin-bottom: 0.75rem; font-family: var(--font-body);">npx proof-of-commitment axios zod chalk express</div>
+          <pre style="margin: 0;">┌──────────┬───────┬─────────────┬────────────┬────────────┐
+│ Package  │ Score │ Risk        │ Publishers │ Downloads  │
+├──────────┼───────┼─────────────┼────────────┼────────────┤
+│ axios    │   86  │ 🔴 CRITICAL │ 1          │ 99M/wk     │
+│ zod      │   83  │ 🔴 CRITICAL │ 1          │ 163M/wk    │
+│ chalk    │   75  │ 🔴 CRITICAL │ 1          │ 413M/wk    │
+│ express  │   90  │ ✅ OK       │ 5          │ 95M/wk     │
+└──────────┴───────┴─────────────┴────────────┴────────────┘
+ 3 CRITICAL · 0 HIGH · 0 WARNING</pre>
+        </div>
+
+        <div style="display: flex; gap: 1rem; flex-wrap: wrap; align-items: center;">
+          <a href="/audit" class="btn-primary" style="display: inline-block;">Try with your packages →</a>
+          <a href="/blog/two-attacks-one-week" style="font-size: 0.85rem; color: var(--accent); text-decoration: none;">Read: Two attacks, one week — the data was already there →</a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <hr class="section-divider" />
+
+  <!-- GitHub Repo Trust Card Demo -->
+  <section id="try" style="padding: var(--space-section) 0;">
+    <div class="container">
+      <p class="section-label">Live demo</p>
+      <div class="editorial reveal" style="max-width: var(--max-content);">
+        <h2 style="margin-bottom: 0.5rem;">Type any GitHub repo. See its trust card instantly.</h2>
+        <p style="margin-bottom: 0.75rem; font-size: 1rem;">
+          No install. No account. Longevity, maintenance activity, contributor depth — scored from behavioral signals.
+        </p>
+        <p style="margin-bottom: 2rem; font-size: 0.9rem; color: var(--ink-muted);">
+          The same data the extension injects into GitHub. Available as JSON for any script or agent.
+        </p>
+
+        <!-- Example repo pills -->
+        <div style="display: flex; flex-wrap: wrap; gap: 0.5rem; margin-bottom: 1.25rem;">
+          <button class="repo-pill" data-repo="facebook/react">facebook/react</button>
+          <button class="repo-pill" data-repo="vercel/next.js">vercel/next.js</button>
+          <button class="repo-pill" data-repo="vuejs/vue">vuejs/vue</button>
+          <button class="repo-pill" data-repo="pallets/flask">pallets/flask</button>
+          <button class="repo-pill" data-repo="hawkaa/commit">hawkaa/commit</button>
+        </div>
+
+        <!-- Search input -->
+        <div style="display: flex; gap: 0.75rem; margin-bottom: 2rem; flex-wrap: wrap;">
+          <input
+            id="repo-input"
+            type="text"
+            placeholder="e.g. facebook/react"
+            autocomplete="off"
+            autocorrect="off"
+            autocapitalize="off"
+            spellcheck="false"
+            style="flex: 1; min-width: 200px; padding: 0.65rem 1rem; border: 1px solid var(--border); border-radius: 6px; background: var(--paper-dim); font-family: var(--font-mono, 'JetBrains Mono', monospace); font-size: 0.95rem; color: var(--ink); outline: none;"
+          />
+          <button
+            id="repo-search-btn"
+            style="padding: 0.65rem 1.25rem; background: var(--ink); color: var(--paper); border: none; border-radius: 6px; font-family: var(--font-body); font-size: 0.875rem; font-weight: 500; cursor: pointer; white-space: nowrap;"
+          >
+            Check trust →
+          </button>
+        </div>
+
+        <!-- Result card -->
+        <div id="repo-result" style="display: none;"></div>
+        <div id="repo-loading" style="display: none; color: var(--ink-muted); font-size: 0.875rem; padding: 1rem 0;">
+          Fetching trust card…
+        </div>
+        <div id="repo-error" style="display: none; color: var(--accent); font-size: 0.875rem; padding: 1rem 0;"></div>
+      </div>
+    </div>
+  </section>
+
+  <style>
+    .repo-pill {
+      padding: 0.35rem 0.85rem;
+      border: 1px solid var(--border);
+      border-radius: 999px;
+      background: transparent;
+      font-family: var(--font-mono, 'JetBrains Mono', monospace);
+      font-size: 0.78rem;
+      color: var(--ink-muted);
+      cursor: pointer;
+      transition: border-color 0.15s, color 0.15s, background 0.15s;
+    }
+    .repo-pill:hover, .repo-pill.active {
+      border-color: var(--ink);
+      color: var(--ink);
+      background: var(--paper-dim);
+    }
+    .repo-result-card {
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 1.5rem;
+      background: var(--paper-dim);
+    }
+    .repo-score-bar {
+      height: 6px;
+      border-radius: 3px;
+      background: var(--border);
+      overflow: hidden;
+      margin-top: 0.35rem;
+    }
+    .repo-score-fill {
+      height: 100%;
+      border-radius: 3px;
+      transition: width 0.6s ease;
+    }
+    .repo-score-fill.high { background: #3c7d3c; }
+    .repo-score-fill.mid  { background: #8a6d00; }
+    .repo-score-fill.low  { background: var(--accent); }
+    .repo-stat-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+      gap: 1rem;
+      margin: 1rem 0;
+      padding: 1rem 0;
+      border-top: 1px solid var(--border-light, rgba(0,0,0,0.06));
+      border-bottom: 1px solid var(--border-light, rgba(0,0,0,0.06));
+    }
+    .repo-stat-label {
+      font-size: 0.68rem;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      color: var(--ink-subtle, #9e9e9e);
+      margin-bottom: 0.2rem;
+    }
+    .repo-stat-value {
+      font-size: 1rem;
+      font-weight: 500;
+      color: var(--ink);
+    }
+    .repo-signal-list {
+      margin-top: 1rem;
+      display: grid;
+      gap: 0.4rem;
+    }
+    .repo-signal-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 0.82rem;
+      color: var(--ink-muted);
+    }
+    .repo-cta-block {
+      margin-top: 1.25rem;
+      padding-top: 1.25rem;
+      border-top: 1px solid var(--border-light, rgba(0,0,0,0.06));
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      flex-wrap: wrap;
+    }
+  </style>
+
+  <script lang="ts">
+    const COMMIT_API = 'https://poc-backend.amdal-dev.workers.dev';
+
+    function repoScoreClass(n: number): string {
+      if (n >= 70) return 'high';
+      if (n >= 45) return 'mid';
+      return 'low';
+    }
+
+    function renderRepoResult(data: any, repoId: string) {
+      // API returns: { score: number, signals: {ageYears, contributors, daysSinceLastPush, ...}, endorsements: number }
+      const score = typeof data.score === 'number' ? data.score : (data.score?.score ?? 0);
+      const scoreCls = repoScoreClass(score);
+      const endorsements = data.endorsements ?? data.endorsement_count ?? 0;
+
+      // Build signal rows from object-shaped signals
+      const sigs = data.signals ?? {};
+      const signalDefs = [
+        { label: 'Age', value: sigs.ageYears != null ? `${Number(sigs.ageYears).toFixed(1)} yrs` : '—' },
+        { label: 'Contributors', value: sigs.contributors != null ? String(sigs.contributors) : '—' },
+        { label: 'Last push', value: sigs.daysSinceLastPush != null ? `${sigs.daysSinceLastPush}d ago` : '—' },
+      ];
+
+      const signalRows = signalDefs.map(s => `
+          <div class="repo-signal-row">
+            <span style="color: var(--ink-subtle); font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.05em;">${s.label}</span>
+            <span style="font-weight: 500; color: var(--ink);">${s.value}</span>
+          </div>`).join('');
+
+      const apiUrl = `${COMMIT_API}/api/github/${repoId}`;
+
+      return `
+        <div class="repo-result-card">
+          <div style="display: flex; align-items: flex-start; justify-content: space-between; gap: 1rem; flex-wrap: wrap; margin-bottom: 0.75rem;">
+            <div>
+              <div style="font-family: var(--font-mono, 'JetBrains Mono', monospace); font-size: 1.1rem; color: var(--ink); line-height: 1.2; margin-bottom: 0.3rem;">${repoId}</div>
+              <div style="font-size: 0.82rem; color: var(--ink-subtle);">${endorsements} endorsement${endorsements !== 1 ? 's' : ''}</div>
+            </div>
+            <div style="text-align: right; flex-shrink: 0;">
+              <div style="font-size: 2.75rem; font-weight: 600; color: var(--ink); line-height: 1;">${score}</div>
+              <div style="font-size: 0.68rem; text-transform: uppercase; letter-spacing: 0.06em; color: var(--ink-subtle, #9e9e9e); margin-top: 0.15rem;">Commit Score / 100</div>
+              <div class="repo-score-bar" style="width: 80px; margin: 0.4rem 0 0 auto;">
+                <div class="repo-score-fill ${scoreCls}" style="width: ${score}%"></div>
+              </div>
+            </div>
+          </div>
+
+          <div class="repo-signal-list">
+            ${signalRows}
+          </div>
+
+          <div class="repo-cta-block">
+            <a href="/extension" style="padding: 0.5rem 1rem; background: var(--ink); color: var(--paper); border-radius: 6px; font-family: var(--font-body); font-size: 0.8rem; font-weight: 500; text-decoration: none; white-space: nowrap;">
+              Install extension →
+            </a>
+            <a href="${apiUrl}" target="_blank" rel="noopener" style="font-size: 0.8rem; color: var(--accent); text-decoration: none; white-space: nowrap;">
+              Raw JSON →
+            </a>
+          </div>
+        </div>`;
+    }
+
+    async function repoLookup(repoId: string) {
+      const input = document.getElementById('repo-input') as HTMLInputElement;
+      const result = document.getElementById('repo-result')!;
+      const loading = document.getElementById('repo-loading')!;
+      const error = document.getElementById('repo-error')!;
+
+      // Normalize "github.com/owner/repo" or full URLs to "owner/repo"
+      const normalized = repoId.replace(/^https?:\/\/github\.com\//, '').replace(/\/$/, '');
+      input.value = normalized;
+      result.style.display = 'none';
+      error.style.display = 'none';
+      loading.style.display = 'block';
+
+      document.querySelectorAll('.repo-pill').forEach(p => {
+        p.classList.toggle('active', (p as HTMLElement).dataset.repo === normalized);
+      });
+
+      const [owner, repo] = normalized.split('/');
+      if (!owner || !repo) {
+        loading.style.display = 'none';
+        error.textContent = 'Enter a repo as owner/repo (e.g. facebook/react)';
+        error.style.display = 'block';
+        return;
+      }
+
+      try {
+        const res = await fetch(`${COMMIT_API}/api/github/${owner}/${repo}`);
+        loading.style.display = 'none';
+
+        if (!res.ok) {
+          error.textContent = `Repo "${normalized}" not found or not yet indexed.`;
+          error.style.display = 'block';
+          return;
+        }
+
+        const data = await res.json() as any;
+        result.innerHTML = renderRepoResult(data, normalized);
+        result.style.display = 'block';
+      } catch (e) {
+        loading.style.display = 'none';
+        error.textContent = 'Lookup failed — the trust API may be temporarily unavailable.';
+        error.style.display = 'block';
+      }
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+      document.querySelectorAll('.repo-pill').forEach(pill => {
+        pill.addEventListener('click', () => {
+          repoLookup((pill as HTMLElement).dataset.repo!);
+        });
+      });
+
+      document.getElementById('repo-search-btn')!.addEventListener('click', () => {
+        const q = (document.getElementById('repo-input') as HTMLInputElement).value.trim();
+        if (q) repoLookup(q);
+      });
+
+      document.getElementById('repo-input')!.addEventListener('keydown', (e: KeyboardEvent) => {
+        if (e.key === 'Enter') {
+          const q = (e.target as HTMLInputElement).value.trim();
+          if (q) repoLookup(q);
+        }
+      });
+
+      // Auto-load facebook/react as default
+      repoLookup('facebook/react');
+    });
+  </script>
+
+  <hr class="section-divider" />
+
+  <!-- Get Started -->
+  <section id="get-started" style="padding: var(--space-section) 0;">
+    <div class="container">
+      <p class="section-label">Get started</p>
+      <div class="editorial reveal" style="max-width: var(--max-content);">
+        <h2 style="margin-bottom: 0.5rem;">Four ways in. No account required.</h2>
+        <p style="margin-bottom: 3rem; font-size: 1rem; color: var(--ink-muted);">
+          CLI for your terminal, GitHub Action for your CI, IDE hook for Cursor / Claude Code, API for everything else.
+        </p>
+      </div>
+
+      <div class="gs-grid">
+
+        <!-- A: CLI -->
+        <div class="gs-card reveal">
+          <span class="gs-label">Terminal</span>
+          <h3 class="gs-title">CLI — zero install</h3>
+          <p class="gs-desc">Run once in any project directory. Auto-detects package.json, lockfiles, requirements.txt, Cargo.toml, go.mod.</p>
+          <div class="gs-code">
+            <div class="gs-code-path">terminal</div>
+            <pre style="margin: 0; line-height: 1.7; padding: 1rem; padding-top: 2rem; overflow-x: auto;"><code>$ npx proof-of-commitment
+Auto-detected: package-lock.json (247 deps)
+ 3 CRITICAL · 2 HIGH · 12 WARNING
+$ npx proof-of-commitment --fail-on=critical
+ exit 1  # blocks your CI pipeline</code></pre>
+          </div>
+          <a href="/quickstart" class="gs-cta">Quickstart guide →</a>
+        </div>
+
+        <!-- B: GitHub Action -->
+        <div class="gs-card reveal">
+          <span class="gs-label">CI/CD</span>
+          <h3 class="gs-title">GitHub Action</h3>
+          <p class="gs-desc">Block PRs that introduce CRITICAL dependencies. Posts audit table as a PR comment. One YAML file.</p>
+          <div class="gs-code">
+            <div class="gs-code-path">.github/workflows/supply-chain.yml</div>
+            <pre style="margin: 0; line-height: 1.7; padding: 1rem; padding-top: 2rem; overflow-x: auto;"><code>- uses: piiiico/commit-action@v1
+  with:
+    fail-on-critical: true
+    comment-on-pr: true</code></pre>
+          </div>
+          <a href="https://github.com/piiiico/commit-action" class="gs-cta" target="_blank" rel="noopener">commit-action on GitHub →</a>
+        </div>
+
+        <!-- C: IDE Hook (Cursor / Claude Code) -->
+        <div class="gs-card reveal">
+          <span class="gs-label">IDE hook</span>
+          <h3 class="gs-title">Cursor / Claude Code gate</h3>
+          <p class="gs-desc">Block CRITICAL packages before they install. The hook intercepts <code style="font-size:0.85em;">npm install</code>, <code style="font-size:0.85em;">pip install</code>, and <code style="font-size:0.85em;">cargo add</code> inside Cursor, Claude Code, or any IDE with hook support.</p>
+          <div class="gs-code">
+            <div class="gs-code-path">terminal</div>
+            <pre style="margin: 0; line-height: 1.7; padding: 1rem; padding-top: 2rem; overflow-x: auto;"><code>$ npx proof-of-commitment hook
+ wrote ~/.commit/cursor-hook.js
+ configured .cursor/hooks.json
+
+# Next install in Cursor triggers the gate.</code></pre>
+          </div>
+          <a href="/blog/cursor-hook-supply-chain-gate" class="gs-cta">How the IDE hook works →</a>
+        </div>
+
+        <!-- D: API + MCP -->
+        <div class="gs-card reveal">
+          <span class="gs-label">API / MCP</span>
+          <h3 class="gs-title">REST API + MCP server</h3>
+          <p class="gs-desc">Batch audit up to 20 packages in one call. Add the MCP server to Claude Desktop or Cursor — ask it to audit your project.</p>
+          <div class="gs-code">
+            <div class="gs-code-path">curl</div>
+            <pre style="margin: 0; line-height: 1.7; padding: 1rem; padding-top: 2rem; overflow-x: auto;" set:html={`curl -X POST getcommit.dev/api/audit \\
+  -d '&#123;"packages":["axios","zod"]&#125;'
+
+# &#8594; &#123;"results":[&#123;"name":"axios",
+#    "score":86,"riskFlags":["CRITICAL"]&#125;,...]&#125;`}></pre>
+          </div>
+          <a href="/get-started" class="gs-cta">Get free API key →</a>
+        </div>
+
+      </div>
+
+    </div>
+  </section>
+
+  <style>
+    .gs-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 1.5rem;
+      max-width: var(--max-page);
+    }
+    .gs-card {
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 1.75rem;
+      background: var(--paper-dim);
+      display: flex;
+      flex-direction: column;
+      gap: 0.75rem;
+    }
+    .gs-label {
+      font-size: 0.72rem;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--ink-subtle);
+      font-family: var(--font-body, 'Inter', sans-serif);
+    }
+    .gs-title {
+      font-family: var(--font-body, 'Inter', sans-serif);
+      font-size: 1rem;
+      font-weight: 600;
+      color: var(--ink);
+      margin: 0;
+      line-height: 1.3;
+    }
+    .gs-desc {
+      font-size: 0.875rem;
+      color: var(--ink-muted);
+      margin: 0;
+      line-height: 1.55;
+    }
+    .gs-code {
+      position: relative;
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      overflow: hidden;
+      background: var(--paper);
+      flex: 1;
+      font-family: var(--font-mono, 'JetBrains Mono', monospace);
+      font-size: 0.78rem;
+      color: var(--ink);
+    }
+    .gs-code-path {
+      position: absolute;
+      top: 0.5rem;
+      right: 0.75rem;
+      font-size: 0.65rem;
+      color: var(--ink-subtle);
+      font-family: var(--font-body, 'Inter', sans-serif);
+      letter-spacing: 0.03em;
+    }
+    .gs-cta {
+      font-size: 0.875rem;
+      color: var(--accent);
+      text-decoration: none;
+      font-weight: 500;
+      margin-top: 0.25rem;
+    }
+    .gs-cta:hover {
+      text-decoration: underline;
+    }
+  </style>
+
+  <hr class="section-divider" />
+
+  <!-- Problem -->
+  <section class="problem-section">
+    <div class="container">
+      <p class="section-label">The problem</p>
+      <div class="problem-inner">
+        <div>
+          <div class="problem-number">01</div>
+        </div>
+        <div class="editorial reveal">
+          <h2>Content is free. Commitment is not.</h2>
+          <div class="thesis-text" style="margin-top: 1.5rem;">
+            <p>
+              PageRank solved 1996 with hyperlinks — costly acts that were hard to fake at scale. In 2026, links are easy. AI generates content, reviews, and citations at zero marginal cost. The information layer has collapsed into self-referential noise.
+            </p>
+            <p>
+              But there is a category of signal that remains structurally hard to fake: <strong>commitment</strong>. A repeat purchase. A decade of profitable operation. A customer who returns after a price increase. These acts require real cost — time, money, skin in the game. No AI can manufacture them at scale without bearing that cost.
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <hr class="section-divider" />
+
+  <!-- Thesis -->
+  <section id="thesis">
+    <div class="container">
+      <p class="section-label">The thesis</p>
+      <div class="editorial reveal">
+        <div class="thesis-text">
+          <p>
+            PageRank worked because hyperlinks were <em>costly acts</em> — a website owner putting their reputation behind another page was a meaningful signal. That signal was hard to fake in 1998. In 2026, it is easy.
+          </p>
+          <p>
+            But there is a category of human action that remains structurally hard to fake: <strong>commitment</strong>. A person who visits the same restaurant twelve times in thirty days. A company with twelve years of profitable operation. A customer who has purchased from the same supplier across three different economic cycles.
+          </p>
+          <p>
+            These are behavioral signals rooted in real cost — time, money, attention, reputation on the line. No language model can manufacture them at scale without bearing the actual cost.
+          </p>
+
+          <blockquote>
+            &ldquo;When content becomes free, commitment becomes scarce. The commitment layer is what remains hard to fake.&rdquo;
+          </blockquote>
+
+          <p>
+            Commit captures, aggregates, and surfaces these signals — so AI recommendations, search results, and trust scores are grounded in reality, not manufactured consensus.
+          </p>
+          <p>
+            Think of it as the trust layer that should have been built alongside the information layer — but wasn't, because we didn't need it until now.
+          </p>
+
+          <h3 style="margin-top: 3rem; margin-bottom: 1rem;">Why now</h3>
+          <p>
+            Three curves converged in early 2026. AI search is wrong about local businesses
+            <a href="/blog/ai-lies-about-your-favorite-restaurant">a third of the time</a> —
+            the trust problem is acute. Zero-knowledge proofs hit production
+            (<a href="https://www.reclaimprotocol.org/" target="_blank" rel="noopener">zkTLS: 3M verifications, zero fraud</a>). And proof of personhood
+            reached scale (<a href="https://world.org/blog/announcements/world-id-full-stack-proof-of-human" target="_blank" rel="noopener">World ID: 18M verified humans</a>; eIDAS 2.0 mandates wallets
+            for 450M Europeans by year-end).
+          </p>
+          <p>
+            Each component existed in isolation. The integration — behavioral proofs from
+            verified humans, consumed by AI systems — is what nobody has built.
+          </p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <hr class="section-divider" />
+
+  <!-- Three pillars — editorial list, NOT card grid -->
+  <section>
+    <div class="container">
+      <p class="section-label">What we're building</p>
+      <div class="proof-grid">
+
+        <div class="proof-item reveal">
+          <div class="proof-number">I — Trust API</div>
+          <div>
+            <div class="proof-title">Behavioral ground truth for AI systems.</div>
+            <p class="proof-body">
+              AI agents and recommendation systems query a simple API: how many real humans committed to this, and how deeply? Instead of scraped reviews and gamed ratings, they get behavioral signals rooted in real cost — time, money, sustained engagement.
+            </p>
+          </div>
+        </div>
+
+        <div class="proof-item reveal">
+          <div class="proof-number">II — Browser Extension</div>
+          <div>
+            <div class="proof-title">Ad blocker for AI hallucinations.</div>
+            <p class="proof-body">
+              When ChatGPT, Perplexity, or Claude recommends a business, the extension surfaces what's real: years of operation, financial health, food safety scores — verified from public records and behavioral data. Catches bankrupt restaurants still being recommended. Useful from install one.
+            </p>
+          </div>
+        </div>
+
+        <div class="proof-item reveal">
+          <div class="proof-number">III — Commitment Protocol</div>
+          <div>
+            <div class="proof-title">The index layer for reality.</div>
+            <p class="proof-body">
+              A privacy-preserving protocol for contributing behavioral commitments anonymously. Zero-knowledge proofs let anyone prove they committed — without revealing who they are. The foundation for trust infrastructure that can't be gamed.
+            </p>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <hr class="section-divider" />
+
+  <!-- Asymmetric pull quote -->
+  <section class="pullquote-section">
+    <div class="container">
+      <div class="pullquote-layout">
+        <div class="pullquote-main reveal">
+          "Skin in the game is the only unfakeable signal."
+        </div>
+        <div class="pullquote-aside reveal">
+          <p>
+            Reputation can be manufactured. Reviews can be bought. But repeat purchases, staked capital, and sustained behavioral patterns require real cost.
+          </p>
+          <p style="margin-top: 1em;">
+            Any system that substitutes opinion for commitment will be gamed. We're building the alternative.
+          </p>
+          <p style="margin-top: 1.5em;">
+            <a href="/blog/commitment-is-the-new-link" style="font-size: 0.875rem; color: var(--accent); text-decoration: none; font-weight: 500;">Read the full essay →</a>
+          </p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <hr class="section-divider" />
+
+  <!-- Three pillars: foundations -->
+  <section>
+    <div class="container">
+      <p class="section-label">How it works</p>
+      <div class="proof-grid">
+
+        <div class="proof-item reveal">
+          <div class="proof-number">I — Proof of Personhood</div>
+          <div>
+            <div class="proof-title">No fake people, no fake data.</div>
+            <p class="proof-body">
+              There is no "bad data" — only fake data from fake people. BankID (4.6M Norwegians), <a href="https://world.org/blog/announcements/world-id-full-stack-proof-of-human" target="_blank" rel="noopener">World ID (18M+ globally)</a>, and eIDAS 2.0 (450M Europeans by year-end) provide the sybil-resistant identity layer. Every signal in the graph comes from a verified, unique human.
+            </p>
+          </div>
+        </div>
+
+        <div class="proof-item reveal">
+          <div class="proof-number">II — Zero-Knowledge Proofs</div>
+          <div>
+            <div class="proof-title">Contribute everything, reveal nothing.</div>
+            <p class="proof-body">
+              zkTLS lets anyone prove behavioral claims about themselves — "I've visited this restaurant five times in six months" — without revealing identity, transaction details, or any other data. <a href="https://www.reclaimprotocol.org/" target="_blank" rel="noopener">3M+ verifications, zero fraud</a>. Privacy is not a tradeoff.
+            </p>
+          </div>
+        </div>
+
+        <div class="proof-item reveal">
+          <div class="proof-number">III — Incentive Mechanism</div>
+          <div>
+            <div class="proof-title">Money, not reputation points.</div>
+            <p class="proof-body">
+              Earn by contributing verified behavioral data. Pay to query the network's collective intelligence. Stake on recommendations — if others commit to the same thing, you earn; if they don't, you lose. Resolution is behavioral data, not opinion. The game cannot be rigged.
+            </p>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <hr class="section-divider" />
+
+  <!-- Norwegian cold start -->
+  <section>
+    <div class="container">
+      <p class="section-label">Why Norway first</p>
+      <div class="editorial reveal" style="max-width: var(--max-content);">
+        <p style="font-size: 1rem;">
+          Norway has something no other country has: freely accessible, structured commitment data already in the public domain.
+          Brønnøysundregistrene publishes full financial statements for every Norwegian company.
+          Mattilsynet publishes food safety inspection results for every restaurant.
+          PSD2 mandates open banking APIs across 3,500+ European banks.
+        </p>
+        <p style="font-size: 1rem; margin-top: 1rem;">
+          The gap is not data access — it's <strong>assembly</strong>. The foundation layer is live today. The behavioral layer is what we're building.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <hr class="section-divider" />
+
+  <!-- Developer / Trust API section -->
+  <section id="mcp" style="padding: var(--space-section) 0;">
+    <div class="container">
+      <p class="section-label">For developers</p>
+      <div class="editorial reveal" style="max-width: var(--max-content);">
+        <h2 style="margin-bottom: 0.5rem;">Trust API + browser extension.</h2>
+        <p style="margin-bottom: 0.5rem; font-size: 1rem;">
+          The extension surfaces commitment signals at point of decision — on GitHub and search.
+          The trust API exposes the same data to any script, agent, or AI assistant.
+        </p>
+        <p style="margin-bottom: 1.5rem; font-size: 0.9rem; color: var(--ink-muted);">
+          One data layer. Two surfaces. No API key required.
+        </p>
+
+        <!-- Trust API example -->
+        <div style="background: var(--paper-dim); border: 1px solid var(--border); border-radius: 8px; padding: 1.25rem 1.5rem; font-family: var(--font-mono, 'JetBrains Mono', 'Fira Mono', monospace); font-size: 0.82rem; color: var(--ink); overflow-x: auto; margin-bottom: 1.5rem; position: relative;">
+          <div style="position: absolute; top: 0.6rem; right: 1rem; font-size: 0.7rem; color: var(--ink-subtle); font-family: var(--font-body);">curl</div>
+          <pre style="margin: 0; line-height: 1.7;">curl https://poc-backend.amdal-dev.workers.dev/api/github/hawkaa/commit</pre>
+        </div>
+
+        <!-- Canonical tool list -->
+        <div style="display: grid; gap: 0.5rem; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); margin-bottom: 2rem;">
+          <div class="mcp-tool-row">
+            <span class="mcp-tool-name">GET /api/github/&#123;owner&#125;/&#123;repo&#125;</span>
+            <span class="mcp-tool-desc">Commit Score, endorsements, longevity — any public repo</span>
+          </div>
+          <div class="mcp-tool-row">
+            <span class="mcp-tool-name">GET /api/business/&#123;orgno&#125;</span>
+            <span class="mcp-tool-desc">Norwegian business — Brreg financial health, years operating</span>
+          </div>
+          <div class="mcp-tool-row">
+            <span class="mcp-tool-name">POST /endorsements</span>
+            <span class="mcp-tool-desc">Submit a ZK-verified endorsement — anonymous, on-chain anchored</span>
+          </div>
+          <div class="mcp-tool-row">
+            <span class="mcp-tool-name">GET /badge/github/&#123;owner&#125;/&#123;repo&#125;.svg</span>
+            <span class="mcp-tool-desc">Embeddable SVG badge — updates daily</span>
+          </div>
+        </div>
+
+        <!-- Commit Index MCP — sub-mention -->
+        <p style="font-size: 0.85rem; font-weight: 600; color: var(--ink); margin-bottom: 0.5rem;">Commit Index MCP — package supply-chain auditing</p>
+        <p style="font-size: 0.85rem; color: var(--ink-muted); margin-bottom: 1rem;">
+          Sister product for npm/PyPI risk scoring. Add to Claude Desktop or Cursor — no install, no API key.
+        </p>
+
+        <!-- Config block -->
+        <div style="background: var(--paper-dim); border: 1px solid var(--border); border-radius: 8px; padding: 1.25rem 1.5rem; font-family: var(--font-mono, 'JetBrains Mono', 'Fira Mono', monospace); font-size: 0.82rem; color: var(--ink); overflow-x: auto; margin-bottom: 1rem; position: relative;">
+          <div style="position: absolute; top: 0.6rem; right: 1rem; font-size: 0.7rem; color: var(--ink-subtle); font-family: var(--font-body);">~/.claude/claude_desktop_config.json</div>
+          <pre style="margin: 0; line-height: 1.7;" set:html={`&#123;
+  &quot;mcpServers&quot;: &#123;
+    &quot;commit-index&quot;: &#123;
+      &quot;type&quot;: &quot;streamable-http&quot;,
+      &quot;url&quot;: &quot;https://poc-backend.amdal-dev.workers.dev/mcp&quot;
+    &#125;
+  &#125;
+&#125;`}></pre>
+        </div>
+
+        <!-- Example prompt -->
+        <div style="background: var(--paper-dim); border: 1px solid var(--border); border-left: 3px solid var(--ink-light); border-radius: 0 8px 8px 0; padding: 1rem 1.5rem; margin-bottom: 1.5rem; font-size: 0.875rem; color: var(--ink-muted); font-style: italic;">
+          "Audit these for supply chain risk: axios, zod, chalk, lodash, express, dotenv, uuid"
+        </div>
+
+        <p style="margin-top: 0.75rem; font-size: 0.85rem; color: var(--ink-muted);">
+          Open source.
+          Source on <a href="https://github.com/hawkaa/commit" target="_blank" rel="noopener" style="color: var(--accent); text-decoration: none;">GitHub</a>.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <hr class="section-divider" />
+
+  <!-- Live Demo -->
+  <section id="demo" style="padding: var(--space-section) 0;">
+    <div class="container">
+      <p class="section-label">Foundation layer</p>
+      <div class="editorial reveal" style="max-width: var(--max-content);">
+        <h2 style="margin-bottom: 0.5rem;">Public records are the floor, not the ceiling.</h2>
+        <p style="margin-bottom: 0.75rem; font-size: 1rem;">
+          Registry data — years of operation, financial health, regulatory status — is the
+          verifiable foundation. It tells you a business has skin in the game: capital committed,
+          years survived, filings maintained.
+        </p>
+        <p style="margin-bottom: 2rem; font-size: 0.9rem; color: var(--ink-muted);">
+          The full picture requires behavioral data: repeat customers, return rates, sustained
+          engagement. That layer is what we're building. The extension shows where
+          it starts. The protocol defines where it ends.
+        </p>
+
+        <!-- Example pills -->
+        <div id="demo-examples" style="display: flex; flex-wrap: wrap; gap: 0.5rem; margin-bottom: 1.25rem;">
+          <button class="demo-pill" data-query="Maaemo">Maaemo</button>
+          <button class="demo-pill" data-query="Storebrand">Storebrand</button>
+          <button class="demo-pill" data-query="Equinor">Equinor</button>
+          <button class="demo-pill" data-query="Kaffebrenneriet">Kaffebrenneriet</button>
+          <button class="demo-pill" data-query="Rema 1000">Rema 1000</button>
+        </div>
+
+        <!-- Search input -->
+        <div style="display: flex; gap: 0.75rem; margin-bottom: 2rem; flex-wrap: wrap;">
+          <input
+            id="demo-input"
+            type="text"
+            placeholder="Search a Norwegian business…"
+            style="flex: 1; min-width: 200px; padding: 0.65rem 1rem; border: 1px solid var(--border); border-radius: 6px; background: var(--paper-dim); font-family: var(--font-body); font-size: 0.95rem; color: var(--ink); outline: none;"
+          />
+          <button
+            id="demo-search-btn"
+            style="padding: 0.65rem 1.25rem; background: var(--ink); color: var(--paper); border: none; border-radius: 6px; font-family: var(--font-body); font-size: 0.875rem; font-weight: 500; cursor: pointer; white-space: nowrap;"
+          >
+            Look up →
+          </button>
+        </div>
+
+        <!-- Result card -->
+        <div id="demo-result" style="display: none;"></div>
+        <div id="demo-loading" style="display: none; color: var(--ink-muted); font-size: 0.875rem; padding: 1rem 0;">
+          Fetching from public registries…
+        </div>
+        <div id="demo-error" style="display: none; color: var(--accent); font-size: 0.875rem; padding: 1rem 0;"></div>
+      </div>
+    </div>
+  </section>
+
+  <style>
+    .mcp-tool-row {
+      display: flex;
+      align-items: baseline;
+      gap: 0.75rem;
+      padding: 0.5rem 0;
+      border-bottom: 1px solid rgba(0,0,0,0.06);
+    }
+    .mcp-tool-name {
+      font-family: 'JetBrains Mono', 'Fira Mono', 'Courier New', monospace;
+      font-size: 0.78rem;
+      color: var(--ink);
+      white-space: nowrap;
+      flex-shrink: 0;
+    }
+    .mcp-tool-desc {
+      font-size: 0.8rem;
+      color: var(--ink-muted);
+    }
+    .demo-pill {
+      padding: 0.35rem 0.85rem;
+      border: 1px solid var(--border);
+      border-radius: 999px;
+      background: transparent;
+      font-family: var(--font-body);
+      font-size: 0.8rem;
+      color: var(--ink-muted);
+      cursor: pointer;
+      transition: border-color 0.15s, color 0.15s, background 0.15s;
+    }
+    .demo-pill:hover {
+      border-color: var(--ink-light);
+      color: var(--ink);
+      background: var(--paper-dim);
+    }
+    .demo-result-card {
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 1.5rem;
+      background: var(--paper-dim);
+    }
+    .demo-score-bar {
+      height: 6px;
+      border-radius: 3px;
+      background: var(--border);
+      overflow: hidden;
+      margin-top: 0.35rem;
+    }
+    .demo-score-fill {
+      height: 100%;
+      border-radius: 3px;
+      background: var(--ink-light);
+      transition: width 0.6s ease;
+    }
+    .demo-score-fill.high { background: #3c7d3c; }
+    .demo-score-fill.mid  { background: #8a6d00; }
+    .demo-score-fill.low  { background: var(--accent); }
+  </style>
+
+  <script lang="ts">
+    const API = 'https://poc-backend.amdal-dev.workers.dev';
+
+    function scoreClass(n: number): string {
+      if (n >= 70) return 'high';
+      if (n >= 45) return 'mid';
+      return 'low';
+    }
+
+    function fmt(n: number): string {
+      if (n >= 1_000_000_000) return (n / 1_000_000_000).toFixed(1) + 'B';
+      if (n >= 1_000_000)     return (n / 1_000_000).toFixed(1) + 'M';
+      if (n >= 1_000)         return (n / 1_000).toFixed(0) + 'K';
+      return String(n);
+    }
+
+    function renderResult(biz: any) {
+      const s = biz.signals;
+      const f = biz.financials;
+      const overallClass = scoreClass(s.overall);
+
+      let financialRow = '';
+      if (f) {
+        financialRow = `
+          <div style="margin-top: 1rem; padding-top: 1rem; border-top: 1px solid var(--border-light); display: flex; gap: 2rem; flex-wrap: wrap;">
+            <div>
+              <div style="font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.06em; color: var(--ink-subtle);">Revenue</div>
+              <div style="font-size: 1rem; font-weight: 500; color: var(--ink);">${fmt(f.revenue)} NOK</div>
+            </div>
+            <div>
+              <div style="font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.06em; color: var(--ink-subtle);">Profit margin</div>
+              <div style="font-size: 1rem; font-weight: 500; color: var(--ink);">${f.profitMargin}%</div>
+            </div>
+            <div>
+              <div style="font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.06em; color: var(--ink-subtle);">Equity ratio</div>
+              <div style="font-size: 1rem; font-weight: 500; color: var(--ink); ${f.equityRatio < 0 ? 'color: var(--accent)' : ''}">${f.equityRatio}%</div>
+            </div>
+          </div>`;
+      }
+
+      return `
+        <div class="demo-result-card">
+          <div style="display: flex; align-items: flex-start; justify-content: space-between; gap: 1rem; flex-wrap: wrap; margin-bottom: 1.25rem;">
+            <div>
+              <div style="font-family: var(--font-display); font-size: 1.35rem; color: var(--ink); line-height: 1.2;">${biz.name}</div>
+              <div style="font-size: 0.8rem; color: var(--ink-subtle); margin-top: 0.25rem;">${biz.orgForm} · ${biz.location} · ${biz.industry}</div>
+            </div>
+            <div style="text-align: right; flex-shrink: 0;">
+              <div style="font-size: 2.5rem; font-weight: 600; color: var(--ink); line-height: 1;">${s.overall}</div>
+              <div style="font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.06em; color: var(--ink-subtle);">Foundation score</div>
+            </div>
+          </div>
+
+          <div style="display: grid; gap: 0.75rem;">
+            <div>
+              <div style="display: flex; justify-content: space-between; font-size: 0.8rem; color: var(--ink-muted);">
+                <span>Longevity <span style="color: var(--ink-subtle);">${Math.round(biz.yearsOperating)} years operating</span></span>
+                <span style="font-weight: 500; color: var(--ink);">${s.temporal}</span>
+              </div>
+              <div class="demo-score-bar"><div class="demo-score-fill ${scoreClass(s.temporal)}" style="width: ${s.temporal}%"></div></div>
+            </div>
+            <div>
+              <div style="display: flex; justify-content: space-between; font-size: 0.8rem; color: var(--ink-muted);">
+                <span>Financial health <span style="color: var(--ink-subtle);">${biz.employees ? biz.employees + ' employees' : ''}</span></span>
+                <span style="font-weight: 500; color: var(--ink);">${s.financial}</span>
+              </div>
+              <div class="demo-score-bar"><div class="demo-score-fill ${scoreClass(s.financial)}" style="width: ${s.financial}%"></div></div>
+            </div>
+            <div>
+              <div style="display: flex; justify-content: space-between; font-size: 0.8rem; color: var(--ink-muted);">
+                <span>Operational activity</span>
+                <span style="font-weight: 500; color: var(--ink);">${s.operational}</span>
+              </div>
+              <div class="demo-score-bar"><div class="demo-score-fill ${scoreClass(s.operational)}" style="width: ${s.operational}%"></div></div>
+            </div>
+          </div>
+          ${financialRow}
+          <div style="margin-top: 1rem; font-size: 0.75rem; color: var(--ink-subtle);">
+            Source: Brønnøysundregistrene · ${biz.isBankrupt ? '⚠️ Bankrupt' : biz.isActive ? '✓ Active' : 'Inactive'} · <span style="font-style: italic;">Behavioral layer in development</span>
+          </div>
+        </div>`;
+    }
+
+    async function lookup(query: string) {
+      const input = document.getElementById('demo-input') as HTMLInputElement;
+      const result = document.getElementById('demo-result')!;
+      const loading = document.getElementById('demo-loading')!;
+      const error = document.getElementById('demo-error')!;
+
+      input.value = query;
+      result.style.display = 'none';
+      error.style.display = 'none';
+      loading.style.display = 'block';
+
+      try {
+        const res = await fetch(`${API}/api/business/search?q=${encodeURIComponent(query)}`);
+        const data = await res.json() as any;
+        loading.style.display = 'none';
+
+        if (!data.results || data.results.length === 0) {
+          error.textContent = `No results found for "${query}". Try a different name.`;
+          error.style.display = 'block';
+          return;
+        }
+
+        result.innerHTML = renderResult(data.results[0]);
+        result.style.display = 'block';
+      } catch (e) {
+        loading.style.display = 'none';
+        error.textContent = 'Lookup failed. The API may be unavailable.';
+        error.style.display = 'block';
+      }
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+      // Pills
+      document.querySelectorAll('.demo-pill').forEach(pill => {
+        pill.addEventListener('click', () => {
+          const q = (pill as HTMLElement).dataset.query!;
+          lookup(q);
+        });
+      });
+
+      // Search button
+      document.getElementById('demo-search-btn')!.addEventListener('click', () => {
+        const input = document.getElementById('demo-input') as HTMLInputElement;
+        const q = input.value.trim();
+        if (q) lookup(q);
+      });
+
+      // Enter key
+      document.getElementById('demo-input')!.addEventListener('keydown', (e: KeyboardEvent) => {
+        if (e.key === 'Enter') {
+          const input = e.target as HTMLInputElement;
+          const q = input.value.trim();
+          if (q) lookup(q);
+        }
+      });
+
+      // Auto-load Maaemo as the default example
+      lookup('Maaemo');
+    });
+  </script>
+
+  <hr class="section-divider" />
+
+  <!-- Trust cards + README Badges -->
+  <section id="badges" style="padding: var(--space-section) 0;">
+    <div class="container">
+      <p class="section-label">For maintainers</p>
+      <div class="editorial reveal" style="max-width: var(--max-content);">
+        <h2 style="margin-bottom: 0.5rem;">A canonical trust page for your repo.</h2>
+        <p style="margin-bottom: 0.5rem; font-size: 1rem;">
+          Every public GitHub repo has a trust card — Commit Score, endorsements, longevity.
+          Share it. Link it from your README, paste it in your launch post. The URL is permanent.
+        </p>
+        <p style="margin-bottom: 1.25rem; font-size: 0.9rem; color: var(--ink-muted);">
+          <code style="font-family: var(--font-mono); font-size: 0.9em; background: var(--paper-dim); padding: 0.1em 0.4em; border-radius: 3px;">poc-backend.amdal-dev.workers.dev/api/github/&#123;owner&#125;/&#123;repo&#125;</code>
+        </p>
+
+        <!-- Trust card link example -->
+        <div style="background: var(--paper-dim); border: 1px solid var(--border); border-radius: 8px; padding: 1.25rem 1.5rem; font-family: var(--font-mono, 'JetBrains Mono', 'Fira Mono', monospace); font-size: 0.82rem; color: var(--ink); overflow-x: auto; margin-bottom: 1.75rem;">
+          <pre style="margin: 0; line-height: 1.7;">[Trust card →](https://poc-backend.amdal-dev.workers.dev/api/github/hawkaa/commit)</pre>
+        </div>
+
+        <!-- Commit Index badges — sub-mention -->
+        <p style="font-size: 0.875rem; font-weight: 600; color: var(--ink); margin-bottom: 0.5rem;">Commit Index — README badges for npm/PyPI packages</p>
+        <p style="font-size: 0.85rem; color: var(--ink-muted); margin-bottom: 1rem;">
+          Sister product for package maintainers. Embed a live trust score badge — updates daily.
+        </p>
+
+        <!-- npm example -->
+        <p style="font-size: 0.8rem; color: var(--ink-subtle); text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 0.5rem;">npm</p>
+        <div style="background: var(--paper-dim); border: 1px solid var(--border); border-radius: 8px; padding: 1.25rem 1.5rem; font-family: var(--font-mono, 'JetBrains Mono', 'Fira Mono', monospace); font-size: 0.82rem; color: var(--ink); overflow-x: auto; margin-bottom: 0.75rem;">
+          <pre style="margin: 0; line-height: 1.7;">[![Commit Trust](https://getcommit.dev/badge/npm/YOUR-PACKAGE)](https://getcommit.dev)</pre>
+        </div>
+
+        <!-- pypi example -->
+        <p style="font-size: 0.8rem; color: var(--ink-subtle); text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 0.5rem;">PyPI</p>
+        <div style="background: var(--paper-dim); border: 1px solid var(--border); border-radius: 8px; padding: 1.25rem 1.5rem; font-family: var(--font-mono, 'JetBrains Mono', 'Fira Mono', monospace); font-size: 0.82rem; color: var(--ink); overflow-x: auto; margin-bottom: 1.75rem;">
+          <pre style="margin: 0; line-height: 1.7;">[![Commit Trust](https://getcommit.dev/badge/pypi/YOUR-PACKAGE)](https://getcommit.dev)</pre>
+        </div>
+
+        <!-- Live badge examples -->
+        <p style="font-size: 0.875rem; color: var(--ink-muted); margin-bottom: 1rem;">Live examples:</p>
+        <div style="display: flex; flex-wrap: wrap; gap: 0.75rem; align-items: center;">
+          <a href="/npm/axios"><img src="https://getcommit.dev/badge/npm/axios" alt="axios commit trust" style="height: 20px;" loading="lazy" /></a>
+          <a href="/npm/express"><img src="https://getcommit.dev/badge/npm/express" alt="express commit trust" style="height: 20px;" loading="lazy" /></a>
+          <a href="/npm/chalk"><img src="https://getcommit.dev/badge/npm/chalk" alt="chalk commit trust" style="height: 20px;" loading="lazy" /></a>
+          <a href="/npm/zod"><img src="https://getcommit.dev/badge/npm/zod" alt="zod commit trust" style="height: 20px;" loading="lazy" /></a>
+          <a href="/pypi/requests"><img src="https://getcommit.dev/badge/pypi/requests" alt="requests commit trust" style="height: 20px;" loading="lazy" /></a>
+          <a href="/pypi/numpy"><img src="https://getcommit.dev/badge/pypi/numpy" alt="numpy commit trust" style="height: 20px;" loading="lazy" /></a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <hr class="section-divider" />
+
+  <!-- Newsletter -->
+  <section class="newsletter-section" id="early-access">
+    <div class="container">
+      <div class="editorial reveal">
+        <h2 style="margin-bottom: 0.75rem;">Get early access</h2>
+        <p style="margin-bottom: 2rem; font-size: 1rem;">
+          First access to the Trust API and browser extension. Research updates and the occasional strong opinion.
+        </p>
+
+        <form
+          action="https://buttondown.email/api/emails/embed-subscribe/commitgraph"
+          method="post"
+          target="popupwindow"
+          class="newsletter-form"
+        >
+          <input
+            type="email"
+            name="email"
+            placeholder="you@example.com"
+            required
+            class="newsletter-input"
+          />
+          <button type="submit" class="btn-primary" style="white-space: nowrap;">
+            Subscribe
+          </button>
+        </form>
+
+        <p class="newsletter-note">No spam. Unsubscribe anytime.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer>
+    <div class="container footer-inner">
+      <span class="footer-brand">Commit</span>
+      <ul class="footer-links">
+        <li><a href="/blog">Writing</a></li>
+        <li><a href="/pricing">Pricing</a></li><li><a href="/docs">Docs</a></li><li><a href="https://github.com/hawkaa/commit" target="_blank" rel="noopener">GitHub</a></li>
+        <li><a href="mailto:pico@amdal.dev">Contact</a></li>
+      </ul>
+      <span class="footer-locale">Stavanger, Norway</span>
+    </div>
+  </footer>
+</Layout>
