@@ -1929,6 +1929,125 @@ uuid</textarea>
       row.classList.toggle('expanded', isHidden);
     }
 
+    // ── Rate-limit rescue surface ────────────────────────────────────────────
+    // Renders a focused upgrade banner when /api/audit or /api/audit/github
+    // returns 429. Anchored at the audit moment — the user's IP just hit the
+    // free-tier wall, so the offer ("score the rest with a free key") is the
+    // exact intervention they need. Prior to this surface, web users hitting
+    // 429 saw "Error: Request failed" with no CTA — 4 IPs at soft_cta in
+    // 7 days, 0 conversions (2026-06-01 funnel diagnosis).
+    //
+    // For the package path (kind=package) the worker scores RATE_LIMIT_TASTE
+    // packages first, so partial results render above this banner via
+    // renderAuditResults. For the GitHub path we don't pre-score so the banner
+    // is the only surface.
+    function renderRateLimitRescue(opts: {
+      kind: 'package' | 'github';
+      message: string;
+      upgradeUrl: string;
+      upgradeLabel: string;
+      webRef?: string;
+    }) {
+      const ctaEl = document.getElementById('post-results-cta');
+      if (!ctaEl) return;
+      const partialNote = opts.kind === 'package'
+        ? '<span class="cta-hint">Free tier resets at 00:00 UTC. 200 audits/day with a free key — no card, 10 seconds.</span>'
+        : '<span class="cta-hint">2 free GitHub repo audits per day per IP. Single-package scoring at /audit remains free.</span>';
+      const headline = `<strong>Free-tier daily limit reached</strong> — ${opts.message}`;
+      // Inline form for package path mirrors the post-audit CTA shape (email →
+      // instant key, no page hop). Falls back to anchor href for noscript.
+      if (opts.kind === 'package' && opts.webRef) {
+        const formId = 'rescue-inline-form';
+        const inputId = 'rescue-inline-email';
+        const btnId = 'rescue-inline-btn';
+        const errId = 'rescue-inline-err';
+        const successId = 'rescue-inline-success';
+        ctaEl.innerHTML = `
+          <div class="cta-text">${headline}</div>
+          <form class="cta-form" id="${formId}" data-source="${opts.webRef}">
+            <input type="email" id="${inputId}" class="cta-input"
+                   placeholder="you@company.com" required autocomplete="email"
+                   aria-label="Your email">
+            <button type="submit" id="${btnId}" class="cta-form-btn">${opts.upgradeLabel}</button>
+            <noscript><a href="${opts.upgradeUrl}" class="cta-btn">${opts.upgradeLabel} &rarr;</a></noscript>
+          </form>
+          ${partialNote}
+          <p class="cta-error" id="${errId}" hidden></p>
+          <div class="cta-success" id="${successId}" hidden></div>
+        `;
+        ctaEl.hidden = false;
+        const form = document.getElementById(formId) as HTMLFormElement;
+        const input = document.getElementById(inputId) as HTMLInputElement;
+        const btnEl = document.getElementById(btnId) as HTMLButtonElement;
+        const errEl = document.getElementById(errId) as HTMLParagraphElement;
+        const successEl = document.getElementById(successId) as HTMLDivElement;
+        form.addEventListener('submit', async (e) => {
+          e.preventDefault();
+          errEl.hidden = true;
+          const email = input.value.trim();
+          if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+            errEl.textContent = 'Please enter a valid email address.';
+            errEl.hidden = false;
+            return;
+          }
+          btnEl.disabled = true;
+          btnEl.textContent = 'Saving…';
+          try {
+            const res = await fetch(KEYS_API, {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ email, source: opts.webRef }),
+            });
+            const data = await res.json().catch(() => ({})) as { key?: string; message?: string; error?: string };
+            if (res.ok || res.status === 201) {
+              markInlineKey();
+              form.hidden = true;
+              const hint = ctaEl.querySelector('.cta-hint') as HTMLElement | null;
+              if (hint) hint.hidden = true;
+              if (data.key) {
+                successEl.innerHTML =
+                  `<strong>✓ Your free API key</strong> — copy it now, backup sent to ${email}:<br>` +
+                  `<code>${data.key}</code><br>` +
+                  `<span style="font-size:0.82rem;color:var(--ink-muted);">` +
+                  `<strong>Re-run your audit now</strong> — paste the key as <code>Authorization: Bearer ${data.key}</code> ` +
+                  `or set it in the CLI with <code>npx proof-of-commitment login ${data.key}</code> · ` +
+                  `<a href="/dashboard" style="color:var(--accent);">Dashboard</a></span>`;
+              } else {
+                successEl.innerHTML =
+                  `<strong>✓ Check your inbox.</strong> We sent your free API key to ${email}. ` +
+                  `Re-run your audit after pasting the key.`;
+              }
+              successEl.hidden = false;
+            } else if (res.status === 429) {
+              errEl.textContent = data.message || 'Rate limit: max 3 keys per IP per day. Try again tomorrow.';
+              errEl.hidden = false;
+              btnEl.disabled = false;
+              btnEl.textContent = opts.upgradeLabel;
+            } else {
+              errEl.textContent = data.message || data.error || `Request failed (${res.status}). Try the full form: ${opts.upgradeUrl}`;
+              errEl.hidden = false;
+              btnEl.disabled = false;
+              btnEl.textContent = opts.upgradeLabel;
+            }
+          } catch (err) {
+            errEl.textContent = `Network error. Try the full form: ${opts.upgradeUrl}`;
+            errEl.hidden = false;
+            btnEl.disabled = false;
+            btnEl.textContent = opts.upgradeLabel;
+          }
+        });
+      } else {
+        // GitHub path — no inline form (the upgrade is a paid tier, not a free
+        // key). Single anchor button to /pricing with the upgrade campaign tag.
+        ctaEl.innerHTML = `
+          <div class="cta-text">${headline}</div>
+          <a href="${opts.upgradeUrl}" class="cta-btn cta-btn-upgrade">${opts.upgradeLabel}</a>
+          ${partialNote}
+        `;
+        ctaEl.hidden = false;
+      }
+    }
+
     document.getElementById('audit-btn')!.addEventListener('click', async () => {
       const btn = document.getElementById('audit-btn') as HTMLButtonElement;
       const resultsArea = document.getElementById('results-area')!;
@@ -1949,11 +2068,43 @@ uuid</textarea>
 
           btn.textContent = 'Auditing repo…';
 
+          // Accept: application/json — without this the worker returns text/plain
+          // for CLI clients on 429, which fails res.json() and drops the user into
+          // the generic "Request failed" path with no upgrade CTA. (Funnel bug
+          // surfaced 2026-06-01: 4 IPs in 7d hit the soft-CTA, 0 converted.)
           const res = await fetch(GITHUB_API, {
             method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
+            headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
             body: JSON.stringify({ repo }),
           });
+
+          // 429 rescue path — GitHub repo audit hard limit is 2/day for anonymous.
+          // Render the upgrade banner with the structured upgrade URL instead of
+          // bouncing the user into the generic error UI.
+          if (res.status === 429) {
+            const rescue = await res.json().catch(() => ({})) as {
+              message?: string;
+              upgrade?: { url?: string; plan?: string; price?: string; limit?: string };
+            };
+            const upgradeUrl = rescue?.upgrade?.url || '/pricing/?utm_source=audit-results&utm_campaign=github-audit-429';
+            const plan = rescue?.upgrade?.plan || 'developer';
+            const price = rescue?.upgrade?.price || '$15/month';
+            const message = rescue?.message || 'Free GitHub repo audit limit reached for today.';
+            renderRateLimitRescue({
+              kind: 'github',
+              message,
+              upgradeUrl: upgradeUrl + (upgradeUrl.includes('?') ? '&' : '?') + 'utm_source=audit-rescue&utm_campaign=github-audit-429',
+              upgradeLabel: `Unlock GitHub audits — ${plan === 'pro' ? 'Pro' : 'Developer'} ${price} →`,
+            });
+            loadingArea.hidden = true;
+            // Update share state with empty results so /share doesn't carry stale data.
+            _lastRepo = repo;
+            _lastPackages = [];
+            _lastEco = 'github';
+            _lastResults = [];
+            _lastRepoLabel = repo;
+            return;
+          }
 
           if (!res.ok) {
             const err = await res.json().catch(() => ({ error: 'Request failed' })) as { error?: string };
@@ -1989,11 +2140,52 @@ uuid</textarea>
 
           btn.textContent = 'Auditing…';
 
+          // Accept: application/json — see GitHub branch above. Without this the
+          // worker returns text/plain CLI-formatted rescue for 429 which fails
+          // res.json() and the user sees "Error: Request failed" with no CTA.
           const res = await fetch(API, {
             method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
+            headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
             body: JSON.stringify({ packages, ecosystem: activeEco }),
           });
+
+          // 429 rescue path — the worker still scores RATE_LIMIT_TASTE packages
+          // before flagging. We render those partial results so the user sees
+          // real value, then surface the inline upgrade form. instant_key_url
+          // attribution flows to source=audit-web-429.
+          if (res.status === 429) {
+            const rescue = await res.json().catch(() => ({})) as {
+              message?: string;
+              instant_key_url?: string;
+              packages_already_scored?: AuditResult[];
+            };
+            const tasteResults = rescue?.packages_already_scored ?? [];
+            const totalRequested = packages.length;
+            const scored = tasteResults.length;
+            // Render partial results first — the "taste" the user paid for with
+            // their time. Then surface the rescue CTA above the inline form so
+            // the upgrade pitch is anchored to the rate-limit moment.
+            if (scored > 0) {
+              renderAuditResults(tasteResults, scored);
+              resultsArea.hidden = false;
+            }
+            renderRateLimitRescue({
+              kind: 'package',
+              message: rescue?.message || `Scored ${scored} of ${totalRequested} packages — free-tier daily limit reached on this IP.`,
+              upgradeUrl: rescue?.instant_key_url || 'https://getcommit.dev/get-started?ref=audit-web-429',
+              upgradeLabel: scored < totalRequested
+                ? `Free API key — score the remaining ${totalRequested - scored} now →`
+                : 'Free API key — lift the limit to 200/day →',
+              webRef: 'audit-web-429',
+            });
+            loadingArea.hidden = true;
+            _lastPackages = packages;
+            _lastEco = activeEco;
+            _lastRepo = '';
+            _lastResults = tasteResults;
+            _lastRepoLabel = '';
+            return;
+          }
 
           if (!res.ok) {
             const err = await res.json().catch(() => ({ error: 'Request failed' })) as { error?: string };
