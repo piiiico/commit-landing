@@ -247,6 +247,13 @@ console.log(data.results[0].score); // 0–100 trust score</code></pre>
             'Anonymous CLI is rate-limited. A free key bumps you to 200 audits/day — no card. Enter your email below; your key appears instantly on screen (email is just a backup).<br />' +
             'Then paste it back in your terminal as <code>export COMMIT_API_KEY=…</code> and re-run.',
         },
+        'audit-web-429': {
+          eyebrow: 'Past the daily limit',
+          title: 'Get a free key, score the rest',
+          lead:
+            'You hit the shared anonymous quota on this network IP — likely corporate NAT or a dev container. A free key bumps you to 200 audits/day, no card. Enter your email below; your key appears instantly on screen.<br />' +
+            'Then re-run your audit and paste the key as <code>Authorization: Bearer sk_commit_…</code> (or save it once with <code>npx proof-of-commitment login</code>).',
+        },
         'cursor-hook-429': {
           eyebrow: 'Cursor hook hit the daily limit',
           title: 'Free key, full audits',
@@ -267,6 +274,20 @@ console.log(data.results[0].score); // 0–100 trust score</code></pre>
           lead:
             'The hook will audit every install going forward. Anonymous mode gives you 15 audits per day, shared across this network IP. A free key gives you 200 per day, bound to your account, no card. Enter your email below; the key appears instantly.<br />' +
             'Save it with <code>npx proof-of-commitment login</code>. The hook reads it automatically on the next install.',
+        },
+        'mcp-cli': {
+          eyebrow: 'Free MCP quota filling up',
+          title: 'Get alerted when packages you query get worse',
+          lead:
+            'A free key lifts the shared daily limit and sends push alerts if any package you\'ve queried degrades. No card. Enter your email; your key appears on screen.<br />' +
+            'Then add <code>COMMIT_API_KEY: sk_commit_…</code> to the <code>env</code> block for this server in your Claude Desktop or Cursor MCP config.',
+        },
+        'audit-cli': {
+          eyebrow: 'Free audit quota filling up',
+          title: 'Get alerted when these scores change',
+          lead:
+            'A free key lifts the shared daily limit and pushes alerts if any package you audited degrades. No card. Enter your email; your key appears on screen.<br />' +
+            'Then pass it in the same terminal: <code>export COMMIT_API_KEY=sk_commit_…</code>',
         },
       };
       const variant = HERO_BY_REF[ref];
@@ -309,6 +330,7 @@ console.log(data.results[0].score); // 0–100 trust score</code></pre>
           'cli': 'cli',                                // inline CLI signup
           'audit-cli': 'cli',                          // audit soft-CTA (worker.ts AUDIT_SIGNUP_URL)
           'audit-cli-429': 'audit-cli-429',            // CLI 429 rescue (npm-package v1.17.0 + worker.ts hard-limit branch)
+          'audit-web-429': 'audit-web-429',            // web /audit page 429 rescue (audit.astro renderRateLimitRescue) — 2026-06-01
           'audit-baseline': 'audit-baseline',          // CLI all-healthy footer soft CTA (npm-package v1.18.0) — 2026-05-24
           'audit-web': 'audit-web',                    // web /audit page secondary CTA (audit-waitlist-btn, no result yet)
           'audit-web-critical': 'audit-web-critical',  // post-result CTA on /audit when ≥1 CRITICAL — 2026-05-23
@@ -361,8 +383,9 @@ console.log(data.results[0].score); // 0–100 trust score</code></pre>
               // command. Showing them an `Authorization: Bearer` REST snippet adds
               // friction (they have to translate it back to CLI usage). Web/API users
               // get the standard REST instruction.
-              const CLI_SOURCES = new Set(['audit-cli-429', 'audit-baseline', 'cli']);
+              const CLI_SOURCES = new Set(['audit-cli-429', 'audit-baseline', 'cli', 'audit-cli']);
               const HOOK_SOURCES = new Set(['cursor-hook-429', 'claude-code-hook-429', 'poc-hook']);
+              const MCP_SOURCES = new Set(['mcp-soft-cta']);
               if (source && HOOK_SOURCES.has(source)) {
                 // Hook users have the proof-of-commitment package already (it wrote the hook script).
                 // `poc login <key>` writes to ~/.commit/config which all hook paths read via readApiKey().
@@ -372,6 +395,15 @@ console.log(data.results[0].score); // 0–100 trust score</code></pre>
                   'Run this once. The hook reads <code style="background:var(--bg-muted,#f5f5f5);padding:0.1rem 0.3rem;border-radius:3px;">~/.commit/config</code> on every install:<br>' +
                   '<code style="display:inline-block;margin-top:0.4rem;padding:0.3rem 0.5rem;background:var(--bg-muted,#f5f5f5);border-radius:4px;font-size:0.85rem;">' +
                   'npx proof-of-commitment login ' + data.key +
+                  '</code>';
+              } else if (source && MCP_SOURCES.has(source)) {
+                // MCP users arrived from the MCP server's soft-CTA. They need to add
+                // the key to their Claude Desktop / Cursor MCP config, not set an env
+                // var in a terminal. The env block is the right insertion point.
+                noteEl.innerHTML =
+                  'Add this to the <code style="background:var(--bg-muted,#f5f5f5);padding:0.1rem 0.3rem;border-radius:3px;">env</code> block for this server in your Claude Desktop or Cursor MCP config:<br>' +
+                  '<code style="display:inline-block;margin-top:0.4rem;padding:0.3rem 0.5rem;background:var(--bg-muted,#f5f5f5);border-radius:4px;font-size:0.85rem;">' +
+                  '"COMMIT_API_KEY": "' + data.key + '"' +
                   '</code>';
               } else if (source && CLI_SOURCES.has(source)) {
                 noteEl.innerHTML =
