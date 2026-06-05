@@ -1,0 +1,106 @@
+# Commit — Supply Chain Trust Scoring
+
+> Score npm, PyPI, Cargo, and Go packages on behavioral signals that stars,
+> READMEs, and vulnerability databases miss. Free CLI, API, MCP server,
+> GitHub Action, and IDE hooks.
+
+## What it does
+
+Commit scores packages 0–100 on behavioral commitment: publisher depth,
+release consistency, download trends, maintenance longevity, and OpenSSF
+Scorecard data. Packages with a single npm publisher controlling millions
+of weekly downloads are flagged CRITICAL — the exact pattern behind the
+axios (March 30 2026) and LiteLLM (March 2026) supply chain attacks.
+
+## Why it matters
+
+26 npm packages with 10M+ weekly downloads have a single publisher.
+`npm audit` and Dependabot don't flag this. Scorecard measures process
+security, not credential-concentration risk. Commit fills the gap.
+
+## Quick start
+
+CLI (zero install):
+  npx proof-of-commitment axios chalk zod
+
+CI gate:
+  npx proof-of-commitment --fail-on=critical
+
+File scan (auto-detects npm/yarn/pnpm/pip/cargo/go):
+  npx proof-of-commitment --file package-lock.json
+
+## Key URLs
+
+- Homepage:    https://getcommit.dev
+- Audit:       https://getcommit.dev/audit
+- Rankings:    https://getcommit.dev/rankings
+- Pricing:     https://getcommit.dev/pricing
+- Quickstart:  https://getcommit.dev/quickstart
+- Docs:        https://getcommit.dev/docs
+- Blog:        https://getcommit.dev/blog
+- GitHub:      https://github.com/piiiico/proof-of-commitment
+- npm:         https://www.npmjs.com/package/proof-of-commitment
+
+## API
+
+POST https://poc-backend.amdal-dev.workers.dev/api/audit
+Content-Type: application/json
+
+  {"packages": ["axios", "zod", "chalk"]}
+
+Returns: score, maintainers, weeklyDownloads, ageYears, trend, riskFlags,
+scorecardScore, scoreBreakdown for each package.
+
+No API key needed for up to 200 requests/day.
+
+## MCP Server
+
+Remote (Streamable HTTP — no install):
+  https://poc-backend.amdal-dev.workers.dev/mcp
+
+Claude Desktop config:
+  {"mcpServers": {"commit": {"type": "streamable-http", "url": "https://poc-backend.amdal-dev.workers.dev/mcp"}}}
+
+9 tools: audit_dependencies, lookup_npm_package, lookup_pypi_package,
+lookup_cargo_crate, lookup_go_module, lookup_github_repo,
+lookup_business, lookup_business_by_org, query_commitment.
+
+## GitHub Action
+
+  - uses: piiiico/commit-action@v1
+    with:
+      fail-on-critical: true
+      comment-on-pr: true
+
+Posts audit results as a PR comment. Auto-detects packages from
+package.json, requirements.txt, Cargo.toml, go.mod.
+
+## IDE Hooks
+
+  poc hook              # installs for both Cursor and Claude Code
+  poc hook --cursor     # Cursor only
+  poc hook --claude-code # Claude Code only
+
+Intercepts npm/pip/cargo/go install commands and blocks CRITICAL packages.
+
+## Scoring
+
+0–100 score based on:
+- Publisher depth: how many people can publish to npm/PyPI/crates.io
+- Release consistency: regular releases signal active oversight
+- Download momentum: growth trends
+- Longevity: how long the package has existed
+- OpenSSF Scorecard: process security (code review, branch protection)
+
+Risk flags:
+- CRITICAL: sole publisher + >10M weekly downloads
+- HIGH: package <1yr old + rapid adoption
+- WARN: no release in 12+ months
+
+## Detailed documentation
+
+- /llms-full.txt — expanded docs with examples and response schemas
+
+## Contact
+
+pico@amdal.dev
