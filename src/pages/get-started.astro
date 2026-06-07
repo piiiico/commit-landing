@@ -176,8 +176,17 @@ console.log(data.results[0].score); // 0–100 trust score</code></pre>
           </p>
         </div>
         <div class="upgrade-action">
-          <a href="/api/checkout?tier=developer&utm_source=get-started&utm_campaign=upgrade-from-free-key" class="upgrade-btn">Upgrade to Developer — $15/mo →</a>
-          <a href="/api/checkout?tier=pro&utm_source=get-started&utm_campaign=upgrade-from-free-key" class="upgrade-btn" style="margin-top: 0.5rem; background: transparent; border: 1px solid var(--border); color: var(--ink);">Or Pro — $29/mo →</a>
+          <!-- Buttons (not anchors) by design — handleUpgradeClick builds the
+               checkout URL at click time with email pre-fill. Static anchors
+               here caused crawlers to follow the link and create empty-email
+               Stripe sessions on every crawl (caught 2026-06-07 ~05Z, 2 USD
+               sessions). Worker-side no-email gate (worker.ts L6139, shipped
+               2026-06-07 05:45Z) catches the residual, but per-IP rate-limit
+               budget still gets consumed when crawlers hit the URL. This is
+               the defense-in-depth layer: keep the URL out of indexable HTML
+               entirely. See script block below for the click handler. -->
+          <button type="button" class="upgrade-btn" data-tier="developer" data-utm-source="get-started" data-utm-campaign="upgrade-from-free-key">Upgrade to Developer — $15/mo →</button>
+          <button type="button" class="upgrade-btn" data-tier="pro" data-utm-source="get-started" data-utm-campaign="upgrade-from-free-key" style="margin-top: 0.5rem; background: transparent; border: 1px solid var(--border); color: var(--ink);">Or Pro — $29/mo →</button>
         </div>
       </div>
     </div>
@@ -233,6 +242,11 @@ console.log(data.results[0].score); // 0–100 trust score</code></pre>
     (() => {
       const params = new URLSearchParams(window.location.search);
       const ref = params.get('ref') ?? '';
+      // Sanitize optional ?pkg= for safe interpolation into innerHTML below.
+      // Accept npm package shape only: scoped or unscoped, conservative charset.
+      // Reject anything else (drops to generic pkg-profile copy — no XSS path).
+      const pkgRaw = params.get('pkg') ?? '';
+      const pkgName = /^@?[a-z0-9._/-]{1,100}$/i.test(pkgRaw) ? pkgRaw : '';
       const HERO_BY_REF: Record<string, { eyebrow: string; title: string; lead: string }> = {
         'audit-baseline': {
           eyebrow: 'Lock in your baseline',
@@ -289,6 +303,49 @@ console.log(data.results[0].score); // 0–100 trust score</code></pre>
             'A free key lifts the shared daily limit and pushes alerts if any package you audited degrades. No card. Enter your email; your key appears on screen.<br />' +
             'Then pass it in the same terminal: <code>export COMMIT_API_KEY=sk_commit_…</code>',
         },
+        'cli': {
+          eyebrow: 'From the CLI',
+          title: 'Get a free key, keep auditing',
+          lead:
+            'A free key bumps you to 200 audits/day — no card. Enter your email; your key appears on screen.<br />' +
+            'Save it in the same terminal: <code>export COMMIT_API_KEY=sk_commit_…</code> or run <code>npx proof-of-commitment login</code> to persist it.',
+        },
+        'audit-web': {
+          eyebrow: 'From the audit tool',
+          title: 'Run this in CI. Audit every push.',
+          lead:
+            'A free key bumps you to 200 audits/day — enough for every PR on every repo. Enter your email; your key appears on screen.<br />' +
+            'Add <code>COMMIT_API_KEY</code> to your CI secrets and gate merges when a package drops below your threshold.',
+        },
+        'audit-web-critical': {
+          eyebrow: 'Past the audit',
+          title: 'Save this scan + get alerts',
+          lead:
+            'You just found CRITICAL packages. A free key saves the audit and notifies you when any of these score lower — daily re-scans, 200/day, no card.<br />' +
+            'Want push alerts on every package change? Developer ($15/mo) watches your tree continuously.',
+        },
+        'audit-web-healthy': {
+          eyebrow: 'Past the audit',
+          title: 'Lock in this clean baseline',
+          lead:
+            'Your scan came back without CRITICAL flags — that\'s the baseline you want to defend. A free key re-runs this audit anytime, up to 200/day, no card.<br />' +
+            'Want push alerts the moment a package degrades? Developer ($15/mo) sends them straight to email.',
+        },
+        'pkg-profile': pkgName
+          ? {
+              eyebrow: `From the ${pkgName} profile`,
+              title: `Watch ${pkgName}. And the rest of your tree.`,
+              lead:
+                `A free key audits the other ~50 packages around <code>${pkgName}</code> — 200/day, no card.<br />` +
+                `Want a heads-up when <code>${pkgName}</code>'s publisher count drops, its release cadence stalls, or its score degrades? Developer ($15/mo) adds push alerts on every package you watch.`,
+            }
+          : {
+              eyebrow: 'From a package profile',
+              title: 'Watch the packages you depend on',
+              lead:
+                'A free key audits 200 packages/day — your whole tree, not just the one you searched for.<br />' +
+                'Want push alerts the moment a package you watch drops in score, loses publishers, or stalls? Developer ($15/mo) adds monitoring + email alerts.',
+            },
       };
       const variant = HERO_BY_REF[ref];
       if (!variant) return;
@@ -416,31 +473,15 @@ console.log(data.results[0].score); // 0–100 trust score</code></pre>
               }
             }
 
-            // Enhance upgrade buttons with email pre-fill so Stripe checkout
-            // doesn't ask the user to re-type the email they just gave us.
+            // Email is now read live at upgrade-click time via the global
+            // handleUpgradeClick handler (see end-of-script). After free-key
+            // creation, #gs-email still holds the value the user typed, so
+            // the click handler picks it up and assembles /api/checkout?
+            // tier=…&email=… at navigation time. No href mutation needed.
             // Critical for webhook binding: checkout.session.completed uses
-            // session.customer_details.email to provision the paid key — if
-            // the user pays with a different email than they signed up with,
-            // the upgrade orphans the free key and creates a new paid key
-            // under a different identity. Pre-fill keeps both keys under one
-            // email, and matches the worker's /api/checkout?email= prefill
-            // path (worker.ts L5260).
-            const emailEnc = encodeURIComponent(email);
-            document.querySelectorAll<HTMLAnchorElement>('.upgrade-btn').forEach((btn) => {
-              const href = btn.getAttribute('href') ?? '';
-              if (href.includes('/api/checkout')) {
-                try {
-                  const url = new URL(href);
-                  url.searchParams.set('email', email);
-                  btn.setAttribute('href', url.toString());
-                } catch {
-                  // If URL parsing fails, fall back to naive append — don't
-                  // break the click target on edge cases.
-                  const sep = href.includes('?') ? '&' : '?';
-                  btn.setAttribute('href', href + sep + 'email=' + emailEnc);
-                }
-              }
-            });
+            // session.customer_details.email to provision the paid key —
+            // mismatched emails would orphan the free key under a different
+            // identity. Live-read keeps the upgrade email = signup email.
           } else {
             const data = await res.json() as any;
             const msg = data?.error ?? data?.message ?? `Error ${res.status} — please try again.`;
@@ -454,6 +495,45 @@ console.log(data.results[0].score); // 0–100 trust score</code></pre>
         }
       });
     }
+
+    // ── Upgrade button click handler ──────────────────────────────────────
+    // Pairs with /api/checkout no-email gate (worker.ts L6139). The buttons
+    // carry data-tier + data-utm-* but NO href — keeps the URL out of
+    // crawler-indexable HTML. Click handler reads #gs-email live, builds the
+    // /api/checkout URL with email pre-fill, and navigates. If the user
+    // clicks before entering email, we scroll them to the form input and
+    // surface a gentle prompt instead of triggering an empty checkout.
+    function handleUpgradeClick(this: HTMLButtonElement, ev: MouseEvent) {
+      ev.preventDefault();
+      const btn = this;
+      const tier = btn.dataset.tier ?? '';
+      if (!tier) return;
+      const emailInput = document.getElementById('gs-email') as HTMLInputElement | null;
+      const rawEmail = emailInput?.value?.trim() ?? '';
+      const emailValid = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(rawEmail);
+      if (!emailValid) {
+        // No valid email yet — scroll to form and prompt. Stops empty-email
+        // upgrades from reaching the worker's gate at all (saves the 302 +
+        // rate-limit bump).
+        emailInput?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        emailInput?.focus();
+        const err = document.getElementById('gs-error');
+        if (err) {
+          err.textContent = 'Enter your email above to upgrade — your key is bound to this address.';
+          err.hidden = false;
+        }
+        return;
+      }
+      const params = new URLSearchParams({ tier, email: rawEmail });
+      const utmSource = btn.dataset.utmSource;
+      const utmCampaign = btn.dataset.utmCampaign;
+      if (utmSource) params.set('utm_source', utmSource);
+      if (utmCampaign) params.set('utm_campaign', utmCampaign);
+      window.location.href = '/api/checkout?' + params.toString();
+    }
+    document.querySelectorAll<HTMLButtonElement>('.upgrade-btn').forEach((btn) => {
+      btn.addEventListener('click', handleUpgradeClick);
+    });
   </script>
 
   <style>
@@ -805,14 +885,28 @@ console.log(data.results[0].score); // 0–100 trust score</code></pre>
       background: var(--accent);
       color: white;
       text-decoration: none;
+      border: none;
       border-radius: 4px;
+      font-family: inherit;
       font-weight: 500;
       font-size: 0.9rem;
+      line-height: 1.2;
       white-space: nowrap;
+      cursor: pointer;
       transition: background 0.15s;
+      /* When upgrade-btn is a <button>, ensure it sits in the same vertical
+         flow as the prior <a> render. Inline-block matches the .upgrade-action
+         column layout. */
+      display: inline-block;
+      text-align: center;
     }
 
     .upgrade-btn:hover { background: var(--accent-dim); }
+
+    .upgrade-btn:focus-visible {
+      outline: 2px solid var(--accent);
+      outline-offset: 2px;
+    }
 
     .upgrade-sub {
       font-size: 0.78rem;
