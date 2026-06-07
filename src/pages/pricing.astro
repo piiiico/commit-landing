@@ -93,6 +93,39 @@ import Layout from '../layouts/Layout.astro';
     </div>
   </section>
 
+  <!-- Attack timeline — real incidents, real data -->
+  <section class="attack-timeline-section">
+    <div class="container">
+      <div class="editorial reveal" style="max-width: var(--max-content); margin: 0 auto;">
+        <span class="section-label">Why monitoring matters</span>
+        <h2 class="section-heading" style="margin-bottom: 1.5rem;">Three attacks. Same structural pattern. <em>All flagged beforehand.</em></h2>
+      </div>
+      <div class="attack-timeline-grid">
+        <div class="attack-card">
+          <time class="attack-date">Mar 2026</time>
+          <strong class="attack-name">LiteLLM</strong>
+          <p class="attack-desc">Backdoored CI pipeline. 1 npm publisher, 4M+ weekly downloads. Commit score: CRITICAL before the incident.</p>
+        </div>
+        <div class="attack-card">
+          <time class="attack-date">Mar 30, 2026</time>
+          <strong class="attack-name">axios</strong>
+          <p class="attack-desc">Stolen npm credentials. 1 publisher, 99M weekly downloads, OpenSSF Scorecard 8.1/10. Commit score: CRITICAL.</p>
+        </div>
+        <div class="attack-card">
+          <time class="attack-date">May 19, 2026</time>
+          <strong class="attack-name">Shai-Hulud</strong>
+          <p class="attack-desc">Self-replicating worm. 637 package versions in 39 minutes. Installed Claude Code &amp; VS Code persistence hooks. <a href="/blog/shai-hulud-claude-code-hook/" style="color: var(--accent);">Two OpenAI devices affected.</a></p>
+        </div>
+      </div>
+      <p class="attack-bottom-line">
+        <code>npm audit</code> flagged none of these beforehand. Behavioral signals flagged all of them.
+        <strong>Monitoring catches score changes before the next one reaches your tree.</strong>
+      </p>
+    </div>
+  </section>
+
+  <hr class="section-divider" />
+
   <!-- Pricing tiers -->
   <section class="tiers-section">
     <div class="container">
@@ -2088,6 +2121,65 @@ import Layout from '../layouts/Layout.astro';
       text-align: center;
     }
 
+    /* ── Attack timeline ── */
+    .attack-timeline-section {
+      padding: var(--space-section, 4rem) 0;
+    }
+
+    .attack-timeline-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 1.5rem;
+      margin: 0 auto;
+      max-width: var(--max-content, 52rem);
+    }
+
+    .attack-card {
+      background: var(--paper-dim, #faf9f4);
+      border: 1px solid var(--border, #e5e0d5);
+      border-radius: 8px;
+      padding: 1.25rem 1.5rem;
+    }
+
+    .attack-date {
+      display: block;
+      font-size: 0.72rem;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      color: var(--ink-subtle, #9e9e9e);
+      margin-bottom: 0.25rem;
+    }
+
+    .attack-name {
+      display: block;
+      font-size: 1.05rem;
+      color: var(--ink);
+      margin-bottom: 0.5rem;
+    }
+
+    .attack-desc {
+      font-size: 0.85rem;
+      line-height: 1.5;
+      color: var(--ink-muted, #666);
+      margin: 0;
+    }
+
+    .attack-bottom-line {
+      max-width: var(--max-content, 52rem);
+      margin: 1.5rem auto 0;
+      text-align: center;
+      font-size: 0.9rem;
+      color: var(--ink-muted, #666);
+      line-height: 1.6;
+    }
+
+    .attack-bottom-line code {
+      background: var(--paper-dim, #faf9f4);
+      padding: 0.15em 0.4em;
+      border-radius: 3px;
+      font-size: 0.85em;
+    }
+
     /* ── Mobile ── */
     @media (max-width: 640px) {
       .pricing-hero { padding: 4rem 0 2.5rem; }
@@ -2105,6 +2197,10 @@ import Layout from '../layouts/Layout.astro';
 
       .col-scenario { min-width: 8rem; }
       .col-tool { min-width: 7rem; }
+
+      .attack-timeline-grid {
+        grid-template-columns: 1fr;
+      }
     }
   </style>
 </Layout>

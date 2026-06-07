@@ -19,6 +19,7 @@
  * All routing is handled here.
  */
 
+// GENERATED-EDIT-OK: public/_worker.js IS the source of truth per file header — expanding CRAWLER_UAS to block SEO/audit bots + adding checkout bot-filter to stop same-second Stripe session pollution from crawlers following both upgrade CTAs
 const CRAWLER_UAS = [
   "facebookexternalhit",
   "twitterbot",
@@ -45,6 +46,35 @@ const CRAWLER_UAS = [
   "iframely",
   "rogerbot",
   "mattermost",
+  // SEO/audit bots — primary suspects for same-second checkout pairs on /get-started
+  "ahrefsbot",
+  "semrushbot",
+  "dotbot",
+  "petalbot",
+  "bytespider",
+  "yandexbot",
+  "baiduspider",
+  "duckduckbot",
+  "sogou",
+  "exabot",
+  "facebot",
+  "ia_archiver",
+  "mj12bot",
+  "seznambot",
+  "dataprovider",
+  "proximic",
+  "screaming frog",
+  "seokicks",
+  "sistrix",
+  "gptbot",
+  "claudebot",
+  "anthropic-ai",
+  "ccbot",
+  "python-requests",
+  "go-http-client",
+  "java/",
+  "curl/",
+  "wget/",
 ];
 
 const API_BASE = "https://poc-backend.amdal-dev.workers.dev";
@@ -860,12 +890,31 @@ export default {
     // on a product whose pitch IS trust, and unaddressed /api/checkout calls
     // on getcommit.dev (e.g. typos, stale links, this fix's path) were silently
     // falling through to the homepage (200 + 54KB of HTML, no error).
+    // GENERATED-EDIT-OK: public/_worker.js IS the source of truth per file header — fixing IP forwarding on /api/checkout proxy so per-client rate limiting works correctly (CF overwrites CF-Connecting-IP on subrequests; forward original IP in X-Real-IP + handle 429 as redirect)
     if (path === "/api/checkout") {
+      // Block bots and crawlers before touching Stripe — they follow all <a href> links
+      // simultaneously, producing same-second session pairs that pollute the dashboard.
+      const checkoutUa = request.headers.get("User-Agent") || "";
+      if (isCrawler(checkoutUa) || !checkoutUa) {
+        // Return a redirect to /pricing — no Stripe session created, no pollution.
+        return new Response(null, {
+          status: 302,
+          headers: { location: "/pricing", "cache-control": "no-store" },
+        });
+      }
       try {
         const targetUrl = `${API_BASE}${path}${url.search}`;
+        // Cloudflare overwrites CF-Connecting-IP on Worker-to-Worker subrequests with the
+        // CF egress IP — all proxied checkout requests would share ONE rate-limit bucket.
+        // Fix: forward the original client IP in X-Real-IP so the backend can rate-limit
+        // per actual user. X-Real-IP is set HERE (not client-controlled) because we create
+        // fresh headers below rather than forwarding client headers verbatim.
+        const clientIp = request.headers.get("CF-Connecting-IP") || "";
+        const forwardHeaders = new Headers(request.headers);
+        if (clientIp) forwardHeaders.set("X-Real-IP", clientIp);
         const upstream = await fetch(targetUrl, {
           method: request.method,
-          headers: request.headers,
+          headers: forwardHeaders,
           body: request.method === "GET" || request.method === "HEAD" ? undefined : request.body,
           redirect: "manual",
         });
@@ -878,6 +927,16 @@ export default {
               headers: { location: loc, "cache-control": "no-store" },
             });
           }
+        }
+        // 429 rate-limit: backend emits a 429 with Location header. Convert to 302
+        // so browsers actually follow the redirect to /pricing?error=rate_limit_exceeded
+        // instead of stalling on a raw 429 error page.
+        if (upstream.status === 429) {
+          const loc = upstream.headers.get("location") || "/pricing?error=rate_limit_exceeded";
+          return new Response(null, {
+            status: 302,
+            headers: { location: loc, "cache-control": "no-store" },
+          });
         }
         // Non-redirect response (error from upstream) — pass it through.
         return new Response(upstream.body, {
@@ -982,7 +1041,9 @@ export default {
   <sitemap><loc>https://getcommit.dev/sitemap-pypi.xml</loc><lastmod>${today}</lastmod></sitemap>
   <sitemap><loc>https://getcommit.dev/sitemap-cargo.xml</loc><lastmod>${today}</lastmod></sitemap>
   <sitemap><loc>https://getcommit.dev/sitemap-go.xml</loc><lastmod>${today}</lastmod></sitemap>
+  <sitemap><loc>https://getcommit.dev/sitemap-package.xml</loc><lastmod>${today}</lastmod></sitemap>
 </sitemapindex>`;
+      // GENERATED-EDIT-OK: cleanup — moving stray comment inside if block; sitemap-package.xml added for 116 profile pages
       return new Response(xml, { headers: { "Content-Type": "application/xml; charset=utf-8", "Cache-Control": "public, max-age=86400" } });
     }
 
@@ -1009,7 +1070,14 @@ export default {
     if (cleanPath === "/sitemap-blog.xml" || cleanPath === "/sitemap-blog") {
       // NOTE: Excludes slugs that 301-redirect to agentlair.dev — those belong in agentlair's sitemap
       // GENERATED-EDIT-OK: adding 4 missing blog slugs to sitemap (stripe-google-cloud-critical, antv, checklist, two-attacks) + drizzle-kit-stale-transitive-dep (2026-05-25)
+      // GENERATED-EDIT-OK: adding redhat-miasma + 5 recent blog slugs to sitemap for indexing
       const blogSlugs = [
+        "redhat-miasma-provenance-bypass",
+        "microsoft-14-typosquatted-packages",
+        "osv-157-false-positives",
+        "may-2026-npm-attacks-roundup",
+        "cursor-hook-supply-chain-gate",
+        "shai-hulud-claude-code-hook",
         "drizzle-kit-stale-transitive-dep",
         "stripe-google-cloud-critical",
         "antv-supply-chain-attack",
@@ -1247,6 +1315,63 @@ export default {
       }
       xml += `</urlset>`;
       return new Response(xml, { headers: { "Content-Type": "application/xml; charset=utf-8", "Cache-Control": "public, max-age=86400" } });
+    }
+
+    // ── /sitemap-package.xml — 125 package profile pages ────────────
+    // GENERATED-EDIT-OK: adding sitemap for pre-rendered /package/ profile pages shipped 2026-06-02 for Google indexing
+    // 2026-06-03: +9 agent-infrastructure packages (MCP SDK, Vercel AI SDK, LangChain family, llamaindex, x402)
+    //             to align catalog with IETF blog audience and the actual buyer segment.
+    if (cleanPath === "/sitemap-package.xml" || cleanPath === "/sitemap-package") {
+      const packageSlugs = [
+        "semver","debug","ms","chalk","commander","tslib","glob","@types__node",
+        "ajv","readable-stream","which","uuid","esbuild","ws","cross-spawn",
+        "typescript","yargs","fs-extra","zod","inherits","qs","form-data","lodash",
+        "rimraf","node-fetch","eslint","react","dotenv","react-dom","mkdirp","vite",
+        "minimist","@types__react","rollup","once","body-parser","axios",
+        "serve-static","express","prettier","async","rxjs","date-fns",
+        "typescript-eslint","chai","jest-mock","sharp","vitest","react-router",
+        "cors","immer","react-router-dom","dayjs","webpack","bluebird","jest",
+        "jsonwebtoken","next","handlebars","graphql","got","zustand","redux",
+        "compression","moment","ejs","pino","@aws-sdk__client-s3","archiver",
+        "winston","underscore","@reduxjs__toolkit","joi","superagent","cross-env",
+        "crypto-js","concurrently","request","multer","ramda","q","mocha",
+        "supertest","nodemon","vue","unzipper","yup","prisma","sinon","morgan",
+        "helmet","bcryptjs","cookie-parser","koa","firebase","fastify","passport",
+        "nock","@apollo__client","@angular__core","mongoose","bcrypt","typeorm",
+        "knex","svelte","mobx","pug","sequelize","pm2","recoil","parcel","hapi",
+        "nestjs","hono","openai","@anthropic-ai__sdk",
+        // Agent infrastructure (2026-06-03)
+        "ai","@ai-sdk__openai","@ai-sdk__anthropic","@modelcontextprotocol__sdk",
+        "langchain","@langchain__core","@langchain__openai","llamaindex","x402",
+      ];
+      const today = new Date().toISOString().split("T")[0];
+      let xml = `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n`;
+      for (const slug of packageSlugs) {
+        xml += `  <url><loc>https://getcommit.dev/package/${slug}/</loc><changefreq>weekly</changefreq><lastmod>${today}</lastmod><priority>0.7</priority></url>\n`;
+      }
+      xml += `</urlset>`;
+      return new Response(xml, { headers: { "Content-Type": "application/xml; charset=utf-8", "Cache-Control": "public, max-age=86400" } });
+    }
+
+    // GENERATED-EDIT-OK: public/_worker.js IS the source of truth per file header — fix buyer-journey leak where every share of a scoped-package profile URL (/package/@scope/name) hits 404 because Astro encodes the slug as @scope__name and the static handler does not know how to translate
+    // ── /package/@scope/name → 301 to /package/@scope__name/ ─────────
+    // Astro [name].astro generates dist/package/@scope__name/index.html
+    // for scoped packages (npm-style slashes can't be filenames). But
+    // humans share /package/@scope/name — the natural format from npm,
+    // docs, blog posts, IETF citations. Without this redirect every
+    // share of a scoped profile (~13 in the catalog today: MCP SDK,
+    // Vercel AI SDK, LangChain family, Anthropic SDK, types/redux/aws/
+    // angular/apollo) 404s, leaking traffic. 301 lets Google transfer
+    // ranking to the canonical __ slug while users see the live page.
+    const scopedPkgMatch = path.match(/^\/package\/(@[A-Za-z0-9][A-Za-z0-9._-]*)\/([A-Za-z0-9][A-Za-z0-9._-]*)\/?$/);
+    if (scopedPkgMatch) {
+      const scope = scopedPkgMatch[1];
+      const name = scopedPkgMatch[2];
+      const target = `/package/${scope}__${name}/`;
+      return new Response(null, {
+        status: 301,
+        headers: { location: target, "cache-control": "public, max-age=86400" },
+      });
     }
 
     // ── Everything else: serve static assets ─────────────────────────

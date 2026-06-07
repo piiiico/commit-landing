@@ -1613,6 +1613,7 @@ uuid</textarea>
       hasProvenance?: boolean | null;
       daysSinceLastPublish?: number | null;
       githubContributors?: number | null;
+      compromised?: { attack: string; date: string; url: string } | null;
       error?: string;
     };
 
@@ -1696,11 +1697,16 @@ uuid</textarea>
             </div>`
           : '';
 
+        // Use API compromised data first, fall back to hardcoded INCIDENT_NOTES
         const normalizedName = (pkgName ?? '').toLowerCase().replace(/^(npm:|pypi:)/, '').trim();
-        const incident = INCIDENT_NOTES[normalizedName];
-        const incidentHtml = incident
-          ? `<div class="incident-note">🚨 <strong>${incident.date}:</strong> ${incident.text} <a href="${incident.url}" target="_blank">View forensics →</a></div>`
-          : '';
+        const apiCompromised = result?.compromised;
+        const hardcodedIncident = INCIDENT_NOTES[normalizedName];
+        let incidentHtml = '';
+        if (apiCompromised) {
+          incidentHtml = `<div class="incident-note">🚨 <strong>Compromised ${apiCompromised.date}</strong> — ${apiCompromised.attack}. This package was involved in a confirmed supply chain attack. <a href="${apiCompromised.url}" target="_blank">Read analysis →</a></div>`;
+        } else if (hardcodedIncident) {
+          incidentHtml = `<div class="incident-note">🚨 <strong>${hardcodedIncident.date}:</strong> ${hardcodedIncident.text} <a href="${hardcodedIncident.url}" target="_blank">View forensics →</a></div>`;
+        }
         return grid + provenanceHtml + incidentHtml;
       }
 
@@ -1748,6 +1754,27 @@ uuid</textarea>
         const errId = 'cta-inline-err';
         const successId = 'cta-inline-success';
         const noScriptHref = fallbackHref;
+        // High-intent skip-ahead — visible BEFORE the email gate, only when an
+        // upgrade URL exists (i.e. audit found ≥1 CRITICAL package). The cold-
+        // outreach deep-link funnel sends visitors here with their actual
+        // CRITICAL packages already in the URL: they've already had the "this
+        // is real, my packages are flagged" reaction. For that subset, the
+        // email gate is a bounce risk — they want to evaluate Developer
+        // pricing before committing identity. This link routes them to
+        // /pricing with their packages preloaded in the audit-critical-key
+        // banner; the existing modal flow asks for email at the actual
+        // purchase moment (one email entry, not two). Default-path users who
+        // still want the free key + weekly digest see the form above this
+        // line. (2026-06-03: shipped to test the email-gate-suppresses-
+        // conversion hypothesis. Measurable in pricing-friction-v1 readout
+        // 2026-06-20: visits to /pricing with utm_medium=audit-skip-form vs
+        // utm_medium=critical-cta.)
+        const skipAheadBlock = upgradeCtxUrl
+          ? `<div class="cta-skip-ahead" style="width:100%;margin-top:0.4rem;font-size:0.8rem;color:var(--ink-muted);">` +
+            `Already evaluating? ` +
+            `<a href="${upgradeCtxUrl.replace('critical-cta', 'audit-skip-form')}" class="cta-skip-link" data-cta="audit-skip-to-pricing" style="color:var(--accent);font-weight:500;">See Developer pricing ($15/mo) for these CRITICAL packages &rarr;</a>` +
+            `</div>`
+          : '';
         ctaEl.innerHTML = `
           <div class="cta-text">${headline}</div>
           <form class="cta-form" id="${formId}" data-source="audit-web-inline" data-fallback-ref="${refTag}">
@@ -1758,6 +1785,7 @@ uuid</textarea>
             <noscript><a href="${noScriptHref}" class="cta-btn">${btnLabel} &rarr;</a></noscript>
           </form>
           <span class="cta-hint">${hintText}</span>
+          ${skipAheadBlock}
           <p class="cta-error" id="${errId}" hidden></p>
           <div class="cta-success" id="${successId}" hidden></div>
         `;
@@ -1792,6 +1820,12 @@ uuid</textarea>
               form.hidden = true;
               const hint = ctaEl.querySelector('.cta-hint') as HTMLElement | null;
               if (hint) hint.hidden = true;
+              // Hide the pre-submit skip-ahead link too — the success state
+              // renders the same Developer upgrade CTA prominently below.
+              // Leaving both visible duplicates the same destination and
+              // dilutes the call-to-action.
+              const skipAhead = ctaEl.querySelector('.cta-skip-ahead') as HTMLElement | null;
+              if (skipAhead) skipAhead.hidden = true;
               // If caller passed a CRITICAL-context upgrade URL (audit found
               // ≥1 CRITICAL package), append &email= and render a prominent
               // Developer-tier CTA in the success view. Free tier scores once
@@ -1877,8 +1911,8 @@ uuid</textarea>
           ? critNames.slice(0, 2).join(', ') + ` + ${critCount - 2} more`
           : critNames.join(' and ');
         const headline = `<strong>${critCount} CRITICAL</strong> package${critCount > 1 ? 's' : ''} in your project (${nameList}). ` +
-          `Single-publisher packages get compromised — axios and node-ipc were both CRITICAL before their attacks. ` +
-          `Lock in weekly monitoring.`;
+          `One person can publish to ${critCount > 1 ? 'each of these' : 'this package'} — one stolen credential and your CI runs their code. ` +
+          `It happened to axios on March 30. We'll email you within 24 hours if it happens to ${critCount > 1 ? 'any of yours' : nameList}.`;
         // Pre-load up to 5 CRITICAL names into the upgrade URL so /pricing
         // can render `audit-critical-key` banner with the user's actual
         // package names. Used by BOTH branches: returning users see the
@@ -1905,11 +1939,11 @@ uuid</textarea>
             developerCtaUrl
           );
         } else {
-          renderInlineForm(headline, '/get-started?ref=audit-web-critical', 'audit-web-critical', 'Save audit + get alerts', 'Free · no card · 10 seconds', developerCtaUrl);
+          renderInlineForm(headline, '/get-started?ref=audit-web-critical', 'audit-web-critical', 'Alert me if these get attacked', 'Free · no card · 10 seconds', developerCtaUrl);
         }
       } else if (count > 0) {
-        const headline = `No CRITICAL flags — your dependency tree looks healthy. ` +
-          `Lock in weekly checks so you catch risk changes early.`;
+        const headline = `No CRITICAL flags — your dependency tree looks healthy today. ` +
+          `Packages change hands. Publishers get compromised. We'll email you if any of these scores drop.`;
         if (alreadyHasKey) {
           renderMonitoringActive(headline + ' You already have a Commit key — gate this repo so a future CRITICAL flag fails the PR.');
         } else {
@@ -2392,11 +2426,18 @@ uuid</textarea>
 
     // ── URL param pre-fill + auto-run ──
     // Supports:
-    //   ?packages=axios,zod,chalk          → pre-fill npm tab, auto-run
-    //   ?pypi=langchain,litellm            → pre-fill pypi tab, auto-run
-    //   ?cargo=serde,tokio                 → pre-fill Cargo tab, auto-run
-    //   ?go=github.com/gin-gonic/gin       → pre-fill Go tab, auto-run
-    //   ?repo=vercel/ai                    → switch to GitHub tab, pre-fill, auto-run
+    //   ?packages=axios,zod,chalk                       → pre-fill npm tab, auto-run
+    //   ?pypi=langchain,litellm                         → pre-fill pypi tab, auto-run
+    //   ?cargo=serde,tokio                              → pre-fill Cargo tab, auto-run
+    //   ?go=github.com/gin-gonic/gin                    → pre-fill Go tab, auto-run
+    //   ?repo=vercel/ai                                 → switch to GitHub tab, pre-fill, auto-run
+    //   ?packages=fastapi,litellm&ecosystem=pypi        → pre-fill pypi tab (intuitive form)
+    //   ?packages=fastapi&eco=pypi                      → same; alt qualifier name
+    // ecosystem= / eco= accepts: npm | pypi | cargo | go | golang (case-insensitive).
+    // Heals published Dev.to articles, blog posts, and cold-email links that wrote
+    // ?packages=...&ecosystem=pypi (the obvious shape) but used to silently fall
+    // through to the npm tab and audit Python/Rust/Go packages as npm — which
+    // returned junk results and killed conversion.
     (function initFromUrlParams() {
       const params = new URLSearchParams(window.location.search);
       const pkgParam = params.get('packages');
@@ -2404,6 +2445,16 @@ uuid</textarea>
       const cargoParam = params.get('cargo');
       const goParam = params.get('go');
       const repoParam = params.get('repo');
+      const ecoParam = (params.get('ecosystem') || params.get('eco') || '').toLowerCase().trim();
+
+      // Helper: switch tab, fill textarea with newline-joined items, auto-click audit.
+      function runEco(ecoSelector: string, raw: string) {
+        const tab = document.querySelector(`[data-eco="${ecoSelector}"]`) as HTMLButtonElement | null;
+        tab?.click();
+        const ta = document.getElementById('packages-input') as HTMLTextAreaElement | null;
+        if (ta) ta.value = raw.split(',').map(p => p.trim()).filter(Boolean).join('\n');
+        setTimeout(() => (document.getElementById('audit-btn') as HTMLButtonElement)?.click(), 100);
+      }
 
       if (repoParam) {
         const githubTab = document.querySelector('[data-eco="github"]') as HTMLButtonElement;
@@ -2412,27 +2463,18 @@ uuid</textarea>
         if (repoInput) repoInput.value = repoParam;
         setTimeout(() => (document.getElementById('audit-btn') as HTMLButtonElement)?.click(), 100);
       } else if (cargoParam) {
-        const cargoTab = document.querySelector('[data-eco="cargo"]') as HTMLButtonElement;
-        cargoTab?.click();
-        const ta = document.getElementById('packages-input') as HTMLTextAreaElement;
-        if (ta) ta.value = cargoParam.split(',').map(p => p.trim()).join('\n');
-        setTimeout(() => (document.getElementById('audit-btn') as HTMLButtonElement)?.click(), 100);
+        runEco('cargo', cargoParam);
       } else if (goParam) {
-        const goTab = document.querySelector('[data-eco="golang"]') as HTMLButtonElement;
-        goTab?.click();
-        const ta = document.getElementById('packages-input') as HTMLTextAreaElement;
-        if (ta) ta.value = goParam.split(',').map(p => p.trim()).join('\n');
-        setTimeout(() => (document.getElementById('audit-btn') as HTMLButtonElement)?.click(), 100);
+        runEco('golang', goParam);
       } else if (pypiParam) {
-        const pypiTab = document.querySelector('[data-eco="pypi"]') as HTMLButtonElement;
-        pypiTab?.click();
-        const ta = document.getElementById('packages-input') as HTMLTextAreaElement;
-        if (ta) ta.value = pypiParam.split(',').map(p => p.trim()).join('\n');
-        setTimeout(() => (document.getElementById('audit-btn') as HTMLButtonElement)?.click(), 100);
+        runEco('pypi', pypiParam);
       } else if (pkgParam) {
-        const ta = document.getElementById('packages-input') as HTMLTextAreaElement;
-        if (ta) ta.value = pkgParam.split(',').map(p => p.trim()).join('\n');
-        setTimeout(() => (document.getElementById('audit-btn') as HTMLButtonElement)?.click(), 100);
+        // ?packages=... routes to the ecosystem= qualifier if present;
+        // bare ?packages=... (or ecosystem=npm) stays on the default npm tab.
+        if (ecoParam === 'pypi') runEco('pypi', pkgParam);
+        else if (ecoParam === 'cargo') runEco('cargo', pkgParam);
+        else if (ecoParam === 'go' || ecoParam === 'golang') runEco('golang', pkgParam);
+        else runEco('npm', pkgParam);
       }
     })();
 

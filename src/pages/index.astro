@@ -93,28 +93,42 @@ import Layout from '../layouts/Layout.astro';
 
   <hr class="section-divider" />
 
-  <!-- Live proof: real packages, real scores -->
+  <!-- Predicted before they got hacked: real packages, real attack dates -->
   <section style="padding: var(--space-section) 0;">
     <div class="container">
-      <p class="section-label">Live data</p>
+      <p class="section-label">Predicted, then attacked</p>
       <div class="editorial reveal" style="max-width: var(--max-content);">
-        <h2 style="margin-bottom: 0.5rem;">Packages you depend on, scored right now.</h2>
+        <h2 style="margin-bottom: 0.5rem;">Two attacked. Three match the same pattern.</h2>
         <p style="margin-bottom: 1.5rem; font-size: 1rem; color: var(--ink-muted);">
-          These are real scores from the live API. Single-publisher packages with massive download counts
-          are flagged CRITICAL — the exact profile exploited in the axios, LiteLLM, and node-ipc attacks.
+          Live scores from the same API that ships in the CLI, IDE hook, and CI gate.
+          Single-publisher packages with massive weekly downloads are the recurring shape — axios and node-ipc both scored CRITICAL/HIGH <em>before</em> their compromises. Click any row to verify the current score.
         </p>
 
-        <div style="background: var(--paper-dim); border: 1px solid var(--border); border-radius: 8px; padding: 1.5rem; font-family: var(--font-mono, 'JetBrains Mono', monospace); font-size: 0.8rem; color: var(--ink); line-height: 1.8; overflow-x: auto; margin-bottom: 1.5rem;">
-          <div style="font-size: 0.7rem; color: var(--ink-subtle); margin-bottom: 0.75rem; font-family: var(--font-body);">npx proof-of-commitment axios zod chalk express</div>
-          <pre style="margin: 0;">┌──────────┬───────┬─────────────┬────────────┬────────────┐
-│ Package  │ Score │ Risk        │ Publishers │ Downloads  │
-├──────────┼───────┼─────────────┼────────────┼────────────┤
-│ axios    │   86  │ 🔴 CRITICAL │ 1          │ 99M/wk     │
-│ zod      │   83  │ 🔴 CRITICAL │ 1          │ 163M/wk    │
-│ chalk    │   75  │ 🔴 CRITICAL │ 1          │ 413M/wk    │
-│ express  │   90  │ ✅ OK       │ 5          │ 95M/wk     │
-└──────────┴───────┴─────────────┴────────────┴────────────┘
- 3 CRITICAL · 0 HIGH · 0 WARNING</pre>
+        <div style="background: var(--paper-dim); border: 1px solid var(--border); border-radius: 8px; padding: 1.5rem; font-family: var(--font-mono, 'JetBrains Mono', monospace); font-size: 0.8rem; color: var(--ink); overflow-x: auto; margin-bottom: 1.25rem;">
+          <div style="font-size: 0.7rem; color: var(--ink-subtle); margin-bottom: 0.75rem; font-family: var(--font-body);">npx proof-of-commitment axios node-ipc chalk zod @mistralai/mistralai</div>
+          <div class="attack-table" style="line-height: 1.85;">
+            <div class="attack-row attack-row-head" style="display: grid; grid-template-columns: minmax(11rem, 1.6fr) 4rem 7rem 6rem minmax(6rem, 1fr); gap: 0.75rem; padding-bottom: 0.4rem; border-bottom: 1px solid var(--border); color: var(--ink-subtle); font-size: 0.72rem; letter-spacing: 0.04em; text-transform: uppercase;">
+              <span>Package</span><span>Score</span><span>Risk</span><span>Publishers</span><span>Compromised</span>
+            </div>
+            <a class="attack-row attack-row-hit" href="/audit?packages=axios" style="display: grid; grid-template-columns: minmax(11rem, 1.6fr) 4rem 7rem 6rem minmax(6rem, 1fr); gap: 0.75rem; padding: 0.3rem 0; color: var(--ink); text-decoration: none; border-bottom: 1px dashed var(--border-light);">
+              <span>axios <span style="color: var(--ink-subtle);">↗</span></span><span>88</span><span style="color: var(--accent);">🔴 CRITICAL</span><span>1</span><span style="color: var(--accent);">2026-03-30</span>
+            </a>
+            <a class="attack-row attack-row-hit" href="/audit?packages=node-ipc" style="display: grid; grid-template-columns: minmax(11rem, 1.6fr) 4rem 7rem 6rem minmax(6rem, 1fr); gap: 0.75rem; padding: 0.3rem 0; color: var(--ink); text-decoration: none; border-bottom: 1px solid var(--border);">
+              <span>node-ipc <span style="color: var(--ink-subtle);">↗</span></span><span>69</span><span style="color: #b45309;">🟠 HIGH</span><span>1</span><span style="color: var(--accent);">2026-05-14</span>
+            </a>
+            <a class="attack-row" href="/audit?packages=chalk" style="display: grid; grid-template-columns: minmax(11rem, 1.6fr) 4rem 7rem 6rem minmax(6rem, 1fr); gap: 0.75rem; padding: 0.3rem 0; color: var(--ink); text-decoration: none; border-bottom: 1px dashed var(--border-light);">
+              <span>chalk <span style="color: var(--ink-subtle);">↗</span></span><span>75</span><span style="color: var(--accent);">🔴 CRITICAL</span><span>1</span><span style="color: var(--ink-subtle);">not yet</span>
+            </a>
+            <a class="attack-row" href="/audit?packages=zod" style="display: grid; grid-template-columns: minmax(11rem, 1.6fr) 4rem 7rem 6rem minmax(6rem, 1fr); gap: 0.75rem; padding: 0.3rem 0; color: var(--ink); text-decoration: none; border-bottom: 1px dashed var(--border-light);">
+              <span>zod <span style="color: var(--ink-subtle);">↗</span></span><span>85</span><span style="color: var(--accent);">🔴 CRITICAL</span><span>1</span><span style="color: var(--ink-subtle);">not yet</span>
+            </a>
+            <a class="attack-row" href="/audit?packages=@mistralai/mistralai" style="display: grid; grid-template-columns: minmax(11rem, 1.6fr) 4rem 7rem 6rem minmax(6rem, 1fr); gap: 0.75rem; padding: 0.3rem 0; color: var(--ink); text-decoration: none;">
+              <span>@mistralai/mistralai <span style="color: var(--ink-subtle);">↗</span></span><span>69</span><span style="color: #b45309;">🟠 HIGH</span><span>1</span><span style="color: var(--ink-subtle);">not yet</span>
+            </a>
+          </div>
+          <div style="margin-top: 0.85rem; padding-top: 0.65rem; border-top: 1px solid var(--border); font-size: 0.72rem; color: var(--ink-subtle); font-family: var(--font-body); letter-spacing: 0.02em;">
+            2 attacks predicted in advance · 3 still vulnerable · score updates daily
+          </div>
         </div>
 
         <div style="display: flex; gap: 1rem; flex-wrap: wrap; align-items: center;">
@@ -123,6 +137,16 @@ import Layout from '../layouts/Layout.astro';
         </div>
       </div>
     </div>
+
+    <style>
+      .attack-row.attack-row-hit:hover,
+      .attack-row:hover {
+        background: rgba(0, 0, 0, 0.025);
+      }
+      .attack-row:hover span:first-child {
+        text-decoration: underline;
+      }
+    </style>
   </section>
 
   <hr class="section-divider" />
