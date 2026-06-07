@@ -751,7 +751,7 @@ jobs:
             <tr>
               <td><code>402</code></td>
               <td>Payment Required</td>
-              <td>Endpoint requires a paid tier (Developer $15/mo or higher). Free keys cannot call <code>/api/watchlist</code> or other monitoring routes.</td>
+              <td>Endpoint requires an upgrade. Free keys can call <code>/api/watchlist</code> (up to 3 packages, weekly digest); 422 returned on the 4th add with an upgrade URL. Other monitoring routes still gate to Developer ($15/mo) or higher.</td>
             </tr>
             <tr>
               <td><code>404</code></td>

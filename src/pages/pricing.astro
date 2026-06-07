@@ -169,6 +169,10 @@ import Layout from '../layouts/Layout.astro';
             </li>
             <li class="feature-item">
               <span class="feature-check">✓</span>
+              <span>Dependency monitoring — 3 packages, weekly digest</span>
+            </li>
+            <li class="feature-item">
+              <span class="feature-check">✓</span>
               <span>Full score breakdown + risk flags</span>
             </li>
           </ul>
@@ -210,11 +214,11 @@ import Layout from '../layouts/Layout.astro';
             </li>
             <li class="feature-item">
               <span class="feature-check">✓</span>
-              <span>Dependency monitoring — 3 projects, daily scans</span>
+              <span>Dependency monitoring — 15 packages (5× free), daily scans</span>
             </li>
             <li class="feature-item">
               <span class="feature-check">✓</span>
-              <span>Email alerts</span>
+              <span>Instant email alerts (vs free weekly digest)</span>
             </li>
             <li class="feature-item">
               <span class="feature-check">✓</span>
@@ -518,8 +522,9 @@ import Layout from '../layouts/Layout.astro';
             <p class="faq-a">
               Developer ($15/mo) is for builders: you get 5× more API requests than free,
               batch scanning for up to 5 packages at once, GitHub Action auto-triggers on PR,
-              and monitoring for 3 projects. It's the right tier when you're building something
-              with Commit's API but aren't yet running team-scale pipelines.
+              and monitoring for 15 packages (5× the free-tier weekly digest) with daily scans
+              + instant email alerts the moment any score drops a tier. It's the right tier
+              when you're building something with Commit's API but aren't yet running team-scale pipelines.
             </p>
             <p class="faq-a" style="margin-top: 0.75rem;">
               Pro ($29/mo) is for teams in production: 10,000 requests/month (pooled),
@@ -836,7 +841,7 @@ import Layout from '../layouts/Layout.astro';
           .map((p) => p.trim())
           .filter((p) => p.length > 0 && p.length <= 214 && /^[@a-zA-Z0-9._/-]+$/.test(p));
         if (pkgs.length === 0) {
-          return 'You audited CRITICAL packages with a free key. Free tier scores packages on demand but does not monitor them. Developer ($15/mo) adds daily re-scans + email alerts when any watched package drops a tier.';
+          return 'You audited CRITICAL packages with a free key. Free tier scores them on demand and weekly-digests up to 3 watched packages. Developer ($15/mo) adds daily re-scans + instant email alerts (vs weekly) and watches 15 packages (5× free) so the next compromise pages you, not your users.';
         }
         const shown = pkgs.slice(0, 3);
         const extra = pkgs.length - shown.length;
@@ -848,21 +853,21 @@ import Layout from '../layouts/Layout.astro';
               : `${shown.slice(0, -1).join(', ')}, and ${shown[shown.length - 1]}`;
         const overflow = extra > 0 ? ` (+${extra} more)` : '';
         const them = pkgs.length === 1 ? 'it' : 'them';
-        return `You audited ${nameList}${overflow} — flagged CRITICAL today. Free tier scored ${them} once; it does not watch ${them}. Developer ($15/mo) re-scans daily and emails you when any score drops a tier — so the next compromise pages you, not your users.`;
+        return `You audited ${nameList}${overflow} — flagged CRITICAL today. Free tier scored ${them} once and can weekly-digest up to 3 watched packages. Developer ($15/mo) re-scans daily, watches 15 packages (5× free), and instantly emails you the moment any score drops a tier — so the next compromise pages you, not your users.`;
       };
 
       const CONTEXT_BY_CAMPAIGN: Record<string, { eyebrow: string; msg: string }> = {
         'watch-cmd': {
           eyebrow: 'From your terminal',
-          msg: 'You tried to add a package to your watchlist. Continuous monitoring + email alerts unlock on Developer ($15/mo) — 3 projects, daily scans.',
+          msg: 'You hit the 3-package free-tier watchlist cap. Developer ($15/mo) raises it to 15 packages (5× free), upgrades the weekly digest to daily scans, and adds instant email alerts the moment any score drops a tier.',
         },
         'watchlist-cmd': {
           eyebrow: 'From your terminal',
-          msg: 'Listing or syncing your watchlist needs Developer ($15/mo) — 3 projects, daily scans, email alerts when something degrades.',
+          msg: 'You hit a free-tier limit. Developer ($15/mo) raises the watchlist to 15 packages (5× free), upgrades the weekly digest to daily scans, and adds instant email alerts the moment something degrades.',
         },
         'unwatch-cmd': {
           eyebrow: 'From your terminal',
-          msg: 'Managing watchlists needs Developer ($15/mo) — 3 projects, daily scans, email alerts when something degrades.',
+          msg: 'You hit a free-tier limit. Developer ($15/mo) raises the watchlist to 15 packages (5× free), upgrades the weekly digest to daily scans, and adds instant email alerts the moment something degrades.',
         },
         'audit-critical-key': {
           eyebrow: 'From your audit results',
