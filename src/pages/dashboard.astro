@@ -102,7 +102,14 @@ import Layout from '../layouts/Layout.astro';
               Need more? Developer ($15/mo) gives you 1,000 requests/day and batch up to 5
               packages per call. Pro ($29/mo) adds 10,000 requests/month, batch up to 20, and monitoring.
             </p>
-            <a href="/pricing?utm_experiment=pricing-friction-v1&utm_source=dashboard&utm_medium=upgrade-cta" class="upgrade-btn">See plans →</a>
+            <!--
+              href is overridden in renderUsage() from data.upgrade_url which
+              the backend returns with utm_campaign=key-upgrade + email-prefill
+              so /pricing fires the "From your Commit account" banner AND the
+              checkout modal pre-fills the email. Static fallback below is for
+              no-JS visitors (same CTA, but no email pre-fill).
+            -->
+            <a href="/pricing?utm_campaign=key-upgrade&utm_source=key&utm_medium=dashboard&utm_experiment=pricing-friction-v1" class="upgrade-btn">See plans →</a>
           </div>
 
           <!-- Feedback prompt (free tier only) — opt-in customer-dev channel -->
@@ -252,6 +259,19 @@ import Layout from '../layouts/Layout.astro';
       upgradeEl.hidden = tier !== 'free';
       const feedbackEl = document.getElementById('usage-feedback') as HTMLElement;
       feedbackEl.hidden = tier !== 'free';
+
+      // Wire data.upgrade_url (returned by /api/keys/usage for free tier) into
+      // the CTA. Backend builds this with email + utm_campaign=key-upgrade so
+      // /pricing fires the contextual banner AND the checkout modal pre-fills
+      // the user's email. Falls back to the static href if the response shape
+      // is older (defensive — handler returns null for paid tiers and a tagged
+      // URL for free, so this only no-ops in the unlikely shape-drift case).
+      // Adds utm_experiment for the friction-v1 measurement cohort.
+      const upgradeBtn = document.querySelector('#usage-upgrade .upgrade-btn') as HTMLAnchorElement | null;
+      if (upgradeBtn && typeof data.upgrade_url === 'string' && data.upgrade_url) {
+        const join = data.upgrade_url.includes('?') ? '&' : '?';
+        upgradeBtn.href = data.upgrade_url + join + 'utm_experiment=pricing-friction-v1';
+      }
     }
 
     if (form) {
