@@ -917,6 +917,19 @@ import Layout from '../layouts/Layout.astro';
           eyebrow: 'From your audit results',
           msg: 'You blew past the free-tier audit limit on this IP today. A free key gives 200/day — useful for a project audit, but you\'d hit that wall again. Developer ($15/mo) gives 1,000 audits/day, batch up to 5 packages per call, daily re-scans on up to 15 watched packages, and instant email alerts when any of them changes. 30-day money-back.',
         },
+        // 2026-06-10: key-upgrade fires when a signed-in free user clicks an
+        // upgrade prompt from any authenticated surface — dashboard "See plans",
+        // /api/audit 429 (own-key quota), /api/* 402 (pro feature on free tier),
+        // or /api/watchlist 422 (package cap). Backend buildUpgradeUrl writes
+        // utm_campaign=key-upgrade + utm_source=key + utm_medium=<surface>.
+        // The visitor has already invested attention (signed up, used the key,
+        // hit a limit) — banner reframes /pricing as "you're a returning user,
+        // here's the next step", not "please consider Commit". Pre-selects
+        // Developer in the modal.
+        'key-upgrade': {
+          eyebrow: 'From your Commit account',
+          msg: 'You hit a free-tier limit. Developer ($15/mo) gives 1,000 audits/day, batch up to 5 packages per call, watches 15 packages (vs 3 free) with daily re-scans, and adds instant email alerts the moment any score drops a tier. 30-day money-back guarantee.',
+        },
       };
       const variant = CONTEXT_BY_CAMPAIGN[campaign];
       if (!variant) return;
