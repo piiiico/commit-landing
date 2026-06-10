@@ -2070,6 +2070,35 @@ uuid</textarea>
         const btnId = 'rescue-inline-btn';
         const errId = 'rescue-inline-err';
         const successId = 'rescue-inline-success';
+        // 2026-06-10: skip-ahead link to Developer pricing for JS-enabled
+        // visitors who have demonstrably overshot the free tier. Without
+        // this, the rescue surface only offers a free key (200/day) inline
+        // — the noscript fallback to /pricing never fires for the 99% with
+        // JS. But by the time the API responds with overshoot=true (worker
+        // AUDIT_OVERSHOOT_AT = 4× HARD_LIMIT) and emits instant_key_url
+        // pointing at /pricing?utm_campaign=audit-overshoot, the visitor's
+        // IP has burned through 60+ audits today — a free key (200/day)
+        // is a wall they'd hit again. The skip-ahead mirrors
+        // renderInlineForm's CRITICAL/compromised pattern: visible BEFORE
+        // the email gate, lets heavy users pivot to pricing without
+        // claiming a free key first. Only renders when the API's
+        // upgradeUrl points at /pricing (i.e., overshoot path); for the
+        // regular soft-wall rescue (upgradeUrl points at /get-started for
+        // a free key) the skip-ahead would be incoherent (free key IS
+        // the fit at that volume), so it's suppressed. utm_medium is
+        // rewritten from overshoot-rescue → overshoot-skip so the funnel
+        // report can separate (free-key→eventual-paid) attribution from
+        // (skip→direct-paid).
+        const isOvershootDest = opts.upgradeUrl.includes('audit-overshoot') || opts.upgradeUrl.includes('overshoot-rescue');
+        const skipUrl = isOvershootDest
+          ? opts.upgradeUrl.replace('overshoot-rescue', 'overshoot-skip')
+          : '';
+        const skipAheadBlock = isOvershootDest
+          ? `<div class="cta-skip-ahead" style="width:100%;margin-top:0.4rem;font-size:0.8rem;color:var(--ink-muted);">` +
+            `Past free-tier fit? ` +
+            `<a href="${skipUrl}" class="cta-skip-link" data-cta="audit-overshoot-skip-to-pricing" style="color:var(--accent);font-weight:500;">See Developer pricing ($15/mo, 1,000 audits/day) &rarr;</a>` +
+            `</div>`
+          : '';
         ctaEl.innerHTML = `
           <div class="cta-text">${headline}</div>
           <form class="cta-form" id="${formId}" data-source="${opts.webRef}">
@@ -2080,6 +2109,7 @@ uuid</textarea>
             <noscript><a href="${opts.upgradeUrl}" class="cta-btn">${opts.upgradeLabel} &rarr;</a></noscript>
           </form>
           ${partialNote}
+          ${skipAheadBlock}
           <p class="cta-error" id="${errId}" hidden></p>
           <div class="cta-success" id="${successId}" hidden></div>
         `;
