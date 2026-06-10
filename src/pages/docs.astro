@@ -131,20 +131,23 @@ print(resp.json()["results"][0])</code></pre>
         <span class="docs-section-number">02</span>
         <h2 class="docs-section-title">Authentication</h2>
         <p class="docs-intro">
-          All endpoints work without authentication. Free tier uses IP-based rate limiting.
-          Any paid tier — starting at <strong>Developer ($15/mo)</strong> — issues an
-          API key with higher limits, batch audits, and CI/CD automation.
+          All endpoints work without authentication. Anonymous (no key) is capped at 15 requests/day per IP —
+          tight, because corporate NAT, CGN, and CI runners share IPs.
+          A <strong>free API key</strong> (no card, instant signup at <a href="/get-started">/get-started</a>)
+          lifts the limit to 200/day per key. Paid tiers — starting at <strong>Developer ($15/mo)</strong> —
+          add batch audits, monitoring, and CI/CD automation.
         </p>
 
         <div class="auth-tiers">
           <div class="auth-tier">
             <div class="auth-tier-header">
               <span class="auth-tier-name">Free</span>
-              <span class="auth-tier-desc">No setup required</span>
+              <span class="auth-tier-desc">Free key, no card</span>
             </div>
             <p class="auth-tier-body">
-              Requests are rate-limited per IP address. No header required.
-              Single-package audit per request.
+              Anonymous traffic (no header) gets 15 requests/day per IP. Sign up for a free API key
+              at <a href="/get-started">/get-started</a> to lift to 200/day per key —
+              still single-package per request.
             </p>
           </div>
           <div class="auth-tier auth-tier-paid">
@@ -177,8 +180,9 @@ print(resp.json()["results"][0])</code></pre>
         <div class="auth-key-format">
           <span class="auth-key-label">API key format</span>
           <code>sk_commit_</code> followed by 32 hex characters.
-          Keys are issued after checkout at <a href="/pricing">getcommit.dev/pricing</a> —
-          the cheapest tier with an API key is Developer at $15/mo.
+          Free keys are issued instantly at <a href="/get-started">/get-started</a> (no card).
+          Paid-tier keys (Developer, Pro, Enterprise) are issued after checkout at
+          <a href="/pricing">getcommit.dev/pricing</a>.
           Store them securely — they are shown once.
         </div>
       </div>
@@ -196,7 +200,9 @@ print(resp.json()["results"][0])</code></pre>
         <p class="docs-intro">
           Rate limit headers are returned on every response:
           <code>X-RateLimit-Limit</code>, <code>X-RateLimit-Remaining</code>,
-          <code>X-RateLimit-Reset</code>.
+          <code>X-RateLimit-Reset</code>. The <strong>Free</strong> column below assumes a
+          free API key — anonymous (no key) is capped at <strong>15/day per IP</strong>
+          on <code>/api/audit</code> and <code>/mcp</code>.
         </p>
 
         <div class="rate-table-wrapper">

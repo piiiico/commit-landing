@@ -153,7 +153,7 @@ import Layout from '../layouts/Layout.astro';
             </li>
             <li class="feature-item">
               <span class="feature-check">✓</span>
-              <span>Single-package API — 200 req/day per IP</span>
+              <span>Single-package API — 200 req/day with free API key</span>
             </li>
             <li class="feature-item">
               <span class="feature-check">✓</span>
@@ -165,7 +165,7 @@ import Layout from '../layouts/Layout.astro';
             </li>
             <li class="feature-item">
               <span class="feature-check">✓</span>
-              <span>MCP server (remote HTTP, 100 calls/day per IP)</span>
+              <span>MCP server (remote HTTP, unlimited with free API key)</span>
             </li>
             <li class="feature-item">
               <span class="feature-check">✓</span>
@@ -581,8 +581,10 @@ import Layout from '../layouts/Layout.astro';
           <div class="faq-item reveal">
             <h3 class="faq-q">What's the API rate limit on the free tier?</h3>
             <p class="faq-a">
-              Free tier: 200 single-package requests per day, IP-based.
-              Batch requests (up to 20 packages at once) require a Pro API key.
+              Free tier: 200 single-package requests per day with a free API key (instant signup at
+              <a href="/get-started">/get-started</a>, no card). Anonymous (no key): 15/day per IP — kept tight
+              because corporate NAT, CGN, and CI runners share IPs. Batch requests (up to 5 packages) come with
+              Developer ($15/mo); up to 20 packages with Pro ($29/mo).
               If you hit the limit, the API returns HTTP 429 with a <code>Retry-After</code> header and an upgrade link.
             </p>
           </div>
