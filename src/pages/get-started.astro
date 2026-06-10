@@ -303,6 +303,20 @@ console.log(data.results[0].score); // 0–100 trust score</code></pre>
             'A free key lifts the shared daily limit and pushes alerts if any package you audited degrades. No card. Enter your email; your key appears on screen.<br />' +
             'Then pass it in the same terminal: <code>export COMMIT_API_KEY=sk_commit_…</code>',
         },
+        'audit-cli-soft-cta': {
+          // Added 2026-06-10 to land the engagement-signal gate-bypass shipped
+          // in npm-package@1.28.0. The CLI inline prompt fires when the backend
+          // returns _cta (this IP scored ≥5 audits today), even on
+          // single-package healthy scans. Anyone who declines the in-terminal
+          // prompt and copies the help-line URL instead arrives here — echo
+          // the same wall-approach framing so the page does not look like the
+          // wrong page.
+          eyebrow: 'Approaching the daily anonymous wall',
+          title: 'Get a free key, keep auditing',
+          lead:
+            'Anonymous audits are rate-limited to 15/day on this network IP — shared via corporate NAT, CI runner, or dev container. A free key bumps you to 200/day and alerts you when any package you\'ve audited degrades. No card. Enter your email; your key appears on screen.<br />' +
+            'Then pass it in the same terminal: <code>export COMMIT_API_KEY=sk_commit_…</code> or save it with <code>npx proof-of-commitment login</code>.',
+        },
         'cli': {
           eyebrow: 'From the CLI',
           title: 'Get a free key, keep auditing',
@@ -414,6 +428,7 @@ console.log(data.results[0].score); // 0–100 trust score</code></pre>
           'cursor-hook-429': 'cursor-hook-429',        // Cursor IDE hook 429 deny/ask (npm-package v1.21.0+) — 2026-05-29
           'claude-code-hook-429': 'claude-code-hook-429', // Claude Code PreToolUse hook 429 (npm-package v1.22.0) — 2026-05-29
           'poc-hook': 'poc-hook',                      // Fresh `poc hook` install with no API key configured (npm-package v1.21.0+) — 2026-05-29
+          'audit-cli-soft-cta': 'cli-soft-cta',        // CLI inline-prompt engagement-signal gate-bypass (npm-package v1.28.0+) — 2026-06-10
         };
         const params = new URLSearchParams(window.location.search);
         const refParam = params.get('ref') ?? '';
@@ -458,7 +473,7 @@ console.log(data.results[0].score); // 0–100 trust score</code></pre>
               // command. Showing them an `Authorization: Bearer` REST snippet adds
               // friction (they have to translate it back to CLI usage). Web/API users
               // get the standard REST instruction.
-              const CLI_SOURCES = new Set(['audit-cli-429', 'audit-baseline', 'cli', 'audit-cli']);
+              const CLI_SOURCES = new Set(['audit-cli-429', 'audit-baseline', 'cli', 'audit-cli', 'cli-soft-cta']);
               const HOOK_SOURCES = new Set(['cursor-hook-429', 'claude-code-hook-429', 'poc-hook']);
               const MCP_SOURCES = new Set(['mcp-soft-cta']);
               if (source && HOOK_SOURCES.has(source)) {
