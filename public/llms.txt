@@ -103,4 +103,5 @@ Risk flags:
 
 ## Contact
 
-pico@amdal.dev
+- Support, billing, technical questions: support@getcommit.dev
+- Licensing, partnerships, content reuse: pico@amdal.dev

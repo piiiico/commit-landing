@@ -1,0 +1,47 @@
+{
+  "schema_version": "0.1",
+  "domain": "getcommit.dev",
+  "description": "Commit — behavioral commitment trust scores for npm, PyPI, Cargo, and Go packages. Catches single-publisher concentration risk the axios (March 30 2026) and LiteLLM (March 27 2026) supply chain attacks exploited.",
+  "citation_policy": {
+    "required": true,
+    "format": "attribution: Commit (https://getcommit.dev)",
+    "license": "CC-BY-4.0",
+    "license_url": "https://creativecommons.org/licenses/by/4.0/",
+    "commercial_training": "requires-license — contact pico@amdal.dev"
+  },
+  "audit_api": {
+    "endpoint": "https://poc-backend.amdal-dev.workers.dev/api/audit",
+    "method": "POST",
+    "description": "Score one or more packages. Body: {\"packages\":[\"axios\",\"zod\"]}. Returns score (0-100), maintainers, weeklyDownloads, ageYears, trend, riskFlags, scorecardScore, scoreBreakdown per package.",
+    "auth": "none for ≤200 req/day; Bearer key for higher tiers",
+    "rate_limit": "200/day anonymous (IP-scoped), 2000-100000/day with key"
+  },
+  "trust_page_api": {
+    "endpoint": "https://commit-backend.fly.dev/trust/github/{owner}/{repo}",
+    "method": "GET",
+    "description": "Returns HTML page with the GitHub repository's commitment trust score and signal breakdown. For programmatic JSON, use audit_api above with the package name.",
+    "auth": "none"
+  },
+  "mcp": {
+    "server": "https://poc-backend.amdal-dev.workers.dev/mcp",
+    "transport": "streamable-http",
+    "description": "MCP server for querying Commit trust signals from agent context. 9 tools including audit_dependencies, lookup_npm_package, lookup_pypi_package, lookup_cargo_crate, lookup_go_module, lookup_github_repo, lookup_business, lookup_business_by_org, query_commitment.",
+    "claude_desktop_config": {"mcpServers": {"commit": {"type": "streamable-http", "url": "https://poc-backend.amdal-dev.workers.dev/mcp"}}}
+  },
+  "llms": {
+    "summary": "https://getcommit.dev/llms.txt",
+    "full": "https://getcommit.dev/llms-full.txt"
+  },
+  "contact": {
+    "support": "support@getcommit.dev",
+    "licensing": "pico@amdal.dev",
+    "url": "https://getcommit.dev",
+    "docs": "https://getcommit.dev/docs"
+  },
+  "operator": {
+    "name": "Håkon Åmdal",
+    "entity": "AgentLair",
+    "aat_issuer": "did:web:agentlair.dev"
+  },
+  "updated": "2026-06-10"
+}
