@@ -1621,17 +1621,33 @@ uuid</textarea>
       const critCount = results.filter(r => r.riskFlags?.some(f => f.startsWith('CRITICAL'))).length;
       const highCount = results.filter(r => r.riskFlags?.some(f => f.startsWith('HIGH'))).length;
       const provenanceCount = results.filter(r => r.hasProvenance === true).length;
+      // Packages flagged compromised by the API (incident registry) — these are
+      // confirmed supply-chain victims independent of today's behavioral score.
+      // The redhat-miasma article CTAs land here with 3 packages that score
+      // 60/77/81 (no riskFlags) but ARE in the Miasma incident set. Without
+      // this signal the summary said "No critical risk flags" in green AND
+      // the post-results CTA said "your dependency tree looks healthy today"
+      // — directly contradicting the article that linked to this page. Fixed
+      // 2026-06-10 after walking the redhat-miasma → /audit?packages=... path.
+      const compromisedCount = results.filter(r => r.compromised).length;
 
       const prefix = repoLabel ? `<strong>${repoLabel}</strong> — ` : '';
       const provenanceSuffix = provenanceCount > 0
         ? ` · <span class="provenance-summary" title="Packages using npm Trusted Publishing (OIDC provenance)">${provenanceCount} verified</span>`
+        : '';
+      const compromisedSuffix = compromisedCount > 0
+        ? ` · <span style="color:#991b1b;font-weight:600">${compromisedCount} in confirmed supply-chain attack${compromisedCount > 1 ? 's' : ''}</span>`
         : '';
       document.getElementById('results-summary')!.innerHTML =
         prefix +
         `<strong>${count}</strong> packages scored. ` +
         (critCount > 0 ? `<span style="color:#991b1b;font-weight:600">${critCount} CRITICAL</span>` : '') +
         (highCount > 0 ? ` · <span style="color:#92400e;font-weight:600">${highCount} HIGH</span>` : '') +
-        (critCount === 0 && highCount === 0 ? '<span style="color:#166534;font-weight:600">No critical risk flags</span>' : '') +
+        // Suppress the green "No critical risk flags" reassurance whenever
+        // ANY package is in the compromised set — the user came from an
+        // incident post and a green checkmark next to a 🚨 row reads as a bug.
+        (critCount === 0 && highCount === 0 && compromisedCount === 0 ? '<span style="color:#166534;font-weight:600">No critical risk flags</span>' : '') +
+        compromisedSuffix +
         provenanceSuffix;
 
       const tbody = document.getElementById('results-body')!;
@@ -1755,24 +1771,37 @@ uuid</textarea>
         const successId = 'cta-inline-success';
         const noScriptHref = fallbackHref;
         // High-intent skip-ahead — visible BEFORE the email gate, only when an
-        // upgrade URL exists (i.e. audit found ≥1 CRITICAL package). The cold-
-        // outreach deep-link funnel sends visitors here with their actual
-        // CRITICAL packages already in the URL: they've already had the "this
-        // is real, my packages are flagged" reaction. For that subset, the
-        // email gate is a bounce risk — they want to evaluate Developer
-        // pricing before committing identity. This link routes them to
-        // /pricing with their packages preloaded in the audit-critical-key
-        // banner; the existing modal flow asks for email at the actual
-        // purchase moment (one email entry, not two). Default-path users who
-        // still want the free key + weekly digest see the form above this
-        // line. (2026-06-03: shipped to test the email-gate-suppresses-
-        // conversion hypothesis. Measurable in pricing-friction-v1 readout
-        // 2026-06-20: visits to /pricing with utm_medium=audit-skip-form vs
-        // utm_medium=critical-cta.)
+        // upgrade URL exists (i.e. audit found ≥1 CRITICAL package, or ≥1 in
+        // the compromised registry). The cold-outreach deep-link funnel sends
+        // visitors here with their actual flagged packages already in the URL:
+        // they've already had the "this is real, my packages are flagged"
+        // reaction. For that subset, the email gate is a bounce risk — they
+        // want to evaluate Developer pricing before committing identity. This
+        // link routes them to /pricing with their packages preloaded in the
+        // audit-critical-key OR audit-compromised-key banner; the existing
+        // modal flow asks for email at the actual purchase moment (one email
+        // entry, not two). Default-path users who still want the free key +
+        // weekly digest see the form above this line. (2026-06-03: shipped to
+        // test the email-gate-suppresses-conversion hypothesis. Measurable in
+        // pricing-friction-v1 readout 2026-06-20: visits to /pricing with
+        // utm_medium=audit-skip-form vs utm_medium=critical-cta /
+        // utm_medium=compromised-cta.)
+        // 2026-06-10: extended to handle the compromised branch — the prior
+        // string replace only matched 'critical-cta' so the compromised path
+        // kept 'compromised-cta' (the funnel report still distinguished it,
+        // but the link's intent was "audit-skip-form" attribution). Refresh
+        // copy too: compromised packages are not CRITICAL today, they were
+        // caught in a confirmed supply-chain attack; the label needs to match
+        // what the user just read in the headline.
+        const isCompromisedCtx = refTag === 'audit-web-compromised';
+        const skipMedium = isCompromisedCtx ? 'compromised-cta' : 'critical-cta';
+        const skipLabel = isCompromisedCtx
+          ? 'See Developer pricing ($15/mo) for these compromised packages &rarr;'
+          : 'See Developer pricing ($15/mo) for these CRITICAL packages &rarr;';
         const skipAheadBlock = upgradeCtxUrl
           ? `<div class="cta-skip-ahead" style="width:100%;margin-top:0.4rem;font-size:0.8rem;color:var(--ink-muted);">` +
             `Already evaluating? ` +
-            `<a href="${upgradeCtxUrl.replace('critical-cta', 'audit-skip-form')}" class="cta-skip-link" data-cta="audit-skip-to-pricing" style="color:var(--accent);font-weight:500;">See Developer pricing ($15/mo) for these CRITICAL packages &rarr;</a>` +
+            `<a href="${upgradeCtxUrl.replace(skipMedium, 'audit-skip-form')}" class="cta-skip-link" data-cta="audit-skip-to-pricing" style="color:var(--accent);font-weight:500;">${skipLabel}</a>` +
             `</div>`
           : '';
         ctaEl.innerHTML = `
@@ -1838,9 +1867,16 @@ uuid</textarea>
               const upgradeUrlWithEmail = upgradeCtxUrl
                 ? upgradeCtxUrl + (upgradeCtxUrl.includes('?') ? '&' : '?') + `email=${encodeURIComponent(email)}`
                 : '';
+              // 2026-06-10: success-state CTA label was hardcoded "CRITICAL packages"
+              // — wrong for the compromised branch where packages are not CRITICAL
+              // today, they were caught in a confirmed supply-chain attack and we're
+              // pitching monitoring for the next coordinated burst.
+              const upgradeCtaLabel = refTag === 'audit-web-compromised'
+                ? 'Watch these compromised packages — Developer $15/mo &rarr;'
+                : 'Watch these CRITICAL packages — Developer $15/mo &rarr;';
               const developerUpgradeBlock = upgradeCtxUrl
                 ? `<div style="margin-top:1rem;padding-top:1rem;border-top:1px solid var(--border-light,#e5e0d0);">` +
-                  `<a href="${upgradeUrlWithEmail}" class="cta-btn cta-btn-upgrade" style="display:inline-block;font-size:0.95rem;">Watch these CRITICAL packages — Developer $15/mo &rarr;</a> ` +
+                  `<a href="${upgradeUrlWithEmail}" class="cta-btn cta-btn-upgrade" style="display:inline-block;font-size:0.95rem;">${upgradeCtaLabel}</a> ` +
                   `<span style="font-size:0.78rem;color:var(--ink-subtle);margin-left:0.5rem;">Daily re-scans · email alerts · cancel anytime</span>` +
                   `</div>`
                 : '';
@@ -1940,6 +1976,44 @@ uuid</textarea>
           );
         } else {
           renderInlineForm(headline, '/get-started?ref=audit-web-critical', 'audit-web-critical', 'Alert me if these get attacked', 'Free · no card · 10 seconds', developerCtaUrl);
+        }
+      } else if (compromisedCount > 0) {
+        // Incident-set branch — packages with confirmed supply-chain attack
+        // history. They may score "healthy" behaviorally today, but they
+        // were caught by the coordinated-burst rule (Miasma: 31 pkgs, 4-min
+        // variance, single maintainer cluster; axios: stolen credential
+        // single-maintainer publish). Pitch is alert-on-next-burst, not
+        // "dependency tree is healthy". Article→audit CTA path uses this
+        // branch: getcommit.dev/blog/redhat-miasma-provenance-bypass/.
+        const compNames = results.filter(r => r.compromised).map(r => r.name).slice(0, 3);
+        const nameList = compNames.length > 2
+          ? compNames.slice(0, 2).join(', ') + ` + ${compromisedCount - 2} more`
+          : compNames.join(' and ');
+        const attacks = [...new Set(results.filter(r => r.compromised).map(r => r.compromised!.attack))];
+        const attackList = attacks.length === 1 ? attacks[0] : attacks.join(', ');
+        const headline = `<strong>${compromisedCount} of these packages were in a confirmed supply-chain attack</strong> (${attackList} — ${nameList}). ` +
+          `Behavioral scores look healthy <em>today</em>, but the same maintainer cluster and burst pattern that hit them once will hit them again. ` +
+          `We'll email you within minutes of the next coordinated burst across these maintainers.`;
+        // /pricing renders a banner keyed off utm_campaign=audit-compromised-key
+        // — mirrors the audit-critical-key banner. Truncate to keep URL <2KB.
+        const compNamesForUrl = results
+          .filter(r => r.compromised)
+          .map(r => r.name)
+          .slice(0, 5)
+          .join(',');
+        const ecoForUrl = (activeEco === 'github' || activeEco === 'npm') ? 'npm' : activeEco;
+        const developerCtaUrl =
+          `/pricing/?utm_source=audit-results&utm_medium=compromised-cta` +
+          `&utm_campaign=audit-compromised-key` +
+          (compNamesForUrl ? `&packages=${encodeURIComponent(compNamesForUrl)}` : '') +
+          (compNamesForUrl ? `&eco=${encodeURIComponent(ecoForUrl)}` : '');
+        if (alreadyHasKey) {
+          renderMonitoringActive(
+            headline + ' You already have a Commit key — gate this repo so the next coordinated burst across these maintainers fails the PR.',
+            developerCtaUrl
+          );
+        } else {
+          renderInlineForm(headline, '/get-started?ref=audit-web-compromised', 'audit-web-compromised', 'Alert me on the next burst', 'Free · no card · 10 seconds', developerCtaUrl);
         }
       } else if (count > 0) {
         const headline = `No CRITICAL flags — your dependency tree looks healthy today. ` +
