@@ -905,6 +905,18 @@ import Layout from '../layouts/Layout.astro';
           eyebrow: 'From your audit results',
           msg: buildAuditCompromisedMsg(),
         },
+        // 2026-06-10: audit-overshoot fires when a visitor's IP has burned
+        // past 4× the free anonymous limit (worker.ts AUDIT_OVERSHOOT_AT)
+        // and clicks through the rescue surface. By the time they land here,
+        // a free key — 200/day — is a holding pattern, not a fit: the
+        // shared-IP heuristic might explain part of it, but the behavior
+        // itself is heavy-use. Pitch Developer ($15/mo, 1000/day, batch up
+        // to 5 per call) over Free, framed as "you already outgrew it".
+        // Free remains available on /pricing for visitors who self-correct.
+        'audit-overshoot': {
+          eyebrow: 'From your audit results',
+          msg: 'You blew past the free-tier audit limit on this IP today. A free key gives 200/day — useful for a project audit, but you\'d hit that wall again. Developer ($15/mo) gives 1,000 audits/day, batch up to 5 packages per call, daily re-scans on up to 15 watched packages, and instant email alerts when any of them changes. 30-day money-back.',
+        },
       };
       const variant = CONTEXT_BY_CAMPAIGN[campaign];
       if (!variant) return;
