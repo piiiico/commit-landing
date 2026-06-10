@@ -324,6 +324,23 @@ console.log(data.results[0].score); // 0–100 trust score</code></pre>
             'You just found CRITICAL packages. A free key saves the audit and notifies you when any of these score lower — daily re-scans, 200/day, no card.<br />' +
             'Want push alerts on every package change? Developer ($15/mo) watches your tree continuously.',
         },
+        'audit-web-compromised': {
+          // Added 2026-06-10 to match the audit-page CTA branch shipped in
+          // audit.astro:1960 (compromisedCount > 0). Behavioral scores look
+          // healthy today, but the same maintainer cluster / burst pattern
+          // that hit them once will hit them again — pitch alert-on-next-
+          // burst, not baseline lock-in. Without this entry the noscript
+          // fallback landed on default hero copy and the previous reader
+          // who saw "1 in confirmed supply-chain attack" found no echo of
+          // that signal on the next page — momentum lost.
+          eyebrow: 'Past the audit',
+          title: 'Watch for the next burst',
+          lead:
+            'You just audited packages that were already caught in a confirmed supply-chain attack. ' +
+            'They score healthy <em>today</em>, but the same maintainer cluster and burst pattern hits twice. ' +
+            'A free key re-scans daily and emails you the moment a new coordinated burst hits any of them — 200 audits/day, no card.<br />' +
+            'Want continuous monitoring across your full tree? Developer ($15/mo) watches every package and pages you within minutes.',
+        },
         'audit-web-healthy': {
           eyebrow: 'Past the audit',
           title: 'Lock in this clean baseline',
@@ -392,6 +409,7 @@ console.log(data.results[0].score); // 0–100 trust score</code></pre>
           'audit-web': 'audit-web',                    // web /audit page secondary CTA (audit-waitlist-btn, no result yet)
           'audit-web-critical': 'audit-web-critical',  // post-result CTA on /audit when ≥1 CRITICAL — 2026-05-23
           'audit-web-healthy': 'audit-web-healthy',    // post-result CTA on /audit when 0 CRITICAL + ≥1 HIGH — 2026-05-23
+          'audit-web-compromised': 'audit-web-compromised', // post-result CTA on /audit when ≥1 in compromised registry (Miasma, Mini Shai-Hulud, axios, TrapDoor, IronWorm, etc) — 2026-06-10
           'pkg-profile': 'pkg-profile',                // package profile pages (/npm/:pkg etc) Monitor CTA — 2026-05-23
           'cursor-hook-429': 'cursor-hook-429',        // Cursor IDE hook 429 deny/ask (npm-package v1.21.0+) — 2026-05-29
           'claude-code-hook-429': 'claude-code-hook-429', // Claude Code PreToolUse hook 429 (npm-package v1.22.0) — 2026-05-29
