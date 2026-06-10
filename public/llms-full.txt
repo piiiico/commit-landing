@@ -48,8 +48,17 @@ Supports ecosystems: npm (default), pypi, cargo, golang.
 For non-npm packages, prefix with ecosystem:
   {"packages": ["pypi:litellm", "cargo:serde", "golang:github.com/gin-gonic/gin"]}
 
-Rate limits: 200 requests/day without API key. Developer ($15/mo): 1,000/day.
-Pro ($29/mo): 10,000/month.
+Rate limits:
+  Anonymous (no key):   15 req/day per IP (often CGN-shared)
+  Free key:             200 req/day
+  Developer ($15/mo):   1,000 req/day, batch up to 5 packages
+  Pro ($29/mo):         10,000 req/month, batch up to 20 packages
+  Enterprise ($199/mo): unlimited
+
+Free keys (no card, 30 seconds): https://getcommit.dev/pricing
+
+Default response is human-readable text. For machine-parseable JSON, send:
+  Accept: application/json
 
 With API key:
   Authorization: Bearer sk_commit_YOUR_KEY
@@ -103,6 +112,16 @@ Protocol: Streamable HTTP (stateless)
 ### audit_dependencies
 Batch risk audit for up to 20 packages across npm, PyPI, Cargo, Go.
 Input: { packages: string[], ecosystem?: string }
+
+### audit_github_repo
+Whole-repo dependency audit. Fetches package.json and requirements.txt
+from the GitHub repo and scores every direct dependency.
+Input: { repo: string }   // "owner/repo" or full GitHub URL
+
+### audit_dependency_tree
+Transitive npm dependency audit. Walks the dep graph and surfaces
+CRITICAL/HIGH packages at each level.
+Input: { package: string, depth?: 1 | 2 }   // depth 1 (default) = direct deps; 2 = also traverse CRITICAL/HIGH transitives
 
 ### lookup_npm_package
 Single npm package behavioral profile.
@@ -209,12 +228,16 @@ These packages scored CRITICAL *before* their supply chain attacks:
 
 ## Pricing
 
-Open (free):     200 req/day, CLI, web audit, MCP (100 calls/day)
-Developer $15/mo: 1,000 req/day, batch API, monitoring (3 projects)
-Pro $29/mo:      10,000 req/month, 10 projects, Slack/webhook alerts
-Enterprise $199/mo: unlimited, hourly scans, SBOM, SSO, SLA
+Anonymous (no key):  15 req/day per IP (often CGN-shared)
+Open (free key):     200 req/day, CLI, web audit, MCP (unlimited with key)
+Developer $15/mo:    1,000 req/day, batch API (5 packages), monitoring (3 projects)
+Pro $29/mo:          10,000 req/month, batch API (20 packages), 10 projects, Slack/webhook alerts
+Enterprise $199/mo:  unlimited, hourly scans, SBOM, SSO, SLA
+
+Free keys: https://getcommit.dev/pricing (30 seconds, no credit card)
 
 ## Contact
 
-Email: pico@amdal.dev
+Support, billing, technical: support@getcommit.dev
+Licensing, partnerships, content reuse: pico@amdal.dev
 GitHub: https://github.com/piiiico/proof-of-commitment

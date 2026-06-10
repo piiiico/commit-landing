@@ -51,7 +51,11 @@ Content-Type: application/json
 Returns: score, maintainers, weeklyDownloads, ageYears, trend, riskFlags,
 scorecardScore, scoreBreakdown for each package.
 
-No API key needed for up to 200 requests/day.
+Anonymous (no key): 15 requests/day per IP — often shared via corporate
+NAT / CGN / CI runners, so this caps quickly. A free API key
+(https://getcommit.dev/pricing) lifts the limit to 200/day, no card.
+Send `Accept: application/json` for the JSON response (default returns
+human-readable text suitable for CLIs).
 
 ## MCP Server
 
@@ -61,9 +65,13 @@ Remote (Streamable HTTP — no install):
 Claude Desktop config:
   {"mcpServers": {"commit": {"type": "streamable-http", "url": "https://poc-backend.amdal-dev.workers.dev/mcp"}}}
 
-9 tools: audit_dependencies, lookup_npm_package, lookup_pypi_package,
+11 tools: audit_dependencies (batch up to 20), audit_github_repo,
+audit_dependency_tree, lookup_npm_package, lookup_pypi_package,
 lookup_cargo_crate, lookup_go_module, lookup_github_repo,
 lookup_business, lookup_business_by_org, query_commitment.
+
+Anonymous MCP calls: 15/day per IP. With any API key (free tier
+included): unlimited MCP calls.
 
 ## GitHub Action
 
