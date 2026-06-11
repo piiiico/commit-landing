@@ -1,0 +1,187 @@
+{
+  "schema_version": "https://a2a-protocol.org/latest/specification/",
+  "name": "Commit",
+  "description": "Behavioral commitment trust scoring for npm, PyPI, Cargo, and Go packages. Scores packages 0-100 on publisher depth, release consistency, download trend, and maintenance longevity — the credential-concentration signals npm audit and Dependabot miss. Catches the single-publisher pattern behind the axios (March 30 2026), LiteLLM (March 27 2026), and Miasma (June 2026) supply chain attacks.",
+  "url": "https://poc-backend.amdal-dev.workers.dev",
+  "provider": {
+    "organization": "AS Åmdal Invest",
+    "url": "https://getcommit.dev"
+  },
+  "version": "1.29.2",
+  "iconUrl": "https://getcommit.dev/og-default.png",
+  "documentationUrl": "https://getcommit.dev/docs",
+  "capabilities": {
+    "streaming": false,
+    "pushNotifications": true,
+    "stateTransitionHistory": false
+  },
+  "defaultInputModes": ["application/json", "text/plain"],
+  "defaultOutputModes": ["application/json", "text/plain", "text/html"],
+  "authentication": {
+    "schemes": ["bearer", "anonymous"],
+    "note": "Anonymous: 15 audits/day per IP (often CGN-shared). Free key (https://getcommit.dev/pricing) lifts to 200/day. Paid tiers: Developer $15/mo (1,000/day + batch), Pro $29/mo (10,000/mo), Enterprise $199/mo (unlimited)."
+  },
+  "skills": [
+    {
+      "id": "audit-dependencies",
+      "name": "Audit Package Dependencies",
+      "description": "Score one or more packages on behavioral commitment signals. Returns score (0-100), risk flag (HEALTHY, WARN, HIGH, CRITICAL, COMPROMISED), publisher count, weekly downloads, package age, release trend, scoreBreakdown, and risk reasons. Supports up to 20 packages per call.",
+      "tags": ["supply-chain", "security", "npm", "pypi", "cargo", "golang", "behavioral-trust", "ssc"],
+      "inputModes": ["application/json"],
+      "outputModes": ["application/json", "text/plain"],
+      "examples": [
+        {
+          "input": "POST /api/audit { \"packages\": [\"axios\", \"zod\", \"chalk\", \"pypi:litellm\"] }",
+          "output": "Per-package score with risk flag + scoreBreakdown { longevity, momentum, releases, publishers, github, provenance }"
+        },
+        {
+          "input": "Score @anthropic-ai/sdk and its transitive npm dependencies up to depth 2",
+          "output": "Tree with CRITICAL/HIGH highlighted; @anthropic-ai/sdk scores healthy but 2 transitive deps are CRITICAL"
+        }
+      ]
+    },
+    {
+      "id": "audit-github-repo",
+      "name": "Audit GitHub Repository",
+      "description": "Fetch a GitHub repo's package.json, requirements.txt, Cargo.toml, or go.mod and score every dependency. Supports owner/repo slug or full GitHub URL.",
+      "tags": ["github", "supply-chain", "lock-file"],
+      "inputModes": ["text/plain"],
+      "outputModes": ["application/json", "text/html"],
+      "examples": [
+        {
+          "input": "Audit vercel/ai",
+          "output": "Full dependency scan with CRITICAL/HIGH/HEALTHY counts and per-package scores"
+        }
+      ]
+    },
+    {
+      "id": "audit-dependency-tree",
+      "name": "Audit Transitive Dependency Tree",
+      "description": "Walk a package's npm dependency tree to depth 1 or 2 (up to 20 nodes) and highlight CRITICAL paths. Direct deps may score HEALTHY while transitive deps carry the actual risk.",
+      "tags": ["transitive", "supply-chain", "graph"],
+      "inputModes": ["application/json"],
+      "outputModes": ["application/json", "text/html"]
+    },
+    {
+      "id": "lookup-package",
+      "name": "Lookup Single Package Profile",
+      "description": "Detailed profile for one package: lookup_npm_package, lookup_pypi_package, lookup_cargo_crate, lookup_go_module. Returns maintainer list, release history, download trend, GitHub link, and current risk flag.",
+      "tags": ["lookup", "profile"],
+      "inputModes": ["application/json", "text/plain"],
+      "outputModes": ["application/json"]
+    },
+    {
+      "id": "watchlist-monitor",
+      "name": "Package Watchlist + Weekly Digest",
+      "description": "Watch up to 3 packages (free) or 25+ (paid) and receive a weekly email digest plus immediate alerts when score drops, a maintainer is added, or COMPROMISED flag fires. Auto-seeded from /audit scan results on signup.",
+      "tags": ["monitoring", "alerts", "watchlist", "digest"],
+      "inputModes": ["application/json"],
+      "outputModes": ["application/json", "text/plain"],
+      "examples": [
+        {
+          "input": "Watch axios, lodash, express; email me@company.com",
+          "output": "Watchlist created, weekly digest scheduled, immediate alert wired for COMPROMISED events"
+        }
+      ]
+    },
+    {
+      "id": "lookup-business",
+      "name": "Lookup Norwegian Business Registry",
+      "description": "Resolve organization names or 9-digit organisasjonsnummer against the Norwegian Brreg registry. Useful when verifying who actually maintains a package, owns a security disclosure inbox, or backs a vendor.",
+      "tags": ["brreg", "norway", "kyc", "diligence"],
+      "inputModes": ["application/json", "text/plain"],
+      "outputModes": ["application/json"]
+    }
+  ],
+  "supportedInterfaces": [
+    {
+      "type": "MCP",
+      "url": "https://poc-backend.amdal-dev.workers.dev/mcp",
+      "description": "MCP streamable-http endpoint. 11 tools: audit_dependencies (batch up to 20), audit_github_repo, audit_dependency_tree, lookup_npm_package, lookup_pypi_package, lookup_cargo_crate, lookup_go_module, lookup_github_repo, lookup_business, lookup_business_by_org, query_commitment. Anonymous 15/day, unlimited with bearer key.",
+      "transport": "streamable-http",
+      "claudeDesktopConfig": {
+        "mcpServers": {
+          "commit": {
+            "type": "streamable-http",
+            "url": "https://poc-backend.amdal-dev.workers.dev/mcp"
+          }
+        }
+      }
+    },
+    {
+      "type": "HTTPS",
+      "url": "https://poc-backend.amdal-dev.workers.dev/api/audit",
+      "description": "REST audit endpoint. POST { packages: [\"name\", ...] }. Non-npm ecosystems via prefix: \"pypi:litellm\", \"cargo:serde\", \"golang:github.com/gin-gonic/gin\"."
+    },
+    {
+      "type": "CLI",
+      "url": "https://www.npmjs.com/package/proof-of-commitment",
+      "description": "Zero-install CLI: `npx -y proof-of-commitment audit` auto-detects package.json, package-lock.json, yarn.lock, pnpm-lock.yaml, requirements.txt, Cargo.toml, go.mod, go.sum. Flags: --file, --pypi, --cargo, --golang, --json, --sarif, --fail-on=critical. Aliases: audit, scan, check."
+    },
+    {
+      "type": "GITHUB_ACTION",
+      "url": "https://github.com/piiiico/commit-action",
+      "description": "Drop-in GitHub Action gates PRs on CRITICAL or COMPROMISED packages. Posts a comment with the per-package scoreBreakdown."
+    },
+    {
+      "type": "HTTPS",
+      "url": "https://getcommit.dev/audit",
+      "description": "Web-based audit UI. Paste names, drop a lock file, or scan a GitHub repo by URL. Free; no signup. Shareable result URLs."
+    },
+    {
+      "type": "HTTPS",
+      "url": "https://getcommit.dev/rankings",
+      "description": "Public rankings of CRITICAL packages by ecosystem and weekly download volume."
+    }
+  ],
+  "pricing": {
+    "free": {
+      "price_usd_per_month": 0,
+      "audits_per_day": 200,
+      "watchlist_packages": 3,
+      "url": "https://getcommit.dev/pricing"
+    },
+    "developer": {
+      "price_usd_per_month": 15,
+      "audits_per_day": 1000,
+      "batch_api": true,
+      "watchlist_packages": 25,
+      "url": "https://getcommit.dev/pricing"
+    },
+    "pro": {
+      "price_usd_per_month": 29,
+      "audits_per_month": 10000,
+      "watchlist_packages": 100,
+      "url": "https://getcommit.dev/pricing"
+    },
+    "enterprise": {
+      "price_usd_per_month": 199,
+      "audits_per_month": "unlimited",
+      "url": "https://getcommit.dev/pricing"
+    }
+  },
+  "citation_policy": {
+    "required": true,
+    "format": "attribution: Commit (https://getcommit.dev)",
+    "license": "CC-BY-4.0",
+    "license_url": "https://creativecommons.org/licenses/by/4.0/",
+    "commercial_training": "requires-license — contact pico@amdal.dev"
+  },
+  "llms": {
+    "summary": "https://getcommit.dev/llms.txt",
+    "full": "https://getcommit.dev/llms-full.txt"
+  },
+  "contact": {
+    "support": "support@getcommit.dev",
+    "general": "commit@getcommit.dev",
+    "licensing": "pico@amdal.dev",
+    "docs": "https://getcommit.dev/docs"
+  },
+  "operator": {
+    "name": "Håkon Åmdal",
+    "entity": "AS Åmdal Invest",
+    "aat_issuer": "did:web:agentlair.dev"
+  },
+  "supportsAuthenticatedExtendedCard": false,
+  "updated": "2026-06-11"
+}
