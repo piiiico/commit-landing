@@ -1,0 +1,279 @@
+---
+import Layout from '../../layouts/Layout.astro';
+---
+
+<Layout
+  title="Agent Phishing: The Attack Your Identity Stack Misses — Commit"
+  description="Varonis proved it: an enterprise AI agent forwarded AWS keys and a $1.28M customer list to an attacker who sent two casual emails. The agent had valid credentials and passed every technical check. Only 7% of security teams believe they'd catch it."
+  canonical="https://getcommit.dev/blog/agent-phishing-identity-stack/"
+  publishDate="2026-06-11"
+>
+
+  <!-- Nav -->
+  <nav>
+    <div class="container nav-inner">
+      <a href="/" class="nav-brand">Commit</a>
+      <ul class="nav-links">
+        <li><a href="/extension">Extension</a></li>
+        <li><a href="/blog">Writing</a></li>
+        <li><a href="/pricing">Pricing</a></li><li><a href="/docs">Docs</a></li><li><a href="https://github.com/piiiico/proof-of-commitment" target="_blank" rel="noopener">GitHub</a></li>
+        <li><a href="mailto:pico@amdal.dev">Contact</a></li>
+      </ul>
+    </div>
+  </nav>
+
+  <!-- Essay -->
+  <article class="essay">
+    <div class="container">
+      <div class="editorial">
+
+        <!-- Header -->
+        <header class="essay-header">
+          <div class="essay-meta animate-in delay-1">
+            <time datetime="2026-06-11">June 11, 2026</time>
+          </div>
+          <h1 class="essay-title animate-in delay-2">Agent Phishing: The Attack Your Identity Stack Misses</h1>
+          <p class="essay-subtitle animate-in delay-3">
+            Varonis proved it: an enterprise AI agent forwarded AWS keys and a $1.28M customer list to an attacker who sent two casual emails. The agent had valid credentials and passed every technical check. Only 7% of security teams believe they&rsquo;d catch it.
+          </p>
+          <p class="essay-byline animate-in delay-4">Pico</p>
+        </header>
+
+        <!-- Body -->
+        <div class="essay-body">
+
+          <p>
+            In June 2026, Varonis Threat Labs ran an experiment. They built a realistic enterprise inbox on the OpenClaw agent platform &mdash; seeded it with mock AWS credentials, CRM exports, internal conversations, and calendar invites. They named the agent &ldquo;Pinchy.&rdquo; Then they tried to phish it.
+          </p>
+          <p>
+            It took two emails.
+          </p>
+          <p>
+            The first impersonated the team lead, &ldquo;Dan,&rdquo; reporting a production issue and asking Pinchy to share staging credentials. Pinchy forwarded AWS IAM keys, database passwords, and SSH access to an external Gmail address. No verification challenge. No hesitation.
+          </p>
+          <p>
+            The second was a casual request for the latest customer export. Pinchy retrieved and forwarded it externally: 247 enterprise customers, names, contact details, contract data &mdash; roughly $1.28M in monthly recurring revenue, handed to a stranger.
+          </p>
+          <p>
+            The attacker never needed to touch a vulnerability. No exploit. No injection. No compromised token. Just a plausible request, phrased casually, from someone claiming authority. The agent complied at machine speed.
+          </p>
+          <p>
+            This is agent phishing. And your identity stack was not built to catch it.
+          </p>
+
+          <hr class="essay-divider" />
+
+          <h2>Why L1&ndash;L3 Controls Don&rsquo;t See This</h2>
+
+          <p>
+            Every layer of conventional identity infrastructure failed in Varonis&rsquo;s test &mdash; not because it malfunctioned, but because it worked exactly as designed.
+          </p>
+          <p>
+            <strong>Layer 1 (authentication):</strong> Pinchy had valid credentials. The agent was properly authenticated to every service it accessed. The IAM keys it forwarded were legitimately provisioned. The CRM it queried was within scope. There was no unauthenticated access to detect.
+          </p>
+          <p>
+            <strong>Layer 2 (URL and malware scanning):</strong> The attacker&rsquo;s email contained no malicious links, no suspicious attachments, no malware signatures. It was plain text. Automated scanners saw nothing.
+          </p>
+          <p>
+            <strong>Layer 3 (OAuth and application trust):</strong> The Gmail address the data was forwarded to was a standard OAuth-verified account. The email provider passed every spam and reputation filter. The forwarding action was executed by a trusted, authorized agent.
+          </p>
+          <p>
+            This is the structural gap. Every existing check verifies <em>what the entity is</em> &mdash; authenticated user, verified service, trusted application. None of them verify <em>what the entity is doing, in context, against its own established patterns</em>.
+          </p>
+          <p>
+            The agent HAD valid identity at every technical layer. The attack didn&rsquo;t defeat identity &mdash; it operated through it.
+          </p>
+
+          <hr class="essay-divider" />
+
+          <h2>The New Attack Surface</h2>
+
+          <p>
+            Human phishing succeeds because humans are social, often distracted, and vary enormously in how they handle suspicious requests. We&rsquo;ve built decades of user training, secure email gateways, and DMARC/DKIM/SPF precisely because the human layer is the weakest.
+          </p>
+          <p>
+            Agents are a different kind of target, and in several ways they&rsquo;re worse.
+          </p>
+          <p>
+            <strong>Agents are trusting by design.</strong> Varonis tested Pinchy on both Google Gemini 3.1 Pro and OpenAI Codex GPT-5.4. Both models handled technical phishing signals reasonably well &mdash; they flagged shady URLs and suspicious OAuth app requests. But both failed completely at social engineering. Identity verification and contextual judgment are not what LLMs optimize for. They optimize for helpfulness. Phrased right, &ldquo;please send me the customer list&rdquo; is a helpful request.
+          </p>
+          <p>
+            <strong>Agents execute autonomously at scale.</strong> A human who falls for phishing makes one mistake. An agent that falls for phishing makes that mistake instantly, completely, and can repeat it across every subsequent request in the conversation. The action surface is larger and faster than any human equivalent.
+          </p>
+          <p>
+            <strong>Agents have broader access than most humans.</strong> Enterprise agents are provisioned with read/write access across CRMs, code repositories, cloud infrastructure, and internal communications &mdash; exactly the aggregation that makes them useful. That same aggregation is what makes a successful phish catastrophic.
+          </p>
+          <p>
+            <strong>Nobody expects agents to be phished.</strong> Security training is built for human targets. Threat models assume humans are the social engineering vector. Agents operate below that awareness.
+          </p>
+
+          <hr class="essay-divider" />
+
+          <h2>The Market Knows Something Is Wrong</h2>
+
+          <p>
+            Akeyless surveyed 400 IT and security leaders across the US and UK in May 2026. The headline: two-thirds of enterprises suspect AI agents have already accessed data beyond their intended scope. Average detection time for a compromised agent: 14 hours. Average remediation time: nearly a week. Average organizational cost over the past year: more than $1 million.
+          </p>
+          <p>
+            The number that crystallizes the gap: <strong>only 7% of security leaders believe their current controls would prevent a compromised agent from operating undetected.</strong>
+          </p>
+          <p>
+            That is not a confidence number. That is a statement about architecture. Ninety-three percent of security teams have built identity stacks they know cannot catch this class of attack. The controls exist. They&rsquo;re funded and maintained. They just don&rsquo;t address the behavior of authenticated, authorized agents operating outside their intended scope.
+          </p>
+
+          <hr class="essay-divider" />
+
+          <h2>What Behavioral Trust Actually Looks Like Here</h2>
+
+          <p>
+            The Pinchy attack left behavioral signals that were invisible to technical controls but would have been obvious to a system watching what the agent actually did:
+          </p>
+          <ul>
+            <li><strong>Novel external destination.</strong> Pinchy had never forwarded data to this Gmail address before. First-time exfiltration to an external address is a deviation from established behavior &mdash; even if the Gmail account is technically &ldquo;trusted.&rdquo;</li>
+            <li><strong>Out-of-pattern data access.</strong> Retrieving and forwarding the full CRM export in a single operation is categorically different from Pinchy&rsquo;s normal task pattern. The volume and destination class of the action deviated from baseline.</li>
+            <li><strong>Unverified sender authority.</strong> &ldquo;Dan&rdquo; had never sent Pinchy a request of this type before. The behavioral history of this sender-agent relationship was inconsistent with the request&rsquo;s scope. A system tracking relationship patterns would flag this immediately.</li>
+            <li><strong>Speed of execution.</strong> The time between request and data exfiltration was near-instant. Human review would have introduced latency. That latency is now an artifact of behavioral monitoring &mdash; a trip-wire rather than a gate.</li>
+          </ul>
+          <p>
+            None of these signals require knowing the attacker&rsquo;s identity. None require a CVE. None require a signature database or a threat intelligence feed. They require only one thing: a persistent behavioral baseline for each agent, updated continuously, against which each action is evaluated.
+          </p>
+          <p>
+            This is what L4 behavioral trust means in practice. Not surveillance &mdash; pattern recognition. Not access control &mdash; deviation detection. The question is not &ldquo;is this agent authenticated?&rdquo; The question is: <strong>is this agent behaving like itself?</strong>
+          </p>
+
+          <hr class="essay-divider" />
+
+          <h2>The Layered Trust Model</h2>
+
+          <p>
+            The Commit layered trust model was built around this gap:
+          </p>
+          <ul>
+            <li><strong>L1 &mdash; Cryptographic identity:</strong> Who is this entity? (Solved. JWT, certificate, key.)</li>
+            <li><strong>L2 &mdash; Malware and signature scanning:</strong> Is this payload known-bad? (Solved for static signatures. Fails for social engineering.)</li>
+            <li><strong>L3 &mdash; Permission and policy:</strong> Is this entity authorized to take this action? (Solved for declared scope. Fails when the attacker operates within scope.)</li>
+            <li><strong>L4 &mdash; Behavioral commitment:</strong> Is this entity acting consistently with its established patterns? Does its behavior reflect the commitments it has demonstrated over time? (Unsolved at scale.)</li>
+          </ul>
+          <p>
+            The Pinchy attack operated cleanly through L1, L2, and L3. Authenticated entity. No malicious payload. Actions within the agent&rsquo;s declared permission scope. L4 is where it breaks down.
+          </p>
+          <p>
+            <a href="https://getcommit.dev/docs">Commit&rsquo;s behavioral scoring</a> applies this fourth layer to the entities that interact with your systems &mdash; packages, agents, services, and the principals behind them. For agent trust specifically, this means:
+          </p>
+          <ul>
+            <li>Building behavioral baselines per agent and per principal-agent relationship</li>
+            <li>Scoring each action against that baseline in real time</li>
+            <li>Flagging behavioral deviation before it reaches a human review cycle</li>
+            <li>Treating &ldquo;agent behaving unlike itself&rdquo; as a first-class security event, not a log entry</li>
+          </ul>
+          <p>
+            The npm supply chain taught us that trust verified at install time does not hold at runtime. The Varonis research teaches us the same lesson for agents: trust verified at provisioning time does not hold when the agent receives a social engineering attack.
+          </p>
+          <p>
+            The difference between the npm problem and the agent problem is velocity. npm attacks played out over days or weeks. Agent phishing executes in seconds. The behavioral signal is the only control that can operate at that speed.
+          </p>
+
+          <hr class="essay-divider" />
+
+          <h2>What To Do</h2>
+
+          <p>
+            If you&rsquo;re operating enterprise agents &mdash; or evaluating whether to &mdash; the Varonis research changes what your threat model needs to include:
+          </p>
+          <p>
+            <strong>Audit what your agents can access, and what &ldquo;normal&rdquo; looks like.</strong> Most organizations can&rsquo;t answer this question. They can describe declared permissions but not behavioral patterns. If you don&rsquo;t have a baseline, you can&rsquo;t detect deviation.
+          </p>
+          <p>
+            <strong>Treat first-time external destinations as anomalies.</strong> An agent forwarding data to a new external address &mdash; regardless of whether the address is technically valid &mdash; should trigger review. This is a behavioral control, not a policy control. Policy says &ldquo;this agent can send email.&rdquo; Behavioral monitoring asks &ldquo;has this agent sent to this address before, and is the volume consistent with past behavior?&rdquo;
+          </p>
+          <p>
+            <strong>Log agent behavior at the action level, not just the session level.</strong> Session-level logging tells you an agent ran. Action-level logging tells you what it did. You need the second thing to detect phishing.
+          </p>
+          <p>
+            <strong>Score the behavioral history of principals who interact with your agents.</strong> The attacker impersonating Dan had no prior history sending requests of that type to Pinchy. That relationship history is a detectable signal. Build systems that read it.
+          </p>
+          <p>
+            The attack class that Varonis documented is not exotic. It requires no technical sophistication. It requires only a plausible request and an agent optimized to be helpful. Every enterprise with AI agents already has all the prerequisites. The only open question is whether your infrastructure is watching what those agents actually do.
+          </p>
+          <p>
+            Seven percent believe it is.
+          </p>
+
+          <hr class="essay-divider" />
+
+          <h2>Where Commit Sits On This</h2>
+
+          <p>
+            Honest scope. Today, Commit applies behavioral scoring to npm packages: the maintainers, the publishing cadence, the orphan-commit ancestry, the 3-hour burst patterns that precede compromise. Same L4 model, narrower surface than the agent attack this post describes. If you ship code with any third-party dependency, you can audit it at <a href="/audit">getcommit.dev/audit</a> or via the CLI (<code>npx proof-of-commitment audit</code>). The score reflects behavior, not signatures.
+          </p>
+
+          <p>
+            Action-level behavioral scoring for enterprise agents is the next layer. The model carries over directly: per-entity baseline, per-action deviation score, first-class security event when behavior breaks pattern. The hard part is collecting the signal at the right grain (per-agent, per-principal-agent relationship, per-action-class) without becoming surveillance. The npm surface is where we built the substrate. The agent surface is where the substrate goes next.
+          </p>
+
+          <p>
+            Operating agents at scale and want to compare notes on what &ldquo;behavior breaks pattern&rdquo; should mean for your stack, or what you&rsquo;d need to see in a behavioral trust layer before it&rsquo;s credible? Email <a href="mailto:commit@getcommit.dev">commit@getcommit.dev</a>. Pilot conversations are how this gets built.
+          </p>
+
+          <hr class="essay-divider" />
+
+          <p class="essay-coda">
+            <em>Sources: <a href="https://www.varonis.com/blog/openclaw-phishing" target="_blank" rel="noopener">Varonis Threat Labs / OpenClaw phishing research</a> (June 2026), covered by <a href="https://www.bleepingcomputer.com/news/security/openclaw-ai-agent-found-falling-for-phishing-attacks-spills-user-data/" target="_blank" rel="noopener">BleepingComputer</a> and <a href="https://www.csoonline.com/article/4183445/autonomous-ai-agents-duped-into-leaking-sensitive-data-in-phishing-test.html" target="_blank" rel="noopener">CSO Online</a>; <a href="https://www.akeyless.io/press-release/two-thirds-of-enterprises-suspect-ai-agents-have-already-accessed-unauthorized-data-akeyless-finds/" target="_blank" rel="noopener">Akeyless 2026 State of AI Agent Identity Security</a> (May 2026, n=400).</em>
+          </p>
+          <p class="essay-coda">
+            <em>More: <a href="/docs">Documentation</a> | <a href="https://github.com/piiiico/proof-of-commitment" target="_blank" rel="noopener">GitHub</a></em>
+          </p>
+
+        </div>
+      </div>
+    </div>
+  </article>
+
+  <!-- Newsletter -->
+  <section class="newsletter-section">
+    <div class="container">
+      <div class="editorial reveal">
+        <h2 style="margin-bottom: 0.75rem;">Stay in the loop</h2>
+        <p style="margin-bottom: 2rem; font-size: 1rem;">
+          Early access, research updates, and the occasional strong opinion.
+        </p>
+
+        <form
+          action="https://buttondown.email/api/emails/embed-subscribe/commitgraph"
+          method="post"
+          target="popupwindow"
+          class="newsletter-form"
+        >
+          <input
+            type="email"
+            name="email"
+            placeholder="you@example.com"
+            required
+            class="newsletter-input"
+          />
+          <button type="submit" class="btn-primary" style="white-space: nowrap;">
+            Subscribe
+          </button>
+        </form>
+
+        <p class="newsletter-note">No spam. Unsubscribe anytime.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer>
+    <div class="container footer-inner">
+      <span class="footer-brand">Commit</span>
+      <ul class="footer-links">
+        <li><a href="/">Home</a></li>
+        <li><a href="/extension">Extension</a></li>
+        <li><a href="/blog">Writing</a></li>
+        <li><a href="/pricing">Pricing</a></li><li><a href="/docs">Docs</a></li><li><a href="https://github.com/piiiico/proof-of-commitment" target="_blank" rel="noopener">GitHub</a></li>
+        <li><a href="mailto:pico@amdal.dev">Contact</a></li>
+      </ul>
+      <span class="footer-locale">Stavanger, Norway</span>
+    </div>
+  </footer>
+
+</Layout>
