@@ -254,6 +254,70 @@ async function checkLiveTokens(): Promise<boolean> {
 // ---------------------------------------------------------------------------
 
 // ---------------------------------------------------------------------------
+// SHARED HELPER: Object-key extraction (brace-walking, not regex)
+// ---------------------------------------------------------------------------
+//
+// Finds `const <varName> = { ... }` in `source` and returns the set of
+// top-level quoted keys.  Used by GUARD 3 (hero-ref mapping) and GUARD 4
+// (emitted-refs ⊆ REF_TO_SOURCE).
+//
+// Simple regex would mis-match nested objects; this brace-walker is correct
+// for the patterns in get-started.astro.
+function extractObjectKeys(source: string, varName: string): Set<string> | null {
+  // Anchor on `const NAME` then jump past any TypeScript type annotation
+  // (which itself may contain `{...}`) to the `=` sign and find the
+  // object literal opening brace after it.
+  const anchor = `const ${varName}`;
+  const startIdx = source.indexOf(anchor);
+  if (startIdx === -1) return null;
+  const eqIdx = source.indexOf("=", startIdx);
+  if (eqIdx === -1) return null;
+  const openIdx = source.indexOf("{", eqIdx);
+  if (openIdx === -1) return null;
+  let depth = 0;
+  let endIdx = -1;
+  for (let i = openIdx; i < source.length; i++) {
+    const c = source[i];
+    if (c === "{") depth++;
+    else if (c === "}") {
+      depth--;
+      if (depth === 0) { endIdx = i; break; }
+    }
+  }
+  if (endIdx === -1) return null;
+  const body = source.slice(openIdx + 1, endIdx);
+  // Match only top-level keys (depth-1). Walk the body counting braces.
+  const keys = new Set<string>();
+  depth = 0;
+  let i = 0;
+  while (i < body.length) {
+    const c = body[i];
+    if (c === "{") depth++;
+    else if (c === "}") depth--;
+    else if (depth === 0 && (c === "'" || c === '"')) {
+      const quote = c;
+      const start = i + 1;
+      let j = start;
+      while (j < body.length && body[j] !== quote) {
+        if (body[j] === "\\") j++; // skip escape
+        j++;
+      }
+      const key = body.slice(start, j);
+      // Only count quoted strings followed by `:` (object keys, not values)
+      let k = j + 1;
+      while (k < body.length && /\s/.test(body[k])) k++;
+      if (body[k] === ":" && /^[a-zA-Z0-9_-]+$/.test(key)) {
+        keys.add(key);
+      }
+      i = j + 1;
+      continue;
+    }
+    i++;
+  }
+  return keys;
+}
+
+// ---------------------------------------------------------------------------
 // GUARD 3: HERO_BY_REF ⊇ REF_TO_SOURCE (orphan-promise prevention)
 // ---------------------------------------------------------------------------
 //
@@ -288,64 +352,8 @@ async function checkHeroRefMapping(): Promise<boolean> {
     return true;
   }
 
-  function extractObjectKeys(varName: string): Set<string> | null {
-    // Find the declaration anchor, then walk braces forward until the
-    // matching closing brace. Simple regex would mis-match nested objects.
-    // Anchor on `const NAME` then jump past any TypeScript type annotation
-    // (which itself may contain `{...}`) to the `=` sign and find the
-    // object literal opening brace after it.
-    const anchor = `const ${varName}`;
-    const startIdx = source.indexOf(anchor);
-    if (startIdx === -1) return null;
-    const eqIdx = source.indexOf("=", startIdx);
-    if (eqIdx === -1) return null;
-    const openIdx = source.indexOf("{", eqIdx);
-    if (openIdx === -1) return null;
-    let depth = 0;
-    let endIdx = -1;
-    for (let i = openIdx; i < source.length; i++) {
-      const c = source[i];
-      if (c === "{") depth++;
-      else if (c === "}") {
-        depth--;
-        if (depth === 0) { endIdx = i; break; }
-      }
-    }
-    if (endIdx === -1) return null;
-    const body = source.slice(openIdx + 1, endIdx);
-    // Match only top-level keys (depth-1). Walk the body counting braces.
-    const keys = new Set<string>();
-    depth = 0;
-    let i = 0;
-    while (i < body.length) {
-      const c = body[i];
-      if (c === "{") depth++;
-      else if (c === "}") depth--;
-      else if (depth === 0 && (c === "'" || c === '"')) {
-        const quote = c;
-        const start = i + 1;
-        let j = start;
-        while (j < body.length && body[j] !== quote) {
-          if (body[j] === "\\") j++; // skip escape
-          j++;
-        }
-        const key = body.slice(start, j);
-        // Only count quoted strings followed by `:` (object keys, not values)
-        let k = j + 1;
-        while (k < body.length && /\s/.test(body[k])) k++;
-        if (body[k] === ":" && /^[a-zA-Z0-9_-]+$/.test(key)) {
-          keys.add(key);
-        }
-        i = j + 1;
-        continue;
-      }
-      i++;
-    }
-    return keys;
-  }
-
-  const refKeys = extractObjectKeys("REF_TO_SOURCE");
-  const heroKeys = extractObjectKeys("HERO_BY_REF");
+  const refKeys = extractObjectKeys(source, "REF_TO_SOURCE");
+  const heroKeys = extractObjectKeys(source, "HERO_BY_REF");
   if (!refKeys || !heroKeys) {
     console.warn(`⚠️  Hero-ref check: could not parse REF_TO_SOURCE/HERO_BY_REF — skipping.`);
     return true;
@@ -374,7 +382,102 @@ async function checkHeroRefMapping(): Promise<boolean> {
 }
 
 // ---------------------------------------------------------------------------
-// GUARD 4: No crawler-followable /api/checkout in static HTML
+// GUARD 4: Emitted refs ⊆ REF_TO_SOURCE (attribution-leak prevention)
+// ---------------------------------------------------------------------------
+//
+// audit.astro is the primary source surface — it emits ?ref= values via:
+//   1. Static href="/get-started?ref=<value>" anchor attributes
+//   2. renderInlineForm(headline, '/get-started?ref=<value>', '<value>', ...)
+//      — 3rd positional arg is the refTag (also appears in the URL literal)
+//   3. renderRateLimitRescue({ ..., webRef: '<value>' })
+//      — webRef is stored in api_keys.source; appears in upgradeUrl too
+//
+// Pattern 1 is a superset: every ref in patterns 2 and 3 also appears as a
+// URL literal containing `/get-started?ref=<value>`. A single regex on the
+// full audit.astro source catches them all.
+//
+// When a new ref is added to audit.astro but NOT to get-started.astro
+// REF_TO_SOURCE, the attribution is silently dropped — api_keys.source
+// records nothing, the funnel report misses the cohort.
+//
+// 2nd occurrence of this pattern (1st: audit-web-critical/healthy, 2026-05-22;
+// 2nd: audit-web-compromised, 2026-06-10 ~2h gap). Per CLAUDE.md escalation
+// rule ("2nd occurrence → code gate"), this is the guard that prevents a 3rd.
+//
+// NOTE (future work): proof-of-commitment/src/backend/worker.ts also maintains
+// VALID_SOURCES. A cross-repo guard enforcing worker.ts VALID_SOURCES ⊇ audit.astro
+// refs would close the remaining gap — out of scope for this first iteration.
+async function checkEmittedRefs(): Promise<boolean> {
+  const auditPath = join(SRC_DIR, "pages", "audit.astro");
+  const getStartedPath = join(SRC_DIR, "pages", "get-started.astro");
+
+  let auditSource: string;
+  let getStartedSource: string;
+  try {
+    auditSource = await Bun.file(auditPath).text();
+  } catch {
+    console.warn(`⚠️  Emitted-refs check: could not read ${auditPath} — skipping.`);
+    return true;
+  }
+  try {
+    getStartedSource = await Bun.file(getStartedPath).text();
+  } catch {
+    console.warn(`⚠️  Emitted-refs check: could not read ${getStartedPath} — skipping.`);
+    return true;
+  }
+
+  // Extract every ref value emitted via /get-started?ref=<value> in audit.astro.
+  // This regex matches both relative paths (/get-started?ref=foo) and absolute
+  // URLs (https://getcommit.dev/get-started?ref=foo).
+  const emittedRefs = new Set<string>();
+  const refEmitRe = /\/get-started\?ref=([a-zA-Z0-9_-]+)/g;
+  let m: RegExpExecArray | null;
+  while ((m = refEmitRe.exec(auditSource)) !== null) {
+    emittedRefs.add(m[1]);
+  }
+  // Also catch standalone webRef: '<value>' assignments that may not always
+  // co-appear with a URL literal (belt-and-suspenders for future refactors).
+  const webRefRe = /webRef\s*:\s*['"]([a-zA-Z0-9_-]+)['"]/g;
+  while ((m = webRefRe.exec(auditSource)) !== null) {
+    emittedRefs.add(m[1]);
+  }
+
+  if (emittedRefs.size === 0) {
+    console.warn("⚠️  Emitted-refs check: no refs found in audit.astro — skipping.");
+    return true;
+  }
+
+  const refToSource = extractObjectKeys(getStartedSource, "REF_TO_SOURCE");
+  if (!refToSource) {
+    console.warn("⚠️  Emitted-refs check: could not parse REF_TO_SOURCE in get-started.astro — skipping.");
+    return true;
+  }
+
+  const missing: string[] = [];
+  for (const ref of emittedRefs) {
+    if (!refToSource.has(ref)) missing.push(ref);
+  }
+
+  if (missing.length > 0) {
+    console.log("");
+    console.log("┌─────────────────────────────────────────────────────────────────┐");
+    console.log("│  ❌ ATTRIBUTION-LEAK: audit.astro emits refs missing REF_TO_SOURCE │");
+    console.log("└─────────────────────────────────────────────────────────────────┘");
+    for (const r of missing) console.log(`  - ${r}`);
+    console.log("");
+    console.log("  Add a REF_TO_SOURCE entry for each ref above in:");
+    console.log("    src/pages/get-started.astro");
+    console.log("  (Also add a HERO_BY_REF entry so GUARD 3 passes.)");
+    console.log("");
+    return false;
+  }
+
+  console.log(`✅ Emitted-refs check: ${emittedRefs.size} refs from audit.astro all present in REF_TO_SOURCE`);
+  return true;
+}
+
+// ---------------------------------------------------------------------------
+// GUARD 5: No crawler-followable /api/checkout in static HTML
 // ---------------------------------------------------------------------------
 //
 // Shipped 2026-06-07 alongside get-started.astro upgrade-button refactor.
@@ -514,6 +617,7 @@ console.log("🔍 Pre-deploy guard: checking source/production divergence...\n")
 const distOk = await checkDistStaleness();
 const liveOk = await checkLiveTokens();
 const heroOk = await checkHeroRefMapping();
+const emittedRefsOk = await checkEmittedRefs();
 const noStaticCheckoutOk = await checkNoStaticCheckoutLinks();
 
 console.log("");
@@ -530,6 +634,10 @@ if (!heroOk) {
   await handleDivergence("REF_TO_SOURCE has refs without matching HERO_BY_REF entries (orphan promise).");
 }
 
+if (!emittedRefsOk) {
+  await handleDivergence("audit.astro emits refs not present in get-started.astro REF_TO_SOURCE (attribution leak).");
+}
+
 if (!noStaticCheckoutOk) {
   // Hard-fail: this is a measurement-pollution + Stripe-resource bug class,
   // not a stylistic concern. handleDivergence allows CONFIRM-override, which
@@ -542,7 +650,7 @@ if (!noStaticCheckoutOk) {
   console.log("  DEPLOY_FORCE=1 — proceeding despite static-checkout-link findings.\n");
 }
 
-if (distOk && liveOk && heroOk && noStaticCheckoutOk) {
+if (distOk && liveOk && heroOk && emittedRefsOk && noStaticCheckoutOk) {
   console.log("✅ Pre-deploy guard: source/production in sync — proceeding.\n");
 }
 
