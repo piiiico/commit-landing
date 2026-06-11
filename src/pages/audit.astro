@@ -1968,12 +1968,37 @@ uuid</textarea>
               // the user sees a key + dashboard link but no acknowledgment
               // that monitoring already started, so the proposition shift
               // is invisible at the warmest moment.
+              // 2026-06-11 (later, post-Phantom-Gyp dogfood): surface the
+              // unwatched packages BY NAME when the user audited more than
+              // the free cap (3). Article→audit funnels (e.g. Phantom Gyp's
+              // 6-package pre-fill) hit this gap silently — the user came
+              // to monitor 6 confirmed-compromised packages, gets 3, and the
+              // success state previously said "Now watching 3 packages" with
+              // no acknowledgment of the missed 3. Naming them turns the
+              // upgrade pitch from generic ("Developer $15/mo") into concrete
+              // ("specifically these 3 you just audited"). Read input from
+              // the textarea, not _lastResults, because rate-limit-taste mode
+              // truncates _lastResults but not textarea — the user's expressed
+              // intent is the 6 names they typed/pasted, not what was scored.
               const watched = Array.isArray(data.watched_packages) ? data.watched_packages : [];
+              const _watchInputArea = document.getElementById('packages-input') as HTMLTextAreaElement | null;
+              const _watchInputNames = _watchInputArea
+                ? _watchInputArea.value.split(/[\n,]+/).map(s => s.trim()).filter(Boolean)
+                : [];
+              const _watchedSet = new Set(watched.map(w => w.name));
+              const _unwatchedFromInput = _watchInputNames.filter(n => !_watchedSet.has(n));
+              const _watchedHeadline = (_unwatchedFromInput.length > 0 && _watchInputNames.length > watched.length)
+                ? `<strong style="color:#166534;">✓ Now watching ${watched.length} of ${_watchInputNames.length} packages from your audit</strong>`
+                : `<strong style="color:#166534;">✓ Now watching ${watched.length === 1 ? watched[0].name : `${watched.length} packages from your audit`}</strong>`;
+              const _unwatchedHint = _unwatchedFromInput.length > 0
+                ? `<br><span style="font-size:0.78rem;color:#7c2d12;"><strong>Not watched (free cap = 3):</strong> ${_unwatchedFromInput.slice(0, 5).map(n => `<code style="background:#fef2f2;padding:0 0.2rem;">${n}</code>`).join(', ')}${_unwatchedFromInput.length > 5 ? ` +${_unwatchedFromInput.length - 5} more` : ''} — Developer ($15/mo) watches 15.</span>`
+                : '';
               const watchedBlock = watched.length > 0
                 ? `<div style="margin-top:0.6rem;padding:0.55rem 0.75rem;background:#f4f7f1;border-left:3px solid #4a7c2a;font-size:0.85rem;">` +
-                  `<strong style="color:#166534;">✓ Now watching ${watched.length === 1 ? watched[0].name : `${watched.length} packages from your audit`}</strong>` +
+                  _watchedHeadline +
                   (watched.length > 1 ? `: <span style="color:var(--ink-muted);">${watched.map(w => w.name).join(', ')}</span>` : '') +
                   `<br><span style="font-size:0.78rem;color:var(--ink-muted);">Weekly digest Mondays · instant email if any score drops a tier.</span>` +
+                  _unwatchedHint +
                   `</div>`
                 : '';
               if (data.key) {
