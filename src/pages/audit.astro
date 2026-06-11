@@ -1280,6 +1280,54 @@ uuid</textarea>
     let _lastResults: AuditResult[] = [];
     let _lastRepoLabel = '';
 
+    // Build a prioritized watchlist seed from the current audit results.
+    //
+    // Why: the post-results signup CTA used to send only `{ email, source }`.
+    // Backend then issued a key with an empty default project — leaving the
+    // user with a wallet of generic `poc watch express / lodash` examples
+    // orthogonal to what they audited. Real outcome: empty watchlist, empty
+    // weekly digest, proposition delivered zero immediate value. The
+    // disconfirming-read pattern across 13 funnel-surface fixes pointed at
+    // PROPOSITION, not surface, as the bottleneck (19:15Z reflection); this
+    // changes WHAT the email gets you. Backend caps seed length at
+    // PACKAGE_LIMITS.free=3 regardless of input.
+    //
+    // Priority: compromised > CRITICAL > HIGH > others — same risk order the
+    // post-results CTA already keys off (renderInlineForm headline). Caller's
+    // activeEco maps github→npm (audit response packages are always npm even
+    // for github repo audits, per the existing ecoForUrl pattern at L1988).
+    function buildWatchSeeds(): Array<{ name: string; ecosystem: string }> {
+      if (!_lastResults || _lastResults.length === 0) return [];
+      const eco = (activeEco === 'github' || activeEco === 'npm') ? 'npm' : activeEco;
+      function priority(r: AuditResult): number {
+        if (r.compromised) return 0;
+        if (r.riskFlags?.some(f => f.startsWith('CRITICAL'))) return 1;
+        if (r.riskFlags?.some(f => f.startsWith('HIGH'))) return 2;
+        if ((r.riskFlags?.length ?? 0) > 0) return 3;
+        return 4;
+      }
+      const sorted = [..._lastResults]
+        .filter(r => typeof r.name === 'string' && r.name.length > 0 && r.name.length < 215)
+        .sort((a, b) => {
+          const pa = priority(a);
+          const pb = priority(b);
+          if (pa !== pb) return pa - pb;
+          // Tiebreaker: preserve input order (stable-ish sort) by falling back
+          // on stringified index lookup via indexOf in _lastResults
+          return _lastResults.indexOf(a) - _lastResults.indexOf(b);
+        });
+      const seeds: Array<{ name: string; ecosystem: string }> = [];
+      const seen = new Set<string>();
+      for (const r of sorted) {
+        const key = `${r.name}|${eco}`;
+        if (seen.has(key)) continue;
+        seen.add(key);
+        seeds.push({ name: r.name, ecosystem: eco });
+        if (seeds.length >= 3) break; // free-tier cap (backend re-validates)
+      }
+      return seeds;
+    }
+
     // Ecosystem tabs
     let activeEco = 'npm';
     const pkgInputArea = document.getElementById('pkg-input-area')!;
@@ -1855,12 +1903,23 @@ uuid</textarea>
           btn.disabled = true;
           btn.textContent = 'Saving…';
           try {
+            // 2026-06-11: include `watch` — the prioritized package set the
+            // user just audited (top 3, free-tier cap). Backend seeds the
+            // default project's monitored_packages, then the welcome email
+            // names them in step 1 instead of hardcoded examples. Proposition
+            // shift: empty watchlist → already-watching-what-you-came-for.
+            const watch = buildWatchSeeds();
             const res = await fetch(KEYS_API, {
               method: 'POST',
               headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify({ email, source: 'audit-web-inline' }),
+              body: JSON.stringify({ email, source: 'audit-web-inline', watch }),
             });
-            const data = await res.json().catch(() => ({})) as { key?: string; message?: string; error?: string };
+            const data = await res.json().catch(() => ({})) as {
+              key?: string;
+              message?: string;
+              error?: string;
+              watched_packages?: Array<{ name: string; ecosystem: string }>;
+            };
             if (res.ok || res.status === 201) {
               markInlineKey();
               form.hidden = true;
@@ -1902,11 +1961,27 @@ uuid</textarea>
                   `<span style="font-size:0.78rem;color:var(--ink-subtle);margin-left:0.5rem;">Daily re-scans · email alerts · cancel anytime</span>` +
                   `</div>`
                 : '';
+              // 2026-06-11: render the seeded watchlist (free tier, top 3 by
+              // risk priority). Backend echoes what it actually wrote — UI
+              // must trust that echo, not the pre-submit `buildWatchSeeds()`
+              // (the server caps and dedups). Without this confirmation block
+              // the user sees a key + dashboard link but no acknowledgment
+              // that monitoring already started, so the proposition shift
+              // is invisible at the warmest moment.
+              const watched = Array.isArray(data.watched_packages) ? data.watched_packages : [];
+              const watchedBlock = watched.length > 0
+                ? `<div style="margin-top:0.6rem;padding:0.55rem 0.75rem;background:#f4f7f1;border-left:3px solid #4a7c2a;font-size:0.85rem;">` +
+                  `<strong style="color:#166534;">✓ Now watching ${watched.length === 1 ? watched[0].name : `${watched.length} packages from your audit`}</strong>` +
+                  (watched.length > 1 ? `: <span style="color:var(--ink-muted);">${watched.map(w => w.name).join(', ')}</span>` : '') +
+                  `<br><span style="font-size:0.78rem;color:var(--ink-muted);">Weekly digest Mondays · instant email if any score drops a tier.</span>` +
+                  `</div>`
+                : '';
               if (data.key) {
                 successEl.innerHTML =
                   `<strong>✓ Your free API key</strong> — copy it now, backup sent to ${email}:<br>` +
-                  `<code>${data.key}</code><br>` +
-                  `<span style="font-size:0.82rem;color:var(--ink-muted);">` +
+                  `<code>${data.key}</code>` +
+                  watchedBlock +
+                  `<br><span style="font-size:0.82rem;color:var(--ink-muted);">` +
                   `<strong>Next:</strong> fail PRs that introduce CRITICAL deps in this repo: ` +
                   `<code>npx proof-of-commitment poc init</code> ` +
                   `(paste your key when prompted) · ` +
@@ -1916,6 +1991,7 @@ uuid</textarea>
               } else {
                 successEl.innerHTML =
                   `<strong>✓ Check your inbox.</strong> We sent your free API key to ${email}.` +
+                  watchedBlock +
                   ` <strong>Next:</strong> in this repo, run <code>npx proof-of-commitment poc init</code> ` +
                   `to fail PRs that introduce CRITICAL deps.` +
                   developerUpgradeBlock;
@@ -2175,28 +2251,50 @@ uuid</textarea>
           btnEl.disabled = true;
           btnEl.textContent = 'Saving…';
           try {
+            // 2026-06-11: pass the prioritized watch seeds — same proposition
+            // change as the post-results CTA. Rate-limit rescue users have
+            // already burned through 60+ audits today (RATE_LIMIT_TASTE
+            // partial results visible above this form); they're warm. Seeding
+            // makes the offer "free key + we start watching the ones you
+            // care about" rather than "free key + figure it out yourself."
+            const watch = buildWatchSeeds();
             const res = await fetch(KEYS_API, {
               method: 'POST',
               headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify({ email, source: opts.webRef }),
+              body: JSON.stringify({ email, source: opts.webRef, watch }),
             });
-            const data = await res.json().catch(() => ({})) as { key?: string; message?: string; error?: string };
+            const data = await res.json().catch(() => ({})) as {
+              key?: string;
+              message?: string;
+              error?: string;
+              watched_packages?: Array<{ name: string; ecosystem: string }>;
+            };
             if (res.ok || res.status === 201) {
               markInlineKey();
               form.hidden = true;
               const hint = ctaEl.querySelector('.cta-hint') as HTMLElement | null;
               if (hint) hint.hidden = true;
+              const watchedRescue = Array.isArray(data.watched_packages) ? data.watched_packages : [];
+              const watchedRescueBlock = watchedRescue.length > 0
+                ? `<div style="margin-top:0.6rem;padding:0.55rem 0.75rem;background:#f4f7f1;border-left:3px solid #4a7c2a;font-size:0.85rem;">` +
+                  `<strong style="color:#166534;">✓ Now watching ${watchedRescue.length === 1 ? watchedRescue[0].name : `${watchedRescue.length} packages from your audit`}</strong>` +
+                  (watchedRescue.length > 1 ? `: <span style="color:var(--ink-muted);">${watchedRescue.map(w => w.name).join(', ')}</span>` : '') +
+                  `<br><span style="font-size:0.78rem;color:var(--ink-muted);">Weekly digest Mondays · instant email if any score drops a tier.</span>` +
+                  `</div>`
+                : '';
               if (data.key) {
                 successEl.innerHTML =
                   `<strong>✓ Your free API key</strong> — copy it now, backup sent to ${email}:<br>` +
-                  `<code>${data.key}</code><br>` +
-                  `<span style="font-size:0.82rem;color:var(--ink-muted);">` +
+                  `<code>${data.key}</code>` +
+                  watchedRescueBlock +
+                  `<br><span style="font-size:0.82rem;color:var(--ink-muted);">` +
                   `<strong>Re-run your audit now</strong> — paste the key as <code>Authorization: Bearer ${data.key}</code> ` +
                   `or set it in the CLI with <code>npx proof-of-commitment login ${data.key}</code> · ` +
                   `<a href="/dashboard" style="color:var(--accent);">Dashboard</a></span>`;
               } else {
                 successEl.innerHTML =
                   `<strong>✓ Check your inbox.</strong> We sent your free API key to ${email}. ` +
+                  watchedRescueBlock +
                   `Re-run your audit after pasting the key.`;
               }
               successEl.hidden = false;
