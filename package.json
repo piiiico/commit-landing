@@ -1,0 +1,16 @@
+{
+  "name": "commit-landing-v2",
+  "type": "module",
+  "version": "0.1.0",
+  "scripts": {
+    "dev": "astro dev",
+    "build": "bun scripts/check-funnel-surface-parity.ts && astro build",
+    "preview": "astro preview"
+  },
+  "dependencies": {
+    "@astrojs/rss": "^4.0.18",
+    "astro": "^4.15.0",
+    "blake3-wasm": "2.1.5",
+    "dotenv": "^17.3.1"
+  }
+}
