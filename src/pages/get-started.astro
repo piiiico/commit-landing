@@ -379,6 +379,25 @@ console.log(data.results[0].score); // 0–100 trust score</code></pre>
                 'A free key audits 200 packages/day — your whole tree, not just the one you searched for.<br />' +
                 'Want push alerts the moment a package you watch drops in score, loses publishers, or stalls? Developer ($15/mo) adds monitoring + email alerts.',
             },
+        // 2026-06-12: ci-annotation shipped with npm-package v1.31.0 GitHub
+        // Actions annotation work. The annotation surfaces in PR checks tab
+        // when CI hits the anonymous rate limit; link points here as the
+        // free-key landing. Without this entry the CI visitor lands on the
+        // generic "Get your API key" hero — no echo of the PR-checks moment
+        // they came from. CI is the highest-intent audience (already wired
+        // Commit into a workflow); the copy needs to lead with "add the key
+        // to repo secrets" not "enter your email." 5th occurrence of the
+        // funnel-surface-gap pattern shipped with the npm release that
+        // emits the ref. Symmetric ci-annotation handling lives in
+        // pricing.astro (CONTEXT_BY_CAMPAIGN) for the paid-tier annotation
+        // URL, and worker.ts VALID_SOURCES for attribution.
+        'ci-annotation': {
+          eyebrow: 'From your PR checks',
+          title: 'Get a free key, unblock CI',
+          lead:
+            'Your GitHub Actions run hit the anonymous rate limit on this repo\'s IP. A free key bumps you to 200 audits/day — enough for every PR — no card. Enter your email below; the key appears instantly on screen.<br />' +
+            'Then add it to repo secrets: <code>gh secret set COMMIT_API_KEY</code> (or paste in Settings → Secrets → Actions). Re-run the failed job and the annotation goes away.',
+        },
       };
       const variant = HERO_BY_REF[ref];
       if (!variant) return;
@@ -431,6 +450,7 @@ console.log(data.results[0].score); // 0–100 trust score</code></pre>
           'claude-code-hook-429': 'claude-code-hook-429', // Claude Code PreToolUse hook 429 (npm-package v1.22.0) — 2026-05-29
           'poc-hook': 'poc-hook',                      // Fresh `poc hook` install with no API key configured (npm-package v1.21.0+) — 2026-05-29
           'audit-cli-soft-cta': 'cli-soft-cta',        // CLI inline-prompt engagement-signal gate-bypass (npm-package v1.28.0+) — 2026-06-10
+          'ci-annotation': 'ci-annotation',            // GitHub Actions PR-checks rate-limit annotation (npm-package v1.31.0) — 2026-06-12
         };
         const params = new URLSearchParams(window.location.search);
         const refParam = params.get('ref') ?? '';

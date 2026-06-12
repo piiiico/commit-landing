@@ -826,7 +826,27 @@ import Layout from '../layouts/Layout.astro';
     // preserves through to Stripe metadata).
     (() => {
       const sp = new URLSearchParams(window.location.search);
-      const campaign = sp.get('utm_campaign') ?? '';
+      // 2026-06-12: ref→utm_campaign promotion for npm-package URLs that
+      // emit ?ref=… on /pricing (currently only ci-annotation from v1.31.0
+      // GitHub Actions annotation work). All earlier npm CTAs land here
+      // with proper utm_* params; the v1.31.0 annotation shipped a `ref`
+      // because it mirrors the /get-started?ref=ci-annotation free-tier
+      // URL shape. Without this promotion the CONTEXT_BY_CAMPAIGN banner
+      // stays silent (campaign='' → variant=undefined → return) AND the
+      // Stripe metadata loses ci-annotation as utm_campaign — so paid CI
+      // signups silently bucket as 'web' in api_keys.source.
+      // Promote only when utm_campaign is unset so existing utm-tagged
+      // URLs aren't overwritten by a stray ref.
+      let campaign = sp.get('utm_campaign') ?? '';
+      const refParam = sp.get('ref') ?? '';
+      if (!campaign && refParam && /^[a-z0-9_-]{1,64}$/.test(refParam)) {
+        campaign = refParam;
+        // Mirror into utmSnapshot so the POST /api/checkout-intent body
+        // carries utm_campaign=ci-annotation through to Stripe metadata.
+        // utmSnapshot is captured once at page-load above; mutating it
+        // here is safe — it's a plain object referenced by the modal flow.
+        if (!utmSnapshot.utm_campaign) utmSnapshot.utm_campaign = refParam;
+      }
 
       // ── Specificity-first headline for audit-critical-key ──
       // The audit page passes the user's actual CRITICAL package names via
@@ -976,6 +996,20 @@ import Layout from '../layouts/Layout.astro';
         'key-upgrade': {
           eyebrow: 'From your Commit account',
           msg: 'You hit a free-tier limit. Developer ($15/mo) gives 1,000 audits/day, batch up to 5 packages per call, watches 15 packages (vs 3 free) with daily re-scans, and adds instant email alerts the moment any score drops a tier. 30-day money-back guarantee.',
+        },
+        // 2026-06-12: ci-annotation fires for visitors arriving via the
+        // GitHub Actions PR-checks annotation shipped in npm-package v1.31.0.
+        // The annotation surfaces in CI when an authenticated key has hit
+        // its quota (keyUpgrade branch) or an anonymous IP has burned past
+        // the overshoot threshold — both reach /pricing as the upgrade
+        // destination. By the time they're here they already wired Commit
+        // into a workflow, hit a wall, and decided to look at upgrades:
+        // highest-intent surface in the funnel. Pitch Developer's 1,000/day
+        // + batch + 15-package watch in CI-shaped language ("every PR" +
+        // "every push") so the copy mirrors the moment they came from.
+        'ci-annotation': {
+          eyebrow: 'From your PR checks',
+          msg: 'Your CI hit a Commit rate limit on this repo. Free key gives 200 audits/day — works for a small project but not every PR on every push. Developer ($15/mo) gives 1,000 audits/day, batches up to 5 packages per call, watches 15 packages with daily re-scans, and instantly emails you the moment any score drops a tier. 30-day money-back guarantee.',
         },
       };
       const variant = CONTEXT_BY_CAMPAIGN[campaign];
