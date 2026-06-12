@@ -76,6 +76,7 @@ import Layout from '../layouts/Layout.astro';
             It should arrive within a minute.
           </p>
           <div id="gs-key-display" hidden style="margin: 1rem 0; padding: 1rem; background: var(--bg-muted, #f5f5f5); border-radius: 8px; font-family: monospace; word-break: break-all; font-size: 0.95rem; border: 1px solid var(--border-light, #e0e0e0);"></div>
+          <p id="gs-watching" class="gs-success-watching" hidden style="margin: 0.75rem 0; font-size: 0.95rem;"></p>
           <p class="gs-success-note" id="gs-success-note">
             Didn't get it? Check spam or <a href="mailto:pico@amdal.dev">contact us</a>.
           </p>
@@ -304,18 +305,19 @@ console.log(data.results[0].score); // 0–100 trust score</code></pre>
             'Then pass it in the same terminal: <code>export COMMIT_API_KEY=sk_commit_…</code>',
         },
         'audit-cli-soft-cta': {
-          // Added 2026-06-10 to land the engagement-signal gate-bypass shipped
-          // in npm-package@1.28.0. The CLI inline prompt fires when the backend
-          // returns _cta (this IP scored ≥5 audits today), even on
-          // single-package healthy scans. Anyone who declines the in-terminal
-          // prompt and copies the help-line URL instead arrives here — echo
-          // the same wall-approach framing so the page does not look like the
-          // wrong page.
-          eyebrow: 'Approaching the daily anonymous wall',
-          title: 'Get a free key, keep auditing',
+          // Updated 2026-06-11 v1.29.2: CLI heading rephrased from quota-wall
+          // ("past the free anonymous quota — lift to 200/day") to ongoing-
+          // value ("auto-watch these for the next attack"). Watchlist
+          // auto-seed shipped earlier today (abe53f1) made the value-shaped
+          // proposition concrete: signup → packages from this scan on
+          // watchlist + email if attacked. Hero echo must lead with the
+          // same framing so declined-prompt → URL-copy → page does not
+          // feel like the wrong page.
+          eyebrow: 'Watch your packages for the next attack',
+          title: 'Free email alerts when packages get attacked',
           lead:
-            'Anonymous audits are rate-limited to 15/day on this network IP — shared via corporate NAT, CI runner, or dev container. A free key bumps you to 200/day and alerts you when any package you\'ve audited degrades. No card. Enter your email; your key appears on screen.<br />' +
-            'Then pass it in the same terminal: <code>export COMMIT_API_KEY=sk_commit_…</code> or save it with <code>npx proof-of-commitment login</code>.',
+            'A free key auto-seeds your watchlist from your CLI session and emails you when any of those packages get attacked or score lower. No card. Enter your email; your key appears on screen.<br />' +
+            'Then save it: <code>npx proof-of-commitment login</code> or <code>export COMMIT_API_KEY=sk_commit_…</code>.',
         },
         'cli': {
           eyebrow: 'From the CLI',
@@ -440,8 +442,33 @@ console.log(data.results[0].score); // 0–100 trust score</code></pre>
         const source = REF_TO_SOURCE[refParam] ?? UTM_TO_SOURCE[utmSource];
 
         try {
-          const body: { email: string; source?: string } = { email };
+          const body: { email: string; source?: string; watch?: Array<{ name: string; ecosystem: string }> } = { email };
           if (source) body.source = source;
+          // 2026-06-12: package-profile path now actually watches the package
+          // the user clicked. /npm/:pkg "Track this package" CTA promises
+          // "Watch react. And the rest of your tree." — but pre-this commit
+          // only the source ref was sent. The user's key was created, the
+          // watchlist defaulted to empty/static, and the hero promise didn't
+          // match what the welcome email or weekly digest delivered. The
+          // /audit page already passes `watch` (shipped 2026-06-11 watchlist-
+          // auto-seed); this closes the same gap on /get-started for the
+          // ?ref=pkg-profile&pkg=<name>&eco=<ecosystem> entry-path. Backend
+          // worker.ts /api/keys/create accepts body.watch and caps at
+          // PACKAGE_LIMITS.free (3). pkgName is already sanitized at L249
+          // against the same npm-name shape the backend allows; eco is
+          // validated here against the same ECOSYSTEMS set the backend
+          // checks (worker.ts ECOSYSTEMS = npm|pypi|cargo|golang).
+          // pkgName scope: the IIFE that swaps hero copy declared its own
+          // `pkgName` but in a sibling scope; re-derive here using the same
+          // strict regex to avoid relying on cross-scope IIFE state.
+          const pkgRawSubmit = params.get('pkg') ?? '';
+          const pkgNameSubmit = /^@?[a-z0-9._/-]{1,100}$/i.test(pkgRawSubmit) ? pkgRawSubmit : '';
+          if (refParam === 'pkg-profile' && pkgNameSubmit) {
+            const rawEco = (params.get('eco') ?? 'npm').toLowerCase();
+            const VALID_ECOS = new Set(['npm', 'pypi', 'cargo', 'golang']);
+            const eco = VALID_ECOS.has(rawEco) ? rawEco : 'npm';
+            body.watch = [{ name: pkgNameSubmit, ecosystem: eco }];
+          }
           const res = await fetch('https://poc-backend.amdal-dev.workers.dev/api/keys/create', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
@@ -503,6 +530,27 @@ console.log(data.results[0].score); // 0–100 trust score</code></pre>
                   '</code>';
               } else {
                 noteEl.textContent = 'Copy this key and use it in your requests as: Authorization: Bearer ' + data.key;
+              }
+            }
+
+            // 2026-06-12: echo what we just put on the user's watchlist.
+            // Closes the hero-promise gap on the pkg-profile path: hero says
+            // "Watch react." — success state now confirms "Now watching:
+            // react (npm)." Mirrors the audit-page renderInlineForm success
+            // state which already shows the seeded list. Without this echo
+            // the user sees "Check your email" but has no immediate proof
+            // the click-from-package-page actually started watching that
+            // package — they have to wait for the welcome email step 1 to
+            // find out, by which point a meaningful share of signups have
+            // already bounced before reading email.
+            const watched: Array<{ name: string; ecosystem: string }> = Array.isArray(data?.watched_packages) ? data.watched_packages : [];
+            if (watched.length > 0) {
+              const watchEl = document.getElementById('gs-watching') as HTMLElement | null;
+              if (watchEl) {
+                const names = watched.map((w) => `<code style="background:var(--bg-muted,#f5f5f5);padding:0.1rem 0.3rem;border-radius:3px;">${w.name}</code>`).join(', ');
+                const plural = watched.length === 1 ? 'package' : 'packages';
+                watchEl.innerHTML = `✓ Now watching ${watched.length} ${plural}: ${names}. We'll email you the moment any of them gets attacked or drops in score.`;
+                watchEl.hidden = false;
               }
             }
 
