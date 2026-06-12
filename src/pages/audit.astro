@@ -2008,7 +2008,7 @@ uuid</textarea>
                   watchedBlock +
                   `<br><span style="font-size:0.82rem;color:var(--ink-muted);">` +
                   `<strong>Next:</strong> fail PRs that introduce CRITICAL deps in this repo: ` +
-                  `<code>npx proof-of-commitment poc init</code> ` +
+                  `<code>poc init</code> ` +
                   `(paste your key when prompted) · ` +
                   `<a href="/dashboard" style="color:var(--accent);">Dashboard</a> · ` +
                   `<a href="/pricing?email=${encodeURIComponent(email)}" style="color:var(--accent);">Pricing</a></span>` +
@@ -2017,7 +2017,7 @@ uuid</textarea>
                 successEl.innerHTML =
                   `<strong>✓ Check your inbox.</strong> We sent your free API key to ${email}.` +
                   watchedBlock +
-                  ` <strong>Next:</strong> in this repo, run <code>npx proof-of-commitment poc init</code> ` +
+                  ` <strong>Next:</strong> in this repo, run <code>poc init</code> ` +
                   `to fail PRs that introduce CRITICAL deps.` +
                   developerUpgradeBlock;
               }
@@ -2056,7 +2056,7 @@ uuid</textarea>
           <div class="cta-text">${headline}</div>
           <a href="/dashboard" class="cta-btn cta-btn-secondary">Open dashboard &rarr;</a>
           ${upgradeBlock}
-          <span class="cta-hint">You're signed up · run <code>npx proof-of-commitment poc init</code> in this repo to gate PRs</span>
+          <span class="cta-hint">You're signed up · run <code>poc init</code> in this repo to gate PRs</span>
         `;
         ctaEl.hidden = false;
       }
@@ -2300,11 +2300,31 @@ uuid</textarea>
               const hint = ctaEl.querySelector('.cta-hint') as HTMLElement | null;
               if (hint) hint.hidden = true;
               const watchedRescue = Array.isArray(data.watched_packages) ? data.watched_packages : [];
+              // 2026-06-12: surface unscored packages by name for rate-limit-rescue path.
+              // Rescue users hit the IP rate-limit (RATE_LIMIT_TASTE=3) — they saw partial
+              // results, filled in their email to unlock. The 3 packages they didn't get
+              // scored are the actionable gap; naming them turns the key pitch from generic
+              // ("Developer $15/mo") into concrete ("score these 3 with your new key").
+              // Read textarea (not _lastResults) — rate-limit-taste truncates _lastResults
+              // but not the textarea; the user's expressed intent is what they typed.
+              const _rescueInputArea = document.getElementById('packages-input') as HTMLTextAreaElement | null;
+              const _rescueInputNames = _rescueInputArea
+                ? _rescueInputArea.value.split(/[\n,]+/).map(s => s.trim()).filter(Boolean)
+                : [];
+              const _rescueWatchedSet = new Set(watchedRescue.map(w => w.name));
+              const _rescueUnscored = _rescueInputNames.filter(n => !_rescueWatchedSet.has(n));
+              const _rescueHeadline = (_rescueUnscored.length > 0 && _rescueInputNames.length > watchedRescue.length)
+                ? `<strong style="color:#166534;">✓ Now watching ${watchedRescue.length} of ${_rescueInputNames.length} packages from your audit</strong>`
+                : `<strong style="color:#166534;">✓ Now watching ${watchedRescue.length === 1 ? watchedRescue[0].name : `${watchedRescue.length} packages from your audit`}</strong>`;
+              const _rescueUnscoredHint = _rescueUnscored.length > 0
+                ? `<br><span style="font-size:0.78rem;color:#7c2d12;"><strong>Not yet scored (use your new key):</strong> ${_rescueUnscored.slice(0, 5).map(n => `<code style="background:#fef2f2;padding:0 0.2rem;">${n}</code>`).join(', ')}${_rescueUnscored.length > 5 ? ` +${_rescueUnscored.length - 5} more` : ''} — Developer ($15/mo, 1000 audits/day) scores them in one batch.</span>`
+                : '';
               const watchedRescueBlock = watchedRescue.length > 0
                 ? `<div style="margin-top:0.6rem;padding:0.55rem 0.75rem;background:#f4f7f1;border-left:3px solid #4a7c2a;font-size:0.85rem;">` +
-                  `<strong style="color:#166534;">✓ Now watching ${watchedRescue.length === 1 ? watchedRescue[0].name : `${watchedRescue.length} packages from your audit`}</strong>` +
+                  _rescueHeadline +
                   (watchedRescue.length > 1 ? `: <span style="color:var(--ink-muted);">${watchedRescue.map(w => w.name).join(', ')}</span>` : '') +
                   `<br><span style="font-size:0.78rem;color:var(--ink-muted);">Weekly digest Mondays · instant email if any score drops a tier.</span>` +
+                  _rescueUnscoredHint +
                   `</div>`
                 : '';
               if (data.key) {
