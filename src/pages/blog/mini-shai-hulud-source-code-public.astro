@@ -1,0 +1,257 @@
+---
+import Layout from '../../layouts/Layout.astro';
+---
+
+<Layout
+  title="The Mini Shai-Hulud Worm Has Been Public for 31 Days. Two Derivatives Have Shipped. &mdash; Commit"
+  description="TeamPCP open-sourced their self-propagating npm worm on May 12. Within 31 days, two derivative campaigns have shipped — Red Hat Miasma and Phantom Gyp — each finding a new bypass the last one couldn't survive. The pattern is clear."
+  canonical="https://getcommit.dev/blog/mini-shai-hulud-source-code-public/"
+  publishDate="2026-06-12"
+>
+
+  <!-- Nav -->
+  <nav>
+    <div class="container nav-inner">
+      <a href="/" class="nav-brand">Commit</a>
+      <ul class="nav-links">
+        <li><a href="/extension">Extension</a></li>
+        <li><a href="/blog">Writing</a></li>
+        <li><a href="/pricing">Pricing</a></li><li><a href="/docs">Docs</a></li><li><a href="https://github.com/piiiico/proof-of-commitment" target="_blank" rel="noopener">GitHub</a></li>
+        <li><a href="mailto:pico@amdal.dev">Contact</a></li>
+      </ul>
+    </div>
+  </nav>
+
+  <!-- Essay -->
+  <article class="essay">
+    <div class="container">
+      <div class="editorial">
+
+        <!-- Header -->
+        <header class="essay-header">
+          <div class="essay-meta animate-in delay-1">
+            <time datetime="2026-06-12">June 12, 2026</time>
+          </div>
+          <h1 class="essay-title animate-in delay-2">The Worm Has Been Public for 31 Days. Two Derivatives Have Shipped.</h1>
+          <p class="essay-subtitle animate-in delay-3">
+            TeamPCP pushed Mini Shai-Hulud to GitHub on May 12. Within a month, two independent
+            campaigns had forked it. Each invented a new install-time bypass the previous defense
+            couldn't survive. The pattern is now clear enough to predict the next one.
+          </p>
+          <p class="essay-byline animate-in delay-4">Pico</p>
+        </header>
+
+        <!-- Body -->
+        <div class="essay-body">
+
+          <p>
+            On May 11, 2026, TeamPCP poisoned 172 packages across npm and PyPI in a single coordinated
+            wave. TanStack, Mistral AI, OpenSearch, UiPath, Guardrails AI. The mechanism wasn't a typo-squat
+            or a leaked credential. It was a misconfigured GitHub Actions workflow on TanStack itself.
+            The malware exchanged the ambient OIDC token for npm publish access and shipped legitimately-attested
+            malicious tarballs to the registry.
+          </p>
+
+          <p>
+            Twenty-four hours later, TeamPCP published the source.
+            <a href="https://www.akamai.com/blog/security-research/mini-shai-hulud-worm-returns-goes-public" target="_blank" rel="noopener">Akamai</a> dated the release to the evening of May 12.
+            The worm became a starter kit.
+          </p>
+
+          <h2>The original was uncatchable by scoring</h2>
+
+          <p>
+            I want to be honest about this. The packages TeamPCP hit on May 11 were high-trust.
+            <code>@tanstack/react-router</code> has 19.7M weekly downloads, 5 publishers, MIT license,
+            active development. It scores 91 on <a href="/audit?packages=@tanstack/react-router">Commit&rsquo;s behavioral audit</a>.
+            The attack didn't compromise the publishers. It compromised the pipeline those publishers
+            used to release.
+          </p>
+
+          <p>
+            A scoring layer that measures publisher concentration, maintainer continuity, and release
+            cadence will not flag <code>@tanstack/react-router</code>. It shouldn't. Those signals are
+            doing their job. They describe a healthy package. The TanStack attack walked around them by
+            skipping the publisher layer entirely.
+          </p>
+
+          <p>
+            If the only campaigns we ever had to defend against were CI/CD pipeline hijacks against
+            top-50 npm packages, behavioral scoring would be irrelevant. That's not what came next.
+          </p>
+
+          <h2>Derivative #1: Red Hat Miasma (June 1)</h2>
+
+          <p>
+            Twenty days after the source release,
+            <a href="https://research.jfrog.com/post/shai-hulud-miasma-redhat-cloud-services/" target="_blank" rel="noopener">JFrog reported</a>
+            that 96 versions across 32 <code>@redhat-cloud-services</code> packages had been republished
+            with malicious <code>preinstall</code> hooks. The packages carried valid SLSA Build Level 3
+            provenance, signed by Red Hat's own build environment after that environment had been
+            quietly compromised.
+          </p>
+
+          <p>
+            The payload set "Miasma: The Spreading Blight" as the description on attacker-created
+            exfiltration repos. That string is now the field marker for everything downstream from
+            the open-sourced code. It is not a TeamPCP marker. It belongs to whoever ran the binary.
+          </p>
+
+          <p>
+            Red Hat's packages scored 65&ndash;83. That's high. Once again, the attack used compromised
+            infrastructure on otherwise healthy packages. Provenance was meant to be the defense layer
+            here. It signed the malware too.
+          </p>
+
+          <h2>Derivative #2: Phantom Gyp (June 3)</h2>
+
+          <p>
+            Forty-eight hours after Red Hat, the lifecycle-script defense closed. So the next wave
+            stopped using lifecycle scripts. A 157-byte <code>binding.gyp</code> file triggers
+            <code>node-gyp rebuild</code> during install &mdash; it's how native addons have built since 2012.
+            <a href="https://www.stepsecurity.io/blog/binding-gyp-npm-supply-chain-attack-spreads-like-worm" target="_blank" rel="noopener">StepSecurity named the technique &ldquo;Phantom Gyp.&rdquo;</a>
+            <a href="/blog/phantom-gyp-binding-gyp-bypass">I wrote up the technique last week.</a>
+          </p>
+
+          <p>
+            But here is the part nobody has emphasized: the packages Phantom Gyp hit are completely
+            different from the TanStack wave. They are not high-trust at all.
+          </p>
+
+          <div class="essay-table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>Wave</th>
+                  <th>Example package</th>
+                  <th>Score</th>
+                  <th>Publishers</th>
+                  <th>Weekly DL</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>TanStack (May 11)</td>
+                  <td>@tanstack/react-router</td>
+                  <td>91</td>
+                  <td>5</td>
+                  <td>19.7M</td>
+                </tr>
+                <tr>
+                  <td>Red Hat Miasma (Jun 1)</td>
+                  <td>@redhat-cloud-services/types</td>
+                  <td>65&ndash;83</td>
+                  <td>multi</td>
+                  <td>80K</td>
+                </tr>
+                <tr>
+                  <td>Phantom Gyp (Jun 3)</td>
+                  <td>autotel</td>
+                  <td>40</td>
+                  <td>1</td>
+                  <td>6K</td>
+                </tr>
+                <tr>
+                  <td>Phantom Gyp (Jun 3)</td>
+                  <td>awaitly</td>
+                  <td>32</td>
+                  <td>1</td>
+                  <td>287</td>
+                </tr>
+                <tr>
+                  <td>Phantom Gyp (Jun 3)</td>
+                  <td>node-env-resolver</td>
+                  <td>28</td>
+                  <td>1</td>
+                  <td>92</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <p>
+            The score profile inverted. TeamPCP went after the top of the registry through the
+            pipeline. The derivatives are working their way down the long tail through the publishers
+            themselves. They harvest single-publisher accounts with no second pair of eyes, then
+            republish whatever those accounts already own.
+          </p>
+
+          <h2>The pattern, plainly stated</h2>
+
+          <p>
+            Three waves of one malware family, in 23 days:
+          </p>
+
+          <ul>
+            <li><strong>TanStack (May 11):</strong> high-trust packages, CI/CD pipeline as the attack surface, <code>postinstall</code> as the execution path.</li>
+            <li><strong>Red Hat (Jun 1):</strong> medium-trust packages, build environment as the attack surface, <code>preinstall</code> + valid provenance as the execution path.</li>
+            <li><strong>Phantom Gyp (Jun 3):</strong> low-trust packages, single-publisher account takeover as the attack surface, <code>binding.gyp</code> as the execution path &mdash; no lifecycle hook at all.</li>
+          </ul>
+
+          <p>
+            Each derivative bypasses the defense that flagged the last one. None of them recycles a
+            technique. And the target profile shifts down the trust gradient with each iteration:
+            from 91 to 65&ndash;83 to 28&ndash;49.
+          </p>
+
+          <h2>What this implies for the next wave</h2>
+
+          <p>
+            The TanStack-style attacks need a CI/CD posture defense: pinning Actions to commit
+            SHAs, locking down OIDC scopes, scanning Actions for memory-scraping behavior on the runner.
+            Behavioral scoring is the wrong layer to catch those, and I'm not going to pretend otherwise.
+          </p>
+
+          <p>
+            The Phantom Gyp side is exactly the shape behavioral scoring exists to catch. Single
+            publisher. No release cadence. Limited adoption. No community oversight. The technique
+            changes (today <code>binding.gyp</code>; next month something nobody has written about yet).
+            The structural profile of the compromised account does not change. That's the constant the
+            scoring layer is built around.
+          </p>
+
+          <p>
+            A reasonable bet on the next derivative: another no-lifecycle execution path
+            (<code>npm-shrinkwrap.json</code> manipulation, <code>files</code>-field smuggling,
+            something in the resolver), targeting another tier of single-publisher packages
+            with the score profile in the 30s. If that's wrong, it's wrong cheap. The defense
+            is the same either way.
+          </p>
+
+          <h2>What to do today</h2>
+
+          <p>
+            <strong>If you're running CI:</strong> pin every GitHub Action to a commit SHA, not a
+            tag. Scope OIDC tokens to the minimum publishing surface. The TanStack pattern walks in
+            through dependency installs in CI. Treat your runners as the same blast radius as your
+            registry credentials.
+          </p>
+
+          <p>
+            <strong>If you're picking dependencies:</strong> the long-tail packages getting hit by
+            derivative waves all score below 60. <a href="/audit">Run your lockfile through a behavioral audit</a>
+            and you'll see which ones sit at the same risk profile as awaitly, autotel, and node-env-resolver,
+            before they ship the next variant.
+          </p>
+
+          <pre><code>npx proof-of-commitment</code></pre>
+
+          <p>
+            Scores every dependency in your project against the same signals that already separated
+            the TanStack victims (high) from the Phantom Gyp victims (low). The toolkit is public.
+            The pattern is public. The defense for the long-tail half of it is one command.
+          </p>
+
+        </div>
+
+        <!-- CTA -->
+        <footer class="essay-cta animate-in delay-5">
+          <p><a href="/audit?packages=@tanstack/react-router,@redhat-cloud-services/types,autotel,awaitly,node-env-resolver" class="cta-button">Score the three waves &rarr;</a></p>
+          <p class="cta-sub">Free CLI &middot; API &middot; MCP server &middot; No account required</p>
+        </footer>
+
+      </div>
+    </div>
+  </article>
+
+</Layout>
