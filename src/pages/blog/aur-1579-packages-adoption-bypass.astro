@@ -1,0 +1,220 @@
+---
+import Layout from '../../layouts/Layout.astro';
+---
+
+<Layout
+  title="1,579 AUR Packages Were Taken Over Through the Adoption Process. The Bypass Was the Process. &mdash; Commit"
+  description="Arch Linux's AUR has a documented mechanism for orphaned packages to be adopted by new maintainers. Last week attackers used it as designed. Number started at 400. Ended at 1,579. The defense missing in every ecosystem is the same one: behavioral history that follows the human, not the package."
+  canonical="https://getcommit.dev/blog/aur-1579-packages-adoption-bypass/"
+  publishDate="2026-06-13"
+>
+
+  <!-- Nav -->
+  <nav>
+    <div class="container nav-inner">
+      <a href="/" class="nav-brand">Commit</a>
+      <ul class="nav-links">
+        <li><a href="/extension">Extension</a></li>
+        <li><a href="/blog">Writing</a></li>
+        <li><a href="/pricing">Pricing</a></li><li><a href="/docs">Docs</a></li><li><a href="https://github.com/piiiico/proof-of-commitment" target="_blank" rel="noopener">GitHub</a></li>
+        <li><a href="mailto:pico@amdal.dev">Contact</a></li>
+      </ul>
+    </div>
+  </nav>
+
+  <!-- Essay -->
+  <article class="essay">
+    <div class="container">
+      <div class="editorial">
+
+        <!-- Header -->
+        <header class="essay-header">
+          <div class="essay-meta animate-in delay-1">
+            <time datetime="2026-06-13">June 13, 2026</time>
+          </div>
+          <h1 class="essay-title animate-in delay-2">1,579 AUR Packages Were Taken Over Through the Adoption Process</h1>
+          <p class="essay-subtitle animate-in delay-3">
+            Arch Linux's AUR has a documented workflow for adopting orphaned packages. Last week
+            attackers used it as designed. The trust attached to the package. The identity behind
+            it didn't have to earn anything.
+          </p>
+          <p class="essay-byline animate-in delay-4">Pico</p>
+        </header>
+
+        <!-- Body -->
+        <div class="essay-body">
+
+          <p>
+            On June 11, the <a href="https://lists.archlinux.org/archives/list/aur-general@lists.archlinux.org/" target="_blank" rel="noopener">aur-general mailing list</a> started seeing reports
+            of suspicious commits on AUR packages. By June 12 morning,
+            <a href="https://www.phoronix.com/news/Arch-Linux-AUR-400-Compromised" target="_blank" rel="noopener">Phoronix counted 400 compromised packages</a>.
+            By that evening, the number was
+            <a href="https://www.phoronix.com/news/Arch-Linux-AUR-More-Than-1500" target="_blank" rel="noopener">1,579</a>.
+          </p>
+
+          <p>
+            The official Arch Linux advisory uses careful language:
+          </p>
+
+          <blockquote>
+            We are currently experiencing a high volume of <strong>malicious package adoptions
+            and updates</strong> in the Arch User Repository.
+            &mdash; <a href="https://archlinux.org/news/active-aur-malicious-packages-incident/" target="_blank" rel="noopener">archlinux.org, June 12 2026</a>
+          </blockquote>
+
+          <p>
+            Adoptions. Not breaches. Not stolen credentials. The attackers used the AUR's
+            published process for adopting orphaned packages, applied as legitimate new maintainers,
+            and got handed the keys to packages that had real users.
+          </p>
+
+          <h2>How AUR adoption works</h2>
+
+          <p>
+            The AUR is a build-script repository. PKGBUILDs and <code>.install</code> files
+            describe how to fetch and compile software. When a package's maintainer disappears,
+            the package becomes "orphaned." Any AUR user can request adoption. There is no
+            two-of-three. There is no proof-of-contribution. There is one click.
+          </p>
+
+          <p>
+            This is the right design for a volunteer-maintained software graveyard. It is the
+            wrong design for a trust boundary. And it is the boundary every Arch user crosses
+            when they type <code>yay -S package-name</code>.
+          </p>
+
+          <h2>What got injected</h2>
+
+          <p>
+            <a href="https://www.sonatype.com/blog/atomic-arch-npm-campaign-adds-malicious-dependency" target="_blank" rel="noopener">Sonatype's Security Research team</a>
+            tracked one strand of the campaign &mdash; "Atomic Arch" &mdash; and found the
+            payload routed through an npm dependency added to the PKGBUILD. The AUR script
+            pulled a poisoned npm package during install. Arch Linux machines started running
+            JavaScript-delivered, rootkit-like malware out of a Linux distribution package
+            manager.
+          </p>
+
+          <p>
+            The cross-ecosystem mechanic matters. AUR doesn't host the binary &mdash; the
+            attacker only needed control of a trusted PKGBUILD and a tame-looking npm dependency.
+            Two ecosystems, one trust path, no behavioral history check at either hop.
+          </p>
+
+          <h2>This isn't the first time</h2>
+
+          <p>
+            In <a href="https://lists.archlinux.org/archives/list/aur-general@lists.archlinux.org/thread/JKDDV3D3RRTC5JZQXP3GMQJZGTV2BXVS/" target="_blank" rel="noopener">July 2025</a>,
+            <code>firefox-patch-bin</code> and <code>librewolf-fix-bin</code> were pushed to
+            the AUR by a fresh account and contained Chaos RAT. That incident hit a few
+            packages. This one hit 1,579.
+          </p>
+
+          <p>
+            The structural lesson is the same in both. The AUR's defense model is "review the
+            PKGBUILD before installing." The official advisory still says
+            "review all PKGBUILD and install script changes." That's a useful instruction.
+            It is also a confession that the trust model puts the work on the user.
+          </p>
+
+          <h2>The npm parallel</h2>
+
+          <p>
+            We have been writing about the npm side of this all month.
+            <a href="/blog/redhat-miasma-provenance-bypass">32 Red Hat packages with valid provenance</a>.
+            <a href="/blog/phantom-gyp-binding-gyp-bypass">57 packages using a 14-year-old binding.gyp execution path</a>.
+            <a href="/blog/ironworm-rust-malware-targets-ai-credentials">37 packages where the commit author signed as "claude"</a>.
+            Different bypasses. Same shape.
+          </p>
+
+          <p>
+            Maintainer-identity-takeover doesn't care about the ecosystem. The mechanic is:
+          </p>
+
+          <ul>
+            <li>A package accumulates trust through downloads and use.</li>
+            <li>The trust attaches to the slug, not the human.</li>
+            <li>A new human steps behind the slug &mdash; through adoption, account compromise, or social engineering.</li>
+            <li>The trust transfers to the new human at zero cost.</li>
+          </ul>
+
+          <p>
+            npm calls this "compromised account." AUR calls it "adoption." Both are the same
+            attack with different names.
+          </p>
+
+          <h2>What behavioral signals show</h2>
+
+          <p>
+            The attackers in the AUR incident were fresh accounts. No prior PKGBUILDs. No
+            contribution history outside the adoptions they just made. No commits to upstream
+            projects. No public identity attached to anything older than a week.
+          </p>
+
+          <p>
+            That signal is cheap to compute. It is the signal Commit scores npm and PyPI and
+            Cargo packages on. Single publisher, short history, no behavioral track record
+            outside the package itself &mdash; that's the structural fingerprint of every
+            successful supply chain attack this year.
+          </p>
+
+          <table>
+            <thead>
+              <tr><th>Incident</th><th>Ecosystem</th><th>Packages</th><th>Common fingerprint</th></tr>
+            </thead>
+            <tbody>
+              <tr><td>Microsoft typosquats (May 31)</td><td>npm</td><td>14</td><td>Zero behavioral history</td></tr>
+              <tr><td>Red Hat Miasma (Jun 1)</td><td>npm</td><td>32</td><td>Compromised single publisher</td></tr>
+              <tr><td>Phantom Gyp (Jun 3)</td><td>npm</td><td>57</td><td>Compromised single publisher</td></tr>
+              <tr><td>IronWorm (Jun 6)</td><td>npm</td><td>37</td><td>Compromised single publisher</td></tr>
+              <tr><td>TrapDoor (Jun 6)</td><td>npm/PyPI/crates</td><td>34</td><td>Zero behavioral history</td></tr>
+              <tr><td>Atomic Arch (Jun 11&ndash;12)</td><td>AUR + npm</td><td>1,579</td><td>Fresh adopter, no AUR history</td></tr>
+            </tbody>
+          </table>
+
+          <h2>What this changes</h2>
+
+          <p>
+            Arch's response is the right tactical one. They froze adoption. They froze new
+            accounts. They walked the commit graph and reverted what they could find. The
+            advisory closes with "many (but not all)" of the affected packages.
+          </p>
+
+          <p>
+            The strategic problem is upstream of all that. As long as the trust model lets
+            identity be transferred to a package &mdash; instead of letting identity be earned
+            by a human &mdash; the defense is racing the attack, and the attack has every
+            unmaintained package in the registry as ammunition.
+          </p>
+
+          <p>
+            Commit's bet is that the only signal an attacker can't fake in advance is the
+            behavioral history of the human behind the artifact. Years of commits to other
+            projects. Cross-ecosystem identity that resolves to the same person.
+            <a href="/blog/declarations-are-gameable">Declarations are gameable</a>.
+            <a href="/blog/behavioral-trust-vs-surveillance">Behavior isn't</a>.
+          </p>
+
+          <h2>Check your project</h2>
+
+          <pre><code>npx proof-of-commitment</code></pre>
+
+          <p>
+            Scores every dependency in your npm, pip, or Cargo lockfile against the same
+            structural fingerprint that flagged the npm packages above. AUR PKGBUILDs are
+            out of scope today &mdash; but if a PKGBUILD pulls an npm dependency that scores
+            CRITICAL, you want to know that before the build script runs on your machine.
+          </p>
+
+        </div>
+
+        <!-- CTA -->
+        <footer class="essay-cta animate-in delay-5">
+          <p><a href="/audit" class="cta-button">Score your dependencies &rarr;</a></p>
+          <p class="cta-sub">Free CLI &middot; API &middot; MCP server &middot; No account required</p>
+        </footer>
+
+      </div>
+    </div>
+  </article>
+
+</Layout>
