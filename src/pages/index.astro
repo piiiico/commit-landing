@@ -4,7 +4,7 @@ import Layout from '../layouts/Layout.astro';
 
 <Layout
   title="Commit — Supply chain trust scoring for npm, PyPI, Cargo, and Go"
-  description="Score your dependencies on behavioral signals — publisher depth, release patterns, maintenance consistency. Both axios and node-ipc scored CRITICAL before they got attacked. Free CLI, CI gate, API, MCP server, and Cursor IDE hook."
+  description="Score your dependencies on behavioral signals — publisher depth, release patterns, maintenance consistency. Both axios and node-ipc scored CRITICAL before they got attacked. Free CLI, CI gate, API, MCP server, and IDE hooks for Cursor, Claude Code, and Windsurf."
 >
   <!-- Supply-chain blog visitor banner (hidden by default, shown via JS) -->
   <div id="sc-banner" style="display:none; background: var(--ink); color: var(--paper); padding: 0.75rem 1rem; text-align: center; font-size: 0.875rem; position: relative;">
@@ -72,7 +72,7 @@ import Layout from '../layouts/Layout.astro';
 
         <p class="hero-lead animate-in delay-3">
           Behavioral signals — publisher depth, release consistency, maintenance patterns — surface the risk that stars, READMEs, and vulnerability databases miss.
-          <strong>Scores npm, PyPI, Cargo, and Go packages. Free CLI, CI gate, API, MCP server, and Cursor IDE hook.</strong>
+          <strong>Scores npm, PyPI, Cargo, and Go packages. Free CLI, CI gate, API, MCP server, and IDE hooks for Cursor, Claude Code, and Windsurf.</strong>
         </p>
 
         <div class="hero-cta animate-in delay-4">
@@ -425,7 +425,7 @@ import Layout from '../layouts/Layout.astro';
       <div class="editorial reveal" style="max-width: var(--max-content);">
         <h2 style="margin-bottom: 0.5rem;">Four ways in. No account required.</h2>
         <p style="margin-bottom: 3rem; font-size: 1rem; color: var(--ink-muted);">
-          CLI for your terminal, GitHub Action for your CI, IDE hook for Cursor / Claude Code, API for everything else.
+          CLI for your terminal, GitHub Action for your CI, IDE hook for Cursor / Claude Code / Windsurf, API for everything else.
         </p>
       </div>
 
@@ -462,22 +462,24 @@ $ npx proof-of-commitment --fail-on=critical
           <a href="https://github.com/piiiico/commit-action" class="gs-cta" target="_blank" rel="noopener">commit-action on GitHub →</a>
         </div>
 
-        <!-- C: IDE Hook (Cursor / Claude Code) -->
+        <!-- C: IDE Hook (Cursor / Claude Code / Windsurf) -->
         <div class="gs-card reveal">
           <span class="gs-label">IDE hook</span>
-          <h3 class="gs-title">Cursor + Claude Code gate</h3>
-          <p class="gs-desc">One command, one gate, both agents. <code style="font-size:0.85em;">poc hook</code> installs to Cursor's <code style="font-size:0.85em;">beforeShellExecution</code> and Claude Code's <code style="font-size:0.85em;">PreToolUse</code> together — every <code style="font-size:0.85em;">npm install</code>, <code style="font-size:0.85em;">pip install</code>, <code style="font-size:0.85em;">cargo add</code>, and <code style="font-size:0.85em;">go get</code> is scored before it runs.</p>
+          <h3 class="gs-title">Cursor + Claude Code + Windsurf gate</h3>
+          <p class="gs-desc">One command, one gate, all three agents. <code style="font-size:0.85em;">poc hook</code> installs to Cursor's <code style="font-size:0.85em;">beforeShellExecution</code>, Claude Code's <code style="font-size:0.85em;">PreToolUse</code>, and Windsurf's <code style="font-size:0.85em;">pre_run_command</code> — every <code style="font-size:0.85em;">npm install</code>, <code style="font-size:0.85em;">pip install</code>, <code style="font-size:0.85em;">cargo add</code>, and <code style="font-size:0.85em;">go get</code> is scored before it runs.</p>
           <div class="gs-code">
             <div class="gs-code-path">terminal</div>
             <pre style="margin: 0; line-height: 1.7; padding: 1rem; padding-top: 2rem; overflow-x: auto;"><code>$ npx proof-of-commitment hook
  wrote ~/.commit/cursor-hook.js
  configured .cursor/hooks.json
  configured .claude/settings.json
+ configured .windsurf/hooks.json
 
-# Next install in Cursor or Claude Code triggers the gate.</code></pre>
+# Next install in Cursor, Claude Code, or Windsurf triggers the gate.</code></pre>
           </div>
           <a href="/cursor" class="gs-cta">Cursor →</a>
           <a href="/claude-code" class="gs-cta" style="margin-left: 0.75rem;">Claude Code →</a>
+          <a href="/windsurf" class="gs-cta" style="margin-left: 0.75rem;">Windsurf →</a>
         </div>
 
         <!-- D: API + MCP -->

@@ -14,6 +14,7 @@ import Layout from '../layouts/Layout.astro';
       <ul class="nav-links">
         <li><a href="/cursor" style="color: var(--ink);">Cursor</a></li>
         <li><a href="/claude-code">Claude Code</a></li>
+        <li><a href="/windsurf">Windsurf</a></li>
         <li><a href="/audit">Audit</a></li>
         <li><a href="/blog">Writing</a></li>
         <li><a href="/pricing">Pricing</a></li>
@@ -179,11 +180,12 @@ $ npx proof-of-commitment login
           <a href="https://github.com/piiiico/proof-of-commitment/blob/main/npm-package/index.js" target="_blank" rel="noopener">npm-package/index.js</a>.
         </p>
 
-        <h3 style="margin-top: 1.5rem; margin-bottom: 0.5rem; font-size: 1.1rem;">Does this work with Claude Code too?</h3>
+        <h3 style="margin-top: 1.5rem; margin-bottom: 0.5rem; font-size: 1.1rem;">Does this work with Claude Code and Windsurf too?</h3>
         <p style="font-size: 0.95rem; color: var(--ink-muted); margin-bottom: 1rem;">
-          Yes. The same script auto-detects the client — Cursor's <code>beforeShellExecution</code>
-          stdin shape vs Claude Code's <code>PreToolUse</code> shape — and replies in the right format.
-          See <a href="/claude-code">Commit for Claude Code</a> for the Claude-specific install command.
+          Yes. The same script auto-detects the client — Cursor's <code>beforeShellExecution</code>,
+          Claude Code's <code>PreToolUse</code>, or Windsurf's <code>pre_run_command</code> — and replies in the right format.
+          Run <code>poc hook</code> to install for all three at once.
+          See <a href="/claude-code">Commit for Claude Code</a> or <a href="/windsurf">Commit for Windsurf</a>.
         </p>
 
         <h3 style="margin-top: 1.5rem; margin-bottom: 0.5rem; font-size: 1.1rem;">What happens if Commit is down?</h3>
