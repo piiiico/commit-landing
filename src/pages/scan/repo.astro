@@ -149,6 +149,14 @@ import Layout from '../../layouts/Layout.astro';
           </table>
         </div>
 
+        <!-- Dynamic post-results CTA — anchor on the high-intent moment a
+             visitor has just seen their CRITICAL count. Mirrors /audit's
+             inline form (email → instant key → watch the flagged packages).
+             /scan/repo is higher-intent than /audit (they typed their own
+             repo URL), so the email gate sits exactly where the surprise
+             does. -->
+        <div id="post-results-cta" class="post-results-cta" hidden></div>
+
         <!-- MCP CTA -->
         <div class="mcp-cta">
           <p class="mcp-cta-label">Get this in your AI assistant</p>
@@ -649,6 +657,132 @@ import Layout from '../../layouts/Layout.astro';
     .trend-stable { color: var(--ink-muted); }
     .trend-declining { color: var(--accent); }
 
+    /* ── Post-results dynamic CTA ──
+       Ported from /audit (2026-06-13). Same /api/keys/create endpoint, same
+       /pricing utm_campaign banners (audit-critical-key / audit-healthy-key)
+       so the existing CONTEXT_BY_CAMPAIGN copy renders unchanged. /scan/repo
+       gets distinct utm_medium tags (scan-critical-cta / scan-healthy-cta /
+       scan-skip-form) so funnel attribution can compare scan-repo vs
+       paste-package.json conversion. */
+    .post-results-cta {
+      margin-top: 1.5rem;
+      padding: 1.25rem 1.5rem;
+      border: 1px solid #D14D4140;
+      border-radius: 8px;
+      background: #D14D4108;
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      flex-wrap: wrap;
+    }
+    .post-results-cta .cta-text {
+      flex: 1;
+      min-width: 200px;
+      font-size: 0.9rem;
+      color: var(--ink);
+      line-height: 1.5;
+    }
+    .post-results-cta .cta-text strong {
+      color: #991b1b;
+    }
+    .post-results-cta .cta-btn {
+      display: inline-block;
+      padding: 0.6rem 1.25rem;
+      background: var(--accent);
+      color: #fff;
+      border-radius: 4px;
+      text-decoration: none;
+      font-size: 0.85rem;
+      font-weight: 500;
+      white-space: nowrap;
+    }
+    .post-results-cta .cta-btn:hover {
+      background: var(--accent-hover);
+      text-decoration: none;
+    }
+    .post-results-cta .cta-btn-secondary {
+      background: #fff;
+      color: var(--ink);
+      border: 1px solid var(--border, #d8d4cf);
+    }
+    .post-results-cta .cta-btn-secondary:hover {
+      background: var(--paper-dim, #f5f1ea);
+      color: var(--ink);
+    }
+    .post-results-cta .cta-btn-upgrade {
+      background: #991b1b;
+    }
+    .post-results-cta .cta-btn-upgrade:hover {
+      background: #7f1d1d;
+    }
+    .post-results-cta .cta-hint {
+      font-size: 0.75rem;
+      color: var(--ink-subtle);
+    }
+    .post-results-cta .cta-form {
+      display: flex;
+      gap: 0.5rem;
+      flex-wrap: wrap;
+      align-items: center;
+      width: 100%;
+      margin-top: 0.25rem;
+    }
+    .post-results-cta .cta-input {
+      flex: 1 1 220px;
+      min-width: 0;
+      padding: 0.6rem 0.85rem;
+      border: 1px solid var(--border, #d8d4cf);
+      border-radius: 4px;
+      font-size: 0.9rem;
+      font-family: inherit;
+      background: #fff;
+      color: var(--ink);
+    }
+    .post-results-cta .cta-input:focus {
+      outline: none;
+      border-color: var(--accent);
+      box-shadow: 0 0 0 2px #D14D4126;
+    }
+    .post-results-cta .cta-form-btn {
+      padding: 0.6rem 1.1rem;
+      background: var(--accent);
+      color: #fff;
+      border: none;
+      border-radius: 4px;
+      font-size: 0.85rem;
+      font-weight: 500;
+      cursor: pointer;
+      font-family: inherit;
+      white-space: nowrap;
+    }
+    .post-results-cta .cta-form-btn:hover {
+      background: var(--accent-hover);
+    }
+    .post-results-cta .cta-form-btn:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+    }
+    .post-results-cta .cta-success {
+      width: 100%;
+      padding: 0.5rem 0;
+      font-size: 0.9rem;
+      color: #166534;
+    }
+    .post-results-cta .cta-success code {
+      display: inline-block;
+      padding: 0.2rem 0.45rem;
+      background: #f5f5f5;
+      border-radius: 3px;
+      font-size: 0.82rem;
+      margin: 0 0.2rem;
+    }
+    .post-results-cta .cta-error {
+      width: 100%;
+      padding: 0.4rem 0;
+      font-size: 0.85rem;
+      color: #991b1b;
+    }
+
     /* ── MCP CTA ── */
     .mcp-cta {
       margin-top: 2.5rem;
@@ -693,6 +827,7 @@ import Layout from '../../layouts/Layout.astro';
 
   <script>
     const API = 'https://poc-backend.amdal-dev.workers.dev/api/audit';
+    const KEYS_API = 'https://poc-backend.amdal-dev.workers.dev/api/keys/create';
     const BATCH_SIZE = 20; // Backend caps at 20 per request — match to minimize audit-count usage.
     // Lockfile scans can yield 1000s of transitive deps. Cap to MAX_LOCKFILE_PKGS
     // with unscoped packages prioritized first: most CRITICAL flags are sole-
@@ -741,7 +876,57 @@ import Layout from '../../layouts/Layout.astro';
     // State
     let _allPackages: string[] = [];
     let _allResults: AuditResult[] = [];
+    let _allEcosystem: string = 'npm';
+    let _allRepoLabel: string = '';
     let _rowCounter = 0;
+
+    // ── Inline-key state (mirrors /audit) ──
+    // localStorage flag — true if the visitor already created a key via the
+    // post-results form on /audit OR /scan/repo (they share the same key, the
+    // marker reflects has-claimed-key, not surface). Suppresses the email
+    // prompt for returning users: they get the "monitoring active" reassurance
+    // with a Developer upgrade CTA instead.
+    const HAS_KEY_LS_KEY = 'commit_inline_key_created';
+    function hasInlineKey(): boolean {
+      try { return localStorage.getItem(HAS_KEY_LS_KEY) === '1'; } catch { return false; }
+    }
+    function markInlineKey() {
+      try { localStorage.setItem(HAS_KEY_LS_KEY, '1'); } catch {}
+    }
+
+    // Build prioritized watchlist seeds from the current scan results.
+    // Backend caps at PACKAGE_LIMITS.free=3; we send the top-priority 3.
+    // Priority: CRITICAL > HIGH > others — matches the post-results CTA's
+    // own decision tree, so the user's watchlist after signup mirrors the
+    // pkgs the headline just named.
+    function buildWatchSeeds(): Array<{ name: string; ecosystem: string }> {
+      if (!_allResults || _allResults.length === 0) return [];
+      const eco = _allEcosystem || 'npm';
+      function priority(r: AuditResult): number {
+        if (r.riskFlags?.some(f => f.startsWith('CRITICAL'))) return 1;
+        if (r.riskFlags?.some(f => f.startsWith('HIGH'))) return 2;
+        if ((r.riskFlags?.length ?? 0) > 0) return 3;
+        return 4;
+      }
+      const sorted = [..._allResults]
+        .filter(r => typeof r.name === 'string' && r.name.length > 0 && r.name.length < 215)
+        .sort((a, b) => {
+          const pa = priority(a);
+          const pb = priority(b);
+          if (pa !== pb) return pa - pb;
+          return _allResults.indexOf(a) - _allResults.indexOf(b);
+        });
+      const seeds: Array<{ name: string; ecosystem: string }> = [];
+      const seen = new Set<string>();
+      for (const r of sorted) {
+        const key = `${r.name}|${eco}`;
+        if (seen.has(key)) continue;
+        seen.add(key);
+        seeds.push({ name: r.name, ecosystem: eco });
+        if (seeds.length >= 3) break;
+      }
+      return seeds;
+    }
 
     // ── Utilities ──
 
@@ -902,6 +1087,262 @@ import Layout from '../../layouts/Layout.astro';
       document.getElementById('results-summary')!.innerHTML = html;
     }
 
+    // ── Post-results CTA (email capture / Developer upsell) ──
+    //
+    // Ported from /audit.astro 2026-06-13. /scan/repo previously ended at
+    // results + MCP CTA: a high-intent visit (they typed their own repo)
+    // captured ZERO email signal, ZERO Developer-tier handshake. The /audit
+    // first-touch CTA (15:03 reflection today) doesn't fire here because
+    // this is a separate page. Funnel: scan → see CRITICAL → silently leave.
+    //
+    // Two branches: CRITICAL packages found → "alert me if these get attacked"
+    // (audit-critical-key utm_campaign on /pricing); none found → "save scan +
+    // weekly digest" (audit-healthy-key utm_campaign). Reuses the audit-web-
+    // critical / audit-web-healthy refs so /pricing's CONTEXT_BY_CAMPAIGN and
+    // worker.ts VALID_SOURCES stay parity-checked (both refs are on the
+    // DEFAULT_OK_REFS allowlist in check-funnel-surface-parity.ts — they
+    // legitimately route through the REST/web default).
+    //
+    // utm_medium uses scan-* prefixes (scan-critical-cta / scan-healthy-cta /
+    // scan-skip-form) so funnel reports can separate /scan/repo conversions
+    // from /audit conversions even though both flow into the same /pricing
+    // banner.
+    function renderPostResultsCta(results: AuditResult[]) {
+      const ctaEl = document.getElementById('post-results-cta');
+      if (!ctaEl) return;
+
+      const critResults = results.filter(r => r.riskFlags?.some(f => f.startsWith('CRITICAL')));
+      const critCount = critResults.length;
+      const scoredCount = results.filter(r => r.score !== null).length;
+      // Nothing meaningful to render if zero scored packages (network error path).
+      if (scoredCount === 0) {
+        ctaEl.hidden = true;
+        return;
+      }
+
+      const alreadyHasKey = hasInlineKey();
+      const eco = _allEcosystem || 'npm';
+      const repoCtx = _allRepoLabel
+        ? ` in <code>${_allRepoLabel.replace(/[<>&"]/g, '')}</code>`
+        : '';
+
+      function renderInlineForm(
+        headline: string,
+        fallbackHref: string,
+        refTag: string,
+        btnLabel: string,
+        hintText: string,
+        upgradeCtxUrl?: string,
+        skipMedium?: string,
+        skipLabel?: string,
+      ) {
+        const formId = 'cta-inline-form';
+        const inputId = 'cta-inline-email';
+        const btnId = 'cta-inline-btn';
+        const errId = 'cta-inline-err';
+        const successId = 'cta-inline-success';
+        // Skip-ahead surface: high-intent users with a budget skip the email
+        // gate entirely and land on /pricing with packages preloaded. /pricing
+        // asks for email at the actual purchase moment (one email entry, not
+        // two). Only renders when upgradeCtxUrl exists (i.e. we have packages
+        // worth deep-linking to).
+        const skipAheadBlock = upgradeCtxUrl && skipMedium && skipLabel
+          ? `<div class="cta-skip-ahead" style="width:100%;margin-top:0.4rem;font-size:0.8rem;color:var(--ink-muted);">` +
+            `Already evaluating? ` +
+            `<a href="${upgradeCtxUrl.replace(skipMedium, 'scan-skip-form')}" class="cta-skip-link" data-cta="scan-skip-to-pricing" style="color:var(--accent);font-weight:500;">${skipLabel}</a>` +
+            `</div>`
+          : '';
+        ctaEl.innerHTML = `
+          <div class="cta-text">${headline}</div>
+          <form class="cta-form" id="${formId}" data-source="scan-repo-inline" data-fallback-ref="${refTag}">
+            <input type="email" id="${inputId}" class="cta-input"
+                   placeholder="you@company.com" required autocomplete="email"
+                   aria-label="Your email">
+            <button type="submit" id="${btnId}" class="cta-form-btn">${btnLabel}</button>
+            <noscript><a href="${fallbackHref}" class="cta-btn">${btnLabel} &rarr;</a></noscript>
+          </form>
+          <span class="cta-hint">${hintText}</span>
+          ${skipAheadBlock}
+          <p class="cta-error" id="${errId}" hidden></p>
+          <div class="cta-success" id="${successId}" hidden></div>
+        `;
+        ctaEl.hidden = false;
+
+        const form = document.getElementById(formId) as HTMLFormElement;
+        const input = document.getElementById(inputId) as HTMLInputElement;
+        const btn = document.getElementById(btnId) as HTMLButtonElement;
+        const errEl = document.getElementById(errId) as HTMLParagraphElement;
+        const successEl = document.getElementById(successId) as HTMLDivElement;
+
+        form.addEventListener('submit', async (e) => {
+          e.preventDefault();
+          errEl.hidden = true;
+          const email = input.value.trim();
+          if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+            errEl.textContent = 'Please enter a valid email address.';
+            errEl.hidden = false;
+            return;
+          }
+          btn.disabled = true;
+          btn.textContent = 'Saving…';
+          try {
+            // Include `watch` — the prioritized package set the user just
+            // scanned (top 3, free-tier cap). Backend seeds the default
+            // project's monitored_packages so the welcome email names them
+            // instead of hardcoded examples. Mirrors /audit's behavior.
+            const watch = buildWatchSeeds();
+            const res = await fetch(KEYS_API, {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ email, source: refTag, watch }),
+            });
+            const data = await res.json().catch(() => ({})) as {
+              key?: string;
+              message?: string;
+              error?: string;
+              watched_packages?: Array<{ name: string; ecosystem: string }>;
+            };
+            if (res.ok || res.status === 201) {
+              markInlineKey();
+              form.hidden = true;
+              const hint = ctaEl.querySelector('.cta-hint') as HTMLElement | null;
+              if (hint) hint.hidden = true;
+              const skipAhead = ctaEl.querySelector('.cta-skip-ahead') as HTMLElement | null;
+              if (skipAhead) skipAhead.hidden = true;
+              const upgradeUrlWithEmail = upgradeCtxUrl
+                ? upgradeCtxUrl + (upgradeCtxUrl.includes('?') ? '&' : '?') + `email=${encodeURIComponent(email)}`
+                : '';
+              const upgradeCtaLabel = refTag === 'audit-web-healthy'
+                ? 'Watch your packages daily — Developer $15/mo &rarr;'
+                : 'Watch these CRITICAL packages — Developer $15/mo &rarr;';
+              const developerUpgradeBlock = upgradeCtxUrl
+                ? `<div style="margin-top:1rem;padding-top:1rem;border-top:1px solid var(--border-light,#e5e0d0);">` +
+                  `<a href="${upgradeUrlWithEmail}" class="cta-btn cta-btn-upgrade" style="display:inline-block;font-size:0.95rem;">${upgradeCtaLabel}</a> ` +
+                  `<span style="font-size:0.78rem;color:var(--ink-subtle);margin-left:0.5rem;">Daily re-scans · email alerts · cancel anytime</span>` +
+                  `</div>`
+                : '';
+              const watched = Array.isArray(data.watched_packages) ? data.watched_packages : [];
+              const watchedBlock = watched.length > 0
+                ? `<div style="margin-top:0.6rem;padding:0.55rem 0.75rem;background:#f4f7f1;border-left:3px solid #4a7c2a;font-size:0.85rem;">` +
+                  `<strong style="color:#166534;">✓ Now watching ${watched.length === 1 ? watched[0].name : `${watched.length} packages from your scan`}</strong>` +
+                  (watched.length > 1 ? `: <span style="color:var(--ink-muted);">${watched.map(w => w.name).join(', ')}</span>` : '') +
+                  `<br><span style="font-size:0.78rem;color:var(--ink-muted);">Weekly digest Mondays · instant email if any score drops a tier.</span>` +
+                  `</div>`
+                : '';
+              if (data.key) {
+                successEl.innerHTML =
+                  `<strong>✓ Your free API key</strong> — copy it now, backup sent to ${email}:<br>` +
+                  `<code>${data.key}</code>` +
+                  watchedBlock +
+                  `<br><span style="font-size:0.82rem;color:var(--ink-muted);">` +
+                  `<strong>Next:</strong> gate this repo so CRITICAL deps fail PRs: ` +
+                  `<code>poc init</code> ` +
+                  `(paste your key when prompted) · ` +
+                  `<a href="/dashboard" style="color:var(--accent);">Dashboard</a> · ` +
+                  `<a href="/pricing?email=${encodeURIComponent(email)}" style="color:var(--accent);">Pricing</a></span>` +
+                  developerUpgradeBlock;
+              } else {
+                successEl.innerHTML =
+                  `<strong>✓ Check your inbox.</strong> We sent your free API key to ${email}.` +
+                  watchedBlock +
+                  ` <strong>Next:</strong> in this repo, run <code>poc init</code> ` +
+                  `to fail PRs that introduce CRITICAL deps.` +
+                  developerUpgradeBlock;
+              }
+              successEl.hidden = false;
+            } else if (res.status === 429) {
+              errEl.textContent = data.message || 'Rate limit: max 3 keys per IP per day. Try again tomorrow.';
+              errEl.hidden = false;
+              btn.disabled = false;
+              btn.textContent = btnLabel;
+            } else {
+              errEl.textContent = data.message || data.error || `Request failed (${res.status}). Try the full form: ${fallbackHref}`;
+              errEl.hidden = false;
+              btn.disabled = false;
+              btn.textContent = btnLabel;
+            }
+          } catch (err) {
+            errEl.textContent = `Network error. Try the full form: ${fallbackHref}`;
+            errEl.hidden = false;
+            btn.disabled = false;
+            btn.textContent = btnLabel;
+          }
+        });
+      }
+
+      function renderMonitoringActive(headline: string, developerCtaUrl?: string) {
+        const upgradeBlock = developerCtaUrl
+          ? `<a href="${developerCtaUrl}" class="cta-btn cta-btn-upgrade">Watch these on Developer · $15/mo &rarr;</a>`
+          : '';
+        ctaEl.innerHTML = `
+          <div class="cta-text">${headline}</div>
+          <a href="/dashboard" class="cta-btn cta-btn-secondary">Open dashboard &rarr;</a>
+          ${upgradeBlock}
+          <span class="cta-hint">You're signed up · run <code>poc init</code> in this repo to gate PRs</span>
+        `;
+        ctaEl.hidden = false;
+      }
+
+      if (critCount > 0) {
+        const critNames = critResults.map(r => r.name).slice(0, 3);
+        const nameList = critNames.length > 2
+          ? critNames.slice(0, 2).join(', ') + ` + ${critCount - 2} more`
+          : critNames.join(' and ');
+        const headline = `<strong>${critCount} CRITICAL</strong> package${critCount > 1 ? 's' : ''}${repoCtx} (${nameList}). ` +
+          `One person can publish to ${critCount > 1 ? 'each of these' : 'this package'} — one stolen credential and your CI runs their code. ` +
+          `It happened to axios on March 30. We'll email you within 24 hours if it happens to ${critCount > 1 ? 'any of yours' : nameList}.`;
+        const critNamesForUrl = critResults.map(r => r.name).slice(0, 5).join(',');
+        const developerCtaUrl =
+          `/pricing/?utm_source=scan-repo&utm_medium=scan-critical-cta` +
+          `&utm_campaign=audit-critical-key` +
+          (critNamesForUrl ? `&packages=${encodeURIComponent(critNamesForUrl)}` : '') +
+          (critNamesForUrl ? `&eco=${encodeURIComponent(eco)}` : '');
+        if (alreadyHasKey) {
+          renderMonitoringActive(
+            headline + ' You already have a Commit key — gate this repo so a future CRITICAL flag fails the PR, or watch these packages continuously and get email alerts when scores drop.',
+            developerCtaUrl
+          );
+        } else {
+          renderInlineForm(
+            headline,
+            '/get-started?ref=audit-web-critical',
+            'audit-web-critical',
+            'Alert me if these get attacked',
+            'Free · no card · 10 seconds',
+            developerCtaUrl,
+            'scan-critical-cta',
+            'See Developer pricing ($15/mo) for these CRITICAL packages &rarr;',
+          );
+        }
+      } else {
+        const headline = `No CRITICAL flags${repoCtx} — your dependency tree looks healthy today. ` +
+          `Packages change hands. Publishers get compromised. We'll email you if any of these scores drop.`;
+        const healthyNamesForUrl = results.map(r => r.name).slice(0, 5).join(',');
+        const developerCtaUrl =
+          `/pricing/?utm_source=scan-repo&utm_medium=scan-healthy-cta` +
+          `&utm_campaign=audit-healthy-key` +
+          (healthyNamesForUrl ? `&packages=${encodeURIComponent(healthyNamesForUrl)}` : '') +
+          (healthyNamesForUrl ? `&eco=${encodeURIComponent(eco)}` : '');
+        if (alreadyHasKey) {
+          renderMonitoringActive(
+            headline + ' You already have a Commit key — gate this repo so a future CRITICAL flag fails the PR, or watch these packages daily and get instant email alerts when any score drops.',
+            developerCtaUrl
+          );
+        } else {
+          renderInlineForm(
+            headline,
+            '/get-started?ref=audit-web-healthy',
+            'audit-web-healthy',
+            'Save scan + weekly digest',
+            '200 audits/day · no card · 10 seconds',
+            developerCtaUrl,
+            'scan-healthy-cta',
+            'See Developer pricing ($15/mo) — daily scans + instant alerts &rarr;',
+          );
+        }
+      }
+    }
+
     // ── Main scan logic ──
 
     async function scanProject(packages: { name: string; isDev: boolean }[]) {
@@ -982,6 +1423,9 @@ import Layout from '../../layouts/Layout.astro';
         progressText.textContent = `Done!`;
         updateSummary(_allResults, total);
         _allPackages = sorted.map(p => p.name);
+        _allEcosystem = 'npm';
+        _allRepoLabel = '';
+        renderPostResultsCta(_allResults);
 
       } catch (err) {
         progressArea.hidden = true;
@@ -1301,6 +1745,9 @@ import Layout from '../../layouts/Layout.astro';
       // Run the scan using existing infrastructure, but with correct ecosystem
       const packages = packageNames.map(name => ({ name, isDev: false }));
 
+      // Repo label for the post-results CTA headline ("X CRITICAL in owner/repo")
+      _allRepoLabel = `${owner}/${repo}`;
+
       await scanProjectWithEcosystem(packages, foundFile.ecosystem, {
         sourceLabel: displayPath,
         isLockfile,
@@ -1384,6 +1831,8 @@ import Layout from '../../layouts/Layout.astro';
         progressArea.hidden = true;
         updateSummary(_allResults, total);
         _allPackages = packages.map(p => p.name);
+        _allEcosystem = ecosystem;
+        renderPostResultsCta(_allResults);
 
       } catch (err) {
         progressArea.hidden = true;
