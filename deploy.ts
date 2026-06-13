@@ -682,10 +682,61 @@ if (result.exitCode !== 0) {
 
 console.log("\n✅ Deployed!");
 
+// ---------------------------------------------------------------------------
+// GUARD 6: Post-deploy critical-pages liveness check
+// ---------------------------------------------------------------------------
+//
+// 2026-06-13 incident: production /pricing/, /quickstart/, /rankings/, /thesis/,
+// /spec/, /watchlist/, /privacy/, /signup/, /windsurf/ all returned 404 with
+// cache-bust — wave of concurrent background builds raced earlier deploys
+// (07:06 + 07:47) and shipped a CF Pages deployment manifest missing these
+// pages. /pricing/ is the SOLE conversion surface for paid upgrades; every
+// CLI rate-limit overshoot (4465 audits/day on shared NAT IPs), every welcome-
+// email "Enable monitoring" CTA, every README footer click hit 404. The
+// pre-deploy live-tokens check passed because it SKIPS on 404 (`new page?`).
+// dist-staleness passed because dist/ had OTHER newer files even with pricing
+// missing in earlier intermediate state.
+//
+// Rule: after wrangler returns OK, fetch each critical revenue page from the
+// live PROJECT subdomain with cache-bust. If any 404 / non-2xx, exit 1 loudly
+// so the operator (or scheduler) knows to redeploy.
+//
+// Pages: pricing (paid upgrade), audit (free entry), get-started (signup),
+// quickstart (CLI install), index (front door), docs (CLI reference). All are
+// load-bearing for either inbound discovery or outbound revenue.
+if (!process.argv.includes("--skip-post-verify")) {
+  console.log("\nWaiting 8s for edge propagation, then verifying critical pages…");
+  await new Promise((r) => setTimeout(r, 8_000));
+  const CRITICAL_PAGES = ["/", "/audit/", "/get-started/", "/pricing/", "/quickstart/", "/docs/"];
+  const failed: { path: string; status: number }[] = [];
+  for (const path of CRITICAL_PAGES) {
+    const url = `${PAGES_SUBDOMAIN}${path}?cb=${Date.now()}`;
+    try {
+      const res = await fetch(url, { signal: AbortSignal.timeout(8_000) });
+      if (!res.ok) {
+        failed.push({ path, status: res.status });
+        console.error(`  ✗ ${path} → HTTP ${res.status}`);
+      } else {
+        console.log(`  ✓ ${path} → HTTP ${res.status}`);
+      }
+    } catch (err) {
+      failed.push({ path, status: -1 });
+      console.error(`  ✗ ${path} → fetch error: ${(err as Error).message}`);
+    }
+  }
+  if (failed.length > 0) {
+    console.error(
+      `\n❌ POST-DEPLOY VERIFICATION FAILED: ${failed.length}/${CRITICAL_PAGES.length} critical pages broken on live.`
+    );
+    console.error("   Redeploy after diagnosing dist/ + concurrent-build state.");
+    process.exit(1);
+  }
+  console.log(`✅ Post-deploy verification: all ${CRITICAL_PAGES.length} critical pages return 2xx.`);
+}
+
 // Post-deploy: ping IndexNow so Bing / Yandex / Seznam / Naver re-crawl.
 if (!process.argv.includes("--skip-indexnow")) {
-  console.log("\nWaiting 10s for edge propagation, then pinging IndexNow…");
-  await new Promise((r) => setTimeout(r, 10_000));
+  console.log("\nPinging IndexNow…");
   const pingScript = new URL("scripts/indexnow-ping.ts", import.meta.url).pathname;
   const ping = await $`bun ${pingScript}`.nothrow();
   if (ping.exitCode !== 0) {
