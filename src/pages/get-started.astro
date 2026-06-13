@@ -398,6 +398,31 @@ console.log(data.results[0].score); // 0–100 trust score</code></pre>
             'Your GitHub Actions run hit the anonymous rate limit on this repo\'s IP. A free key bumps you to 200 audits/day — enough for every PR — no card. Enter your email below; the key appears instantly on screen.<br />' +
             'Then add it to repo secrets: <code>gh secret set COMMIT_API_KEY</code> (or paste in Settings → Secrets → Actions). Re-run the failed job and the annotation goes away.',
         },
+        // 2026-06-13: README readers (GitHub + npm) had refs in their static
+        // CTAs but neither were mapped here, in REF_TO_SOURCE, or in worker
+        // VALID_SOURCES — both fell through to source=web, so the v1.31.1
+        // visible-CRITICAL-demo README ship (same day, 02:43Z) was unmeasurable.
+        // Splitting the two refs lets us measure GH-README vs npm-README
+        // discovery separately: same package gets 670+ daily npm downloads
+        // with 0 organic signups, so knowing which README the (eventual)
+        // signup came from is the first measurable signal on a discovery
+        // surface that has produced nothing in 92 days. Hero copy here picks
+        // up the README's promise — "behavioral signals that can't be faked"
+        // — and gives the next concrete step (run an audit on your own tree).
+        'readme-monitoring': {
+          eyebrow: 'From the GitHub README',
+          title: 'Free monitoring on your supply chain',
+          lead:
+            'A free key gives you 200 audits/day across npm, PyPI, Cargo, and Go — no card. Enter your email; the key appears on screen.<br />' +
+            'Then score your tree from the same terminal: <code>npx proof-of-commitment --file package-lock.json</code>. Developer ($15/mo) adds push alerts when any watched package degrades.',
+        },
+        'npm-readme-monitoring': {
+          eyebrow: 'From the npm package page',
+          title: 'Free monitoring on your supply chain',
+          lead:
+            'You already have the CLI installed (or one <code>npx</code> away). A free key bumps you to 200 audits/day — no card. Enter your email; the key appears on screen.<br />' +
+            'Then score your tree: <code>npx proof-of-commitment --file package-lock.json</code>. Developer ($15/mo) adds push alerts when any watched package degrades.',
+        },
       };
       const variant = HERO_BY_REF[ref];
       if (!variant) return;
@@ -451,6 +476,8 @@ console.log(data.results[0].score); // 0–100 trust score</code></pre>
           'poc-hook': 'poc-hook',                      // Fresh `poc hook` install with no API key configured (npm-package v1.21.0+) — 2026-05-29
           'audit-cli-soft-cta': 'cli-soft-cta',        // CLI inline-prompt engagement-signal gate-bypass (npm-package v1.28.0+) — 2026-06-10
           'ci-annotation': 'ci-annotation',            // GitHub Actions PR-checks rate-limit annotation (npm-package v1.31.0) — 2026-06-12
+          'readme-monitoring': 'readme-monitoring',    // GitHub README CTA (proof-of-commitment/README.md) — 2026-06-13
+          'npm-readme-monitoring': 'npm-readme-monitoring', // npm package-page README CTA (npm-package/README.md) — 2026-06-13
         };
         const params = new URLSearchParams(window.location.search);
         const refParam = params.get('ref') ?? '';
