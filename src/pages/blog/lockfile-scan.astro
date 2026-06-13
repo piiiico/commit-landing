@@ -1,0 +1,138 @@
+---
+import Layout from '../../layouts/Layout.astro';
+---
+
+<Layout
+  title="Your package.json shows 20 dependencies. Your lock file has 487. — Commit"
+  description="Full lock file support: scan all resolved transitive dependencies, not just your direct ones. The riskiest packages are frequently two hops in — invisible to package.json audits."
+  canonical="https://getcommit.dev/blog/lockfile-scan/"
+  publishDate="2026-04-28"
+>
+
+  <!-- Nav -->
+  <nav>
+    <div class="container nav-inner">
+      <a href="/" class="nav-brand">Commit</a>
+      <ul class="nav-links">
+        <li><a href="/extension">Extension</a></li>
+        <li><a href="/blog">Writing</a></li>
+        <li><a href="/pricing">Pricing</a></li><li><a href="/docs">Docs</a></li><li><a href="https://github.com/piiiico/proof-of-commitment" target="_blank" rel="noopener">GitHub</a></li>
+        <li><a href="mailto:pico@amdal.dev">Contact</a></li>
+      </ul>
+    </div>
+  </nav>
+
+  <!-- Essay -->
+  <article class="essay">
+    <div class="container">
+      <div class="editorial">
+
+        <!-- Header -->
+        <header class="essay-header">
+          <div class="essay-meta animate-in delay-1">
+            <time datetime="2026-04-28">April 28, 2026</time>
+          </div>
+          <h1 class="essay-title animate-in delay-2">Your package.json shows 20 dependencies. Your lock file has 487.</h1>
+          <p class="essay-subtitle animate-in delay-3">
+            Full lock file support for supply chain risk scanning. Audit all resolved transitive
+            dependencies &mdash; not just the ones you added directly.
+          </p>
+          <p class="essay-byline animate-in delay-4">H&aring;kon &Aring;mdal</p>
+        </header>
+
+        <!-- Body -->
+        <div class="essay-body">
+
+          <p>
+            When you run <code>npm audit</code>, it checks your direct dependencies against a CVE database.
+            When ua-parser-js was compromised in October 2021, <code>npm audit</code> showed zero issues. The
+            attack vector was already visible in public data &mdash; a sole maintainer with millions of weekly
+            downloads &mdash; but there was no CVE yet to match against.
+          </p>
+
+          <p>
+            I built a tool that scores packages on behavioral signals instead of CVE databases. It&rsquo;s been
+            useful for auditing direct dependencies. Today I shipped something I&rsquo;ve wanted for a while:
+            <strong>full lock file support</strong>.
+          </p>
+
+          <pre><code># Before: audits direct deps only (package.json)
+npx proof-of-commitment --file package.json
+
+# Now: audits ALL resolved dependencies (lock file)
+npx proof-of-commitment --file package-lock.json
+npx proof-of-commitment --file yarn.lock
+npx proof-of-commitment --file pnpm-lock.yaml</code></pre>
+
+          <h2>What&rsquo;s different</h2>
+
+          <p>
+            Your <code>package.json</code> might have 15&ndash;20 direct dependencies. Your
+            <code>package-lock.json</code> has the full resolved tree &mdash; often 300&ndash;500 packages.
+            The risky packages are frequently <em>not</em> in your direct dependencies. They&rsquo;re two hops in.
+          </p>
+
+          <p>
+            This is what I found when I audited <code>@anthropic-ai/sdk</code> via lock file:
+          </p>
+
+          <ul>
+            <li>The SDK itself scores fine &mdash; 14 maintainers, good release history</li>
+            <li>But <code>json-schema-to-ts</code> &mdash; a transitive dep &mdash; has 1 maintainer and 12M weekly downloads</li>
+            <li>And <code>ts-algebra</code> &mdash; another transitive dep &mdash; has 1 maintainer and hasn&rsquo;t released in 12+ months</li>
+          </ul>
+
+          <p>
+            Neither appears in a direct <code>package.json</code> audit. Both show up immediately with lock file scanning.
+          </p>
+
+          <h2>How it works</h2>
+
+          <p>The CLI now:</p>
+
+          <ol>
+            <li>Parses your lock file to extract all resolved package names</li>
+            <li>Batches them into groups of 20 and scores all batches in parallel</li>
+            <li>Sorts results by risk score (CRITICAL first, then HIGH, etc.)</li>
+            <li>Shows the highest-risk packages with a summary: &ldquo;3 CRITICAL packages found in 487 scanned&rdquo;</li>
+          </ol>
+
+          <p>
+            For a typical Next.js project, this means scanning 400+ packages in about 15 seconds.
+            For a minimal Node.js service, maybe 80 packages in 5 seconds.
+          </p>
+
+          <h2>What CRITICAL means</h2>
+
+          <p>
+            CRITICAL = sole maintainer + &gt;10M weekly downloads. That&rsquo;s the structural risk profile
+            shared by ua-parser-js before the October 2021 compromise. It&rsquo;s also the profile of
+            chalk (413M/wk), minimatch (560M/wk), glob (332M/wk), esbuild (190M/wk) &mdash; packages
+            you&rsquo;re almost certainly running in production right now, probably via a lock file dep
+            you&rsquo;ve never looked at.
+          </p>
+
+          <h2>Try it</h2>
+
+          <p>Zero install, any Node.js project:</p>
+
+          <pre><code>npx proof-of-commitment --file package-lock.json</code></pre>
+
+          <p>
+            Or paste your packages in the browser at <a href="/audit">getcommit.dev/audit</a>.
+            The tool is open source at <a href="https://github.com/piiiico/proof-of-commitment" target="_blank" rel="noopener">github.com/piiiico/proof-of-commitment</a>.
+          </p>
+
+          <p style="margin-top: 2rem; padding-top: 1.5rem; border-top: 1px solid var(--border-light); font-size: 0.875rem; color: var(--ink-muted);">
+            If you want this in your AI assistant: the MCP server at
+            <code>poc-backend.amdal-dev.workers.dev/mcp</code> works with Claude Desktop,
+            Cursor, and any MCP-compatible tool. Ask: &ldquo;Audit the dependencies in vercel/ai&rdquo;
+            and it fetches the repo, scores everything, returns a risk table.
+          </p>
+
+        </div>
+      </div>
+    </div>
+  </article>
+
+</Layout>

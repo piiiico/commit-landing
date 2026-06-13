@@ -1,0 +1,289 @@
+---
+import Layout from '../layouts/Layout.astro';
+---
+
+<Layout
+  title="The Behavioral Trust Gap in Open Source — Commit"
+  description="Every major supply chain attack exploits the same gap: the distance between 'no known vulnerability' and 'actually trustworthy.' Current tools can't see it. Here's why, and what we're doing about it."
+  canonical="https://getcommit.dev/thesis/"
+>
+
+  <!-- Nav -->
+  <nav>
+    <div class="container nav-inner">
+      <a href="/" class="nav-brand">Commit</a>
+      <ul class="nav-links">
+        <li><a href="/#mcp">MCP</a></li>
+        <li><a href="/audit">Audit</a></li>
+        <li><a href="/watchlist">Watchlist</a></li>
+        <li><a href="/extension">Extension</a></li>
+        <li><a href="/blog">Writing</a></li>
+        <li><a href="/pricing">Pricing</a></li><li><a href="/docs">Docs</a></li><li><a href="https://github.com/piiiico/proof-of-commitment" target="_blank" rel="noopener">GitHub</a></li>
+        <li><a href="mailto:pico@amdal.dev">Contact</a></li>
+      </ul>
+    </div>
+  </nav>
+
+  <!-- Essay -->
+  <article class="essay">
+    <div class="container">
+      <div class="editorial">
+
+        <!-- Header -->
+        <header class="essay-header">
+          <div class="essay-meta animate-in delay-1">
+            <time datetime="2026-04-18">April 2026</time>
+          </div>
+          <h1 class="essay-title animate-in delay-2">The Behavioral Trust Gap in Open Source</h1>
+          <p class="essay-subtitle animate-in delay-3">
+            Every major supply chain attack exploits the same structural gap. Current security tools can't see it — because they're answering the wrong question.
+          </p>
+          <p class="essay-byline animate-in delay-4">Pico · Commit</p>
+        </header>
+
+        <!-- Body -->
+        <div class="essay-body">
+
+          <h2>The gap nobody scans for</h2>
+
+          <p>
+            In October 2021, an attacker compromised a single npm authentication token and pushed a cryptominer and credential-stealing trojan into ua-parser-js — used by Facebook, Microsoft, Amazon, and Google. Seven million weekly installs. Zero prior warnings from npm audit, Snyk, Dependabot, or any CVE database on Earth.
+          </p>
+
+          <p>
+            This wasn't a failure of execution. The tools worked exactly as designed. They scanned their databases and found nothing, because there was nothing to find. No CVE had been filed. No vulnerability had been disclosed. The package was clean right up until the moment it wasn't.
+          </p>
+
+          <p>
+            The same pattern played out with event-stream in 2018, when a social engineering attack slipped a cryptocurrency-stealing payload into a package with two million weekly downloads. And again with colors.js in 2022, when the sole maintainer intentionally broke the package, taking down CI pipelines across hundreds of projects. In every case: <a href="/blog/three-npm-disasters-that-were-predictable">zero pre-incident warnings from any existing tool</a>.
+          </p>
+
+          <p>
+            This is the behavioral trust gap. The distance between "no known vulnerability" and "actually trustworthy." It is the gap that every major supply chain attack exploits. And it is invisible to every security tool that works by scanning for known-bad.
+          </p>
+
+          <hr style="margin: 2.5rem 0; border: none; border-top: 1px solid var(--rule);" />
+
+          <h2>Why the gap exists</h2>
+
+          <p>
+            Trust in open source is inferred from popularity. Stars, downloads, dependents — these are the signals developers use when choosing packages, and they're the signals that security tools implicitly rely on when they don't flag anything. If a package has 100 million downloads per week, the assumption is that someone is watching. Millions of developers can't all be wrong.
+          </p>
+
+          <p>
+            But these are cumulative metrics. They tell you about the past — that a package has been useful to many people over time. They tell you nothing about the present structural conditions. A sole maintainer with 100 million weekly downloads is a high-value target <em>precisely because</em> of those downloads. The trust signal (downloads) and the risk signal (single point of failure) point in opposite directions.
+          </p>
+
+          <p>
+            Here's what this looks like in practice, using live data from <a href="https://github.com/piiiico/proof-of-commitment" target="_blank" rel="noopener">proof-of-commitment</a>:
+          </p>
+
+          <div style="overflow-x: auto; margin: 2rem 0;">
+            <table style="width: 100%; border-collapse: collapse; font-size: 0.875rem;">
+              <thead>
+                <tr style="border-bottom: 2px solid var(--ink);">
+                  <th style="text-align: left; padding: 0.5rem 0.75rem;">Package</th>
+                  <th style="text-align: right; padding: 0.5rem 0.75rem;">Score</th>
+                  <th style="text-align: center; padding: 0.5rem 0.75rem;">Risk</th>
+                  <th style="text-align: right; padding: 0.5rem 0.75rem;">Maintainers</th>
+                  <th style="text-align: right; padding: 0.5rem 0.75rem;">Downloads/wk</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr style="border-bottom: 1px solid #eee; background: #fff5f5;">
+                  <td style="padding: 0.4rem 0.75rem; font-weight: bold;">chalk</td>
+                  <td style="padding: 0.4rem 0.75rem; text-align: right;">75</td>
+                  <td style="padding: 0.4rem 0.75rem; text-align: center; color: #c00;">CRITICAL</td>
+                  <td style="padding: 0.4rem 0.75rem; text-align: right; font-weight: bold;">1</td>
+                  <td style="padding: 0.4rem 0.75rem; text-align: right;">411M</td>
+                </tr>
+                <tr style="border-bottom: 1px solid #eee; background: #fff5f5;">
+                  <td style="padding: 0.4rem 0.75rem; font-weight: bold;">esbuild</td>
+                  <td style="padding: 0.4rem 0.75rem; text-align: right;">88</td>
+                  <td style="padding: 0.4rem 0.75rem; text-align: center; color: #c00;">CRITICAL</td>
+                  <td style="padding: 0.4rem 0.75rem; text-align: right; font-weight: bold;">1</td>
+                  <td style="padding: 0.4rem 0.75rem; text-align: right;">194M</td>
+                </tr>
+                <tr style="border-bottom: 2px solid var(--ink); background: #fff5f5;">
+                  <td style="padding: 0.4rem 0.75rem; font-weight: bold;">axios</td>
+                  <td style="padding: 0.4rem 0.75rem; text-align: right;">89</td>
+                  <td style="padding: 0.4rem 0.75rem; text-align: center; color: #c00;">CRITICAL</td>
+                  <td style="padding: 0.4rem 0.75rem; text-align: right; font-weight: bold;">1</td>
+                  <td style="padding: 0.4rem 0.75rem; text-align: right;">101M</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <p>
+            Three of the most-depended-upon packages in the npm ecosystem. Quality scores of 75 to 89. Every traditional metric looks healthy. And all three are CRITICAL — because each is controlled by a single maintainer with sole publish access to tens or hundreds of millions of weekly installs.
+          </p>
+
+          <p>
+            Current tools cannot see this because they only look for known-bad. <code>npm audit</code> checks an advisory database. Snyk checks its vulnerability feed. Dependabot checks for outdated versions with known issues. All of them answer the same question: <em>does this package have a known vulnerability?</em> And they answer it well. But the question itself has a blind spot. The next axios isn't in any database yet. The structural conditions that will make it possible are visible right now, to anyone measuring the right things.
+          </p>
+
+          <hr style="margin: 2.5rem 0; border: none; border-top: 1px solid var(--rule);" />
+
+          <h2>Behavioral commitment as a signal</h2>
+
+          <p>
+            If the gap is between "no known vulnerability" and "actually trustworthy," the question is: what would a trustworthiness signal actually look like?
+          </p>
+
+          <p>
+            Not a score. A signal. The distinction matters. A score implies precision that doesn't exist — trust isn't a number you can calculate to two decimal places. A signal is directional: it tells you where to look, not what to conclude.
+          </p>
+
+          <p>
+            The signal we use is behavioral commitment: patterns of sustained real cost that are structurally hard to fake. Five dimensions:
+          </p>
+
+          <ul>
+            <li><strong>Longevity</strong> — How long has the project existed? Age isn't virtue, but it's a baseline. A package that has been maintained for 10 years has demonstrated something that a 3-month-old fork hasn't.</li>
+            <li><strong>Momentum</strong> — Is the download trend growing, stable, or declining? Declining adoption is a leading indicator of abandonment, and abandoned packages with high download counts are the primary target for social engineering attacks (cf. event-stream).</li>
+            <li><strong>Release cadence</strong> — Does the project ship regularly? Release consistency is expensive to fake because it requires sustained real work. A project that releases every few weeks is being actively maintained. A project that hasn't released in two years may still work, but nobody is watching the door.</li>
+            <li><strong>Maintainer depth</strong> — How many people can publish? This is the single strongest structural signal. A sole maintainer is a single point of failure — one compromised token, one case of burnout, one social engineering attempt away from incident. This isn't about the maintainer's competence. It's about the structure.</li>
+            <li><strong>Community governance</strong> — Is there a visible GitHub community? Open issues being triaged, pull requests being reviewed, multiple contributors with write access? These are signs of institutional resilience — the project survives the departure of any single person.</li>
+          </ul>
+
+          <p>
+            None of these are novel observations individually. What's novel is treating them as a composite signal and making it cheap to check. The reason structural risk persists isn't that nobody knows about it — it's that nobody measures it automatically. The information exists. The tooling to surface it at decision-time didn't.
+          </p>
+
+          <p>
+            These signals are hard to fake precisely because they require sustained real cost. You can buy GitHub stars. You can inflate download counts. You can write an impressive README in an afternoon. But you can't fake three years of consistent biweekly releases, or a governance structure with multiple maintainers who each have meaningful commit history. Berkeley's <a href="https://arxiv.org/abs/2410.06992" target="_blank" rel="noopener">SWE-bench research</a> showed that coding benchmarks can be gamed to 100% with zero actual bugs fixed — point-in-time metrics are gameable by definition. Behavioral metrics resist gaming because they require real work sustained over real time.
+          </p>
+
+          <hr style="margin: 2.5rem 0; border: none; border-top: 1px solid var(--rule);" />
+
+          <h2>A different question</h2>
+
+          <p>
+            The shift from "scan for known-bad" to "score for structurally-fragile" isn't incremental. It's a different question entirely.
+          </p>
+
+          <p>
+            <code>npm audit</code> answers: <em>does this package have a known vulnerability?</em><br />
+            Behavioral scoring answers: <em>is this the kind of project that produces vulnerabilities?</em>
+          </p>
+
+          <p>
+            The first question is reactive. It requires someone to discover the vulnerability, file an advisory, and propagate it through the database. By the time a database entry exists, the attack has already happened. The response is incident management, not prevention.
+          </p>
+
+          <p>
+            The second question is structural. It doesn't predict specific attacks — that's not the claim. It identifies the <em>conditions under which attacks succeed</em>: single points of failure, token concentration, asymmetric blast radius, governance gaps. These conditions are observable months or years before any incident. They were observable before event-stream. Before ua-parser-js. Before axios.
+          </p>
+
+          <p>
+            This reframe has a practical consequence. If you're a security team deciding which dependencies to monitor closely, CVE scanning tells you to monitor everything equally until something breaks. Structural scoring tells you <em>which packages to watch before anything happens</em>. It's the difference between a smoke detector and a fire inspection. You want both, but only one can prevent fires.
+          </p>
+
+          <p>
+            The analogy to financial markets is instructive. Nobody would accept a credit rating system that only flagged defaults <em>after</em> they occurred. The entire point of credit analysis is to assess structural risk <em>before</em> the event. Rating agencies look at debt ratios, governance structures, revenue stability — behavioral commitments, not just past defaults. Open source dependency management is, right now, where credit analysis was before rating agencies existed: purely reactive, and reliably surprised by every crisis.
+          </p>
+
+          <hr style="margin: 2.5rem 0; border: none; border-top: 1px solid var(--rule);" />
+
+          <h2>What we built</h2>
+
+          <p>
+            <a href="https://github.com/piiiico/proof-of-commitment" target="_blank" rel="noopener">proof-of-commitment</a> is an open-source tool that computes behavioral trust scores for npm packages across five dimensions: longevity, momentum, release cadence, maintainer depth, and community governance. It flags CRITICAL when a package has a single maintainer and more than 10 million weekly downloads — the structural profile that produced all three major supply chain attacks analyzed above.
+          </p>
+
+          <p>
+            It runs as a CLI (<code>npx proof-of-commitment axios chalk esbuild</code>), a <a href="/audit">web interface</a>, a <a href="https://github.com/piiiico/proof-of-commitment#github-action">GitHub Action</a> that comments on pull requests, and an <a href="/#mcp">MCP server</a> that integrates with Claude Desktop, Cursor, and Windsurf. All data comes from public npm and GitHub APIs. The tool is free and the source is open.
+          </p>
+
+          <p>
+            What it doesn't do: it doesn't scan code. It doesn't replace <code>npm audit</code>, Snyk, or Dependabot. It doesn't detect malicious payloads or known CVEs. Those tools exist and they work. The behavioral trust gap is the space they don't cover — and that's the only space we're in.
+          </p>
+
+          <hr style="margin: 2.5rem 0; border: none; border-top: 1px solid var(--rule);" />
+
+          <h2>Limitations and open questions</h2>
+
+          <p>
+            Some honest caveats:
+          </p>
+
+          <ul>
+            <li><strong>Point-in-time, not temporal</strong> — The current scoring is a snapshot. It doesn't track behavioral changes over time. A maintainer handoff — the exact attack vector in event-stream — is invisible to a point-in-time score. Temporal diffing is the most important gap to close.</li>
+            <li><strong>Single maintainer ≠ bad</strong> — Many of the best-maintained packages in the ecosystem are the work of dedicated individuals. The CRITICAL flag doesn't mean the maintainer is doing a bad job. It means the <em>structure</em> creates concentration risk regardless of individual competence. The right response isn't to abandon these packages — it's to recognize the structural dependency and plan accordingly.</li>
+            <li><strong>npm-first</strong> — The scoring currently covers npm. PyPI support exists but is less mature. The behavioral trust gap exists in every package ecosystem; the tooling needs to follow.</li>
+            <li><strong>Gaming will evolve</strong> — Any metric that becomes important becomes a target. If behavioral scores start influencing decisions, people will try to game them. The advantage of commitment-based signals is that gaming requires real sustained cost — but the advantage isn't absolute. This is an ongoing arms race, not a solved problem.</li>
+          </ul>
+
+          <hr style="margin: 2.5rem 0; border: none; border-top: 1px solid var(--rule);" />
+
+          <p style="font-size: 1.05rem; line-height: 1.8;">
+            The behavioral trust gap isn't a tooling problem. It's a measurement problem. We measure what packages <em>contain</em> — known bugs, outdated versions, CVE matches — because that's what we know how to measure. We don't measure how packages are <em>governed</em> — who controls the publish token, how many people are watching, whether the project structure is resilient or fragile — because nobody built the instruments.
+          </p>
+
+          <p style="font-size: 1.05rem; line-height: 1.8;">
+            The instruments exist now. The structural conditions that produced event-stream, ua-parser-js, and axios are detectable. Not predicted — <em>detected</em>. The conditions are still present in hundreds of high-impact packages today. The question is whether we check.
+          </p>
+
+          <hr class="essay-divider" />
+
+          <p class="essay-coda">
+            <em><a href="/">Commit</a> indexes behavioral commitment — the signals that require real cost and resist gaming. <a href="https://github.com/piiiico/proof-of-commitment" target="_blank" rel="noopener">proof-of-commitment</a> is our first tool. It's free and open source.</em>
+          </p>
+          <p class="essay-coda">
+            <em>Case studies: <a href="/blog/three-npm-disasters-that-were-predictable">Three npm Disasters That Were Predictable</a> · <a href="/blog/state-of-npm-trust-april-2026">State of npm Trust: April 2026</a> · <a href="/blog/declarations-are-gameable">Declarations Are Gameable</a></em>
+          </p>
+
+        </div>
+      </div>
+    </div>
+  </article>
+
+  <!-- Newsletter -->
+  <section class="newsletter-section">
+    <div class="container">
+      <div class="editorial reveal">
+        <h2 style="margin-bottom: 0.75rem;">Stay in the loop</h2>
+        <p style="margin-bottom: 2rem; font-size: 1rem;">
+          Early access, research updates, and the occasional strong opinion.
+        </p>
+
+        <form
+          action="https://buttondown.email/api/emails/embed-subscribe/commitgraph"
+          method="post"
+          target="popupwindow"
+          class="newsletter-form"
+        >
+          <input
+            type="email"
+            name="email"
+            placeholder="you@example.com"
+            required
+            class="newsletter-input"
+          />
+          <button type="submit" class="btn-primary" style="white-space: nowrap;">
+            Subscribe
+          </button>
+        </form>
+
+        <p class="newsletter-note">No spam. Unsubscribe anytime.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer>
+    <div class="container footer-inner">
+      <span class="footer-brand">Commit</span>
+      <ul class="footer-links">
+        <li><a href="/">Home</a></li>
+        <li><a href="/extension">Extension</a></li>
+        <li><a href="/blog">Writing</a></li>
+        <li><a href="/pricing">Pricing</a></li><li><a href="/docs">Docs</a></li><li><a href="https://github.com/piiiico/proof-of-commitment" target="_blank" rel="noopener">GitHub</a></li>
+        <li><a href="mailto:pico@amdal.dev">Contact</a></li>
+      </ul>
+      <span class="footer-locale">Stavanger, Norway</span>
+    </div>
+  </footer>
+
+</Layout>

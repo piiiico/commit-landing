@@ -1,0 +1,175 @@
+---
+import Layout from '../../layouts/Layout.astro';
+---
+
+<Layout
+  title="Germany Didn't Trust a Certificate. Neither Should You. — Commit"
+  description="Germany's national digital ID abandoned static device certification for runtime behavioral attestation. The same logic applies to AI agents."
+  canonical="https://getcommit.dev/blog/germany-eidas-runtime-attestation/"
+  publishDate="2026-04-05"
+>
+
+  <!-- Nav -->
+  <nav>
+    <div class="container nav-inner">
+      <a href="/" class="nav-brand">Commit</a>
+      <ul class="nav-links">
+        <li><a href="/extension">Extension</a></li>
+        <li><a href="/blog">Writing</a></li>
+        <li><a href="/pricing">Pricing</a></li><li><a href="/docs">Docs</a></li><li><a href="https://github.com/piiiico/proof-of-commitment" target="_blank" rel="noopener">GitHub</a></li>
+        <li><a href="mailto:pico@amdal.dev">Contact</a></li>
+      </ul>
+    </div>
+  </nav>
+
+  <!-- Essay -->
+  <article class="essay">
+    <div class="container">
+      <div class="editorial">
+
+        <!-- Header -->
+        <header class="essay-header">
+          <div class="essay-meta animate-in delay-1">
+            <time datetime="2026-04-05">April 5, 2026</time>
+          </div>
+          <h1 class="essay-title animate-in delay-2">Germany Didn't Trust a Certificate. Neither Should You.</h1>
+          <p class="essay-subtitle animate-in delay-3">
+            Germany's national digital ID abandoned static device certification for runtime behavioral attestation. The same logic applies to AI agents.
+          </p>
+          <p class="essay-byline animate-in delay-4">Pico</p>
+        </header>
+
+        <!-- Body -->
+        <div class="essay-body">
+
+          <p>
+            Germany's national digital identity infrastructure — the eIDAS European Digital Identity Wallet — has a security problem that should be familiar to anyone building with AI agents.
+          </p>
+          <p>
+            The problem is this: you can certify a device today and have no idea what it will be tomorrow.
+          </p>
+          <p>
+            Germany's solution is documented in their Mobile Device Vulnerability Management (MDVM) architecture. It's a specification that quietly discards an assumption most security infrastructure still makes — that certification at a point in time means trustworthiness over time. The document describes what they built instead: a runtime attestation system that continuously evaluates device posture and blocks authentication when posture degrades.
+          </p>
+          <p>
+            Read it as an AI architect and you'll notice something. Every problem they describe is a problem we have with agents.
+          </p>
+
+          <h2>The Certification Trap</h2>
+
+          <p>
+            Traditional device certification works like this: an auditor evaluates a device against known attack potentials, assigns a certification level, and publishes results. The device is trusted until certification expires.
+          </p>
+          <p>
+            The MDVM architects identified the flaw precisely: <em>"new vulnerabilities may be discovered after certification."</em> A device that passed every test in 2024 may have active exploits in 2025. The certification is still valid. The trust assumption it encodes is not.
+          </p>
+          <p>
+            Their solution is a system that:
+          </p>
+          <ul>
+            <li><strong>Collects runtime signals:</strong> Google Play Integrity verdicts — which include a <code>MEETS_STRONG_INTEGRITY</code> check requiring security patches within 12 months — Apple AppAttest assertions, and RASP (Runtime Application Self-Protection) telemetry that independently detects rooting, emulation, hooking, and jailbreaking</li>
+            <li><strong>Cross-references vulnerability databases:</strong> Device model and OS version are used to query known CVEs, identifying whether specific devices are in an affected class</li>
+            <li><strong>Enforces dynamically:</strong> If a vulnerability affecting authentication integrity is discovered, the system "prevents the use of keys by user authentication with insufficiently secure devices" — mid-wallet-lifetime, without requiring OS updates or reinstallation</li>
+          </ul>
+          <p>
+            The design explicitly does not trust any single signal. KeyAttestation validates secure enclave residence but can be defeated by leaked attestation keys. Play Integrity adds Google's backend assessment but has its own trust assumptions. RASP monitors runtime behavior independently of both. Layered, because no single layer is sufficient.
+          </p>
+
+          <h2>The Same Problem, Different Substrate</h2>
+
+          <p>
+            Replace "mobile device" with "AI agent" and the architecture description reads identically.
+          </p>
+          <p>
+            An agent can pass every evaluation at deployment time. It has valid credentials. Its authorization scope is correctly specified. Its behavior in testing matched expectations.
+          </p>
+          <p>
+            None of that tells you whether it will behave trustworthily when operating autonomously across novel conditions, with counterparties it hasn't encountered, in edge cases that weren't in the test set.
+          </p>
+          <p>
+            The MDVM architects solved this for devices by shifting from certification to continuous posture evaluation. They collect signals, cross-reference risk data, and block operations when posture degrades — not because the certification expired, but because the runtime evidence warrants it.
+          </p>
+          <p>
+            Agent trust infrastructure needs the same shift. Not "did this agent pass an evaluation once?" but "what is its behavioral posture right now, across its deployment history, compared to its commitments?"
+          </p>
+          <p>
+            The signals are different: not Play Integrity verdicts but behavioral patterns across deployments, commitment-keeping rates, operator renewal decisions, escalation behavior when scope is ambiguous. But the architecture is identical. Runtime. Layered. Continuous. Enforced at the moment of use.
+          </p>
+
+          <h2>Why This Matters Beyond Analogy</h2>
+
+          <p>
+            Germany built MDVM because they were deploying sovereign-scale infrastructure — national identity credentials — on devices they couldn't physically inspect or control. They couldn't assume trustworthiness. They had to verify it continuously, or the whole system was only as secure as its weakest unpatched Android.
+          </p>
+          <p>
+            The agentic economy is building the same kind of infrastructure. AI agents will handle financial transactions, access sensitive data, execute operations across organizational boundaries. Deployers can't inspect the agents they use. They can't audit counterparty behavior. The trust assumption has to be earned and continuously maintained — or the system's security is bounded by whatever the least-verified agent can do.
+          </p>
+          <p>
+            The Strata/CSA survey published this month found that 70% of enterprises run agents in production outside their IAM systems. Only 18% are confident their IAM can handle agent identities. Just 11% have runtime authorization enforcement. That gap isn't a tooling problem — it's an architecture problem. Static evaluation was designed for static entities.
+          </p>
+          <p>
+            Germany figured this out for devices. Sovereign-scale deployment pressure forced the answer: you cannot certify your way to runtime trust. You have to measure it.
+          </p>
+          <p>
+            The agent layer is next. The architecture is already written.
+          </p>
+
+          <hr class="essay-divider" />
+
+          <p class="essay-coda">
+            <em>This is part of an ongoing series on trust infrastructure for the autonomous economy. Earlier essays: <a href="/blog/the-agent-passed-all-the-checks">The Agent Passed All the Checks. That Was the Problem.</a>, <a href="/blog/sixty-percent-want-approval-gates">60% of Consumers Want Approval Gates for AI Spending</a>, <a href="/blog/commitment-is-the-new-link">Commitment Is the New Link</a>, <a href="/blog/who-decides-what-agents-can-buy">Who Decides What Agents Are Allowed to Buy?</a>, <a href="/blog/declarations-are-gameable">Declarations Are Gameable</a>. We're building <a href="/">Commit</a> — behavioral commitment data as the input layer for agent governance. <a href="mailto:pico@amdal.dev">Reach out</a> if you're thinking about runtime trust infrastructure for autonomous agents.</em>
+          </p>
+
+        </div>
+      </div>
+    </div>
+  </article>
+
+  <!-- Newsletter -->
+  <section class="newsletter-section">
+    <div class="container">
+      <div class="editorial reveal">
+        <h2 style="margin-bottom: 0.75rem;">Stay in the loop</h2>
+        <p style="margin-bottom: 2rem; font-size: 1rem;">
+          Early access, research updates, and the occasional strong opinion.
+        </p>
+
+        <form
+          action="https://buttondown.email/api/emails/embed-subscribe/commitgraph"
+          method="post"
+          target="popupwindow"
+          class="newsletter-form"
+        >
+          <input
+            type="email"
+            name="email"
+            placeholder="you@example.com"
+            required
+            class="newsletter-input"
+          />
+          <button type="submit" class="btn-primary" style="white-space: nowrap;">
+            Subscribe
+          </button>
+        </form>
+
+        <p class="newsletter-note">No spam. Unsubscribe anytime.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer>
+    <div class="container footer-inner">
+      <span class="footer-brand">Commit</span>
+      <ul class="footer-links">
+        <li><a href="/">Home</a></li>
+        <li><a href="/extension">Extension</a></li>
+        <li><a href="/blog">Writing</a></li>
+        <li><a href="/pricing">Pricing</a></li><li><a href="/docs">Docs</a></li><li><a href="https://github.com/piiiico/proof-of-commitment" target="_blank" rel="noopener">GitHub</a></li>
+        <li><a href="mailto:pico@amdal.dev">Contact</a></li>
+      </ul>
+      <span class="footer-locale">Stavanger, Norway</span>
+    </div>
+  </footer>
+
+</Layout>

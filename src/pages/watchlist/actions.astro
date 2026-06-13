@@ -1,0 +1,1015 @@
+---
+import Layout from '../../layouts/Layout.astro';
+---
+
+<Layout
+  title="GitHub Actions Supply Chain Risk — Commit"
+  description="Live risk scores for the most-used GitHub Actions. Tags are mutable. One compromised action can leak every secret in your CI/CD pipeline."
+  canonical="https://getcommit.dev/watchlist/actions/"
+>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg: #FFFCF0;
+      --fg: #1a1a1a;
+      --muted: #6b6b6b;
+      --border: #e5e0d0;
+      --critical: #991b1b;
+      --critical-bg: #fef2f2;
+      --high: #92400e;
+      --high-bg: #fffbeb;
+      --warn: #78350f;
+      --ok: #166534;
+      --ok-bg: #f0fdf4;
+      --max: 1060px;
+    }
+
+    body {
+      background: var(--bg);
+      color: var(--fg);
+      font-family: 'Georgia', serif;
+      line-height: 1.6;
+    }
+
+    nav {
+      border-bottom: 1px solid var(--border);
+      padding: 14px 24px;
+    }
+
+    .nav-inner {
+      max-width: var(--max);
+      margin: 0 auto;
+      display: flex;
+      align-items: center;
+      gap: 32px;
+    }
+
+    .nav-brand {
+      font-weight: 700;
+      font-size: 1.1rem;
+      color: var(--fg);
+      text-decoration: none;
+    }
+
+    .nav-links {
+      list-style: none;
+      display: flex;
+      gap: 24px;
+      margin-left: auto;
+    }
+
+    .nav-links a {
+      color: var(--muted);
+      text-decoration: none;
+      font-family: 'system-ui', sans-serif;
+      font-size: 0.875rem;
+    }
+
+    .nav-links a:hover, .nav-links a.nav-active { color: var(--fg); }
+
+    .container { max-width: var(--max); margin: 0 auto; padding: 0 24px; }
+
+    .hero {
+      padding: 56px 24px 32px;
+      max-width: var(--max);
+      margin: 0 auto;
+    }
+
+    .hero-eyebrow {
+      display: block;
+      font-family: 'system-ui', sans-serif;
+      font-size: 0.8rem;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--muted);
+      margin-bottom: 12px;
+    }
+
+    h1 {
+      font-size: clamp(1.8rem, 4vw, 2.8rem);
+      line-height: 1.15;
+      margin-bottom: 20px;
+      font-weight: 700;
+    }
+
+    h1 em { font-style: italic; }
+
+    .hero-lead {
+      font-size: 1.05rem;
+      color: var(--muted);
+      max-width: 700px;
+      margin-bottom: 24px;
+    }
+
+    .hero-meta {
+      font-family: 'system-ui', sans-serif;
+      font-size: 0.8rem;
+      color: var(--muted);
+    }
+
+    /* Callout box */
+    .attack-callout {
+      background: var(--critical-bg);
+      border: 1px solid #fca5a5;
+      border-left: 4px solid var(--critical);
+      border-radius: 8px;
+      padding: 16px 20px;
+      margin-bottom: 28px;
+      font-family: 'system-ui', sans-serif;
+      font-size: 0.875rem;
+      line-height: 1.6;
+    }
+
+    .attack-callout strong {
+      color: var(--critical);
+    }
+
+    .attack-callout code {
+      background: #fee2e2;
+      padding: 1px 5px;
+      border-radius: 3px;
+      font-size: 0.82rem;
+    }
+
+    /* Ecosystem switcher */
+    .ecosystem-tabs {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 28px;
+    }
+
+    .eco-tab {
+      display: inline-block;
+      padding: 6px 16px;
+      border-radius: 20px;
+      font-family: 'system-ui', sans-serif;
+      font-size: 0.8rem;
+      font-weight: 600;
+      text-decoration: none;
+      border: 1px solid var(--border);
+      color: var(--muted);
+      transition: all 0.15s;
+    }
+
+    .eco-tab:hover { color: var(--fg); border-color: var(--fg); }
+
+    .eco-tab.active {
+      background: var(--fg);
+      color: #fff;
+      border-color: var(--fg);
+    }
+
+    /* Stats banner */
+    .stats-banner {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 24px;
+      background: #fef2f2;
+      border: 1px solid #fca5a5;
+      border-radius: 8px;
+      padding: 16px 20px;
+      margin-bottom: 32px;
+    }
+
+    .stat-item {
+      font-family: 'system-ui', sans-serif;
+    }
+
+    .stat-value {
+      font-size: 1.4rem;
+      font-weight: 700;
+      color: var(--critical);
+      display: block;
+    }
+
+    .stat-label {
+      font-size: 0.75rem;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+    }
+
+    /* Key difference box */
+    .key-difference {
+      background: #fffbeb;
+      border: 1px solid #fbbf24;
+      border-radius: 8px;
+      padding: 16px 20px;
+      margin-bottom: 32px;
+      font-family: 'system-ui', sans-serif;
+      font-size: 0.85rem;
+      line-height: 1.6;
+    }
+
+    .key-difference strong {
+      color: var(--high);
+    }
+
+    .key-difference code {
+      background: #fef3c7;
+      padding: 1px 5px;
+      border-radius: 3px;
+      font-size: 0.82rem;
+    }
+
+    .vs-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 12px;
+      font-size: 0.82rem;
+    }
+
+    .vs-table th {
+      text-align: left;
+      padding: 6px 12px;
+      background: #fef3c7;
+      font-weight: 600;
+      border-bottom: 1px solid #fbbf24;
+    }
+
+    .vs-table td {
+      padding: 6px 12px;
+      border-bottom: 1px solid #fde68a;
+    }
+
+    .vs-table .bad { color: var(--critical); font-weight: 600; }
+    .vs-table .good { color: var(--ok); }
+
+    /* Table */
+    .watchlist-table-wrap {
+      overflow-x: auto;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      margin-bottom: 48px;
+    }
+
+    table.watchlist {
+      width: 100%;
+      border-collapse: collapse;
+      font-family: 'system-ui', sans-serif;
+      font-size: 0.85rem;
+    }
+
+    table.watchlist thead th {
+      background: #f7f4e8;
+      padding: 10px 14px;
+      text-align: left;
+      font-weight: 600;
+      border-bottom: 1px solid var(--border);
+      white-space: nowrap;
+      font-size: 0.72rem;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      color: var(--muted);
+    }
+
+    table.watchlist tbody tr {
+      border-bottom: 1px solid var(--border);
+      transition: background 0.1s;
+    }
+
+    table.watchlist tbody tr:last-child { border-bottom: none; }
+    table.watchlist tbody tr:hover { background: #fafaf5; }
+
+    table.watchlist tbody td {
+      padding: 10px 14px;
+      vertical-align: middle;
+    }
+
+    .pkg-name {
+      font-weight: 600;
+      color: var(--fg);
+    }
+
+    .pkg-link {
+      color: inherit;
+      text-decoration: none;
+    }
+
+    .pkg-link:hover { text-decoration: underline; }
+
+    .attack-annotation {
+      display: inline-block;
+      font-size: 0.68rem;
+      color: var(--critical);
+      font-weight: 600;
+      margin-left: 6px;
+      white-space: nowrap;
+    }
+
+    .risk-badge {
+      display: inline-block;
+      padding: 2px 8px;
+      border-radius: 4px;
+      font-size: 0.72rem;
+      font-weight: 700;
+      letter-spacing: 0.04em;
+      white-space: nowrap;
+    }
+
+    .badge-critical { background: var(--critical-bg); color: var(--critical); }
+    .badge-high { background: var(--high-bg); color: var(--high); }
+    .badge-warn { background: #fff7ed; color: var(--warn); }
+    .badge-ok { background: var(--ok-bg); color: var(--ok); }
+
+    .score-cell { font-variant-numeric: tabular-nums; }
+
+    .score-low { color: var(--critical); font-weight: 600; }
+    .score-mid { color: var(--high); }
+    .score-ok { color: var(--ok); }
+
+    .num-muted { color: var(--muted); font-variant-numeric: tabular-nums; }
+
+    .owner-badge {
+      display: inline-block;
+      padding: 2px 8px;
+      border-radius: 4px;
+      font-size: 0.72rem;
+      font-weight: 600;
+      white-space: nowrap;
+    }
+
+    .owner-official { background: #dbeafe; color: #1e40af; }
+    .owner-vendor { background: #e0e7ff; color: #3730a3; }
+    .owner-community { background: #fef3c7; color: #92400e; }
+
+    .perm-text {
+      font-size: 0.78rem;
+      color: var(--muted);
+      max-width: 160px;
+    }
+
+    .perm-sensitive {
+      color: var(--critical);
+      font-weight: 600;
+    }
+
+    /* Explainer */
+    .explainer {
+      border-top: 1px solid var(--border);
+      padding: 40px 0;
+      display: flex;
+      gap: 40px;
+      flex-wrap: wrap;
+    }
+
+    .explainer-col { flex: 1; min-width: 240px; }
+
+    .explainer h3 {
+      font-size: 1rem;
+      font-weight: 700;
+      margin-bottom: 8px;
+    }
+
+    .explainer p {
+      font-size: 0.875rem;
+      color: var(--muted);
+      line-height: 1.7;
+    }
+
+    .explainer code {
+      background: #f7f4e8;
+      padding: 1px 5px;
+      border-radius: 3px;
+      font-size: 0.82rem;
+    }
+
+    /* Pin example */
+    .pin-example {
+      background: #1a1a1a;
+      color: #e5e0d0;
+      border-radius: 8px;
+      padding: 20px 24px;
+      margin: 32px 0;
+      font-family: 'Menlo', 'Monaco', 'Consolas', monospace;
+      font-size: 0.82rem;
+      line-height: 1.8;
+      overflow-x: auto;
+    }
+
+    .pin-example .comment { color: #6b6b6b; }
+    .pin-example .bad-line { color: #f87171; text-decoration: line-through; opacity: 0.7; }
+    .pin-example .good-line { color: #4ade80; }
+    .pin-example .label {
+      display: inline-block;
+      font-size: 0.68rem;
+      padding: 1px 6px;
+      border-radius: 3px;
+      margin-left: 8px;
+      font-family: 'system-ui', sans-serif;
+      vertical-align: middle;
+    }
+    .pin-example .label-bad { background: #7f1d1d; color: #fca5a5; }
+    .pin-example .label-good { background: #14532d; color: #86efac; }
+
+    .cta-row {
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+      margin-top: 32px;
+      padding-bottom: 48px;
+    }
+
+    .btn {
+      display: inline-block;
+      padding: 10px 20px;
+      border-radius: 6px;
+      font-family: 'system-ui', sans-serif;
+      font-size: 0.875rem;
+      font-weight: 600;
+      text-decoration: none;
+      cursor: pointer;
+    }
+
+    .btn-primary {
+      background: var(--fg);
+      color: #fff;
+    }
+
+    .btn-secondary {
+      background: transparent;
+      color: var(--fg);
+      border: 1px solid var(--border);
+    }
+
+    .btn:hover { opacity: 0.85; }
+  </style>
+
+  <!-- Nav -->
+  <nav>
+    <div class="nav-inner">
+      <a href="/" class="nav-brand">Commit</a>
+      <ul class="nav-links">
+        <li><a href="/#mcp">MCP</a></li>
+        <li><a href="/audit">Audit</a></li>
+        <li><a href="/watchlist" class="nav-active">Watchlist</a></li>
+        <li><a href="/extension">Extension</a></li>
+        <li><a href="/blog">Writing</a></li>
+        <li><a href="/pricing">Pricing</a></li><li><a href="/docs">Docs</a></li><li><a href="https://github.com/piiiico/proof-of-commitment" target="_blank" rel="noopener">GitHub</a></li>
+      </ul>
+    </div>
+  </nav>
+
+  <div class="container">
+    <section class="hero">
+      <span class="hero-eyebrow">Supply chain risk monitor</span>
+      <h1>The most-used GitHub Actions,<br /><em>ranked by supply chain risk</em></h1>
+      <p class="hero-lead">
+        Unlike npm and PyPI, GitHub Actions tags are <strong>mutable</strong>. A maintainer &mdash; or an attacker
+        with their credentials &mdash; can silently replace what <code>v3</code> points to. Every workflow
+        using tag-based references is one compromised account away from leaking every secret in the pipeline.
+      </p>
+      <p class="hero-meta">Curated risk assessment &middot; 25 actions &middot; Updated April 2026</p>
+    </section>
+
+    <!-- Attack callout -->
+    <div class="attack-callout">
+      <strong>Real incident: tj-actions/changed-files (March 2025)</strong><br />
+      Attackers compromised a maintainer token via a cascading supply chain attack through
+      <code>reviewdog/action-setup</code>. The malicious commit replaced the action's tag, dumping CI/CD
+      secrets to workflow logs. <strong>23,000 repos</strong> used the action; <strong>218 repos</strong>
+      had secrets exposed including AWS keys, DockerHub credentials, and npm tokens. The attack lasted
+      ~22 hours before detection.
+    </div>
+
+    <!-- Ecosystem tabs -->
+    <div class="ecosystem-tabs">
+      <a href="/watchlist" class="eco-tab">npm</a>
+      <a href="/watchlist/pypi" class="eco-tab">PyPI</a>
+      <a href="/watchlist/actions" class="eco-tab active">GitHub Actions</a>
+    </div>
+
+    <!-- Stats banner -->
+    <div class="stats-banner" id="stats-banner">
+      <div class="stat-item">
+        <span class="stat-value" id="stat-critical">&mdash;</span>
+        <span class="stat-label">CRITICAL actions</span>
+      </div>
+      <div class="stat-item">
+        <span class="stat-value" id="stat-repos">&mdash;</span>
+        <span class="stat-label">Repos depending on CRITICAL</span>
+      </div>
+      <div class="stat-item">
+        <span class="stat-value" id="stat-solo">&mdash;</span>
+        <span class="stat-label">Solo-maintainer actions</span>
+      </div>
+      <div class="stat-item">
+        <span class="stat-value" id="stat-write">&mdash;</span>
+        <span class="stat-label">Actions with write access</span>
+      </div>
+    </div>
+
+    <!-- Key difference box -->
+    <div class="key-difference">
+      <strong>Why Actions are different from packages</strong>
+      <table class="vs-table">
+        <thead>
+          <tr>
+            <th></th>
+            <th>npm / PyPI</th>
+            <th>GitHub Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Version immutability</td>
+            <td class="good">Immutable (once published, can't change)</td>
+            <td class="bad">Mutable (tags can be silently replaced)</td>
+          </tr>
+          <tr>
+            <td>Execution context</td>
+            <td>Runs in your app's sandbox</td>
+            <td class="bad">Runs in CI with secrets, tokens, deploy keys</td>
+          </tr>
+          <tr>
+            <td>Attack surface</td>
+            <td>Code injection at build/runtime</td>
+            <td class="bad">Direct access to GITHUB_TOKEN + all workflow secrets</td>
+          </tr>
+          <tr>
+            <td>Mitigation</td>
+            <td class="good">Lockfiles pin exact versions</td>
+            <td>SHA pinning available but rarely used</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Table -->
+    <div class="watchlist-table-wrap">
+      <table class="watchlist">
+        <thead>
+          <tr>
+            <th>#</th>
+            <th>Action</th>
+            <th>Risk</th>
+            <th>Score</th>
+            <th>Repos using</th>
+            <th>Owner</th>
+            <th>Permissions</th>
+          </tr>
+        </thead>
+        <tbody id="watchlist-tbody">
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Pin example -->
+    <div class="pin-example">
+      <span class="comment"># How to pin GitHub Actions to commit SHAs</span><br /><br />
+      <span class="comment"># Mutable tag (UNSAFE - can be silently replaced):</span><br />
+      <span class="bad-line">- uses: actions/checkout@v4</span>
+      <span class="label label-bad">MUTABLE</span><br /><br />
+      <span class="comment"># Immutable SHA pin (SAFE - points to exact commit):</span><br />
+      <span class="good-line">- uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2</span>
+      <span class="label label-good">IMMUTABLE</span><br /><br />
+      <span class="comment"># Tools: github.com/mheap/pin-github-action, StepSecurity Harden-Runner</span>
+    </div>
+
+    <!-- Explainer + CTA -->
+    <div class="explainer">
+      <div class="explainer-col">
+        <h3>Why this list exists</h3>
+        <p>
+          Most supply chain monitoring focuses on packages. But the CI/CD pipeline is often the
+          highest-privilege environment in the entire software lifecycle &mdash; it has deploy keys,
+          cloud credentials, and signing keys. A compromised Action is not a dependency risk.
+          It is a <em>credential exfiltration</em> risk.
+        </p>
+      </div>
+      <div class="explainer-col">
+        <h3>How we score Actions</h3>
+        <p>
+          Trust score combines <strong>owner trust</strong> (GitHub official vs solo dev),
+          <strong>permissions scope</strong> (read-only vs secrets access),
+          <strong>adoption scale</strong> (blast radius if compromised), and
+          <strong>incident history</strong>. Actions run by solo developers with write permissions
+          and massive usage are the highest-value targets.
+        </p>
+      </div>
+      <div class="explainer-col">
+        <h3>Pin everything</h3>
+        <p>
+          Replace <code>uses: org/action@v4</code> with
+          <code>uses: org/action@SHA # v4.x.x</code>. Tools like
+          <a href="https://github.com/mheap/pin-github-action" target="_blank" rel="noopener">pin-github-action</a>
+          automate this. It takes 5 minutes to pin every Action in your workflows.
+          After the tj-actions incident, there is no excuse.
+        </p>
+      </div>
+    </div>
+
+    <div class="cta-row">
+      <a href="/audit" class="btn btn-primary">Audit your dependencies</a>
+      <a href="/watchlist" class="btn btn-secondary">View npm watchlist</a>
+      <a href="/watchlist/pypi" class="btn btn-secondary">View PyPI watchlist</a>
+    </div>
+  </div>
+
+  <script>
+    // Static data: Top 25 GitHub Actions ranked by supply chain risk
+    // Scoring methodology:
+    //   Owner trust (30pts): GitHub official=30, Vendor official=22, Established org=15, Solo dev=5
+    //   Permissions scope (25pts): Read-only=25, Write to repo=12, Secrets/creds=6, Compromised=0
+    //   Adoption safety (20pts): Inverse of blast radius. Fewer dependents = less damage potential.
+    //   Incident history (15pts): Clean=15, Adjacent=10, Direct compromise=0
+    //   Pin hygiene (10pts): Docs recommend SHA=10, Mixed=5, Tag-only examples=2
+
+    interface ActionEntry {
+      name: string;
+      risk: 'CRITICAL' | 'HIGH' | 'WARN' | 'OK';
+      score: number;
+      reposUsing: string;
+      reposNum: number;
+      owner: string;
+      ownerType: 'official' | 'vendor' | 'community';
+      permissions: string;
+      permSensitive: boolean;
+      annotation?: string;
+      url: string;
+    }
+
+    const ACTIONS: ActionEntry[] = [
+      // CRITICAL: Solo-maintained, massive usage, write/secrets access
+      {
+        name: "tj-actions/changed-files",
+        risk: "CRITICAL",
+        score: 12,
+        reposUsing: "23K",
+        reposNum: 23000,
+        owner: "Community",
+        ownerType: "community",
+        permissions: "contents: read",
+        permSensitive: true,
+        annotation: "compromised Mar 2025",
+        url: "https://github.com/tj-actions/changed-files"
+      },
+      {
+        name: "softprops/action-gh-release",
+        risk: "CRITICAL",
+        score: 28,
+        reposUsing: "95K",
+        reposNum: 95000,
+        owner: "Solo dev",
+        ownerType: "community",
+        permissions: "contents: write",
+        permSensitive: true,
+        url: "https://github.com/softprops/action-gh-release"
+      },
+      {
+        name: "peaceiris/actions-gh-pages",
+        risk: "CRITICAL",
+        score: 31,
+        reposUsing: "48K",
+        reposNum: 48000,
+        owner: "Solo dev",
+        ownerType: "community",
+        permissions: "contents: write",
+        permSensitive: true,
+        url: "https://github.com/peaceiris/actions-gh-pages"
+      },
+      {
+        name: "JamesIves/github-pages-deploy-action",
+        risk: "CRITICAL",
+        score: 29,
+        reposUsing: "36K",
+        reposNum: 36000,
+        owner: "Solo dev",
+        ownerType: "community",
+        permissions: "contents: write",
+        permSensitive: true,
+        url: "https://github.com/JamesIves/github-pages-deploy-action"
+      },
+      // HIGH: Solo-maintained with significant usage or sensitive permissions
+      {
+        name: "appleboy/ssh-action",
+        risk: "HIGH",
+        score: 35,
+        reposUsing: "28K",
+        reposNum: 28000,
+        owner: "Solo dev",
+        ownerType: "community",
+        permissions: "SSH key + secrets",
+        permSensitive: true,
+        url: "https://github.com/appleboy/ssh-action"
+      },
+      {
+        name: "peter-evans/create-pull-request",
+        risk: "HIGH",
+        score: 39,
+        reposUsing: "18K",
+        reposNum: 18000,
+        owner: "Solo dev",
+        ownerType: "community",
+        permissions: "contents: write, PRs: write",
+        permSensitive: true,
+        url: "https://github.com/peter-evans/create-pull-request"
+      },
+      {
+        name: "ncipollo/release-action",
+        risk: "HIGH",
+        score: 36,
+        reposUsing: "15K",
+        reposNum: 15000,
+        owner: "Solo dev",
+        ownerType: "community",
+        permissions: "contents: write",
+        permSensitive: true,
+        url: "https://github.com/ncipollo/release-action"
+      },
+      {
+        name: "EndBug/add-and-commit",
+        risk: "HIGH",
+        score: 34,
+        reposUsing: "12K",
+        reposNum: 12000,
+        owner: "Solo dev",
+        ownerType: "community",
+        permissions: "contents: write",
+        permSensitive: true,
+        url: "https://github.com/EndBug/add-and-commit"
+      },
+      {
+        name: "dorny/paths-filter",
+        risk: "HIGH",
+        score: 42,
+        reposUsing: "11K",
+        reposNum: 11000,
+        owner: "Solo dev",
+        ownerType: "community",
+        permissions: "contents: read, PRs: read",
+        permSensitive: false,
+        url: "https://github.com/dorny/paths-filter"
+      },
+      {
+        name: "superfly/flyctl-actions",
+        risk: "HIGH",
+        score: 38,
+        reposUsing: "8K",
+        reposNum: 8000,
+        owner: "Fly.io",
+        ownerType: "vendor",
+        permissions: "Deploy tokens",
+        permSensitive: true,
+        url: "https://github.com/superfly/flyctl-actions"
+      },
+      // WARN: Vendor-maintained with credential access
+      {
+        name: "docker/build-push-action",
+        risk: "WARN",
+        score: 62,
+        reposUsing: "74K",
+        reposNum: 74000,
+        owner: "Docker",
+        ownerType: "vendor",
+        permissions: "Registry creds, build secrets",
+        permSensitive: true,
+        url: "https://github.com/docker/build-push-action"
+      },
+      {
+        name: "docker/login-action",
+        risk: "WARN",
+        score: 65,
+        reposUsing: "52K",
+        reposNum: 52000,
+        owner: "Docker",
+        ownerType: "vendor",
+        permissions: "Registry credentials",
+        permSensitive: true,
+        url: "https://github.com/docker/login-action"
+      },
+      {
+        name: "aws-actions/configure-aws-credentials",
+        risk: "WARN",
+        score: 61,
+        reposUsing: "32K",
+        reposNum: 32000,
+        owner: "AWS",
+        ownerType: "vendor",
+        permissions: "AWS access keys / OIDC",
+        permSensitive: true,
+        url: "https://github.com/aws-actions/configure-aws-credentials"
+      },
+      {
+        name: "google-github-actions/auth",
+        risk: "WARN",
+        score: 63,
+        reposUsing: "14K",
+        reposNum: 14000,
+        owner: "Google",
+        ownerType: "vendor",
+        permissions: "GCP credentials / WIF",
+        permSensitive: true,
+        url: "https://github.com/google-github-actions/auth"
+      },
+      {
+        name: "azure/login",
+        risk: "WARN",
+        score: 64,
+        reposUsing: "12K",
+        reposNum: 12000,
+        owner: "Microsoft",
+        ownerType: "vendor",
+        permissions: "Azure service principal",
+        permSensitive: true,
+        url: "https://github.com/azure/login"
+      },
+      {
+        name: "docker/setup-buildx-action",
+        risk: "OK",
+        score: 71,
+        reposUsing: "58K",
+        reposNum: 58000,
+        owner: "Docker",
+        ownerType: "vendor",
+        permissions: "Minimal",
+        permSensitive: false,
+        url: "https://github.com/docker/setup-buildx-action"
+      },
+      // OK: GitHub official actions
+      {
+        name: "actions/checkout",
+        risk: "OK",
+        score: 91,
+        reposUsing: "3.2M",
+        reposNum: 3200000,
+        owner: "GitHub",
+        ownerType: "official",
+        permissions: "contents: read",
+        permSensitive: false,
+        url: "https://github.com/actions/checkout"
+      },
+      {
+        name: "actions/setup-node",
+        risk: "OK",
+        score: 89,
+        reposUsing: "1.8M",
+        reposNum: 1800000,
+        owner: "GitHub",
+        ownerType: "official",
+        permissions: "Minimal",
+        permSensitive: false,
+        url: "https://github.com/actions/setup-node"
+      },
+      {
+        name: "actions/cache",
+        risk: "OK",
+        score: 87,
+        reposUsing: "1.4M",
+        reposNum: 1400000,
+        owner: "GitHub",
+        ownerType: "official",
+        permissions: "Cache access",
+        permSensitive: false,
+        url: "https://github.com/actions/cache"
+      },
+      {
+        name: "actions/upload-artifact",
+        risk: "OK",
+        score: 86,
+        reposUsing: "980K",
+        reposNum: 980000,
+        owner: "GitHub",
+        ownerType: "official",
+        permissions: "actions: write",
+        permSensitive: false,
+        url: "https://github.com/actions/upload-artifact"
+      },
+      {
+        name: "actions/setup-python",
+        risk: "OK",
+        score: 88,
+        reposUsing: "890K",
+        reposNum: 890000,
+        owner: "GitHub",
+        ownerType: "official",
+        permissions: "Minimal",
+        permSensitive: false,
+        url: "https://github.com/actions/setup-python"
+      },
+      {
+        name: "actions/download-artifact",
+        risk: "OK",
+        score: 85,
+        reposUsing: "620K",
+        reposNum: 620000,
+        owner: "GitHub",
+        ownerType: "official",
+        permissions: "actions: read",
+        permSensitive: false,
+        url: "https://github.com/actions/download-artifact"
+      },
+      {
+        name: "actions/setup-java",
+        risk: "OK",
+        score: 87,
+        reposUsing: "560K",
+        reposNum: 560000,
+        owner: "GitHub",
+        ownerType: "official",
+        permissions: "Minimal",
+        permSensitive: false,
+        url: "https://github.com/actions/setup-java"
+      },
+      {
+        name: "actions/setup-go",
+        risk: "OK",
+        score: 88,
+        reposUsing: "420K",
+        reposNum: 420000,
+        owner: "GitHub",
+        ownerType: "official",
+        permissions: "Minimal",
+        permSensitive: false,
+        url: "https://github.com/actions/setup-go"
+      },
+      {
+        name: "actions/github-script",
+        risk: "OK",
+        score: 82,
+        reposUsing: "310K",
+        reposNum: 310000,
+        owner: "GitHub",
+        ownerType: "official",
+        permissions: "GITHUB_TOKEN scope",
+        permSensitive: false,
+        url: "https://github.com/actions/github-script"
+      }
+    ];
+
+    function renderTable() {
+      const tbody = document.getElementById('watchlist-tbody')!;
+
+      // Sort: CRITICAL first, then HIGH, WARN, OK; within same risk, by reposNum descending
+      const riskOrder: Record<string, number> = { CRITICAL: 0, HIGH: 1, WARN: 2, OK: 3 };
+      const sorted = [...ACTIONS].sort((a, b) => {
+        const rDiff = riskOrder[a.risk] - riskOrder[b.risk];
+        if (rDiff !== 0) return rDiff;
+        return b.reposNum - a.reposNum;
+      });
+
+      // Stats
+      const critActions = sorted.filter(a => a.risk === 'CRITICAL');
+      const soloActions = sorted.filter(a => a.ownerType === 'community');
+      const writeActions = sorted.filter(a => a.permSensitive);
+      const critRepos = critActions.reduce((s, a) => s + a.reposNum, 0);
+
+      function fmtRepos(n: number): string {
+        if (n >= 1_000_000) return (n / 1_000_000).toFixed(1) + 'M';
+        if (n >= 1_000) return Math.round(n / 1_000) + 'K';
+        return String(n);
+      }
+
+      document.getElementById('stat-critical')!.textContent = String(critActions.length);
+      document.getElementById('stat-repos')!.textContent = fmtRepos(critRepos);
+      document.getElementById('stat-solo')!.textContent = String(soloActions.length);
+      document.getElementById('stat-write')!.textContent = String(writeActions.length);
+
+      // Render rows
+      tbody.innerHTML = sorted.map((action, i) => {
+        const badgeClass =
+          action.risk === 'CRITICAL' ? 'badge-critical' :
+          action.risk === 'HIGH' ? 'badge-high' :
+          action.risk === 'WARN' ? 'badge-warn' : 'badge-ok';
+
+        const badgeText =
+          action.risk === 'CRITICAL' ? '\u2691 CRITICAL' :
+          action.risk === 'HIGH' ? '\u26A0 HIGH' :
+          action.risk === 'WARN' ? '\u2193 WARN' : '\u2713 OK';
+
+        const scoreClass =
+          action.score < 40 ? 'score-low' :
+          action.score < 65 ? 'score-mid' : 'score-ok';
+
+        const ownerClass =
+          action.ownerType === 'official' ? 'owner-official' :
+          action.ownerType === 'vendor' ? 'owner-vendor' : 'owner-community';
+
+        const rowStyle = action.risk === 'CRITICAL' ? 'background: #fff5f5;' : '';
+
+        const annotationHtml = action.annotation
+          ? `<span class="attack-annotation">\u2190 ${action.annotation}</span>`
+          : '';
+
+        const permHtml = action.permSensitive
+          ? `<span class="perm-sensitive">${action.permissions}</span>`
+          : `<span class="perm-text">${action.permissions}</span>`;
+
+        return `<tr style="${rowStyle}">
+          <td class="num-muted">${i + 1}</td>
+          <td class="pkg-name">
+            <a class="pkg-link" href="${action.url}" target="_blank" rel="noopener">${action.name}</a>${annotationHtml}
+          </td>
+          <td><span class="risk-badge ${badgeClass}">${badgeText}</span></td>
+          <td class="score-cell ${scoreClass}">${action.score}/100</td>
+          <td class="num-muted">${action.reposUsing}</td>
+          <td><span class="owner-badge ${ownerClass}">${action.owner}</span></td>
+          <td>${permHtml}</td>
+        </tr>`;
+      }).join('');
+    }
+
+    renderTable();
+  </script>
+</Layout>

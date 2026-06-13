@@ -1,0 +1,154 @@
+---
+import Layout from '../../layouts/Layout.astro';
+---
+
+<Layout
+  title="FastAPI Was Flagged as Malware Last Week. It Wasn't. &mdash; Commit"
+  description="OSV withdrew 157 malware reports after automated false positives hit FastAPI, Strawberry GraphQL, and dozens of other legitimate packages. Behavioral signals don't have false positives."
+  canonical="https://getcommit.dev/blog/osv-157-false-positives/"
+  publishDate="2026-05-31"
+>
+
+  <!-- Nav -->
+  <nav>
+    <div class="container nav-inner">
+      <a href="/" class="nav-brand">Commit</a>
+      <ul class="nav-links">
+        <li><a href="/extension">Extension</a></li>
+        <li><a href="/blog">Writing</a></li>
+        <li><a href="/pricing">Pricing</a></li><li><a href="/docs">Docs</a></li><li><a href="https://github.com/piiiico/proof-of-commitment" target="_blank" rel="noopener">GitHub</a></li>
+        <li><a href="mailto:pico@amdal.dev">Contact</a></li>
+      </ul>
+    </div>
+  </nav>
+
+  <!-- Essay -->
+  <article class="essay">
+    <div class="container">
+      <div class="editorial">
+
+        <!-- Header -->
+        <header class="essay-header">
+          <div class="essay-meta animate-in delay-1">
+            <time datetime="2026-05-31">May 31, 2026</time>
+          </div>
+          <h1 class="essay-title animate-in delay-2">FastAPI Was Flagged as Malware Last Week. It Wasn't.</h1>
+          <p class="essay-subtitle animate-in delay-3">
+            OSV withdrew 157 malware reports after automated false positives hit FastAPI, Strawberry GraphQL,
+            and dozens of other legitimate packages. Behavioral signals don't have false positives.
+          </p>
+          <p class="essay-byline animate-in delay-4">Pico</p>
+        </header>
+
+        <!-- Body -->
+        <div class="essay-body">
+
+          <p>
+            On May 26, OSV withdrew 157 malware reports. FastAPI, Strawberry GraphQL, rdflib, Pulumi,
+            and dozens of other legitimate packages had been flagged as malicious by an automated pipeline.
+          </p>
+
+          <p>
+            The cause: Amazon Inspector reports flowing directly into the OpenSSF malicious-packages repository
+            without human review. One algorithm's guess became every scanner's alert.
+          </p>
+
+          <p>Builds broke. Maintainers scrambled to prove their own releases weren't compromised. The automation was paused.</p>
+
+          <h2>The detection model is the problem</h2>
+
+          <p>
+            Pattern-matching malware detection asks: "Does this behavior look suspicious?" That's a guess.
+            A useful guess, most of the time. But when it's wrong, it's wrong at scale. 157 packages in one batch.
+          </p>
+
+          <p>
+            The FastAPI flag was triggered by an "undocumented dependency." No payload. No credential theft.
+            No C2 server. Just a dependency that looked unfamiliar to an algorithm.
+          </p>
+
+          <h2>What facts look like</h2>
+
+          <p>
+            I scored every package that was falsely flagged. Here's what behavioral signals
+            (things you can verify yourself) actually say:
+          </p>
+
+          <table>
+            <thead>
+              <tr><th>Package</th><th>Score</th><th>Maintainers</th><th>Weekly Downloads</th><th>Risk Flag</th></tr>
+            </thead>
+            <tbody>
+              <tr><td>fastapi</td><td>89</td><td>1</td><td>110M</td><td>CRITICAL: sole maintainer + &gt;10M/wk</td></tr>
+              <tr><td>strawberry-graphql</td><td>63</td><td>1</td><td>1.4M</td><td>HIGH: sole maintainer + &gt;1M/wk</td></tr>
+              <tr><td>rdflib</td><td>78</td><td>4</td><td>2.9M</td><td>&mdash;</td></tr>
+              <tr><td>pulumi-vcd</td><td>31</td><td>1</td><td>147</td><td>&mdash;</td></tr>
+            </tbody>
+          </table>
+
+          <p>
+            FastAPI scored 89 &mdash; high quality. But it also flags CRITICAL because it has one PyPI maintainer
+            and 110 million weekly downloads.
+          </p>
+
+          <p>
+            That flag isn't a guess. It's a structural fact. One compromised account, 110 million downloads exposed.
+            The flag doesn't say FastAPI IS malware. It says FastAPI is structurally fragile in a way that matters
+            if something goes wrong.
+          </p>
+
+          <p>
+            rdflib doesn't flag at all. Four maintainers, reasonable download volume. The structural risk is distributed.
+          </p>
+
+          <h2>Two different questions</h2>
+
+          <p>Malware scanners ask: <strong>"Is this package attacking you right now?"</strong></p>
+
+          <p>Behavioral scoring asks: <strong>"If this package were compromised tomorrow, how bad would it be?"</strong></p>
+
+          <p>Both questions matter. But only one of them produced 157 false positives last week.</p>
+
+          <p>
+            Behavioral signals can't be false positives. FastAPI either has 1 maintainer or it doesn't.
+            It either has 110M weekly downloads or it doesn't. These are checkable facts, not pattern matches.
+          </p>
+
+          <h2>What this means for your project</h2>
+
+          <p>
+            If your CI pipeline uses OSV or any scanner fed by automated malware detection, you got 157 false
+            alerts last week. Or your builds broke. Or both.
+          </p>
+
+          <p>
+            Adding behavioral scoring alongside malware detection gives you a different layer. One that measures
+            structural risk continuously, not reactive alerts when something looks wrong.
+          </p>
+
+          <pre><code>npx proof-of-commitment</code></pre>
+
+          <p>
+            Run it in your project directory. It picks up your lockfile automatically and scores every dependency
+            on publisher count, release cadence, contributor depth, and provenance. No account required.
+          </p>
+
+          <p>
+            The packages that were falsely flagged as malware? They have real structural risks.
+            FastAPI's sole-maintainer CRITICAL flag has been there for months.
+            It didn't need an algorithm to guess. It's right there in the registry data.
+          </p>
+
+        </div>
+
+        <!-- CTA -->
+        <footer class="essay-cta animate-in delay-5">
+          <p><a href="/audit?packages=fastapi&eco=pypi" class="cta-button">Score FastAPI yourself &rarr;</a></p>
+          <p class="cta-sub">Free CLI &middot; API &middot; MCP server &middot; No account required</p>
+        </footer>
+
+      </div>
+    </div>
+  </article>
+
+</Layout>

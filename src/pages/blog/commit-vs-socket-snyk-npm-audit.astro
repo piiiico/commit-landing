@@ -1,0 +1,477 @@
+---
+import Layout from '../../layouts/Layout.astro';
+---
+
+<Layout
+  title="Commit vs. Socket, Snyk, and npm audit — Commit"
+  description="An honest comparison of four npm security tools. They scan for different things. Here's where each one wins, where each one fails, and what the ua-parser-js attack reveals about the gap."
+  canonical="https://getcommit.dev/blog/commit-vs-socket-snyk-npm-audit/"
+  publishDate="2026-04-21"
+>
+
+  <!-- Nav -->
+  <nav>
+    <div class="container nav-inner">
+      <a href="/" class="nav-brand">Commit</a>
+      <ul class="nav-links">
+        <li><a href="/extension">Extension</a></li>
+        <li><a href="/blog">Writing</a></li>
+        <li><a href="/pricing">Pricing</a></li><li><a href="/docs">Docs</a></li><li><a href="https://github.com/piiiico/proof-of-commitment" target="_blank" rel="noopener">GitHub</a></li>
+        <li><a href="mailto:pico@amdal.dev">Contact</a></li>
+      </ul>
+    </div>
+  </nav>
+
+  <!-- Essay -->
+  <article class="essay">
+    <div class="container">
+      <div class="editorial">
+
+        <!-- Header -->
+        <header class="essay-header">
+          <div class="essay-meta animate-in delay-1">
+            <time datetime="2026-04-21">April 21, 2026</time>
+          </div>
+          <h1 class="essay-title animate-in delay-2">Commit vs. Socket, Snyk, and npm audit</h1>
+          <p class="essay-subtitle animate-in delay-3">
+            An honest comparison. They measure different things. Here&rsquo;s where each one wins,
+            where each one fails, and what the ua-parser-js attack reveals about the gap none of them close.
+          </p>
+          <p class="essay-byline animate-in delay-4">Pico</p>
+        </header>
+
+        <!-- Body -->
+        <div class="essay-body">
+
+          <p>
+            If you landed here from a search for &ldquo;best npm security tool,&rdquo; you&rsquo;re
+            probably evaluating a list that includes Socket, Snyk, and npm audit. Commit is newer and
+            does something different. This page will tell you exactly what each tool does, where it
+            wins, and where it doesn&rsquo;t &mdash; including Commit&rsquo;s genuine gaps.
+          </p>
+          <p>
+            Short answer: most of these tools scan for <em>known</em> vulnerabilities. Commit scans
+            for structural risk that exists <em>before</em> a vulnerability is known. They&rsquo;re
+            complementary, not substitutes. If you only use one, you have blind spots.
+          </p>
+
+          <hr class="essay-divider" />
+
+          <h2>What each tool actually measures</h2>
+
+          <p>
+            Before the comparison table, a framing that matters: these tools answer different questions.
+          </p>
+
+          <p>
+            <strong>npm audit</strong> answers: &ldquo;Does this package have a reported CVE?&rdquo;
+            It submits your <code>package-lock.json</code> to GitHub&rsquo;s Advisory Database and
+            returns known matches. Free, built-in, reactive.
+          </p>
+
+          <p>
+            <strong>Snyk</strong> answers: &ldquo;Does this package have a known vulnerability, and
+            can I auto-fix it?&rdquo; Adds license compliance, SAST for your own code, and container
+            scanning. Strong database, strong integrations.
+          </p>
+
+          <p>
+            <strong>Socket</strong> answers: &ldquo;Is this package doing something dangerous <em>right now</em>?&rdquo;
+            Static analysis of actual package source &mdash; not just CVE lookups. It catches supply chain
+            attacks by scanning newly published version code for suspicious patterns (obfuscated code, unusual
+            network calls, environment variable access). That&rsquo;s a different class of detection.
+          </p>
+
+          <p>
+            <strong>Commit</strong> answers: &ldquo;Is this package a structural single point of
+            failure?&rdquo; Behavioral signals &mdash; maintainer depth, release consistency, bus
+            factor, contributor history &mdash; from the npm registry and GitHub API. No CVE database.
+            No code scanning. Just: how many humans stand between an attacker and the publish button,
+            and how consistently have they shown up?
+          </p>
+
+          <hr class="essay-divider" />
+
+          <h2>The comparison table</h2>
+
+          <div style="overflow-x: auto; margin: 2rem 0;">
+            <table style="width: 100%; border-collapse: collapse; font-size: 0.875rem;">
+              <thead>
+                <tr style="border-bottom: 2px solid var(--border-light);">
+                  <th style="text-align: left; padding: 0.75rem 1rem 0.75rem 0; font-weight: 600; min-width: 200px;">Capability</th>
+                  <th style="text-align: center; padding: 0.75rem 0.5rem; font-weight: 600;">npm audit</th>
+                  <th style="text-align: center; padding: 0.75rem 0.5rem; font-weight: 600;">Snyk</th>
+                  <th style="text-align: center; padding: 0.75rem 0.5rem; font-weight: 600;">Socket</th>
+                  <th style="text-align: center; padding: 0.75rem 0 0.75rem 0.5rem; font-weight: 600;">Commit</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr style="border-bottom: 1px solid var(--border-light);">
+                  <td style="padding: 0.75rem 1rem 0.75rem 0; font-weight: 500;">Known CVE detection</td>
+                  <td style="text-align: center; padding: 0.75rem 0.5rem;">&#x2705;</td>
+                  <td style="text-align: center; padding: 0.75rem 0.5rem;">&#x2705;</td>
+                  <td style="text-align: center; padding: 0.75rem 0.5rem;">&#x2705;</td>
+                  <td style="text-align: center; padding: 0.75rem 0 0.75rem 0.5rem;">&#x274C;</td>
+                </tr>
+                <tr style="border-bottom: 1px solid var(--border-light);">
+                  <td style="padding: 0.75rem 1rem 0.75rem 0; font-weight: 500;">Malicious package detection</td>
+                  <td style="text-align: center; padding: 0.75rem 0.5rem;">&#x274C;</td>
+                  <td style="text-align: center; padding: 0.75rem 0.5rem;">&#x26A0;&#xFE0F; partial</td>
+                  <td style="text-align: center; padding: 0.75rem 0.5rem;">&#x2705; real-time</td>
+                  <td style="text-align: center; padding: 0.75rem 0 0.75rem 0.5rem;">&#x274C;</td>
+                </tr>
+                <tr style="border-bottom: 1px solid var(--border-light);">
+                  <td style="padding: 0.75rem 1rem 0.75rem 0; font-weight: 500;">Typosquatting detection</td>
+                  <td style="text-align: center; padding: 0.75rem 0.5rem;">&#x274C;</td>
+                  <td style="text-align: center; padding: 0.75rem 0.5rem;">&#x274C;</td>
+                  <td style="text-align: center; padding: 0.75rem 0.5rem;">&#x2705;</td>
+                  <td style="text-align: center; padding: 0.75rem 0 0.75rem 0.5rem;">&#x274C;</td>
+                </tr>
+                <tr style="border-bottom: 1px solid var(--border-light);">
+                  <td style="padding: 0.75rem 1rem 0.75rem 0; font-weight: 500;">Obfuscated code detection</td>
+                  <td style="text-align: center; padding: 0.75rem 0.5rem;">&#x274C;</td>
+                  <td style="text-align: center; padding: 0.75rem 0.5rem;">&#x274C;</td>
+                  <td style="text-align: center; padding: 0.75rem 0.5rem;">&#x2705;</td>
+                  <td style="text-align: center; padding: 0.75rem 0 0.75rem 0.5rem;">&#x274C;</td>
+                </tr>
+                <tr style="border-bottom: 1px solid var(--border-light);">
+                  <td style="padding: 0.75rem 1rem 0.75rem 0; font-weight: 500;">Dangerous capabilities (network/shell/eval)</td>
+                  <td style="text-align: center; padding: 0.75rem 0.5rem;">&#x274C;</td>
+                  <td style="text-align: center; padding: 0.75rem 0.5rem;">&#x274C;</td>
+                  <td style="text-align: center; padding: 0.75rem 0.5rem;">&#x2705;</td>
+                  <td style="text-align: center; padding: 0.75rem 0 0.75rem 0.5rem;">&#x274C;</td>
+                </tr>
+                <tr style="border-bottom: 1px solid var(--border-light);">
+                  <td style="padding: 0.75rem 1rem 0.75rem 0; font-weight: 500;">Bus factor / single-maintainer risk</td>
+                  <td style="text-align: center; padding: 0.75rem 0.5rem;">&#x274C;</td>
+                  <td style="text-align: center; padding: 0.75rem 0.5rem;">&#x274C;</td>
+                  <td style="text-align: center; padding: 0.75rem 0.5rem;">&#x26A0;&#xFE0F; partial</td>
+                  <td style="text-align: center; padding: 0.75rem 0 0.75rem 0.5rem;">&#x2705; core focus</td>
+                </tr>
+                <tr style="border-bottom: 1px solid var(--border-light);">
+                  <td style="padding: 0.75rem 1rem 0.75rem 0; font-weight: 500;">Release consistency over time</td>
+                  <td style="text-align: center; padding: 0.75rem 0.5rem;">&#x274C;</td>
+                  <td style="text-align: center; padding: 0.75rem 0.5rem;">&#x274C;</td>
+                  <td style="text-align: center; padding: 0.75rem 0.5rem;">&#x274C;</td>
+                  <td style="text-align: center; padding: 0.75rem 0 0.75rem 0.5rem;">&#x2705;</td>
+                </tr>
+                <tr style="border-bottom: 1px solid var(--border-light);">
+                  <td style="padding: 0.75rem 1rem 0.75rem 0; font-weight: 500;">Contributor depth and longevity</td>
+                  <td style="text-align: center; padding: 0.75rem 0.5rem;">&#x274C;</td>
+                  <td style="text-align: center; padding: 0.75rem 0.5rem;">&#x274C;</td>
+                  <td style="text-align: center; padding: 0.75rem 0.5rem;">&#x274C;</td>
+                  <td style="text-align: center; padding: 0.75rem 0 0.75rem 0.5rem;">&#x2705;</td>
+                </tr>
+                <tr style="border-bottom: 1px solid var(--border-light);">
+                  <td style="padding: 0.75rem 1rem 0.75rem 0; font-weight: 500;">Pre-attack structural signal</td>
+                  <td style="text-align: center; padding: 0.75rem 0.5rem;">&#x274C;</td>
+                  <td style="text-align: center; padding: 0.75rem 0.5rem;">&#x274C;</td>
+                  <td style="text-align: center; padding: 0.75rem 0.5rem;">&#x274C;</td>
+                  <td style="text-align: center; padding: 0.75rem 0 0.75rem 0.5rem;">&#x2705;</td>
+                </tr>
+                <tr style="border-bottom: 1px solid var(--border-light);">
+                  <td style="padding: 0.75rem 1rem 0.75rem 0; font-weight: 500;">Auto-fix PRs</td>
+                  <td style="text-align: center; padding: 0.75rem 0.5rem;">&#x26A0;&#xFE0F; limited</td>
+                  <td style="text-align: center; padding: 0.75rem 0.5rem;">&#x2705;</td>
+                  <td style="text-align: center; padding: 0.75rem 0.5rem;">&#x274C;</td>
+                  <td style="text-align: center; padding: 0.75rem 0 0.75rem 0.5rem;">&#x274C;</td>
+                </tr>
+                <tr style="border-bottom: 1px solid var(--border-light);">
+                  <td style="padding: 0.75rem 1rem 0.75rem 0; font-weight: 500;">SAST (your own code)</td>
+                  <td style="text-align: center; padding: 0.75rem 0.5rem;">&#x274C;</td>
+                  <td style="text-align: center; padding: 0.75rem 0.5rem;">&#x2705;</td>
+                  <td style="text-align: center; padding: 0.75rem 0.5rem;">&#x274C;</td>
+                  <td style="text-align: center; padding: 0.75rem 0 0.75rem 0.5rem;">&#x274C;</td>
+                </tr>
+                <tr style="border-bottom: 1px solid var(--border-light);">
+                  <td style="padding: 0.75rem 1rem 0.75rem 0; font-weight: 500;">MCP integration</td>
+                  <td style="text-align: center; padding: 0.75rem 0.5rem;">&#x274C;</td>
+                  <td style="text-align: center; padding: 0.75rem 0.5rem;">&#x274C;</td>
+                  <td style="text-align: center; padding: 0.75rem 0.5rem;">&#x2705;</td>
+                  <td style="text-align: center; padding: 0.75rem 0 0.75rem 0.5rem;">&#x2705;</td>
+                </tr>
+                <tr style="border-bottom: 1px solid var(--border-light);">
+                  <td style="padding: 0.75rem 1rem 0.75rem 0; font-weight: 500;">Free tier</td>
+                  <td style="text-align: center; padding: 0.75rem 0.5rem;">&#x2705; unlimited</td>
+                  <td style="text-align: center; padding: 0.75rem 0.5rem;">&#x2705; 200 tests/mo</td>
+                  <td style="text-align: center; padding: 0.75rem 0.5rem;">&#x2705; 1,000 scans/mo</td>
+                  <td style="text-align: center; padding: 0.75rem 0 0.75rem 0.5rem;">&#x2705;</td>
+                </tr>
+                <tr>
+                  <td style="padding: 0.75rem 1rem 0.75rem 0; font-weight: 500;">Paid tier starts at</td>
+                  <td style="text-align: center; padding: 0.75rem 0.5rem;">Free</td>
+                  <td style="text-align: center; padding: 0.75rem 0.5rem;">$25/dev/mo</td>
+                  <td style="text-align: center; padding: 0.75rem 0.5rem;">$25/dev/mo</td>
+                  <td style="text-align: center; padding: 0.75rem 0 0.75rem 0.5rem;">Free</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <hr class="essay-divider" />
+
+          <h2>The ua-parser-js test case (2021)</h2>
+
+          <p>
+            In October 2021, Faisal Salman&rsquo;s npm account was compromised and three backdoored versions
+            of ua-parser-js were published (0.7.29, 0.8.0, 1.0.0). The malicious code contained a
+            cryptominer and credential-stealing trojan that ran on every system that ran
+            <code>npm install</code> in the four-hour window before the packages were pulled.
+          </p>
+          <p>
+            ua-parser-js had approximately 7 million weekly downloads. Used by Facebook, Microsoft, Amazon, and Google.
+          </p>
+          <p>
+            Here&rsquo;s how each tool would have performed:
+          </p>
+
+          <div style="overflow-x: auto; margin: 2rem 0;">
+            <table style="width: 100%; border-collapse: collapse; font-size: 0.875rem;">
+              <thead>
+                <tr style="border-bottom: 2px solid var(--border-light);">
+                  <th style="text-align: left; padding: 0.75rem 1rem 0.75rem 0; font-weight: 600;">Tool</th>
+                  <th style="text-align: left; padding: 0.75rem 1rem; font-weight: 600;">Before the attack</th>
+                  <th style="text-align: left; padding: 0.75rem 0 0.75rem 1rem; font-weight: 600;">During the attack</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr style="border-bottom: 1px solid var(--border-light);">
+                  <td style="padding: 0.75rem 1rem 0.75rem 0; font-weight: 500;">npm audit</td>
+                  <td style="padding: 0.75rem 1rem;"><code>0 vulnerabilities</code></td>
+                  <td style="padding: 0.75rem 0 0.75rem 1rem;"><code>0 vulnerabilities</code> &mdash; silent until CVE filed days later</td>
+                </tr>
+                <tr style="border-bottom: 1px solid var(--border-light);">
+                  <td style="padding: 0.75rem 1rem 0.75rem 0; font-weight: 500;">Snyk</td>
+                  <td style="padding: 0.75rem 1rem;">No advisory match</td>
+                  <td style="padding: 0.75rem 0 0.75rem 1rem;">Detected after Socket flagged it and community reported; catalogued as CWE-506</td>
+                </tr>
+                <tr style="border-bottom: 1px solid var(--border-light);">
+                  <td style="padding: 0.75rem 1rem 0.75rem 0; font-weight: 500;">Socket</td>
+                  <td style="padding: 0.75rem 1rem;">No pre-attack warning</td>
+                  <td style="padding: 0.75rem 0 0.75rem 1rem;">&#x2705; Flagged within 6 minutes of registry publication via automated malware scanner</td>
+                </tr>
+                <tr>
+                  <td style="padding: 0.75rem 1rem 0.75rem 0; font-weight: 500;">Commit</td>
+                  <td style="padding: 0.75rem 1rem;">&#x1F534; CRITICAL &mdash; flagged for months: 1 maintainer, 101M weekly downloads</td>
+                  <td style="padding: 0.75rem 0 0.75rem 1rem;">Still CRITICAL (structural risk unchanged) &mdash; no code-level detection</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <p>
+            Two different signals. Socket detected the attack six minutes after it was launched by
+            scanning the malicious code. Commit had identified the structural vulnerability &mdash;
+            one person controls the publish button for 101 million weekly downloads &mdash; for months
+            before anyone pulled the trigger.
+          </p>
+          <p>
+            Socket is genuinely impressive here. Fast detection can prevent most damage
+            if you have auto-blocking enabled. But the structural conditions that make axios a
+            high-value target are visible right now, and no amount of
+            malware scanning changes those conditions. The attack calculus is rational: single
+            maintainer, enormous blast radius.
+          </p>
+
+          <hr class="essay-divider" />
+
+          <h2>The gap none of them close</h2>
+
+          <p>
+            Here&rsquo;s the uncomfortable reality: Socket, Snyk, and npm audit are all reactive
+            to the wrong thing. They detect when something <em>has gone wrong</em> &mdash; either
+            by finding a known CVE or by scanning newly-published code for malicious patterns.
+            They cannot tell you whether your dependency portfolio is structurally dangerous
+            <em>before</em> an attack occurs.
+          </p>
+          <p>
+            Two examples:
+          </p>
+
+          <div style="overflow-x: auto; margin: 2rem 0;">
+            <table style="width: 100%; border-collapse: collapse; font-size: 0.875rem;">
+              <thead>
+                <tr style="border-bottom: 2px solid var(--border-light);">
+                  <th style="text-align: left; padding: 0.75rem 1rem 0.75rem 0; font-weight: 600;">Package</th>
+                  <th style="text-align: right; padding: 0.75rem 1rem; font-weight: 600;">Weekly Downloads</th>
+                  <th style="text-align: right; padding: 0.75rem 1rem; font-weight: 600;">Maintainers</th>
+                  <th style="text-align: left; padding: 0.75rem 1rem; font-weight: 600;">npm audit</th>
+                  <th style="text-align: left; padding: 0.75rem 0 0.75rem 1rem; font-weight: 600;">Commit</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr style="border-bottom: 1px solid var(--border-light);">
+                  <td style="padding: 0.75rem 1rem 0.75rem 0;"><code>chalk</code></td>
+                  <td style="text-align: right; padding: 0.75rem 1rem;">413M</td>
+                  <td style="text-align: right; padding: 0.75rem 1rem;">1</td>
+                  <td style="padding: 0.75rem 1rem;"><code>0 vulnerabilities</code></td>
+                  <td style="padding: 0.75rem 0 0.75rem 1rem;">&#x1F534; CRITICAL</td>
+                </tr>
+                <tr>
+                  <td style="padding: 0.75rem 1rem 0.75rem 0;"><code>zod</code></td>
+                  <td style="text-align: right; padding: 0.75rem 1rem;">158M</td>
+                  <td style="text-align: right; padding: 0.75rem 1rem;">1</td>
+                  <td style="padding: 0.75rem 1rem;"><code>0 vulnerabilities</code></td>
+                  <td style="padding: 0.75rem 0 0.75rem 1rem;">&#x1F534; CRITICAL</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <p>
+            Neither chalk nor zod has a known vulnerability. npm audit, Snyk, and Socket all return
+            clean results. But both have a single person with publish access to hundreds of millions
+            of weekly installs. When (not if) an attacker evaluates those credentials as a target,
+            they make the same rational calculation that was made for ua-parser-js in 2021: compromise one account,
+            get code execution on the systems of millions of developers.
+          </p>
+          <p>
+            Socket will catch that attack in minutes after it happens. Commit tells you the structural
+            risk exists today &mdash; so you can make informed decisions about whether that dependency
+            belongs in your critical path.
+          </p>
+
+          <hr class="essay-divider" />
+
+          <h2>Where each tool wins</h2>
+
+          <p>
+            <strong>Use npm audit if:</strong> You need zero setup, you want to catch low-hanging
+            CVE fruit in CI without paying anything, and you understand it&rsquo;s a known-vuln
+            scanner, not supply chain security. It catches real things. It just has a fundamental
+            floor.
+          </p>
+
+          <p>
+            <strong>Use Snyk if:</strong> You want CVE scanning with strong auto-fix PRs, SAST for
+            your own code, and container/IaC coverage. The integrations are excellent. The database
+            is well-maintained. If you have a team running multiple projects and want remediation
+            velocity, Snyk earns its price.
+          </p>
+
+          <p>
+            <strong>Use Socket if:</strong> You want real-time protection against active malware in
+            the npm registry. Socket is genuinely doing something the others don&rsquo;t &mdash;
+            scanning package source code as it&rsquo;s published and catching malicious payloads
+            before most humans have noticed. The six-minute axios detection is not marketing;
+            it&rsquo;s the product working as designed. If your threat model includes active supply
+            chain attacks, Socket belongs in your pipeline.
+          </p>
+
+          <p>
+            <strong>Use Commit if:</strong> You want to understand the structural risk in your
+            dependency portfolio before anything bad happens. If you&rsquo;re doing architecture
+            review, onboarding new dependencies, evaluating critical-path packages, or just want
+            to understand which of your dependencies is a single point of failure at massive scale
+            &mdash; that&rsquo;s what Commit measures. The signal that chalk at 413 million weekly
+            downloads runs on one maintainer&rsquo;s npm account is not a CVE. It&rsquo;s a
+            structural condition. It matters.
+          </p>
+
+          <hr class="essay-divider" />
+
+          <h2>What Commit doesn&rsquo;t do</h2>
+
+          <p>
+            Commit does not scan for CVEs. It does not detect malicious code. It does not flag
+            typosquatting, obfuscated payloads, or dangerous API usage. If your dependency ships
+            a backdoor, Commit will not catch the backdoor. Socket will (if it&rsquo;s in the
+            registry). npm audit will catch it eventually (when someone files a CVE).
+          </p>
+          <p>
+            Commit measures one thing: how much sustained human commitment stands behind this package.
+            Maintainer depth, release consistency, contributor longevity, download momentum relative
+            to structural fragility. These signals are public, computable in milliseconds from the
+            npm and GitHub APIs, and systematically ignored by every other tool in this comparison.
+          </p>
+          <p>
+            That&rsquo;s the gap. Whether it belongs in your security stack depends on whether you
+            care about knowing the structural risk profile of your dependencies before an attacker
+            acts on it.
+          </p>
+
+          <hr class="essay-divider" />
+
+          <h2>The honest recommendation</h2>
+
+          <p>
+            Run npm audit in CI. It&rsquo;s free and catches real things. Add Socket if you can
+            afford it and your threat model includes supply chain attacks &mdash; the real-time
+            detection is legitimate. Consider Snyk if you want auto-fix PRs and SAST coverage.
+          </p>
+          <p>
+            Add Commit to understand the structural risk in what you&rsquo;re already depending on.
+            It takes 60 seconds to get an MCP server running that answers &ldquo;is this package
+            a single point of failure?&rdquo; for any npm or PyPI package you ask Claude about.
+          </p>
+          <p>
+            The ua-parser-js attack wasn&rsquo;t a failure of security tooling. Every tool performed as
+            designed. The failure was thinking that vulnerability scanning and supply chain security
+            are the same problem. They&rsquo;re not.
+          </p>
+
+          <hr class="essay-divider" />
+
+          <p class="essay-coda">
+            <em>Try Commit: <a href="/audit">getcommit.dev/audit</a> &mdash; paste any <code>package.json</code> and get structural risk scores in seconds.</em>
+          </p>
+          <p class="essay-coda">
+            <em>MCP server (Claude Desktop, Cursor): <a href="/docs">getcommit.dev/docs</a> &mdash; zero install, no API key.</em>
+          </p>
+          <p class="essay-coda">
+            <em>Open source: <a href="https://github.com/piiiico/proof-of-commitment">github.com/piiiico/proof-of-commitment</a></em>
+          </p>
+
+        </div>
+      </div>
+    </div>
+  </article>
+
+  <!-- Newsletter -->
+  <section class="newsletter-section">
+    <div class="container">
+      <div class="editorial reveal">
+        <h2 style="margin-bottom: 0.75rem;">Stay in the loop</h2>
+        <p style="margin-bottom: 2rem; font-size: 1rem;">
+          Early access, research updates, and the occasional strong opinion.
+        </p>
+
+        <form
+          action="https://buttondown.email/api/emails/embed-subscribe/commitgraph"
+          method="post"
+          target="popupwindow"
+          class="newsletter-form"
+        >
+          <input
+            type="email"
+            name="email"
+            placeholder="you@example.com"
+            required
+            class="newsletter-input"
+          />
+          <button type="submit" class="btn-primary" style="white-space: nowrap;">
+            Subscribe
+          </button>
+        </form>
+
+        <p class="newsletter-note">No spam. Unsubscribe anytime.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer>
+    <div class="container footer-inner">
+      <span class="footer-brand">Commit</span>
+      <ul class="footer-links">
+        <li><a href="/">Home</a></li>
+        <li><a href="/extension">Extension</a></li>
+        <li><a href="/blog">Writing</a></li>
+        <li><a href="/pricing">Pricing</a></li><li><a href="/docs">Docs</a></li><li><a href="https://github.com/piiiico/proof-of-commitment" target="_blank" rel="noopener">GitHub</a></li>
+        <li><a href="mailto:pico@amdal.dev">Contact</a></li>
+      </ul>
+      <span class="footer-locale">Stavanger, Norway</span>
+    </div>
+  </footer>
+
+</Layout>

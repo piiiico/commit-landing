@@ -1,0 +1,250 @@
+---
+import Layout from '../../layouts/Layout.astro';
+---
+
+<Layout
+  title="An IETF Draft Specifies Trust Scoring for AI Agents. Five Dimensions, Five Tiers, One Implementation Gap. &mdash; Commit"
+  description="A March 2026 IETF internet-draft specifies behavioral trust scoring for AI agent payments. 0&ndash;100 score, L0&ndash;L4 spend tiers, public cross-org query API. The category got a protocol document. The implementation is still the whole thing."
+  canonical="https://getcommit.dev/blog/ietf-agent-payment-trust-draft/"
+  publishDate="2026-06-03"
+>
+
+  <!-- Nav -->
+  <nav>
+    <div class="container nav-inner">
+      <a href="/" class="nav-brand">Commit</a>
+      <ul class="nav-links">
+        <li><a href="/extension">Extension</a></li>
+        <li><a href="/blog">Writing</a></li>
+        <li><a href="/pricing">Pricing</a></li><li><a href="/docs">Docs</a></li><li><a href="https://github.com/piiiico/proof-of-commitment" target="_blank" rel="noopener">GitHub</a></li>
+        <li><a href="mailto:pico@amdal.dev">Contact</a></li>
+      </ul>
+    </div>
+  </nav>
+
+  <!-- Essay -->
+  <article class="essay">
+    <div class="container">
+      <div class="editorial">
+
+        <!-- Header -->
+        <header class="essay-header">
+          <div class="essay-meta animate-in delay-1">
+            <time datetime="2026-06-03">June 3, 2026</time>
+          </div>
+          <h1 class="essay-title animate-in delay-2">An IETF Draft Specifies Trust Scoring for AI Agents. Five Dimensions, Five Tiers, One Implementation Gap.</h1>
+          <p class="essay-subtitle animate-in delay-3">
+            A March 2026 internet-draft specifies behavioral trust scoring for AI agent payments. 0&ndash;100 score, L0&ndash;L4 spend tiers, public cross-org query API. The category just got a protocol document. The implementation is still the whole thing.
+          </p>
+          <p class="essay-byline animate-in delay-4">Pico</p>
+        </header>
+
+        <!-- Body -->
+        <div class="essay-body">
+
+          <p>
+            Someone outside this category wrote down what we&rsquo;ve been building.
+          </p>
+
+          <p>
+            On March 25, 2026, Raza Sharif (CyberSecAI Ltd, UK) submitted
+            <a href="https://datatracker.ietf.org/doc/draft-sharif-agent-payment-trust/" target="_blank" rel="noopener">draft-sharif-agent-payment-trust-00</a>
+            to the IETF: <em>&ldquo;Trust Scoring and Identity Verification for Autonomous AI Agent Payment Transactions.&rdquo;</em>
+            Individual submission. Version -00. Not adopted by any working group, not approved by anyone.
+            Just one engineer writing down what the protocol should look like when AI agents start paying for things at scale.
+          </p>
+
+          <p>
+            Read what it specifies:
+          </p>
+
+          <table style="width: 100%; border-collapse: collapse; margin: 1.5rem 0; font-size: 0.9rem;">
+            <thead>
+              <tr style="border-bottom: 2px solid var(--border-light);">
+                <th style="text-align: left; padding: 0.5rem 0.75rem; font-weight: 600;">Level</th>
+                <th style="text-align: left; padding: 0.5rem 0.75rem; font-weight: 600;">Score</th>
+                <th style="text-align: left; padding: 0.5rem 0.75rem; font-weight: 600;">Per-transaction</th>
+                <th style="text-align: left; padding: 0.5rem 0.75rem; font-weight: 600;">Daily</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr style="border-bottom: 1px solid var(--border-light);">
+                <td style="padding: 0.5rem 0.75rem;">L0</td>
+                <td style="padding: 0.5rem 0.75rem;">0&ndash;19</td>
+                <td style="padding: 0.5rem 0.75rem;">$0</td>
+                <td style="padding: 0.5rem 0.75rem;">$0</td>
+              </tr>
+              <tr style="border-bottom: 1px solid var(--border-light);">
+                <td style="padding: 0.5rem 0.75rem;">L1</td>
+                <td style="padding: 0.5rem 0.75rem;">20&ndash;39</td>
+                <td style="padding: 0.5rem 0.75rem;">$10</td>
+                <td style="padding: 0.5rem 0.75rem;">$50</td>
+              </tr>
+              <tr style="border-bottom: 1px solid var(--border-light);">
+                <td style="padding: 0.5rem 0.75rem;">L2</td>
+                <td style="padding: 0.5rem 0.75rem;">40&ndash;59</td>
+                <td style="padding: 0.5rem 0.75rem;">$100</td>
+                <td style="padding: 0.5rem 0.75rem;">$500</td>
+              </tr>
+              <tr style="border-bottom: 1px solid var(--border-light);">
+                <td style="padding: 0.5rem 0.75rem;">L3</td>
+                <td style="padding: 0.5rem 0.75rem;">60&ndash;79</td>
+                <td style="padding: 0.5rem 0.75rem;">$1,000</td>
+                <td style="padding: 0.5rem 0.75rem;">$5,000</td>
+              </tr>
+              <tr>
+                <td style="padding: 0.5rem 0.75rem;">L4</td>
+                <td style="padding: 0.5rem 0.75rem;">80&ndash;100</td>
+                <td style="padding: 0.5rem 0.75rem;">$50,000</td>
+                <td style="padding: 0.5rem 0.75rem;">$200,000</td>
+              </tr>
+            </tbody>
+          </table>
+
+          <p>
+            Five dimensions, equal 20% weighting. Per-agent cryptographic identity via ECDSA P-256.
+            Challenge-response identity verification. A public trust query API at
+            <code>GET /api/public/trust/&#123;agentId&#125;</code>, batch support, no authentication required.
+          </p>
+
+          <p>
+            This isn&rsquo;t a competing system. It&rsquo;s our system, written by someone we&rsquo;ve never met.
+          </p>
+
+          <hr class="essay-divider" />
+
+          <h2>What the draft validates</h2>
+
+          <p>
+            There&rsquo;s a moment, when you&rsquo;re building infrastructure for a category nobody has named yet, where the most useful thing that can happen is for someone unconnected, in a different country, working from different first principles, to converge on your protocol shape. That&rsquo;s what an IETF submission is. It isn&rsquo;t a customer, isn&rsquo;t a partner. It&rsquo;s a signal that the category exists.
+          </p>
+
+          <p>
+            The five dimensions in draft-sharif-agent-payment-trust-00 are the dimensions of behavioral trust:
+          </p>
+
+          <ul>
+            <li><strong>Code Attestation</strong> &mdash; does this agent&rsquo;s code match what it claims to be running? L3 identity.</li>
+            <li><strong>Execution Success Rate</strong> &mdash; does it complete tasks without anomaly? Behavioral telemetry.</li>
+            <li><strong>Behavioural Consistency</strong> &mdash; does it behave the same way over time? Drift detection.</li>
+            <li><strong>Operational Tenure</strong> &mdash; how long has it been observed? Skin-in-the-game proxy.</li>
+            <li><strong>Anomaly History</strong> &mdash; has it ever misbehaved, and how? Negative signal weight.</li>
+          </ul>
+
+          <p>
+            We&rsquo;ve written about each of these. Identity is L3; the draft accepts that L3 alone is insufficient and gives Code Attestation only 20% of the score. The remaining 80% is behavioral.
+            <a href="/blog/toctou-of-trust/">&ldquo;The TOCTOU of Trust&rdquo;</a> called this shape out two months ago: trust verified at handshake is not trust at use. The draft codifies the response in protocol form.
+          </p>
+
+          <p>
+            The tiered spend limits also match how this should work. $0 at L0. $50,000 per transaction at L4. Skin-in-the-game is the only unfakeable signal. An agent that has demonstrated low anomaly history over operational tenure deserves higher autonomy than one that just registered, and the protocol enforces this with money, which is the right place to enforce it.
+          </p>
+
+          <h2>What the draft doesn&rsquo;t specify</h2>
+
+          <p>
+            Read the draft carefully and one thing is absent: where the score comes from.
+          </p>
+
+          <p>
+            It says the score exists. It says how to query it. It says what to do with it: clamp the spend.
+            It does not specify who computes the score, how the inputs are gathered, what cryptographic substrate the attestations sit on, or how cross-organization claims are deduplicated. That&rsquo;s normal for an early IETF draft. It&rsquo;s also where the implementation lives.
+          </p>
+
+          <p>
+            The same gap exists at the payment layer.
+            <a href="/blog/payment-layer-governance/">x402</a> specified how agents pay.
+            It did not specify who is allowed to say no.
+            Visa TAP, Mastercard Verifiable Intent, and Microsoft Entra Agent ID all answer &ldquo;who is this agent.&rdquo;
+            None of them compute &ldquo;should this agent be allowed to spend $50,000.&rdquo;
+          </p>
+
+          <p>
+            This is what an attestation substrate is for.
+          </p>
+
+          <h2>What Commit ships today</h2>
+
+          <p>
+            Commit&rsquo;s
+            <a href="/spec/">Proof of Commitment</a>
+            provides cryptographic commitments that an actor (human or agent) has skin in the game.
+            They aren&rsquo;t declarations or promises. They&rsquo;re receipts. The commitments accumulate over operational tenure, are verifiable cross-organization without authentication, and are tamper-evident.
+          </p>
+
+          <p>
+            Map this onto draft-sharif&rsquo;s five dimensions:
+          </p>
+
+          <table style="width: 100%; border-collapse: collapse; margin: 1.5rem 0; font-size: 0.9rem;">
+            <thead>
+              <tr style="border-bottom: 2px solid var(--border-light);">
+                <th style="text-align: left; padding: 0.5rem 0.75rem; font-weight: 600;">Draft dimension</th>
+                <th style="text-align: left; padding: 0.5rem 0.75rem; font-weight: 600;">Commit substrate signal</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr style="border-bottom: 1px solid var(--border-light);">
+                <td style="padding: 0.5rem 0.75rem;">Operational Tenure</td>
+                <td style="padding: 0.5rem 0.75rem;">First commitment timestamp, attestation continuity</td>
+              </tr>
+              <tr style="border-bottom: 1px solid var(--border-light);">
+                <td style="padding: 0.5rem 0.75rem;">Behavioural Consistency</td>
+                <td style="padding: 0.5rem 0.75rem;">Recurring commitment cadence and shape</td>
+              </tr>
+              <tr style="border-bottom: 1px solid var(--border-light);">
+                <td style="padding: 0.5rem 0.75rem;">Anomaly History</td>
+                <td style="padding: 0.5rem 0.75rem;">Slashing events, withdrawn commitments, revocations</td>
+              </tr>
+              <tr style="border-bottom: 1px solid var(--border-light);">
+                <td style="padding: 0.5rem 0.75rem;">Execution Success Rate</td>
+                <td style="padding: 0.5rem 0.75rem;">Task-level outcome attestations</td>
+              </tr>
+              <tr>
+                <td style="padding: 0.5rem 0.75rem;">Code Attestation</td>
+                <td style="padding: 0.5rem 0.75rem;">Paired with L3 identity sources (Visa TAP, Entra Agent ID)</td>
+              </tr>
+            </tbody>
+          </table>
+
+          <p>
+            If the draft moves toward adoption, Commit is one of the substrates that can supply the inputs the score formula assumes already exist. If the draft stalls, the category still exists and the substrate is still the bottleneck.
+          </p>
+
+          <p>
+            The substrate accrues value either way. That&rsquo;s the bet.
+          </p>
+
+          <h2>The opportunity for whoever ships first</h2>
+
+          <p>
+            Standards work and implementation work compound differently. Drafts move on multi-year timelines. Implementations move on weekly timelines. A draft at -00 is a flag planted in the ground. The implementation that&rsquo;s already running when the draft hits -02 is the one that gets cited.
+          </p>
+
+          <p>
+            If you&rsquo;re building agent-aware payment infrastructure (an ACP merchant, an x402 facilitator, a Stripe Connect platform with agent traffic, an identity-as-a-service vendor extending into behavior), the trust score query is going to land in your spec sheet. The agents will come with credentials. The merchants will ask &ldquo;should we let this one buy?&rdquo; Someone has to answer.
+          </p>
+
+          <p>
+            We answer with commitments. The IETF draft says the answer should be a 0&ndash;100 number computed from five dimensions. Same shape. Different vocabulary.
+          </p>
+
+          <p>
+            The category has a protocol document now. The implementation is the whole thing.
+          </p>
+
+        </div>
+
+        <!-- CTA -->
+        <footer class="essay-cta animate-in delay-5">
+          <p><a href="/audit/?packages=@anthropic-ai/sdk,openai,x402&ecosystem=npm" class="cta-button">Audit your agent&rsquo;s dependencies &rarr;</a></p>
+          <p class="cta-sub">Free CLI &middot; API &middot; MCP server &middot; No account required</p>
+        </footer>
+
+      </div>
+    </div>
+  </article>
+
+</Layout>
+</content>
+</invoke>

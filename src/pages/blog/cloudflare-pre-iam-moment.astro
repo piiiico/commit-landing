@@ -1,0 +1,214 @@
+---
+import Layout from '../../layouts/Layout.astro';
+---
+
+<Layout
+  title="The Pre-IAM Moment — Commit"
+  description="Cloudflare just shipped compute, storage, and inference for agents. No identity layer. We've seen this before."
+  canonical="https://getcommit.dev/blog/cloudflare-pre-iam-moment/"
+  publishDate="2026-04-17"
+>
+
+  <!-- Nav -->
+  <nav>
+    <div class="container nav-inner">
+      <a href="/" class="nav-brand">Commit</a>
+      <ul class="nav-links">
+        <li><a href="/extension">Extension</a></li>
+        <li><a href="/blog">Writing</a></li>
+        <li><a href="/pricing">Pricing</a></li><li><a href="/docs">Docs</a></li><li><a href="https://github.com/piiiico/proof-of-commitment" target="_blank" rel="noopener">GitHub</a></li>
+        <li><a href="mailto:pico@amdal.dev">Contact</a></li>
+      </ul>
+    </div>
+  </nav>
+
+  <!-- Essay -->
+  <article class="essay">
+    <div class="container">
+      <div class="editorial">
+
+        <!-- Header -->
+        <header class="essay-header">
+          <div class="essay-meta animate-in delay-1">
+            <time datetime="2026-04-17">April 17, 2026</time>
+          </div>
+          <h1 class="essay-title animate-in delay-2">The Pre-IAM Moment</h1>
+          <p class="essay-subtitle animate-in delay-3">
+            Cloudflare just shipped compute, storage, and inference for agents. No identity layer. We've seen this before.
+          </p>
+          <p class="essay-byline animate-in delay-4">Pico</p>
+        </header>
+
+        <!-- Body -->
+        <div class="essay-body">
+
+          <p>
+            In the past 48 hours, Cloudflare shipped two major infrastructure pieces for autonomous agents.
+          </p>
+          <p>
+            <strong>Artifacts</strong>: a Git-like versioning and sharing layer for AI artifacts, with automatic session persistence across agent runs. It landed at 186 points on Hacker News. <strong>AI Gateway's AI Platform</strong>: unified inference routing across providers, with automatic failover, cost optimization, and caching. 268 points.
+          </p>
+          <p>
+            Both are serious infrastructure. Both solve real problems. And both shipped with zero identity or behavioral trust layer.
+          </p>
+          <p>
+            That's not a bug in Cloudflare's roadmap. It's a pattern we've seen before. And it tells us exactly where we are.
+          </p>
+
+          <h2>2008, Repeated</h2>
+
+          <p>
+            AWS launched EC2 in 2006. By 2008, enterprises were running real workloads on commodity compute for the first time. The infrastructure was capable. The security model was not. You had root access, a running instance, and a prayer.
+          </p>
+          <p>
+            IAM launched in 2010. Two years after compute became serious. Not before, because you can't build access control until you know what you're controlling access <em>to</em>.
+          </p>
+          <p>
+            The agent infrastructure stack is reaching the same inflection point. Compute? Workers: serverless, globally distributed, already running billions of requests. Storage? Artifacts just shipped: stateful, versioned, persistent across sessions. Inference? AI Platform routes across every major model provider with caching and failover.
+          </p>
+          <p>
+            The substrate is nearly complete. The identity layer does not exist.
+          </p>
+
+          <h2>What's Missing</h2>
+
+          <p>
+            When Cloudflare shipped Artifacts, the top Hacker News comment asked a specific question: how does automatic session persistence work with no user consent mechanism? The artifact persists. The session continues. But who authorized the continuation? What scope was granted? What constraints apply to the resumed session versus the original?
+          </p>
+          <p>
+            The answer, today, is: nothing. The agent runs. The artifact persists. The session resumes. Trust is assumed, not established.
+          </p>
+          <p>
+            This is not a Cloudflare failure. It's the nature of pre-IAM infrastructure. Compute was powerful before it was governable. The same is happening with agent substrate.
+          </p>
+          <p>
+            Anthropic noticed the gap from a different angle. Opus 4.7 shipped a "Cyber Verification Program": a gated capability system where identity-verified researchers can unlock advanced autonomous behaviors. The mechanism: manual application, manual review, manual approval. Friction-heavy, human-in-the-loop, designed for controlled access to capabilities that shouldn't be universally available.
+          </p>
+          <p>
+            It's a preview of what agent identity infrastructure needs to do (gated capabilities, scoped behavioral permissions, identity-linked trust) executed manually because the automated layer doesn't exist yet.
+          </p>
+          <p>
+            IAM for agents is the automated version of this.
+          </p>
+
+          <h2>The Stack Is Forming</h2>
+
+          <p>
+            The analogy is more precise than it looks.
+          </p>
+
+          <table style="width: 100%; border-collapse: collapse; margin: 1.5rem 0; font-size: 0.9rem;">
+            <thead>
+              <tr style="border-bottom: 2px solid var(--border-light);">
+                <th style="text-align: left; padding: 0.5rem 1rem 0.5rem 0; font-weight: 600;">AWS (2006–2010)</th>
+                <th style="text-align: left; padding: 0.5rem 1rem; font-weight: 600;">Agentic (2024–2026)</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr style="border-bottom: 1px solid var(--border-light);">
+                <td style="padding: 0.5rem 1rem 0.5rem 0;">EC2 (compute)</td>
+                <td style="padding: 0.5rem 1rem;">Workers (compute)</td>
+              </tr>
+              <tr style="border-bottom: 1px solid var(--border-light);">
+                <td style="padding: 0.5rem 1rem 0.5rem 0;">S3 (storage)</td>
+                <td style="padding: 0.5rem 1rem;">Artifacts (agent storage)</td>
+              </tr>
+              <tr style="border-bottom: 1px solid var(--border-light);">
+                <td style="padding: 0.5rem 1rem 0.5rem 0;">RDS (data)</td>
+                <td style="padding: 0.5rem 1rem;">D1, Durable Objects</td>
+              </tr>
+              <tr style="border-bottom: 1px solid var(--border-light);">
+                <td style="padding: 0.5rem 1rem 0.5rem 0;">ELB (routing)</td>
+                <td style="padding: 0.5rem 1rem;">AI Platform (inference routing)</td>
+              </tr>
+              <tr>
+                <td style="padding: 0.5rem 1rem 0.5rem 0; font-weight: 600;">IAM (identity)</td>
+                <td style="padding: 0.5rem 1rem; font-weight: 600; color: var(--ink-subtle);">???</td>
+              </tr>
+            </tbody>
+          </table>
+
+          <p>
+            AWS built compute, storage, database, and networking before addressing identity. IAM arrived after enterprises were already running production workloads without it, which is why its 2010 launch felt urgent rather than premature.
+          </p>
+          <p>
+            We are at the urgency moment for agent IAM. Enterprises are running autonomous agents in production. Those agents access APIs, execute transactions, persist state across sessions, delegate to sub-agents. The behavioral trust layer does not exist in the infrastructure stack: who is this agent, what has it committed to, what is it doing right now.
+          </p>
+
+          <h2>What Agent IAM Looks Like</h2>
+
+          <p>
+            The static model (verify identity at login, assume trustworthiness afterward) doesn't work for autonomous agents. Agents operate continuously, in changing contexts, with delegated permissions that can drift from their original scope. The German eIDAS architects learned this for devices: runtime attestation, not point-in-time certification.
+          </p>
+          <p>
+            Agent IAM needs the same shift. Not "did this agent authenticate?" but "what is this agent's behavioral posture across its deployment history, right now, compared to its stated commitments?" Cross-org, continuous, behavioral.
+          </p>
+          <p>
+            Cloudflare's Artifacts knows the agent ran. It doesn't know whether the agent behaved.
+          </p>
+          <p>
+            That's the gap. Pre-IAM, the compute ran. Post-IAM, you knew who ran it, what they were allowed to do, and whether they stayed within bounds.
+          </p>
+          <p>
+            We're building that layer.
+          </p>
+
+          <hr class="essay-divider" />
+
+          <p class="essay-coda">
+            <em>We're building <a href="/">Commit</a>: behavioral commitment data as the input layer for agent governance. <a href="https://agentlair.dev">AgentLair</a> provides cross-org agent identity and behavioral trust infrastructure. Earlier essays: <a href="/blog/germany-eidas-runtime-attestation">Germany Didn't Trust a Certificate. Neither Should You.</a>, <a href="/blog/toctou-of-trust">The TOCTOU of Trust</a>, <a href="/blog/the-missing-layer">The Missing Layer</a>. If you're thinking about what agent IAM actually needs to look like, <a href="mailto:pico@amdal.dev">reach out</a>.</em>
+          </p>
+
+        </div>
+      </div>
+    </div>
+  </article>
+
+  <!-- Newsletter -->
+  <section class="newsletter-section">
+    <div class="container">
+      <div class="editorial reveal">
+        <h2 style="margin-bottom: 0.75rem;">Stay in the loop</h2>
+        <p style="margin-bottom: 2rem; font-size: 1rem;">
+          Early access, research updates, and the occasional strong opinion.
+        </p>
+
+        <form
+          action="https://buttondown.email/api/emails/embed-subscribe/commitgraph"
+          method="post"
+          target="popupwindow"
+          class="newsletter-form"
+        >
+          <input
+            type="email"
+            name="email"
+            placeholder="you@example.com"
+            required
+            class="newsletter-input"
+          />
+          <button type="submit" class="btn-primary" style="white-space: nowrap;">
+            Subscribe
+          </button>
+        </form>
+
+        <p class="newsletter-note">No spam. Unsubscribe anytime.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer>
+    <div class="container footer-inner">
+      <span class="footer-brand">Commit</span>
+      <ul class="footer-links">
+        <li><a href="/">Home</a></li>
+        <li><a href="/extension">Extension</a></li>
+        <li><a href="/blog">Writing</a></li>
+        <li><a href="/pricing">Pricing</a></li><li><a href="/docs">Docs</a></li><li><a href="https://github.com/piiiico/proof-of-commitment" target="_blank" rel="noopener">GitHub</a></li>
+        <li><a href="mailto:pico@amdal.dev">Contact</a></li>
+      </ul>
+      <span class="footer-locale">Stavanger, Norway</span>
+    </div>
+  </footer>
+
+</Layout>

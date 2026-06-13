@@ -1,0 +1,565 @@
+---
+import Layout from '../../layouts/Layout.astro';
+---
+
+<Layout
+  title="CRITICAL PyPI Packages — Commit"
+  description="Live risk scores for the most-downloaded PyPI packages. See which ones are structural supply chain risks: sole maintainer, hundreds of millions of weekly downloads."
+  canonical="https://getcommit.dev/watchlist/pypi/"
+>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg: #FFFCF0;
+      --fg: #1a1a1a;
+      --muted: #6b6b6b;
+      --border: #e5e0d0;
+      --critical: #991b1b;
+      --critical-bg: #fef2f2;
+      --high: #92400e;
+      --high-bg: #fffbeb;
+      --warn: #78350f;
+      --ok: #166534;
+      --ok-bg: #f0fdf4;
+      --max: 960px;
+    }
+
+    body {
+      background: var(--bg);
+      color: var(--fg);
+      font-family: 'Georgia', serif;
+      line-height: 1.6;
+    }
+
+    nav {
+      border-bottom: 1px solid var(--border);
+      padding: 14px 24px;
+    }
+
+    .nav-inner {
+      max-width: var(--max);
+      margin: 0 auto;
+      display: flex;
+      align-items: center;
+      gap: 32px;
+    }
+
+    .nav-brand {
+      font-weight: 700;
+      font-size: 1.1rem;
+      color: var(--fg);
+      text-decoration: none;
+    }
+
+    .nav-links {
+      list-style: none;
+      display: flex;
+      gap: 24px;
+      margin-left: auto;
+    }
+
+    .nav-links a {
+      color: var(--muted);
+      text-decoration: none;
+      font-family: 'system-ui', sans-serif;
+      font-size: 0.875rem;
+    }
+
+    .nav-links a:hover, .nav-links a.nav-active { color: var(--fg); }
+
+    .container { max-width: var(--max); margin: 0 auto; padding: 0 24px; }
+
+    .hero {
+      padding: 56px 24px 32px;
+      max-width: var(--max);
+      margin: 0 auto;
+    }
+
+    .hero-eyebrow {
+      display: block;
+      font-family: 'system-ui', sans-serif;
+      font-size: 0.8rem;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--muted);
+      margin-bottom: 12px;
+    }
+
+    h1 {
+      font-size: clamp(1.8rem, 4vw, 2.8rem);
+      line-height: 1.15;
+      margin-bottom: 20px;
+      font-weight: 700;
+    }
+
+    h1 em { font-style: italic; }
+
+    .hero-lead {
+      font-size: 1.05rem;
+      color: var(--muted);
+      max-width: 640px;
+      margin-bottom: 24px;
+    }
+
+    .hero-meta {
+      font-family: 'system-ui', sans-serif;
+      font-size: 0.8rem;
+      color: var(--muted);
+    }
+
+    /* Ecosystem switcher */
+    .ecosystem-tabs {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 28px;
+    }
+
+    .eco-tab {
+      display: inline-block;
+      padding: 6px 16px;
+      border-radius: 20px;
+      font-family: 'system-ui', sans-serif;
+      font-size: 0.8rem;
+      font-weight: 600;
+      text-decoration: none;
+      border: 1px solid var(--border);
+      color: var(--muted);
+      transition: all 0.15s;
+    }
+
+    .eco-tab:hover { color: var(--fg); border-color: var(--fg); }
+
+    .eco-tab.active {
+      background: var(--fg);
+      color: #fff;
+      border-color: var(--fg);
+    }
+
+    /* Stats banner */
+    .stats-banner {
+      display: none;
+      flex-wrap: wrap;
+      gap: 24px;
+      background: #fef2f2;
+      border: 1px solid #fca5a5;
+      border-radius: 8px;
+      padding: 16px 20px;
+      margin-bottom: 32px;
+    }
+
+    .stats-banner.visible { display: flex; }
+
+    .stat-item {
+      font-family: 'system-ui', sans-serif;
+    }
+
+    .stat-value {
+      font-size: 1.4rem;
+      font-weight: 700;
+      color: var(--critical);
+      display: block;
+    }
+
+    .stat-label {
+      font-size: 0.75rem;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+    }
+
+    /* Table */
+    .watchlist-table-wrap {
+      overflow-x: auto;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      margin-bottom: 48px;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-family: 'system-ui', sans-serif;
+      font-size: 0.875rem;
+    }
+
+    thead th {
+      background: #f7f4e8;
+      padding: 10px 14px;
+      text-align: left;
+      font-weight: 600;
+      border-bottom: 1px solid var(--border);
+      white-space: nowrap;
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      color: var(--muted);
+    }
+
+    tbody tr {
+      border-bottom: 1px solid var(--border);
+      transition: background 0.1s;
+    }
+
+    tbody tr:last-child { border-bottom: none; }
+    tbody tr:hover { background: #fafaf5; }
+
+    tbody td {
+      padding: 10px 14px;
+      vertical-align: middle;
+    }
+
+    .pkg-name {
+      font-weight: 600;
+      color: var(--fg);
+    }
+
+    .pkg-link {
+      color: inherit;
+      text-decoration: none;
+    }
+
+    .pkg-link:hover { text-decoration: underline; }
+
+    .risk-badge {
+      display: inline-block;
+      padding: 2px 8px;
+      border-radius: 4px;
+      font-size: 0.72rem;
+      font-weight: 700;
+      letter-spacing: 0.04em;
+      white-space: nowrap;
+    }
+
+    .badge-critical { background: var(--critical-bg); color: var(--critical); }
+    .badge-high { background: var(--high-bg); color: var(--high); }
+    .badge-warn { background: #fff7ed; color: var(--warn); }
+    .badge-ok { background: var(--ok-bg); color: var(--ok); }
+
+    .score-cell { font-variant-numeric: tabular-nums; }
+
+    .score-low { color: var(--critical); font-weight: 600; }
+    .score-mid { color: var(--high); }
+    .score-ok { color: var(--ok); }
+
+    .num-muted { color: var(--muted); font-variant-numeric: tabular-nums; }
+
+    /* Skeleton rows */
+    .skeleton-row td { padding: 10px 14px; }
+    .skeleton {
+      display: inline-block;
+      height: 14px;
+      background: linear-gradient(90deg, #e5e0d0 25%, #f7f4e8 50%, #e5e0d0 75%);
+      background-size: 200% 100%;
+      animation: shimmer 1.5s infinite;
+      border-radius: 3px;
+    }
+
+    @keyframes shimmer {
+      0% { background-position: 200% 0; }
+      100% { background-position: -200% 0; }
+    }
+
+    /* Explainer */
+    .explainer {
+      border-top: 1px solid var(--border);
+      padding: 40px 0;
+      display: flex;
+      gap: 40px;
+      flex-wrap: wrap;
+    }
+
+    .explainer-col { flex: 1; min-width: 240px; }
+
+    .explainer h3 {
+      font-size: 1rem;
+      font-weight: 700;
+      margin-bottom: 8px;
+    }
+
+    .explainer p {
+      font-size: 0.875rem;
+      color: var(--muted);
+      line-height: 1.7;
+    }
+
+    .cta-row {
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+      margin-top: 32px;
+      padding-bottom: 48px;
+    }
+
+    .btn {
+      display: inline-block;
+      padding: 10px 20px;
+      border-radius: 6px;
+      font-family: 'system-ui', sans-serif;
+      font-size: 0.875rem;
+      font-weight: 600;
+      text-decoration: none;
+      cursor: pointer;
+    }
+
+    .btn-primary {
+      background: var(--fg);
+      color: #fff;
+    }
+
+    .btn-secondary {
+      background: transparent;
+      color: var(--fg);
+      border: 1px solid var(--border);
+    }
+
+    .btn:hover { opacity: 0.85; }
+  </style>
+
+  <!-- Nav -->
+  <nav>
+    <div class="nav-inner">
+      <a href="/" class="nav-brand">Commit</a>
+      <ul class="nav-links">
+        <li><a href="/#mcp">MCP</a></li>
+        <li><a href="/audit">Audit</a></li>
+        <li><a href="/watchlist" class="nav-active">Watchlist</a></li>
+        <li><a href="/extension">Extension</a></li>
+        <li><a href="/blog">Writing</a></li>
+        <li><a href="/pricing">Pricing</a></li><li><a href="/docs">Docs</a></li><li><a href="https://github.com/piiiico/proof-of-commitment" target="_blank" rel="noopener">GitHub</a></li>
+      </ul>
+    </div>
+  </nav>
+
+  <div class="container">
+    <section class="hero">
+      <span class="hero-eyebrow">Live risk monitor</span>
+      <h1>The most-downloaded PyPI packages,<br /><em>ranked by structural risk</em></h1>
+      <p class="hero-lead">
+        CRITICAL = sole maintainer + 10M+ weekly downloads. The profile that makes packages like
+        <code>six</code>, <code>certifi</code>, and <code>charset-normalizer</code> high-value targets
+        before any CVE exists. Updated from PyPI registry data.
+      </p>
+      <p class="hero-meta" id="updated-line">Loading…</p>
+    </section>
+
+    <!-- Ecosystem tabs -->
+    <div class="ecosystem-tabs">
+      <a href="/watchlist" class="eco-tab">npm</a>
+      <a href="/watchlist/pypi" class="eco-tab active">PyPI</a>
+      <a href="/watchlist/actions" class="eco-tab">GitHub Actions</a>
+    </div>
+
+    <!-- Stats banner (shown after load) -->
+    <div class="stats-banner" id="stats-banner">
+      <div class="stat-item">
+        <span class="stat-value" id="stat-critical">—</span>
+        <span class="stat-label">CRITICAL packages</span>
+      </div>
+      <div class="stat-item">
+        <span class="stat-value" id="stat-downloads">—</span>
+        <span class="stat-label">Weekly downloads at risk</span>
+      </div>
+      <div class="stat-item">
+        <span class="stat-value" id="stat-solo">—</span>
+        <span class="stat-label">Sole-maintainer packages</span>
+      </div>
+    </div>
+
+    <!-- Table -->
+    <div class="watchlist-table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>#</th>
+            <th>Package</th>
+            <th>Risk</th>
+            <th>Score</th>
+            <th>Downloads/wk</th>
+            <th>Maintainers</th>
+            <th>Age</th>
+            <th>Last release</th>
+          </tr>
+        </thead>
+        <tbody id="watchlist-tbody">
+          <!-- Skeleton rows while loading -->
+          {Array.from({length: 25}).map((_, i) => (
+            <tr class="skeleton-row">
+              <td><span class="skeleton" style={`width: ${20}px`}></span></td>
+              <td><span class="skeleton" style={`width: ${60 + (i % 5) * 20}px`}></span></td>
+              <td><span class="skeleton" style="width: 70px"></span></td>
+              <td><span class="skeleton" style="width: 36px"></span></td>
+              <td><span class="skeleton" style="width: 60px"></span></td>
+              <td><span class="skeleton" style="width: 24px"></span></td>
+              <td><span class="skeleton" style="width: 40px"></span></td>
+              <td><span class="skeleton" style="width: 50px"></span></td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Explainer + CTA -->
+    <div class="explainer">
+      <div class="explainer-col">
+        <h3>Why behavioral signals?</h3>
+        <p>
+          <code>pip audit</code> finds known CVEs — vulnerabilities already catalogued in a database.
+          This scores <em>structural risk before it becomes a CVE</em>. A sole-maintainer package
+          with 300M+ weekly downloads is a high-value target regardless of CVE history.
+        </p>
+      </div>
+      <div class="explainer-col">
+        <h3>What CRITICAL means</h3>
+        <p>
+          Sole maintainer + 10M+ weekly downloads = high-value target if credentials are stolen
+          or the maintainer goes rogue. Not a verdict — a flag. The ua-parser-js attack (October 2021)
+          and other supply chain incidents fit this profile exactly.
+        </p>
+      </div>
+      <div class="explainer-col">
+        <h3>Audit your own deps</h3>
+        <p>
+          Paste your <code>requirements.txt</code> or <code>pyproject.toml</code> in the
+          <a href="/audit">audit tool</a> to score your Python dependencies. Or add the
+          <a href="https://github.com/piiiico/proof-of-commitment" target="_blank">GitHub Action</a>
+          to flag CRITICAL packages on every PR.
+        </p>
+      </div>
+    </div>
+
+    <div class="cta-row">
+      <a href="/audit" class="btn btn-primary">Audit your dependencies</a>
+      <a href="/watchlist" class="btn btn-secondary">View npm watchlist</a>
+    </div>
+  </div>
+
+  <script>
+    const API = 'https://poc-backend.amdal-dev.workers.dev/api/audit';
+
+    // Top PyPI packages by weekly downloads
+    const WATCHLIST_PACKAGES = [
+      // Core HTTP / networking
+      'requests', 'urllib3', 'certifi', 'charset-normalizer', 'idna',
+      // AWS SDK
+      'boto3', 'botocore', 's3transfer',
+      // Build/packaging essentials
+      'setuptools', 'pip', 'wheel', 'packaging',
+      // Compatibility layer (legacy but massive)
+      'six', 'python-dateutil',
+      // Config/serialization
+      'pyyaml', 'typing-extensions', 'attrs',
+      // Data science core
+      'numpy', 'pandas', 'pyarrow',
+      // Security / crypto
+      'cryptography', 'cffi',
+      // CLI / utilities
+      'click', 'tqdm',
+      // Imaging
+      'pillow',
+    ];
+
+    function fmtNum(n: number): string {
+      if (n >= 1_000_000_000) return (n / 1_000_000_000).toFixed(1) + 'B';
+      if (n >= 1_000_000) return (n / 1_000_000).toFixed(0) + 'M';
+      if (n >= 1_000) return (n / 1_000).toFixed(0) + 'K';
+      return String(n);
+    }
+
+    function fmtAge(years: number): string {
+      if (years < 1) return Math.round(years * 12) + 'mo';
+      return years.toFixed(1) + 'y';
+    }
+
+    function fmtDays(days: number): string {
+      if (days === 0) return 'today';
+      if (days < 7) return days + 'd ago';
+      if (days < 30) return Math.round(days / 7) + 'wk ago';
+      if (days < 365) return Math.round(days / 30) + 'mo ago';
+      return Math.round(days / 365) + 'y ago';
+    }
+
+    interface AuditResult {
+      name: string;
+      ecosystem: string;
+      score: number;
+      maintainers: number;
+      weeklyDownloads: number;
+      ageYears: number;
+      trend: string;
+      daysSinceLastPublish: number;
+      riskFlags: string[];
+    }
+
+    async function loadWatchlist() {
+      const tbody = document.getElementById('watchlist-tbody')!;
+      const updatedLine = document.getElementById('updated-line')!;
+
+      try {
+        const res = await fetch(API, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ packages: WATCHLIST_PACKAGES, ecosystem: 'pypi' }),
+        });
+
+        if (!res.ok) throw new Error(`HTTP ${res.status}`);
+        const data = await res.json() as { results: AuditResult[] };
+
+        // Sort: CRITICAL first, then by downloads descending
+        const sorted = data.results.sort((a, b) => {
+          const aCrit = a.riskFlags.includes('CRITICAL') ? 1 : 0;
+          const bCrit = b.riskFlags.includes('CRITICAL') ? 1 : 0;
+          if (aCrit !== bCrit) return bCrit - aCrit;
+          return (b.weeklyDownloads || 0) - (a.weeklyDownloads || 0);
+        });
+
+        // Stats
+        const critPkgs = sorted.filter(p => p.riskFlags.includes('CRITICAL'));
+        const soloPkgs = sorted.filter(p => p.maintainers === 1);
+        const critDownloads = critPkgs.reduce((s, p) => s + (p.weeklyDownloads || 0), 0);
+
+        document.getElementById('stat-critical')!.textContent = String(critPkgs.length);
+        document.getElementById('stat-downloads')!.textContent = fmtNum(critDownloads) + '/wk';
+        document.getElementById('stat-solo')!.textContent = String(soloPkgs.length);
+        document.getElementById('stats-banner')!.classList.add('visible');
+
+        updatedLine.textContent = `Updated ${new Date().toLocaleString('en-US', { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' })} · ${sorted.length} packages`;
+
+        // Render rows
+        tbody.innerHTML = sorted.map((pkg, i) => {
+          const isCritical = pkg.riskFlags.includes('CRITICAL');
+          const isHigh = pkg.riskFlags.includes('HIGH');
+          const isWarn = pkg.riskFlags.includes('WARN');
+
+          const badgeClass = isCritical ? 'badge-critical' : isHigh ? 'badge-high' : isWarn ? 'badge-warn' : 'badge-ok';
+          const badgeText = isCritical ? '⚑ CRITICAL' : isHigh ? '⚠ HIGH' : isWarn ? '↓ WARN' : '✓ OK';
+
+          const scoreClass = pkg.score < 50 ? 'score-low' : pkg.score < 75 ? 'score-mid' : 'score-ok';
+
+          const rowStyle = isCritical ? 'background: #fff5f5;' : '';
+
+          return `<tr style="${rowStyle}">
+            <td class="num-muted">${i + 1}</td>
+            <td class="pkg-name">
+              <a class="pkg-link" href="/pypi/${encodeURIComponent(pkg.name)}">${pkg.name}</a>
+            </td>
+            <td><span class="risk-badge ${badgeClass}">${badgeText}</span></td>
+            <td class="score-cell ${scoreClass}">${pkg.score}/100</td>
+            <td class="num-muted">${pkg.weeklyDownloads > 0 ? fmtNum(pkg.weeklyDownloads) : '—'}</td>
+            <td class="num-muted">${pkg.maintainers}</td>
+            <td class="num-muted">${fmtAge(pkg.ageYears)}</td>
+            <td class="num-muted">${fmtDays(pkg.daysSinceLastPublish)}</td>
+          </tr>`;
+        }).join('');
+
+      } catch (err) {
+        tbody.innerHTML = `<tr><td colspan="8" style="padding:24px;text-align:center;color:#991b1b;font-family:system-ui">
+          Failed to load watchlist. <a href="/audit">Try the audit tool</a> instead.
+        </td></tr>`;
+        updatedLine.textContent = 'Error loading data';
+      }
+    }
+
+    loadWatchlist();
+  </script>
+</Layout>

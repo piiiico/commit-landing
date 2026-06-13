@@ -1,0 +1,488 @@
+---
+import Layout from '../layouts/Layout.astro';
+---
+
+<Layout
+  title="Commit Extension — Trust card on every GitHub repo"
+  description="A browser extension that adds a trust card to every GitHub repo — Commit Score, longevity, endorsements. Also surfaces foundation signals for Norwegian businesses. Free. Open source."
+  canonical="https://getcommit.dev/extension/"
+>
+
+  <!-- Nav -->
+  <nav>
+    <div class="container nav-inner">
+      <a href="/" class="nav-brand">Commit</a>
+      <ul class="nav-links">
+        <li><a href="/audit">Audit</a></li>
+        <li><a href="/extension" style="color: var(--ink);">Extension</a></li>
+        <li><a href="/blog">Writing</a></li>
+        <li><a href="/pricing">Pricing</a></li><li><a href="/docs">Docs</a></li><li><a href="https://github.com/hawkaa/commit" target="_blank" rel="noopener">GitHub</a></li>
+      </ul>
+    </div>
+  </nav>
+
+  <!-- Hero -->
+  <section class="hero">
+    <div class="container">
+      <div class="editorial">
+        <span class="hero-eyebrow animate-in delay-1">Chrome Extension · Free · Open Source · v0.3.0</span>
+
+        <h1 class="hero-title animate-in delay-2" style="font-size: clamp(2rem, 5vw, 3.5rem);">
+          A trust card on every GitHub repo.<br />
+          <em>Commitment signals you can't fake.</em>
+        </h1>
+
+        <p class="hero-lead animate-in delay-3">
+          The Commit extension injects a trust panel into every GitHub repository — Commit Score,
+          longevity, contributor signals. Open any repo. See whether it's been built for real.
+          <strong>Behavioral data that takes years to accumulate. Can't be manufactured overnight.</strong>
+        </p>
+
+        <div class="hero-cta animate-in delay-4">
+          <a
+            href="https://github.com/piiiico/proof-of-commitment/releases/download/v0.3.0/commit-extension-v0.3.0.zip"
+            class="btn-primary"
+          >
+            Download v0.3.0 →
+          </a>
+          <a href="#how-it-works" class="btn-ghost">How it works</a>
+          <a href="https://github.com/piiiico/proof-of-commitment/releases" class="btn-ghost" target="_blank" rel="noopener">All releases →</a>
+        </div>
+
+        <p class="animate-in delay-5" style="margin-top: 1rem; font-size: 0.85rem; color: var(--muted);">
+          Chrome / Brave / Edge · Manifest V3 · No account required to start
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <hr class="section-divider" />
+
+  <!-- GitHub trust panel (v0.3.0) -->
+  <section style="padding: var(--space-section) 0;">
+    <div class="container">
+      <p class="section-label">New in v0.3.0</p>
+      <div class="editorial reveal" style="max-width: var(--max-content);">
+        <h2 style="margin-bottom: 0.5rem;">GitHub trust panel — live in every repo.</h2>
+        <p style="margin-bottom: 1.5rem; font-size: 1rem; color: var(--ink-muted);">
+          Install the extension. Open any GitHub repo. A Commit panel appears in the sidebar
+          — Commit Score, age, contributors, endorsements. The same data is available as a REST API
+          for scripts and agents.
+        </p>
+
+        <div style="background: var(--paper-dim); border: 1px solid var(--border); border-radius: 8px; padding: 1.5rem; font-family: var(--font-mono, 'JetBrains Mono', monospace); font-size: 0.8rem; color: var(--ink); line-height: 1.8; overflow-x: auto; margin-bottom: 1.5rem;">
+          <div style="font-size: 0.7rem; color: var(--ink-subtle); margin-bottom: 0.75rem; font-family: var(--font-body);">Extension panel — GitHub repo sidebar</div>
+          <pre style="margin: 0;">┌─────────────────────────────────────────────────────┐
+│  COMMIT                                             │
+│  hawkaa/commit                                      │
+│                                                     │
+│  Score    42 / 100   ▓▓▓▓▒░░░░░░░░░░░░░░░░░░░░░░  │
+│  Age      1 yr 3 mo  ──────────────────────────    │
+│  Contributors  3     ──────────────────────────    │
+│                                                     │
+│  0 endorsements  ·  No ZK proofs yet               │
+│  [Endorse →]  [Not for me →]                       │
+└─────────────────────────────────────────────────────┘</pre>
+          <div style="font-size: 0.7rem; color: var(--ink-subtle); margin-top: 0.75rem; font-family: var(--font-body);">Injected by Commit browser extension · Chrome MV3</div>
+        </div>
+
+        <div class="hero-cta" style="margin-bottom: 0.75rem;">
+          <a
+            href="https://github.com/piiiico/proof-of-commitment/releases/download/v0.3.0/commit-extension-v0.3.0.zip"
+            class="btn-primary"
+          >
+            Download v0.3.0 →
+          </a>
+          <a
+            href="https://github.com/piiiico/proof-of-commitment/releases"
+            class="btn-ghost"
+            target="_blank"
+            rel="noopener"
+          >
+            View all releases →
+          </a>
+        </div>
+        <p style="font-size: 0.85rem; color: var(--ink-muted);">
+          CWS submission pending — sideload via GitHub Releases until then. Takes under a minute.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <hr class="section-divider" />
+
+  <!-- Two layers -->
+  <section id="how-it-works">
+    <div class="container">
+      <p class="section-label">Two layers</p>
+      <div class="editorial reveal">
+        <div class="thesis-text">
+          <p>
+            The extension is built on a deliberate architecture: foundation data that works
+            immediately, and behavioral data that builds over time. They answer different questions.
+          </p>
+        </div>
+      </div>
+
+      <div class="proof-grid" style="margin-top: 2rem;">
+
+        <div class="proof-item reveal">
+          <div class="proof-number">Layer 1 — Foundation</div>
+          <div>
+            <div class="proof-title">Public records. The floor.</div>
+            <p class="proof-body">
+              Years of operation, financial health, food safety record — sourced from Brønnøysund
+              and Mattilsynet, Norway's mandatory public registries. Useful from the moment you
+              install. This is the floor: it tells you a business has skin in the game,
+              but it doesn't tell you who keeps going back.
+            </p>
+          </div>
+        </div>
+
+        <div class="proof-item reveal">
+          <div class="proof-number" style="color: var(--accent);">Layer 2 — Commitment</div>
+          <div>
+            <div class="proof-title">Your behavioral data. The signal.</div>
+            <p class="proof-body">
+              The extension passively tracks your visits, sessions, and time spent on business
+              websites — locally, in your browser. When ChatGPT recommends a restaurant you've
+              visited twelve times, the panel shows that. Your own commitment history is the
+              most trustworthy signal you have. <em>In development — opt-in via World ID.</em>
+            </p>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <hr class="section-divider" />
+
+  <!-- Foundation data detail -->
+  <section>
+    <div class="container">
+      <p class="section-label">Foundation data</p>
+      <div class="editorial reveal">
+        <div class="thesis-text">
+          <p>
+            A floating panel appears when AI mentions a Norwegian business.
+            The public data it surfaces is verifiable — legally required filings,
+            government inspection results. Not reviews. Not ratings.
+          </p>
+        </div>
+      </div>
+
+      <div class="proof-grid" style="margin-top: 2rem;">
+        <div class="proof-item reveal">
+          <div class="proof-number">⏱</div>
+          <div>
+            <div class="proof-title">Years of operation</div>
+            <p class="proof-body">
+              A restaurant that survived 25 years — through recessions, pandemics, changing tastes —
+              is a different entity from one that opened last spring. You can't fake time.
+            </p>
+          </div>
+        </div>
+
+        <div class="proof-item reveal">
+          <div class="proof-number">📊</div>
+          <div>
+            <div class="proof-title">Financial health</div>
+            <p class="proof-body">
+              Revenue, profit margin, equity position — from mandatory annual filings
+              at Brønnøysund. Self-reported, legally required, publicly available.
+            </p>
+          </div>
+        </div>
+
+        <div class="proof-item reveal">
+          <div class="proof-number">🍽</div>
+          <div>
+            <div class="proof-title">Food safety record</div>
+            <p class="proof-body">
+              Inspection results from Mattilsynet, Norway's Food Safety Authority.
+              Pass, minor issues, or major findings — every restaurant has a record.
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <hr class="section-divider" />
+
+  <!-- Behavioral commitment detail -->
+  <section class="problem-section">
+    <div class="container">
+      <p class="section-label">Behavioral commitment</p>
+      <div class="problem-inner">
+        <div>
+          <div class="problem-number">II</div>
+        </div>
+        <div class="editorial reveal">
+          <h2>Local-first. Yours until you choose otherwise.</h2>
+          <div class="thesis-text" style="margin-top: 1.5rem;">
+            <p>
+              The extension's second layer tracks your visit history silently —
+              sessions, time on site, return frequency. All of it stored in
+              <code style="background: var(--surface); padding: 0.15em 0.4em; border-radius: 3px; font-size: 0.85em;">chrome.storage.local</code>,
+              on your machine, readable only by you.
+            </p>
+            <p>
+              A commitment score (0–100) is computed from signals weighted by
+              unfakeability: return visits and sessions carry the most weight;
+              raw visit count the least. A single long session counts for less
+              than three separate visits over three weeks.
+            </p>
+            <p>
+              <strong>Opt-in sharing via World ID.</strong> When you authenticate with
+              World ID — either device-verified or Orb-verified — your behavioral data
+              can be contributed to the commitment graph with cryptographic proof that
+              it came from a real human. Sybil-resistant from the start.
+              Until you opt in, nothing leaves your browser.
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <hr class="section-divider" />
+
+  <!-- Where the extension fits -->
+  <section>
+    <div class="container">
+      <p class="section-label">Where the extension fits</p>
+      <div class="editorial reveal">
+        <div class="thesis-text">
+          <p>
+            The extension is the consumer entry point to the commitment graph.
+            When AI recommends a business, it surfaces the behavioral data that
+            reveals whether that recommendation is grounded in reality.
+          </p>
+        </div>
+      </div>
+
+      <div class="proof-grid" style="margin-top: 2rem;">
+
+        <div class="proof-item reveal">
+          <div class="proof-number">Foundation data</div>
+          <div>
+            <p class="proof-body">
+              Years operating, employee count, financial health scores — available from day one,
+              sourced from Brønnøysund and public registries.
+              The kind of commitment that takes years to build and can't be faked.
+            </p>
+          </div>
+        </div>
+
+        <div class="proof-item reveal">
+          <div class="proof-number" style="color: var(--accent);">Behavioral signals</div>
+          <div>
+            <div class="proof-title">Your commitment data, over time</div>
+            <p class="proof-body">
+              Repeat visits. Purchase patterns. Sustained patronage across economic cycles.
+              The extension collects these signals as you browse — aggregated into a trust score
+              that means something because it cost something.
+            </p>
+          </div>
+        </div>
+
+        <div class="proof-item reveal">
+          <div class="proof-number">AI recommendations</div>
+          <div>
+            <p class="proof-body">
+              ChatGPT, Perplexity, Claude, Gemini — AI systems that recommend businesses.
+              They produce recommendations without verification. The extension gives you the
+              missing signal: commitment data alongside every recommendation.
+            </p>
+          </div>
+        </div>
+
+      </div>
+
+      <div class="editorial reveal" style="margin-top: 2rem;">
+        <p style="font-size: 0.95rem; color: var(--ink-muted);">
+          The browser extension is the first data source into the commitment graph.
+          <a href="/" style="color: var(--accent); text-decoration: none; font-weight: 500; margin-left: 0.25em;">Read the full protocol thesis →</a>
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <hr class="section-divider" />
+
+  <!-- Supported platforms -->
+  <section>
+    <div class="container">
+      <p class="section-label">Works on</p>
+      <div class="editorial reveal">
+        <div style="display: flex; gap: 1.5rem; flex-wrap: wrap; margin-top: 1rem;">
+          <div style="padding: 0.75rem 1.25rem; border: 1px solid var(--border); border-radius: 4px; font-weight: 600;">ChatGPT</div>
+          <div style="padding: 0.75rem 1.25rem; border: 1px solid var(--border); border-radius: 4px; font-weight: 600;">Perplexity</div>
+          <div style="padding: 0.75rem 1.25rem; border: 1px solid var(--border); border-radius: 4px; font-weight: 600;">Claude</div>
+          <div style="padding: 0.75rem 1.25rem; border: 1px solid var(--border); border-radius: 4px; font-weight: 600;">Gemini</div>
+        </div>
+        <p class="thesis-text" style="margin-top: 1.5rem;">
+          Foundation data: Norwegian businesses (AS, ANS, DA, and other entity types).
+          Behavioral data: any domain you visit, regardless of country.
+          Global registry coverage expands as the commitment data layer grows.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <hr class="section-divider" />
+
+  <!-- Install instructions -->
+  <section id="install">
+    <div class="container">
+      <p class="section-label">Install in 60 seconds</p>
+      <div class="editorial reveal">
+        <div class="thesis-text">
+          <p>
+            The extension isn't on the Chrome Web Store yet (pending review).
+            Until then, install via GitHub Releases — takes about a minute:
+          </p>
+        </div>
+
+        <ol style="margin: 2rem 0; padding-left: 1.5rem; line-height: 2.2; font-size: 1.05rem;">
+          <li>
+            <strong>Download</strong> the extension:
+            <a
+              href="https://github.com/piiiico/proof-of-commitment/releases/download/v0.3.0/commit-extension-v0.3.0.zip"
+              style="font-weight: 600;"
+            >commit-extension-v0.3.0.zip</a>
+          </li>
+          <li>
+            <strong>Unzip</strong> the archive
+          </li>
+          <li>
+            <strong>Open</strong> Chrome and go to
+            <code style="background: var(--surface); padding: 0.2em 0.5em; border-radius: 3px; font-size: 0.9em;">
+              chrome://extensions
+            </code>
+          </li>
+          <li>
+            <strong>Enable</strong> <em>Developer mode</em> (toggle, top right)
+          </li>
+          <li>
+            <strong>Click</strong> <em>Load unpacked</em> → select the unzipped folder
+          </li>
+          <li>
+            <strong>Done.</strong> Open any GitHub repo — the trust panel appears. Or ask ChatGPT about a Norwegian restaurant.
+          </li>
+        </ol>
+
+        <div class="hero-cta" style="margin-top: 2rem;">
+          <a
+            href="https://github.com/piiiico/proof-of-commitment/releases/download/v0.3.0/commit-extension-v0.3.0.zip"
+            class="btn-primary"
+          >
+            Download v0.3.0 →
+          </a>
+          <a
+            href="https://github.com/piiiico/proof-of-commitment/releases"
+            class="btn-ghost"
+            target="_blank"
+            rel="noopener"
+          >
+            All releases on GitHub →
+          </a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <hr class="section-divider" />
+
+  <!-- Try the API -->
+  <section>
+    <div class="container">
+      <p class="section-label">Try the foundation API directly</p>
+      <div class="editorial reveal">
+        <div class="thesis-text">
+          <p>
+            The public registry data is also available as a REST API.
+            Query any Norwegian business by name — this is the same data
+            the extension surfaces in the panel:
+          </p>
+        </div>
+        <pre style="background: #1a1a2e; color: #e0e0e0; padding: 1rem 1.25rem; border-radius: 6px; overflow-x: auto; font-size: 0.85rem; line-height: 1.5; margin: 1.5rem 0;"><code>curl "https://poc-backend.amdal-dev.workers.dev/api/business/search?q=Fisketorget"</code></pre>
+        <p class="thesis-text">
+          Returns foundation score, years of operation, financial signals, and food safety status.
+          The behavioral commitment layer is not yet publicly available via API — that's Phase 2.
+          <a href="/blog/five-stars-zero-commitment">Read the full breakdown →</a>
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <hr class="section-divider" />
+
+  <!-- Pull quote -->
+  <section class="pullquote-section">
+    <div class="container">
+      <div class="pullquote-layout">
+        <div class="pullquote-main reveal">
+          "When content becomes free, commitment becomes scarce."
+        </div>
+        <div class="pullquote-aside reveal">
+          <p>
+            AI floods the information layer — content, reviews, recommendations.
+            The commitment layer is what remains structurally hard to fake:
+            time spent, money paid, returns made, relationships sustained.
+          </p>
+          <p style="margin-top: 1em;">
+            The extension is the first instrument for measuring that layer.
+          </p>
+          <p style="margin-top: 1.5em;">
+            <a href="/blog/commitment-is-the-new-link" style="font-size: 0.875rem; color: var(--accent); text-decoration: none; font-weight: 500;">Read the full essay →</a>
+          </p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <hr class="section-divider" />
+
+  <!-- Newsletter / Early access -->
+  <section id="early-access" class="newsletter-section">
+    <div class="container">
+      <div class="editorial reveal">
+        <h2 style="margin-bottom: 0.75rem;">Get notified when it hits the Chrome Web Store</h2>
+        <p style="margin-bottom: 2rem; font-size: 1rem;">
+          Plus updates when the behavioral commitment layer launches — opt-in sharing, World ID auth,
+          and the first public commitment graph data.
+        </p>
+        <form
+          action="https://buttondown.email/api/emails/embed-subscribe/commitgraph"
+          method="post"
+          target="popupwindow"
+          class="newsletter-form"
+        >
+          <input type="email" name="email" placeholder="you@example.com" required class="newsletter-input" />
+          <button type="submit" class="btn-primary" style="white-space: nowrap;">
+            Subscribe
+          </button>
+        </form>
+        <p class="newsletter-note">No spam. Unsubscribe anytime.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer>
+    <div class="container footer-inner">
+      <span class="footer-brand">Commit</span>
+      <ul class="footer-links">
+        <li><a href="/">Home</a></li>
+        <li><a href="/blog">Writing</a></li>
+        <li><a href="/pricing">Pricing</a></li><li><a href="/docs">Docs</a></li><li><a href="https://github.com/hawkaa/commit" target="_blank" rel="noopener">GitHub</a></li>
+        <li><a href="mailto:pico@amdal.dev">Contact</a></li>
+      </ul>
+      <span class="footer-locale">Stavanger, Norway</span>
+    </div>
+  </footer>
+
+</Layout>

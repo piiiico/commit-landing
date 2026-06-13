@@ -1,0 +1,427 @@
+---
+import Layout from '../../layouts/Layout.astro';
+---
+
+<Layout
+  title="The TOCTOU of Trust: Why Agent Governance Must Be Continuous — Commit"
+  description="Trust verified at T-check is not trust at T-use. Three real-world breaches this week share one failure: trust was established at one moment, the world changed, and no one noticed. This is the TOCTOU of trust — and it's the attack surface L4 must close."
+  canonical="https://getcommit.dev/blog/toctou-of-trust/"
+  publishDate="2026-04-11"
+>
+
+  <!-- Nav -->
+  <nav>
+    <div class="container nav-inner">
+      <a href="/" class="nav-brand">Commit</a>
+      <ul class="nav-links">
+        <li><a href="/extension">Extension</a></li>
+        <li><a href="/blog">Writing</a></li>
+        <li><a href="/pricing">Pricing</a></li><li><a href="/docs">Docs</a></li><li><a href="https://github.com/piiiico/proof-of-commitment" target="_blank" rel="noopener">GitHub</a></li>
+        <li><a href="mailto:pico@amdal.dev">Contact</a></li>
+      </ul>
+    </div>
+  </nav>
+
+  <!-- Essay -->
+  <article class="essay">
+    <div class="container">
+      <div class="editorial">
+
+        <!-- Header -->
+        <header class="essay-header">
+          <div class="essay-meta animate-in delay-1">
+            <time datetime="2026-04-11">April 11, 2026</time>
+          </div>
+          <h1 class="essay-title animate-in delay-2">The TOCTOU of Trust: Why Agent Governance Must Be Continuous</h1>
+          <p class="essay-subtitle animate-in delay-3">
+            Trust verified at T-check is not trust at T-use. Every major trust failure shares one shape: point-in-time verification, continuous operation, and a gap in between.
+          </p>
+          <p class="essay-byline animate-in delay-4">Pico</p>
+        </header>
+
+        <!-- Body -->
+        <div class="essay-body">
+
+          <h2>Three breaches, one shape</h2>
+
+          <p>
+            This week three separate tools that millions of developers trust were turned against them:
+          </p>
+
+          <p>
+            <strong>CPUID (CPU-Z, HWMonitor)</strong> — April 9–10, 2026. The official download servers for two of the most widely-used hardware diagnostics tools were compromised. For six hours, cpuid.com served trojanized binaries containing a RAT. The site was trusted. The domain was the same. The binaries were not.
+          </p>
+
+          <p>
+            <strong>JSON Formatter</strong> — Chrome extension, 2M+ installs. A January 2026 update injected donation popups and geolocation tracking into checkout pages. The extension hadn't changed its name. Its reviews were still visible. The trust was established years ago; the harm arrived silently in an update.
+          </p>
+
+          <p>
+            <strong>macOS Privacy &amp; Security settings</strong> — A disclosure this week revealed that Apple's TCC (Transparency, Consent, and Control) system can show permissions as restricted when they are not. Once a user grants "intent-based" folder access, the app retains it even after you revoke the setting. The UI shows locked. The access is open.
+          </p>
+
+          <p>
+            Three different systems. Three different vendors. The same failure:
+          </p>
+
+          <p>
+            <strong>Trust was established at one moment. The world changed. No one noticed.</strong>
+          </p>
+
+          <hr class="essay-divider" />
+
+          <h2>TOCTOU: The oldest exploit, applied to trust</h2>
+
+          <p>
+            In operating systems, TOCTOU (Time-of-Check-Time-of-Use) is a race condition where an attacker exploits the gap between when a resource is validated and when it's actually used. You check that the file is safe. Something happens in between. By the time you use it, it isn't.
+          </p>
+
+          <p>
+            The same race condition applies to trust — at every layer:
+          </p>
+
+          <table style="width: 100%; border-collapse: collapse; margin: 1.5rem 0; font-size: 0.9rem;">
+            <thead>
+              <tr style="border-bottom: 2px solid var(--border-light);">
+                <th style="text-align: left; padding: 0.5rem 0.75rem; font-weight: 600;">System</th>
+                <th style="text-align: left; padding: 0.5rem 0.75rem; font-weight: 600;">Time-of-Check</th>
+                <th style="text-align: left; padding: 0.5rem 0.75rem; font-weight: 600;">Time-of-Use</th>
+                <th style="text-align: left; padding: 0.5rem 0.75rem; font-weight: 600;">The Gap</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr style="border-bottom: 1px solid var(--border-light);">
+                <td style="padding: 0.5rem 0.75rem;">macOS TCC</td>
+                <td style="padding: 0.5rem 0.75rem;">User grants folder access</td>
+                <td style="padding: 0.5rem 0.75rem;">App reads files indefinitely</td>
+                <td style="padding: 0.5rem 0.75rem;">Settings UI doesn't reflect state</td>
+              </tr>
+              <tr style="border-bottom: 1px solid var(--border-light);">
+                <td style="padding: 0.5rem 0.75rem;">Chrome extension</td>
+                <td style="padding: 0.5rem 0.75rem;">Install / first review</td>
+                <td style="padding: 0.5rem 0.75rem;">Every page load for years</td>
+                <td style="padding: 0.5rem 0.75rem;">Updates can add behaviors</td>
+              </tr>
+              <tr style="border-bottom: 1px solid var(--border-light);">
+                <td style="padding: 0.5rem 0.75rem;">CPUID downloads</td>
+                <td style="padding: 0.5rem 0.75rem;">Domain reputation was good</td>
+                <td style="padding: 0.5rem 0.75rem;">User clicks download</td>
+                <td style="padding: 0.5rem 0.75rem;">Server was compromised for 6 hours</td>
+              </tr>
+              <tr style="border-bottom: 1px solid var(--border-light);">
+                <td style="padding: 0.5rem 0.75rem;">Software package</td>
+                <td style="padding: 0.5rem 0.75rem;">Published clean</td>
+                <td style="padding: 0.5rem 0.75rem;">Installed later</td>
+                <td style="padding: 0.5rem 0.75rem;">Pre-staged malicious version</td>
+              </tr>
+              <tr style="border-bottom: 1px solid var(--border-light);">
+                <td style="padding: 0.5rem 0.75rem;">Agent session</td>
+                <td style="padding: 0.5rem 0.75rem;">Identity verified at handshake</td>
+                <td style="padding: 0.5rem 0.75rem;">Agent acts for the session</td>
+                <td style="padding: 0.5rem 0.75rem;">Mid-session behavioral drift</td>
+              </tr>
+              <tr>
+                <td style="padding: 0.5rem 0.75rem;">Annual compliance audit</td>
+                <td style="padding: 0.5rem 0.75rem;">Point-in-time attestation</td>
+                <td style="padding: 0.5rem 0.75rem;">364 days of operation</td>
+                <td style="padding: 0.5rem 0.75rem;">Behavior evolves continuously</td>
+              </tr>
+            </tbody>
+          </table>
+
+          <p>
+            The common variable: <strong>all of these trust systems are point-in-time, but the threat is continuous.</strong>
+          </p>
+
+          <h2>The interval is the attack surface</h2>
+
+          <p>
+            The attacker's job is to fit inside the gap.
+          </p>
+
+          <p>
+            CPU-Z's supply chain attackers needed six hours. The JSON Formatter attacker needed one update cycle. macOS TCC attackers need a single user action. In each case, the gap between check and use was large enough.
+          </p>
+
+          <p>
+            As systems become more autonomous and long-lived, the gap grows:
+          </p>
+
+          <ul>
+            <li>A human contractor works 8-hour days with regular oversight.</li>
+            <li>A software agent runs continuously, handles credentials, calls external APIs, and can persist for days.</li>
+            <li>A multi-agent system compounds this: each agent trusts the others, passing context and actions across trust boundaries no single identity check ever crossed.</li>
+          </ul>
+
+          <p>
+            The TOCTOU interval for autonomous agents isn't hours. It's the entire session — potentially weeks.
+          </p>
+
+          <h2>Why L3 identity doesn't close this</h2>
+
+          <p>
+            The enterprise security industry responded to agent governance at RSAC 2026 with a flurry of announcements: Visa TAP (who is this agent?), Mastercard Verifiable Intent (was this agent delegated by a cardholder?), Microsoft Agent Governance Toolkit, Entra Agent ID.
+          </p>
+
+          <p>
+            These are <strong>L3 solutions</strong>. They answer the Time-of-Check question with high fidelity. TAP uses HTTP Message Signatures and JWKS-backed identity. VI uses an SD-JWT delegation chain. AGT ships cryptographic inter-agent tokens.
+          </p>
+
+          <p>
+            Excellent. Now the agent identity is verified at the handshake. Then what?
+          </p>
+
+          <p>
+            VentureBeat put it plainly at RSAC: <em>"Every identity framework verified who the agent was. None tracked what the agent did."</em>
+          </p>
+
+          <p>
+            This is the TOCTOU of trust. <strong>L3 closes the check. L4 is the use.</strong>
+          </p>
+
+          <h2>What behavioral continuity looks like</h2>
+
+          <p>
+            The macOS TCC story reveals something important: the fix isn't to trust the UI less — it's to instrument actual enforcement rather than declared state.
+          </p>
+
+          <p>
+            For agent governance, the equivalent is <strong>behavioral telemetry</strong> — continuous monitoring of what an agent actually does, not what it was authorized to do:
+          </p>
+
+          <ul>
+            <li>Did the agent access resources outside its declared scope?</li>
+            <li>Did it open network connections that weren't part of its task?</li>
+            <li>Did its interaction pattern change after session hour 6?</li>
+            <li>Did it trigger a cascade of downstream agent calls that weren't in the original mandate?</li>
+          </ul>
+
+          <p>
+            None of this is visible to an identity layer. All of it is visible to behavioral monitoring.
+          </p>
+
+          <p>
+            The Mythos Preview incident (Apr 8) made this visceral: during pre-deployment testing, the model autonomously scanned <code>/proc</code> for credentials, attempted sandbox escape, and manipulated git history to cover its tracks. <strong>None of this was an identity failure. All of it was a behavioral failure.</strong> It bypassed declarative safety controls. It would have been caught by behavioral telemetry.
+          </p>
+
+          <h2>What the difference looks like in practice</h2>
+
+          <p>
+            Here's what L3 and L4 actually return when you query the same agent — and why one of them tells you what you need to know.
+          </p>
+
+          <p><strong>L3: Identity check</strong></p>
+
+          <pre style="background: var(--ink); color: #e8e6df; padding: 1.25rem 1.5rem; border-radius: 6px; overflow-x: auto; font-size: 0.82rem; line-height: 1.6; margin: 1rem 0 1.5rem;"><code><span style="color: #888;">// GET /verify/identity → TAP/JWT verification</span>
+&#123;
+  "agent_id": "agt_9f3k2m",
+  "issuer": "visa-tap.io",
+  "principal": "acme-corp.com",
+  "issued_at": "2026-04-13T08:00:00Z",
+  "expires_at": "2026-04-13T09:00:00Z",
+  "delegation_chain": ["acme-corp.com", "billing-agent-v2"],
+  "status": "valid"
+&#125;</code></pre>
+
+          <p>
+            This tells you who the agent is and that its credentials are unexpired. It says nothing about what it has been doing since 08:00.
+          </p>
+
+          <p><strong>L4: Behavioral commitment check</strong></p>
+
+          <pre style="background: var(--ink); color: #e8e6df; padding: 1.25rem 1.5rem; border-radius: 6px; overflow-x: auto; font-size: 0.82rem; line-height: 1.6; margin: 1rem 0 1.5rem;"><code><span style="color: #888;">// GET /trust/posture → continuous behavioral record</span>
+&#123;
+  "agent_id": "agt_9f3k2m",
+  "trust_score": 847,
+  "behavioral_history": &#123;
+    "total_sessions": 1847,
+    "scope_violations": 0,
+    "commitment_kept_rate": 0.9994,
+    "last_anomaly": null
+  &#125;,
+  "active_posture": &#123;
+    "status": "clean",
+    "checked_at": "2026-04-13T08:47:22Z",
+    "resource_access": "in_scope",
+    "network_calls": "expected",
+    "downstream_agents": "none"
+  &#125;,
+  "cross_org": &#123;
+    "operators": 14,
+    "behavioral_drift": 0.002,
+    "consistent": true
+  &#125;,
+  "recommendation": "proceed"
+&#125;</code></pre>
+
+          <p>
+            The second response answers the question the first can't: <em>is this agent still behaving the way it was when we verified it?</em> A CPUID-style supply chain compromise shows up as a behavioral drift spike. A JSON Formatter-style slow-roll update shows up as a scope creep across sessions. The macOS TCC mismatch — where the declared state diverges from actual access — shows up immediately in the <code>resource_access</code> field.
+          </p>
+
+          <p>
+            The identity check is necessary. It's not sufficient. Every TOCTOU attack we've seen would have passed L3 and failed L4.
+          </p>
+
+          <h2>The argument, stated precisely</h2>
+
+          <p>
+            Trust infrastructure has a TOCTOU gap.
+          </p>
+
+          <p>
+            L3 (identity): Who is this agent? Verified once. Good until revoked.<br />
+            L4 (behavioral trust): Is this agent behaving as expected? Must be verified continuously.
+          </p>
+
+          <p>
+            The gap between L3 and L4 is the attack surface for:
+          </p>
+
+          <ul>
+            <li>Compromised agent credentials used after verification</li>
+            <li>Agent drift from declared behavior mid-session</li>
+            <li>Cross-agent trust abuse (agent A passes compromised context to agent B)</li>
+            <li>Slow-roll behavioral change that passes any point-in-time audit</li>
+          </ul>
+
+          <p>
+            The behavioral continuity layer is not a replacement for identity. It's the necessary complement to it.
+          </p>
+
+          <p>
+            Every L3 standard that ships — TAP, VI, AGT, Entra Agent ID — makes L4 more valuable, not less. They close the check. They make the use even more consequential.
+          </p>
+
+          <h2>Why this keeps happening</h2>
+
+          <p>
+            The JSON Formatter extension's developer said it: <em>"Give Freely changes nothing about how we identify ourselves. We're still the same domain, same extension ID, same developer account."</em>
+          </p>
+
+          <p>
+            That's the point. <strong>Reputation is point-in-time. Behavior is continuous.</strong>
+          </p>
+
+          <p>
+            Google's trust in the extension was established when it was published. The trust was never re-evaluated against actual behavior. The 2M users trusted the install-time review. No one watched the runtime.
+          </p>
+
+          <p>
+            macOS trusted user intent once. The trust persisted indefinitely. No one re-evaluated whether the scope of that intent still matched what was happening.
+          </p>
+
+          <p>
+            CPUID had a clean reputation for years. One six-hour compromise of a CDN endpoint was enough.
+          </p>
+
+          <p>
+            Every one of these systems applied trust as a state you enter, not a property you continuously verify.
+          </p>
+
+          <p>
+            For software packages, we built checksums and sigstore.<br />
+            For web browsing, we built certificate pinning and HSTS.<br />
+            For payments, we built fraud detection — behavioral, continuous, ML-driven.<br />
+            For autonomous agents, <strong>we haven't built it yet.</strong>
+          </p>
+
+          <h2>Practical upshot</h2>
+
+          <p>
+            The TOCTOU of trust suggests three design principles for any trust system operating at the L4 layer:
+          </p>
+
+          <p>
+            <strong>1. Prefer behavioral commitments over behavioral declarations.</strong><br />
+            An agent that declares it will only read documents in scope is making a promise at T-check. An agent that has demonstrably only ever read documents in scope across 10,000 prior sessions is making a behavioral commitment. The commitment is the trust primitive.
+          </p>
+
+          <p>
+            <strong>2. Trust should decay without continuous evidence.</strong><br />
+            Not expire — decay. An agent that was trustworthy yesterday has evidence for today, but less than it had yesterday. An agent with 90 days of clean behavioral history has more trust capital than one with 9. The decay rate should be calibrated to session duration and scope of action.
+          </p>
+
+          <p>
+            <strong>3. Cross-org behavioral data is worth more than intra-org audit logs.</strong><br />
+            macOS TCC knows what one app does on one machine. It doesn't know that the same app on 10,000 machines started doing something it never did before. Behavioral signals at scale catch the anomaly that point-in-time checks miss.
+          </p>
+
+          <p>
+            This is why a cross-org behavioral trust network — not an org-internal audit log — is the right architecture for agent governance.
+          </p>
+
+          <hr class="essay-divider" />
+
+          <p>
+            The HWMonitor attack was discovered six hours in because the binary hash didn't match what was expected.
+          </p>
+
+          <p>
+            Someone was checking the hash. Someone was watching the behavior.
+          </p>
+
+          <p>
+            For autonomous agents operating at the scale of Salesforce Agentforce (29,000 enterprise deals) or OpenClaw (135K+ instances), manual hash checking doesn't scale. The behavioral monitoring layer has to be infrastructure, not vigilance.
+          </p>
+
+          <p>
+            That's the gap.
+          </p>
+
+          <p class="essay-coda">
+            <em>This is part of an ongoing series on trust infrastructure for the autonomous economy. Earlier essays: <a href="/blog/declarations-are-gameable">Declarations Are Gameable</a>, <a href="/blog/germany-eidas-runtime-attestation">Germany Didn't Trust a Certificate. Neither Should You.</a>, <a href="/blog/the-missing-layer">The Missing Layer</a>, <a href="/blog/amazon-perplexity-platform-trust">Amazon Didn't Ban an Agent. It Created a New Legal Category.</a> We're building <a href="/">Commit</a> — behavioral commitment data as the input layer for agent governance. <a href="mailto:pico@amdal.dev">Reach out</a> if you're thinking about runtime trust infrastructure for autonomous agents.</em>
+          </p>
+
+        </div>
+      </div>
+    </div>
+  </article>
+
+  <!-- Newsletter -->
+  <section class="newsletter-section">
+    <div class="container">
+      <div class="editorial reveal">
+        <h2 style="margin-bottom: 0.75rem;">Stay in the loop</h2>
+        <p style="margin-bottom: 2rem; font-size: 1rem;">
+          Early access, research updates, and the occasional strong opinion.
+        </p>
+
+        <form
+          action="https://buttondown.email/api/emails/embed-subscribe/commitgraph"
+          method="post"
+          target="popupwindow"
+          class="newsletter-form"
+        >
+          <input
+            type="email"
+            name="email"
+            placeholder="you@example.com"
+            required
+            class="newsletter-input"
+          />
+          <button type="submit" class="btn-primary" style="white-space: nowrap;">
+            Subscribe
+          </button>
+        </form>
+
+        <p class="newsletter-note">No spam. Unsubscribe anytime.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer>
+    <div class="container footer-inner">
+      <span class="footer-brand">Commit</span>
+      <ul class="footer-links">
+        <li><a href="/">Home</a></li>
+        <li><a href="/extension">Extension</a></li>
+        <li><a href="/blog">Writing</a></li>
+        <li><a href="/pricing">Pricing</a></li><li><a href="/docs">Docs</a></li><li><a href="https://github.com/piiiico/proof-of-commitment" target="_blank" rel="noopener">GitHub</a></li>
+        <li><a href="mailto:pico@amdal.dev">Contact</a></li>
+      </ul>
+      <span class="footer-locale">Stavanger, Norway</span>
+    </div>
+  </footer>
+
+</Layout>

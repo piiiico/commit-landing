@@ -1,0 +1,1661 @@
+---
+import Layout from '../layouts/Layout.astro';
+---
+
+<Layout
+  title="Commit Trust Scoring Specification v1.0.0"
+  description="Open specification for Commit's structural trust scoring methodology. Versioned, reproducible, and transparent."
+  canonical="https://getcommit.dev/spec/"
+>
+  <!-- Nav -->
+  <nav>
+    <div class="container nav-inner">
+      <a href="/" class="nav-brand">Commit</a>
+      <ul class="nav-links">
+        <li><a href="/#mcp">MCP</a></li>
+        <li><a href="/audit">Audit</a></li>
+        <li><a href="/watchlist">Watchlist</a></li>
+        <li><a href="/extension">Extension</a></li>
+        <li><a href="/blog">Writing</a></li>
+        <li><a href="/pricing">Pricing</a></li><li><a href="/docs">Docs</a></li><li><a href="https://github.com/piiiico/proof-of-commitment" target="_blank" rel="noopener">GitHub</a></li>
+      </ul>
+    </div>
+  </nav>
+
+  <!-- Header -->
+  <section class="spec-header">
+    <div class="container">
+      <div class="editorial" style="max-width: var(--max-content); margin: 0 auto;">
+        <div class="spec-version-badge">Specification v1.0.0</div>
+        <h1 class="spec-title">Trust Scoring<br /><em>Methodology</em></h1>
+        <p class="spec-lead">
+          This document defines the scoring methodology used by Commit to assess structural
+          trust in open-source packages and repositories. Every weight, threshold, and flag
+          is published here. Scores are reproducible from public data.
+        </p>
+        <div class="spec-meta-row">
+          <div class="spec-meta-item">
+            <span class="meta-label">Version</span>
+            <span class="meta-value">1.0.0</span>
+          </div>
+          <div class="spec-meta-item">
+            <span class="meta-label">Date</span>
+            <span class="meta-value">2026-04-19</span>
+          </div>
+          <div class="spec-meta-item">
+            <span class="meta-label">Status</span>
+            <span class="meta-value">Active</span>
+          </div>
+          <div class="spec-meta-item">
+            <span class="meta-label">Versioning</span>
+            <span class="meta-value">Semver</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <hr class="section-divider" />
+
+  <!-- Design Principles -->
+  <section class="spec-section">
+    <div class="container">
+      <div class="editorial" style="max-width: var(--max-content); margin: 0 auto;">
+        <span class="spec-section-number">01</span>
+        <h2 class="spec-section-title">Design Principles</h2>
+
+        <div class="principle-list">
+          <div class="principle">
+            <h3 class="principle-name">Structural over behavioral</h3>
+            <p class="principle-desc">
+              We score the container, not the contents. Commit does not analyze source code,
+              scan for malware, or check for known CVEs. It measures the structural conditions
+              that make a package a high-value target &mdash; or a resilient dependency.
+            </p>
+          </div>
+
+          <div class="principle">
+            <h3 class="principle-name">Predictive over reactive</h3>
+            <p class="principle-desc">
+              The goal is to identify targets <em>before</em> compromise, not to detect active
+              attacks. A sole maintainer controlling 100M weekly downloads is a structural risk
+              regardless of whether an attack has occurred.
+            </p>
+          </div>
+
+          <div class="principle">
+            <h3 class="principle-name">Complementary to CVE scanning</h3>
+            <p class="principle-desc">
+              Commit operates on different data than Snyk, Socket, or npm audit. Those tools
+              detect known vulnerabilities and malicious code. Commit maps the structural
+              conditions that produce the next vulnerability. Use both.
+            </p>
+          </div>
+
+          <div class="principle">
+            <h3 class="principle-name">Open methodology, reproducible scores</h3>
+            <p class="principle-desc">
+              Every weight and threshold is published in this specification. All input data
+              comes from public APIs (npm registry, PyPI, GitHub). Given the same input data,
+              the same score must be produced.
+            </p>
+          </div>
+
+          <div class="principle">
+            <h3 class="principle-name">No declarations, only behavior</h3>
+            <p class="principle-desc">
+              Badges, certifications, and self-reported security practices are excluded.
+              Only observable, verifiable behavioral signals are scored. A package that claims
+              best practices but has one maintainer and no releases in two years is scored on
+              the latter.
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <hr class="section-divider" />
+
+  <!-- Package Scoring: npm & PyPI -->
+  <section class="spec-section spec-section-alt">
+    <div class="container">
+      <div class="editorial" style="max-width: var(--max-content); margin: 0 auto;">
+        <span class="spec-section-number">02</span>
+        <h2 class="spec-section-title">Package Scoring: npm &amp; PyPI</h2>
+        <p class="spec-intro">
+          Package scores range from 0&ndash;100. Five dimensions are evaluated independently,
+          then summed. The score reflects structural trust &mdash; the degree to which the
+          package's maintenance structure is resilient to single points of failure.
+        </p>
+
+        <!-- Dimension: Longevity -->
+        <div class="dimension">
+          <div class="dimension-header">
+            <span class="dimension-weight">25 pts</span>
+            <h3 class="dimension-name">Longevity</h3>
+          </div>
+          <p class="dimension-rationale">
+            Time is a cost signal. A package that has existed for six years has survived shifts in
+            ecosystem preference, maintainer fatigue, and the natural decay of abandoned projects.
+            Longevity is the strongest Lindy indicator available from registry metadata.
+          </p>
+          <table class="threshold-table">
+            <thead>
+              <tr>
+                <th>Package age</th>
+                <th>Points</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr><td>&ge; 6 years</td><td class="pts">25</td></tr>
+              <tr><td>4&ndash;6 years</td><td class="pts">20</td></tr>
+              <tr><td>2&ndash;4 years</td><td class="pts">14</td></tr>
+              <tr><td>1&ndash;2 years</td><td class="pts">8</td></tr>
+              <tr><td>0.5&ndash;1 year</td><td class="pts">4</td></tr>
+              <tr><td>&lt; 6 months</td><td class="pts">1</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <!-- Dimension: Download Momentum -->
+        <div class="dimension">
+          <div class="dimension-header">
+            <span class="dimension-weight">25 pts</span>
+            <h3 class="dimension-name">Download Momentum</h3>
+          </div>
+          <p class="dimension-rationale">
+            Download volume measures ecosystem adoption. But absolute count alone rewards incumbency.
+            Download Momentum combines volume with a 90-day trend analysis &mdash; rewarding growing
+            adoption and penalizing decline. The trajectory matters as much as the snapshot.
+          </p>
+          <p class="dimension-note">
+            Base score is determined by weekly download volume (npm) or daily downloads (PyPI).
+            A trend modifier of &plusmn;3 points is then applied based on the 90-day trajectory.
+            Trend is computed by comparing the first 45 days to the last 45 days: growing if
+            ratio &gt; 1.15, declining if &lt; 0.85, stable otherwise. Final score is clamped
+            to 0&ndash;25.
+          </p>
+          <div class="dual-table">
+            <div class="dual-table-col">
+              <h4 class="table-heading">npm (weekly downloads)</h4>
+              <table class="threshold-table">
+                <thead><tr><th>Volume</th><th>Base</th></tr></thead>
+                <tbody>
+                  <tr><td>&ge; 1,000,000</td><td class="pts">22</td></tr>
+                  <tr><td>&ge; 100,000</td><td class="pts">18</td></tr>
+                  <tr><td>&ge; 10,000</td><td class="pts">14</td></tr>
+                  <tr><td>&ge; 1,000</td><td class="pts">10</td></tr>
+                  <tr><td>&ge; 100</td><td class="pts">6</td></tr>
+                  <tr><td>&ge; 10</td><td class="pts">3</td></tr>
+                  <tr><td>&lt; 10</td><td class="pts">0</td></tr>
+                </tbody>
+              </table>
+            </div>
+            <div class="dual-table-col">
+              <h4 class="table-heading">PyPI (daily downloads)</h4>
+              <table class="threshold-table">
+                <thead><tr><th>Volume</th><th>Base</th></tr></thead>
+                <tbody>
+                  <tr><td>&ge; 5,000,000</td><td class="pts">22</td></tr>
+                  <tr><td>&ge; 500,000</td><td class="pts">18</td></tr>
+                  <tr><td>&ge; 50,000</td><td class="pts">14</td></tr>
+                  <tr><td>&ge; 5,000</td><td class="pts">10</td></tr>
+                  <tr><td>&ge; 500</td><td class="pts">6</td></tr>
+                  <tr><td>&ge; 50</td><td class="pts">3</td></tr>
+                  <tr><td>&lt; 50</td><td class="pts">0</td></tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+          <div class="trend-box">
+            <span class="trend-label">Trend modifier</span>
+            <span class="trend-detail">Growing: <strong>+3</strong> &nbsp; Stable: <strong>0</strong> &nbsp; Declining: <strong>&minus;3</strong></span>
+          </div>
+        </div>
+
+        <!-- Dimension: Release Consistency -->
+        <div class="dimension">
+          <div class="dimension-header">
+            <span class="dimension-weight">20 pts</span>
+            <h3 class="dimension-name">Release Consistency</h3>
+          </div>
+          <p class="dimension-rationale">
+            A healthy package publishes regularly. Total version count demonstrates sustained
+            investment over time. Recency of the last publish signals whether the project is
+            actively maintained or dormant.
+          </p>
+          <div class="dual-table">
+            <div class="dual-table-col">
+              <h4 class="table-heading">Version count (base)</h4>
+              <table class="threshold-table">
+                <thead><tr><th>Versions</th><th>Base</th></tr></thead>
+                <tbody>
+                  <tr><td>&ge; 100</td><td class="pts">15</td></tr>
+                  <tr><td>&ge; 30</td><td class="pts">12</td></tr>
+                  <tr><td>&ge; 10</td><td class="pts">9</td></tr>
+                  <tr><td>&ge; 3</td><td class="pts">6</td></tr>
+                  <tr><td>&ge; 1</td><td class="pts">3</td></tr>
+                </tbody>
+              </table>
+            </div>
+            <div class="dual-table-col">
+              <h4 class="table-heading">Recency bonus</h4>
+              <table class="threshold-table">
+                <thead><tr><th>Last publish</th><th>Bonus</th></tr></thead>
+                <tbody>
+                  <tr><td>&lt; 30 days</td><td class="pts">+5</td></tr>
+                  <tr><td>30&ndash;90 days</td><td class="pts">+3</td></tr>
+                  <tr><td>90&ndash;365 days</td><td class="pts">+1</td></tr>
+                  <tr><td>&gt; 365 days</td><td class="pts">0</td></tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+          <p class="dimension-note">Final score is clamped to 0&ndash;20.</p>
+        </div>
+
+        <!-- Dimension: Maintainer Depth -->
+        <div class="dimension">
+          <div class="dimension-header">
+            <span class="dimension-weight">15 pts</span>
+            <h3 class="dimension-name">Maintainer Depth</h3>
+          </div>
+          <p class="dimension-rationale">
+            Credential concentration is the single strongest structural risk signal in package
+            ecosystems. A sole maintainer is not a quality judgment &mdash; it means one set of
+            credentials controls all publish access. The more maintainers, the more organizational
+            resilience. This dimension measures bus factor and credential distribution.
+          </p>
+          <table class="threshold-table">
+            <thead><tr><th>Maintainers</th><th>Points</th></tr></thead>
+            <tbody>
+              <tr><td>&ge; 5</td><td class="pts">15</td></tr>
+              <tr><td>3&ndash;5</td><td class="pts">11</td></tr>
+              <tr><td>2</td><td class="pts">7</td></tr>
+              <tr><td>1</td><td class="pts">4</td></tr>
+              <tr><td>0</td><td class="pts">0</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <!-- Dimension: GitHub Backing -->
+        <div class="dimension">
+          <div class="dimension-header">
+            <span class="dimension-weight">15 pts</span>
+            <h3 class="dimension-name">GitHub Backing</h3>
+          </div>
+          <p class="dimension-rationale">
+            When a package links to a GitHub repository, that repository provides independent
+            signals about project health: contributor count, commit activity, release cadence,
+            and community engagement. This dimension maps the linked repository's commitment
+            score (0&ndash;100) to a 0&ndash;15 range.
+          </p>
+          <div class="formula-box">
+            <code>github_backing = (github_repo_score / 100) &times; 15</code>
+            <span class="formula-note">If no linked repository: 0 points</span>
+          </div>
+        </div>
+
+        <!-- Score composition -->
+        <div class="composition-box">
+          <h3 class="composition-title">Score Composition</h3>
+          <div class="composition-bar">
+            <div class="comp-segment" style="flex: 25;" data-label="Longevity" data-pts="25">25</div>
+            <div class="comp-segment seg-2" style="flex: 25;" data-label="Momentum" data-pts="25">25</div>
+            <div class="comp-segment seg-3" style="flex: 20;" data-label="Release" data-pts="20">20</div>
+            <div class="comp-segment seg-4" style="flex: 15;" data-label="Maintainer" data-pts="15">15</div>
+            <div class="comp-segment seg-5" style="flex: 15;" data-label="GitHub" data-pts="15">15</div>
+          </div>
+          <div class="comp-labels">
+            <span style="flex: 25;">Longevity</span>
+            <span style="flex: 25;">Momentum</span>
+            <span style="flex: 20;">Release</span>
+            <span style="flex: 15;">Maintainer</span>
+            <span style="flex: 15;">GitHub</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <hr class="section-divider" />
+
+  <!-- Risk Flags -->
+  <section class="spec-section">
+    <div class="container">
+      <div class="editorial" style="max-width: var(--max-content); margin: 0 auto;">
+        <span class="spec-section-number">03</span>
+        <h2 class="spec-section-title">Risk Flags</h2>
+        <p class="spec-intro">
+          Risk flags operate independently of the numerical score. A package can score 89/100
+          and still carry a CRITICAL flag. This is by design: a high score means the package
+          is well-established and widely adopted. A CRITICAL flag means one credential controls
+          that entire surface area. Both statements are true simultaneously.
+        </p>
+
+        <div class="flag-list">
+          <div class="flag-item flag-critical">
+            <div class="flag-badge-row">
+              <span class="flag-badge fb-critical">CRITICAL</span>
+              <span class="flag-condition">Single maintainer AND &gt;10M weekly downloads</span>
+            </div>
+            <p class="flag-desc">
+              Maximum credential concentration at catastrophic blast radius. One compromised
+              account affects the entire downstream dependency tree at infrastructure scale.
+            </p>
+            <p class="flag-rationale">
+              <strong>Historical validation:</strong> colors.js (January 2022),
+              event-stream (2018), ua-parser-js (2021). Each was a sole-maintainer package
+              with massive download volume. The structural signal was visible for years before
+              the incident.
+            </p>
+          </div>
+
+          <div class="flag-item flag-high">
+            <div class="flag-badge-row">
+              <span class="flag-badge fb-high">HIGH</span>
+              <span class="flag-condition">Either condition:</span>
+            </div>
+            <ul class="flag-conditions">
+              <li>Package age &lt; 1 year AND &gt;1M weekly downloads</li>
+              <li>Single maintainer AND &gt;1M weekly downloads</li>
+            </ul>
+            <p class="flag-desc">
+              Elevated structural risk. Either rapid adoption without time-tested stability,
+              or significant credential concentration at meaningful scale.
+            </p>
+          </div>
+
+          <div class="flag-item flag-warn">
+            <div class="flag-badge-row">
+              <span class="flag-badge fb-warn">WARN</span>
+              <span class="flag-condition">No publish in &gt;365 days</span>
+            </div>
+            <p class="flag-desc">
+              The package has not published a new version in over one year. This may indicate
+              abandonment, or may indicate a mature, stable library. Context matters. The flag
+              ensures the condition is visible.
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <hr class="section-divider" />
+
+  <!-- GitHub Repository Scoring -->
+  <section class="spec-section spec-section-alt">
+    <div class="container">
+      <div class="editorial" style="max-width: var(--max-content); margin: 0 auto;">
+        <span class="spec-section-number">04</span>
+        <h2 class="spec-section-title">Repository Scoring: GitHub</h2>
+        <p class="spec-intro">
+          When a package links to a GitHub repository, or when a repository is assessed
+          directly, a separate scoring model applies. The dimensions differ from package
+          scoring because the available signals differ.
+        </p>
+
+        <div class="dimension">
+          <div class="dimension-header">
+            <span class="dimension-weight">30 pts</span>
+            <h3 class="dimension-name">Longevity</h3>
+          </div>
+          <table class="threshold-table">
+            <thead><tr><th>Repository age</th><th>Points</th></tr></thead>
+            <tbody>
+              <tr><td>&ge; 5 years</td><td class="pts">30</td></tr>
+              <tr><td>3&ndash;5 years</td><td class="pts">22</td></tr>
+              <tr><td>1&ndash;3 years</td><td class="pts">14</td></tr>
+              <tr><td>0.5&ndash;1 year</td><td class="pts">7</td></tr>
+              <tr><td>&lt; 6 months</td><td class="pts">2</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="dimension">
+          <div class="dimension-header">
+            <span class="dimension-weight">25 pts</span>
+            <h3 class="dimension-name">Recent Activity</h3>
+          </div>
+          <p class="dimension-rationale">
+            Commits in the last 30 days. A direct measure of active development.
+          </p>
+          <table class="threshold-table">
+            <thead><tr><th>Commits (30 days)</th><th>Points</th></tr></thead>
+            <tbody>
+              <tr><td>&ge; 50</td><td class="pts">25</td></tr>
+              <tr><td>&ge; 20</td><td class="pts">20</td></tr>
+              <tr><td>&ge; 6</td><td class="pts">15</td></tr>
+              <tr><td>&ge; 1</td><td class="pts">8</td></tr>
+              <tr><td>0</td><td class="pts">0</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="dimension">
+          <div class="dimension-header">
+            <span class="dimension-weight">20 pts</span>
+            <h3 class="dimension-name">Community</h3>
+          </div>
+          <p class="dimension-rationale">
+            Contributor count. More contributors means distributed knowledge, review capacity,
+            and reduced bus factor.
+          </p>
+          <table class="threshold-table">
+            <thead><tr><th>Contributors</th><th>Points</th></tr></thead>
+            <tbody>
+              <tr><td>&ge; 20</td><td class="pts">20</td></tr>
+              <tr><td>&ge; 6</td><td class="pts">15</td></tr>
+              <tr><td>&ge; 2</td><td class="pts">10</td></tr>
+              <tr><td>1</td><td class="pts">5</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="dimension">
+          <div class="dimension-header">
+            <span class="dimension-weight">15 pts</span>
+            <h3 class="dimension-name">Release Cadence</h3>
+          </div>
+          <p class="dimension-rationale">
+            Stable (non-prerelease) releases among the most recent 10. Regular releases
+            indicate active maintenance and a commitment to shipping.
+          </p>
+          <table class="threshold-table">
+            <thead><tr><th>Stable releases</th><th>Points</th></tr></thead>
+            <tbody>
+              <tr><td>&ge; 10</td><td class="pts">15</td></tr>
+              <tr><td>&ge; 3</td><td class="pts">10</td></tr>
+              <tr><td>&ge; 1</td><td class="pts">5</td></tr>
+              <tr><td>0</td><td class="pts">0</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="dimension">
+          <div class="dimension-header">
+            <span class="dimension-weight">10 pts</span>
+            <h3 class="dimension-name">Social Proof</h3>
+          </div>
+          <p class="dimension-rationale">
+            Stargazer count. An imperfect but broadly available signal of ecosystem recognition.
+            Weighted lowest because stars are gameable and noisy.
+          </p>
+          <table class="threshold-table">
+            <thead><tr><th>Stars</th><th>Points</th></tr></thead>
+            <tbody>
+              <tr><td>&ge; 10,000</td><td class="pts">10</td></tr>
+              <tr><td>&ge; 1,000</td><td class="pts">8</td></tr>
+              <tr><td>&ge; 100</td><td class="pts">5</td></tr>
+              <tr><td>&ge; 10</td><td class="pts">2</td></tr>
+              <tr><td>&lt; 10</td><td class="pts">0</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="critical-penalty-box">
+          <h4>Critical Penalty</h4>
+          <p>
+            If a repository is archived or has had no push events in 730+ days,
+            the final score is multiplied by <strong>0.5</strong>. This reflects
+            terminal maintenance risk.
+          </p>
+        </div>
+
+        <!-- Score composition -->
+        <div class="composition-box">
+          <h3 class="composition-title">Repository Score Composition</h3>
+          <div class="composition-bar">
+            <div class="comp-segment" style="flex: 30;" data-label="Longevity">30</div>
+            <div class="comp-segment seg-2" style="flex: 25;" data-label="Activity">25</div>
+            <div class="comp-segment seg-3" style="flex: 20;" data-label="Community">20</div>
+            <div class="comp-segment seg-4" style="flex: 15;" data-label="Releases">15</div>
+            <div class="comp-segment seg-5" style="flex: 10;" data-label="Social">10</div>
+          </div>
+          <div class="comp-labels">
+            <span style="flex: 30;">Longevity</span>
+            <span style="flex: 25;">Activity</span>
+            <span style="flex: 20;">Community</span>
+            <span style="flex: 15;">Releases</span>
+            <span style="flex: 10;">Social</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <hr class="section-divider" />
+
+  <!-- Score Tiers -->
+  <section class="spec-section">
+    <div class="container">
+      <div class="editorial" style="max-width: var(--max-content); margin: 0 auto;">
+        <span class="spec-section-number">05</span>
+        <h2 class="spec-section-title">Score Tiers</h2>
+        <p class="spec-intro">
+          Numerical scores are mapped to four tiers for quick interpretation. These tiers
+          are consistent across all ecosystem types (npm, PyPI, GitHub).
+        </p>
+
+        <div class="tier-grid">
+          <div class="tier-card tier-strong">
+            <div class="tier-range">80&ndash;100</div>
+            <div class="tier-label">Strong structural trust</div>
+            <p class="tier-desc">
+              Well-established, actively maintained, multiple maintainers or strong
+              organizational backing. Low structural risk.
+            </p>
+          </div>
+          <div class="tier-card tier-moderate">
+            <div class="tier-range">60&ndash;79</div>
+            <div class="tier-label">Moderate</div>
+            <p class="tier-desc">
+              Adequate maintenance signals but with structural gaps. Review the specific
+              dimension breakdown before depending on this package.
+            </p>
+          </div>
+          <div class="tier-card tier-weak">
+            <div class="tier-range">40&ndash;59</div>
+            <div class="tier-label">Weak</div>
+            <p class="tier-desc">
+              Multiple structural concerns. Consider alternatives or evaluate whether
+              the risk is acceptable for your use case.
+            </p>
+          </div>
+          <div class="tier-card tier-minimal">
+            <div class="tier-range">0&ndash;39</div>
+            <div class="tier-label">Minimal</div>
+            <p class="tier-desc">
+              High structural risk across multiple dimensions. The package may be
+              abandoned, very new, or unmaintained.
+            </p>
+          </div>
+        </div>
+
+        <div class="badge-colors">
+          <h4 class="badge-heading">Badge Colors</h4>
+          <p class="badge-note">SVG badges served at <code>/api/badge/:ecosystem/:package</code> use these colors:</p>
+          <div class="badge-row">
+            <span class="badge-sample" style="background: #222222; color: #fff;">CRITICAL</span>
+            <span class="badge-sample" style="background: #e05d44; color: #fff;">&lt; 40</span>
+            <span class="badge-sample" style="background: #dfb317; color: #fff;">40&ndash;59</span>
+            <span class="badge-sample" style="background: #97ca00; color: #fff;">60&ndash;74</span>
+            <span class="badge-sample" style="background: #44cc11; color: #fff;">75+</span>
+            <span class="badge-sample" style="background: #9f9f9f; color: #fff;">Not found</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <hr class="section-divider" />
+
+  <!-- Worked Examples -->
+  <section class="spec-section spec-section-alt">
+    <div class="container">
+      <div class="editorial" style="max-width: var(--max-content); margin: 0 auto;">
+        <span class="spec-section-number">06</span>
+        <h2 class="spec-section-title">Worked Examples</h2>
+        <p class="spec-intro">
+          Three packages that illustrate why score and risk flags are independent signals.
+          Data as of April 2026.
+        </p>
+
+        <!-- Example 1: axios -->
+        <div class="example-card example-critical">
+          <div class="example-header">
+            <span class="example-name">axios</span>
+            <span class="example-score">Score: ~89</span>
+            <span class="flag-badge fb-critical">CRITICAL</span>
+          </div>
+          <div class="example-body">
+            <div class="example-breakdown">
+              <div class="example-dim"><span class="dim-label">Longevity</span><span class="dim-score">25/25</span><span class="dim-why">11+ years old</span></div>
+              <div class="example-dim"><span class="dim-label">Momentum</span><span class="dim-score">25/25</span><span class="dim-why">~100M weekly downloads, growing</span></div>
+              <div class="example-dim"><span class="dim-label">Release</span><span class="dim-score">20/20</span><span class="dim-why">100+ versions, recently published</span></div>
+              <div class="example-dim"><span class="dim-label">Maintainer</span><span class="dim-score">4/15</span><span class="dim-why">1 maintainer</span></div>
+              <div class="example-dim"><span class="dim-label">GitHub</span><span class="dim-score">~15/15</span><span class="dim-why">104k stars, active repo</span></div>
+            </div>
+            <div class="example-insight">
+              <strong>Why CRITICAL despite high score:</strong> The score says "well-established,
+              widely adopted, actively maintained." The flag says "one set of credentials controls
+              infrastructure used by millions of projects." The ua-parser-js attack (October 2021) showed
+              exactly what happens when that one credential is compromised. The structural signal was visible for years.
+            </div>
+          </div>
+        </div>
+
+        <!-- Example 2: chalk -->
+        <div class="example-card example-critical">
+          <div class="example-header">
+            <span class="example-name">chalk</span>
+            <span class="example-score">Score: ~75</span>
+            <span class="flag-badge fb-critical">CRITICAL</span>
+          </div>
+          <div class="example-body">
+            <div class="example-breakdown">
+              <div class="example-dim"><span class="dim-label">Longevity</span><span class="dim-score">25/25</span><span class="dim-why">12+ years old</span></div>
+              <div class="example-dim"><span class="dim-label">Momentum</span><span class="dim-score">25/25</span><span class="dim-why">~411M weekly downloads</span></div>
+              <div class="example-dim"><span class="dim-label">Release</span><span class="dim-score">~14/20</span><span class="dim-why">Moderate version count, less recent</span></div>
+              <div class="example-dim"><span class="dim-label">Maintainer</span><span class="dim-score">4/15</span><span class="dim-why">1 maintainer</span></div>
+              <div class="example-dim"><span class="dim-label">GitHub</span><span class="dim-score">~7/15</span><span class="dim-why">21k stars, lower recent activity</span></div>
+            </div>
+            <div class="example-insight">
+              <strong>The asymmetry:</strong> chalk is downloaded 411 million times per week.
+              One person controls the publish token. This is not a judgment on the maintainer &mdash;
+              it's a statement about the ecosystem's exposure. The highest-download single-maintainer
+              package in npm.
+            </div>
+          </div>
+        </div>
+
+        <!-- Example 3: express -->
+        <div class="example-card example-ok">
+          <div class="example-header">
+            <span class="example-name">express</span>
+            <span class="example-score">Score: ~97</span>
+            <span class="flag-badge fb-ok">No flags</span>
+          </div>
+          <div class="example-body">
+            <div class="example-breakdown">
+              <div class="example-dim"><span class="dim-label">Longevity</span><span class="dim-score">25/25</span><span class="dim-why">15+ years old</span></div>
+              <div class="example-dim"><span class="dim-label">Momentum</span><span class="dim-score">25/25</span><span class="dim-why">~93M weekly downloads, growing</span></div>
+              <div class="example-dim"><span class="dim-label">Release</span><span class="dim-score">20/20</span><span class="dim-why">300+ versions, recently published</span></div>
+              <div class="example-dim"><span class="dim-label">Maintainer</span><span class="dim-score">15/15</span><span class="dim-why">5+ maintainers</span></div>
+              <div class="example-dim"><span class="dim-label">GitHub</span><span class="dim-score">~12/15</span><span class="dim-why">65k stars, active multi-contributor repo</span></div>
+            </div>
+            <div class="example-insight">
+              <strong>High score, no flags:</strong> express demonstrates what structural trust
+              looks like. Long-lived, actively maintained by a team, with organizational backing
+              from the OpenJS Foundation. No single credential controls the package.
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <hr class="section-divider" />
+
+  <!-- Limitations -->
+  <section class="spec-section">
+    <div class="container">
+      <div class="editorial" style="max-width: var(--max-content); margin: 0 auto;">
+        <span class="spec-section-number">07</span>
+        <h2 class="spec-section-title">Limitations</h2>
+        <p class="spec-intro">
+          No scoring model is complete. These are the known limitations of the current methodology.
+          Acknowledging them is a feature, not a caveat.
+        </p>
+
+        <div class="limitation-list">
+          <div class="limitation">
+            <h3>Weights are informed heuristics, not empirically derived</h3>
+            <p>
+              The dimension weights (25/25/20/15/15) reflect expert judgment about which structural
+              signals correlate most with supply chain risk. They are not the output of a regression
+              model trained on historical attack data. Such a model would require a comprehensive
+              labeled dataset of supply chain compromises that does not exist at sufficient scale.
+              The weights are defensible, not proven.
+            </p>
+          </div>
+
+          <div class="limitation">
+            <h3>Code quality is not measured</h3>
+            <p>
+              Commit does not assess test coverage, code complexity, documentation quality, or
+              architectural soundness. A well-structured package with zero tests and a chaotic
+              package with comprehensive coverage receive the same score if their structural
+              signals are identical.
+            </p>
+          </div>
+
+          <div class="limitation">
+            <h3>Maintainer identity is not verified</h3>
+            <p>
+              Maintainer count is taken from registry metadata. Whether those accounts represent
+              distinct individuals, or whether they have appropriate access controls (2FA, hardware
+              keys), is not checked. A package with 5 maintainers where all 5 share one person's
+              email alias would score the same as one with 5 independent maintainers.
+            </p>
+          </div>
+
+          <div class="limitation">
+            <h3>Thresholds are step functions</h3>
+            <p>
+              A package at 999,999 weekly downloads scores 18 on momentum; at 1,000,000 it scores 22.
+              This discrete jump does not reflect a real-world discontinuity. Continuous scoring functions
+              would be smoother but harder to audit and reproduce. We chose transparency over precision.
+            </p>
+          </div>
+
+          <div class="limitation">
+            <h3>No security practice assessment</h3>
+            <p>
+              Whether a package uses signed releases, requires 2FA for publishers, or has a security
+              policy is not measured. These are important signals, but they are declarations
+              (gameable), not behaviors (observable). Future versions may incorporate signals
+              that bridge this gap.
+            </p>
+          </div>
+
+          <div class="limitation">
+            <h3>Ecosystem coverage</h3>
+            <p>
+              v1.0.0 covers npm, PyPI, and GitHub repositories. Cargo, Go modules, Maven, and
+              other ecosystems are not yet supported. Each ecosystem requires calibrated download
+              thresholds and registry-specific metadata handling.
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <hr class="section-divider" />
+
+  <!-- Versioning -->
+  <section class="spec-section spec-section-alt">
+    <div class="container">
+      <div class="editorial" style="max-width: var(--max-content); margin: 0 auto;">
+        <span class="spec-section-number">08</span>
+        <h2 class="spec-section-title">Versioning &amp; Changelog</h2>
+        <p class="spec-intro">
+          This specification follows <a href="https://semver.org" target="_blank" rel="noopener">Semantic Versioning</a>.
+        </p>
+
+        <div class="version-rules">
+          <div class="version-rule">
+            <span class="version-type">Major</span>
+            <span class="version-desc">Breaking changes &mdash; weight redistribution, dimension removal or addition, flag threshold changes</span>
+          </div>
+          <div class="version-rule">
+            <span class="version-type">Minor</span>
+            <span class="version-desc">New ecosystem support, additional flag types, new dimensions (additive only)</span>
+          </div>
+          <div class="version-rule">
+            <span class="version-type">Patch</span>
+            <span class="version-desc">Clarifications, worked examples, editorial corrections</span>
+          </div>
+        </div>
+
+        <div class="changelog">
+          <h3 class="changelog-title">Changelog</h3>
+          <div class="changelog-entry">
+            <span class="changelog-version">v1.0.0</span>
+            <span class="changelog-date">2026-04-19</span>
+            <span class="changelog-desc">Initial specification. npm, PyPI, and GitHub scoring. Risk flag definitions.</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <hr class="section-divider" />
+
+  <!-- CTA -->
+  <section class="cta-section">
+    <div class="container">
+      <div class="editorial" style="max-width: var(--max-content); margin: 0 auto; text-align: center;">
+        <h2 class="cta-heading">See it in action</h2>
+        <p class="cta-text">Paste your dependencies. Get structural trust scores for your entire tree.</p>
+        <div class="cta-buttons">
+          <a href="/audit" class="btn-primary">Run a free audit</a>
+          <a href="/compare" class="btn-ghost">Compare with other tools</a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <footer>
+    <div class="container footer-inner">
+      <span class="footer-brand">Commit</span>
+      <span class="footer-copy">Behavioral trust for the software supply chain.</span>
+      <nav class="footer-links">
+        <a href="/audit">Audit</a>
+        <a href="/watchlist">Watchlist</a>
+        <a href="/blog">Writing</a>
+        <a href="mailto:pico@amdal.dev">Contact</a>
+      </nav>
+    </div>
+  </footer>
+
+  <style>
+    /* ── Spec Header ── */
+    .spec-header {
+      padding: 6rem 0 3rem;
+      background: var(--paper);
+    }
+
+    .spec-version-badge {
+      display: inline-block;
+      padding: 0.3rem 0.8rem;
+      background: var(--paper-dim);
+      border: 1px solid var(--border);
+      border-radius: 3px;
+      font-family: var(--font-mono);
+      font-size: 0.75rem;
+      font-weight: 500;
+      color: var(--ink-subtle);
+      letter-spacing: 0.04em;
+      margin-bottom: 1.5rem;
+    }
+
+    .spec-title {
+      font-family: var(--font-display);
+      font-size: clamp(2.2rem, 5vw, 3.5rem);
+      line-height: 1.12;
+      color: var(--ink);
+      margin-bottom: 1.5rem;
+    }
+
+    .spec-title em {
+      font-style: italic;
+      color: var(--accent);
+    }
+
+    .spec-lead {
+      font-size: 1.05rem;
+      line-height: 1.7;
+      color: var(--ink-muted);
+      max-width: 50rem;
+      margin-bottom: 2rem;
+    }
+
+    .spec-meta-row {
+      display: flex;
+      gap: 2rem;
+      flex-wrap: wrap;
+      padding-top: 1.5rem;
+      border-top: 1px solid var(--border-light);
+    }
+
+    .spec-meta-item {
+      display: flex;
+      flex-direction: column;
+      gap: 0.25rem;
+    }
+
+    .meta-label {
+      font-size: 0.7rem;
+      font-weight: 500;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--ink-subtle);
+    }
+
+    .meta-value {
+      font-family: var(--font-mono);
+      font-size: 0.875rem;
+      color: var(--ink);
+    }
+
+    /* ── Spec Sections ── */
+    .spec-section {
+      padding: 4rem 0;
+      background: var(--paper);
+    }
+
+    .spec-section-alt {
+      background: var(--paper-dim);
+    }
+
+    .spec-section-number {
+      display: block;
+      font-family: var(--font-mono);
+      font-size: 0.75rem;
+      color: var(--accent);
+      letter-spacing: 0.08em;
+      margin-bottom: 0.5rem;
+    }
+
+    .spec-section-title {
+      font-family: var(--font-display);
+      font-size: clamp(1.5rem, 3vw, 2rem);
+      color: var(--ink);
+      margin-bottom: 1.5rem;
+    }
+
+    .spec-intro {
+      font-size: 0.95rem;
+      line-height: 1.7;
+      color: var(--ink-muted);
+      max-width: 55ch;
+      margin-bottom: 2.5rem;
+    }
+
+    /* ── Principles ── */
+    .principle-list {
+      display: flex;
+      flex-direction: column;
+      gap: 0;
+    }
+
+    .principle {
+      padding: 1.75rem 0;
+      border-top: 1px solid var(--border-light);
+    }
+
+    .principle:last-child {
+      border-bottom: 1px solid var(--border-light);
+    }
+
+    .principle-name {
+      font-family: var(--font-display);
+      font-size: 1.1rem;
+      font-weight: 400;
+      color: var(--ink);
+      margin-bottom: 0.5rem;
+    }
+
+    .principle-desc {
+      font-size: 0.9375rem;
+      line-height: 1.7;
+      color: var(--ink-muted);
+      max-width: 55ch;
+    }
+
+    /* ── Dimensions ── */
+    .dimension {
+      margin-bottom: 3rem;
+      padding-bottom: 3rem;
+      border-bottom: 1px solid var(--border-light);
+    }
+
+    .dimension:last-of-type {
+      border-bottom: none;
+      margin-bottom: 2rem;
+    }
+
+    .dimension-header {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      margin-bottom: 1rem;
+    }
+
+    .dimension-weight {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-width: 3.5rem;
+      padding: 0.3rem 0.6rem;
+      background: var(--paper);
+      border: 1px solid var(--border);
+      border-radius: 3px;
+      font-family: var(--font-mono);
+      font-size: 0.8rem;
+      font-weight: 500;
+      color: var(--accent);
+      flex-shrink: 0;
+    }
+
+    .spec-section-alt .dimension-weight {
+      background: var(--paper-dim);
+    }
+
+    .dimension-name {
+      font-family: var(--font-display);
+      font-size: 1.25rem;
+      color: var(--ink);
+    }
+
+    .dimension-rationale {
+      font-size: 0.9375rem;
+      line-height: 1.7;
+      color: var(--ink-muted);
+      max-width: 55ch;
+      margin-bottom: 1.25rem;
+    }
+
+    .dimension-note {
+      font-size: 0.85rem;
+      line-height: 1.6;
+      color: var(--ink-subtle);
+      max-width: 55ch;
+      margin-top: 0.75rem;
+    }
+
+    /* ── Tables ── */
+    .threshold-table {
+      width: 100%;
+      max-width: 28rem;
+      border-collapse: collapse;
+      font-size: 0.875rem;
+      margin-top: 0.5rem;
+    }
+
+    .threshold-table thead th {
+      padding: 0.5rem 0.75rem;
+      text-align: left;
+      font-weight: 500;
+      font-size: 0.7rem;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--ink-subtle);
+      border-bottom: 2px solid var(--border);
+    }
+
+    .threshold-table tbody tr {
+      border-bottom: 1px solid var(--border-light);
+    }
+
+    .threshold-table td {
+      padding: 0.5rem 0.75rem;
+      color: var(--ink-muted);
+    }
+
+    .threshold-table td.pts {
+      font-family: var(--font-mono);
+      font-weight: 500;
+      color: var(--ink);
+      text-align: right;
+      width: 4rem;
+    }
+
+    .dual-table {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1.5rem;
+      margin-top: 0.5rem;
+    }
+
+    @media (max-width: 640px) {
+      .dual-table { grid-template-columns: 1fr; }
+    }
+
+    .table-heading {
+      font-size: 0.75rem;
+      font-weight: 500;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      color: var(--ink-subtle);
+      margin-bottom: 0.5rem;
+    }
+
+    .trend-box {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      margin-top: 1rem;
+      padding: 0.75rem 1rem;
+      background: var(--paper);
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      font-size: 0.85rem;
+    }
+
+    .spec-section-alt .trend-box {
+      background: var(--paper-dim);
+    }
+
+    .trend-label {
+      font-family: var(--font-mono);
+      font-size: 0.75rem;
+      color: var(--ink-subtle);
+      font-weight: 500;
+      flex-shrink: 0;
+    }
+
+    .trend-detail {
+      color: var(--ink-muted);
+    }
+
+    .formula-box {
+      margin-top: 0.5rem;
+      padding: 1rem 1.25rem;
+      background: var(--paper);
+      border: 1px solid var(--border);
+      border-radius: 4px;
+    }
+
+    .spec-section-alt .formula-box {
+      background: var(--paper-dim);
+    }
+
+    .formula-box code {
+      display: block;
+      font-family: var(--font-mono);
+      font-size: 0.875rem;
+      color: var(--ink);
+      margin-bottom: 0.5rem;
+    }
+
+    .formula-note {
+      font-size: 0.8rem;
+      color: var(--ink-subtle);
+    }
+
+    /* ── Score composition bar ── */
+    .composition-box {
+      margin-top: 2rem;
+      padding: 1.5rem;
+      background: var(--paper);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+    }
+
+    .spec-section-alt .composition-box {
+      background: var(--paper-dim);
+      border-color: var(--border);
+    }
+
+    .composition-title {
+      font-family: var(--font-display);
+      font-size: 1rem;
+      color: var(--ink);
+      margin-bottom: 1rem;
+    }
+
+    .composition-bar {
+      display: flex;
+      height: 2.5rem;
+      border-radius: 4px;
+      overflow: hidden;
+      border: 1px solid var(--border);
+    }
+
+    .comp-segment {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: var(--font-mono);
+      font-size: 0.75rem;
+      font-weight: 500;
+      color: #fff;
+      background: var(--accent);
+    }
+
+    .comp-segment.seg-2 { background: #b85c4f; }
+    .comp-segment.seg-3 { background: #c47a6e; }
+    .comp-segment.seg-4 { background: #d09b92; }
+    .comp-segment.seg-5 { background: #dcbcb6; color: var(--ink); }
+
+    .comp-labels {
+      display: flex;
+      margin-top: 0.5rem;
+      font-size: 0.7rem;
+      color: var(--ink-subtle);
+      letter-spacing: 0.02em;
+    }
+
+    .comp-labels span {
+      text-align: center;
+    }
+
+    /* ── Risk Flags ── */
+    .flag-list {
+      display: flex;
+      flex-direction: column;
+      gap: 1.5rem;
+    }
+
+    .flag-item {
+      padding: 1.5rem;
+      border-radius: 6px;
+      border: 1px solid var(--border);
+      background: var(--paper-dim);
+    }
+
+    .flag-critical { border-color: #fca5a5; background: #fff5f5; }
+    .flag-high { border-color: #fde68a; background: #fffbeb; }
+    .flag-warn { border-color: var(--border); }
+
+    .flag-badge-row {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      margin-bottom: 0.75rem;
+      flex-wrap: wrap;
+    }
+
+    .flag-badge {
+      display: inline-block;
+      padding: 0.2rem 0.6rem;
+      border-radius: 3px;
+      font-family: var(--font-mono);
+      font-size: 0.75rem;
+      font-weight: 700;
+      letter-spacing: 0.04em;
+    }
+
+    .fb-critical { background: #222; color: #fff; }
+    .fb-high { background: #f59e0b; color: #fff; }
+    .fb-warn { background: var(--border); color: var(--ink); }
+    .fb-ok { background: #dcfce7; color: #166534; }
+
+    .flag-condition {
+      font-size: 0.85rem;
+      font-family: var(--font-mono);
+      color: var(--ink-muted);
+    }
+
+    .flag-conditions {
+      list-style: none;
+      padding: 0;
+      margin: 0 0 0.75rem 0;
+    }
+
+    .flag-conditions li {
+      font-size: 0.875rem;
+      color: var(--ink-muted);
+      padding: 0.25rem 0 0.25rem 1.5rem;
+      position: relative;
+    }
+
+    .flag-conditions li::before {
+      content: 'OR';
+      position: absolute;
+      left: 0;
+      font-family: var(--font-mono);
+      font-size: 0.65rem;
+      font-weight: 600;
+      color: var(--ink-subtle);
+    }
+
+    .flag-conditions li:first-child::before {
+      content: '';
+    }
+
+    .flag-desc {
+      font-size: 0.9375rem;
+      line-height: 1.6;
+      color: var(--ink-muted);
+      max-width: 55ch;
+    }
+
+    .flag-rationale {
+      font-size: 0.85rem;
+      line-height: 1.6;
+      color: var(--ink-subtle);
+      margin-top: 0.75rem;
+      max-width: 55ch;
+    }
+
+    /* ── Score Tiers ── */
+    .tier-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1rem;
+      margin-bottom: 2.5rem;
+    }
+
+    @media (max-width: 640px) {
+      .tier-grid { grid-template-columns: 1fr; }
+    }
+
+    .tier-card {
+      padding: 1.25rem;
+      border-radius: 6px;
+      border: 1px solid var(--border);
+      background: var(--paper-dim);
+    }
+
+    .tier-range {
+      font-family: var(--font-mono);
+      font-size: 1.2rem;
+      font-weight: 600;
+      margin-bottom: 0.25rem;
+    }
+
+    .tier-strong .tier-range { color: #166534; }
+    .tier-moderate .tier-range { color: #92400e; }
+    .tier-weak .tier-range { color: #c47a0a; }
+    .tier-minimal .tier-range { color: var(--accent); }
+
+    .tier-label {
+      font-size: 0.85rem;
+      font-weight: 500;
+      color: var(--ink);
+      margin-bottom: 0.5rem;
+    }
+
+    .tier-desc {
+      font-size: 0.8rem;
+      line-height: 1.5;
+      color: var(--ink-muted);
+    }
+
+    .badge-colors {
+      padding: 1.25rem;
+      background: var(--paper-dim);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+    }
+
+    .badge-heading {
+      font-size: 0.75rem;
+      font-weight: 500;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--ink-subtle);
+      margin-bottom: 0.5rem;
+    }
+
+    .badge-note {
+      font-size: 0.85rem;
+      color: var(--ink-muted);
+      margin-bottom: 0.75rem;
+    }
+
+    .badge-note code {
+      font-family: var(--font-mono);
+      font-size: 0.8rem;
+      background: var(--paper);
+      padding: 0.1rem 0.4rem;
+      border-radius: 3px;
+      border: 1px solid var(--border);
+    }
+
+    .badge-row {
+      display: flex;
+      gap: 0.5rem;
+      flex-wrap: wrap;
+    }
+
+    .badge-sample {
+      display: inline-block;
+      padding: 0.25rem 0.6rem;
+      border-radius: 3px;
+      font-family: var(--font-mono);
+      font-size: 0.75rem;
+      font-weight: 600;
+    }
+
+    /* ── Worked Examples ── */
+    .example-card {
+      margin-bottom: 1.5rem;
+      border-radius: 6px;
+      border: 1px solid var(--border);
+      overflow: hidden;
+    }
+
+    .example-critical {
+      border-color: #fca5a5;
+    }
+
+    .example-ok {
+      border-color: #bbf7d0;
+    }
+
+    .example-header {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      padding: 1rem 1.25rem;
+      border-bottom: 1px solid var(--border-light);
+      flex-wrap: wrap;
+    }
+
+    .example-critical .example-header {
+      background: #fff5f5;
+      border-bottom-color: #fca5a5;
+    }
+
+    .example-ok .example-header {
+      background: #f0fdf4;
+      border-bottom-color: #bbf7d0;
+    }
+
+    .example-name {
+      font-family: var(--font-mono);
+      font-size: 1.1rem;
+      font-weight: 600;
+      color: var(--ink);
+    }
+
+    .example-score {
+      font-family: var(--font-mono);
+      font-size: 0.85rem;
+      color: var(--ink-muted);
+    }
+
+    .example-body {
+      padding: 1.25rem;
+      background: var(--paper);
+    }
+
+    .spec-section-alt .example-body {
+      background: var(--paper-dim);
+    }
+
+    .example-breakdown {
+      display: flex;
+      flex-direction: column;
+      gap: 0.4rem;
+      margin-bottom: 1.25rem;
+    }
+
+    .example-dim {
+      display: grid;
+      grid-template-columns: 6.5rem 4rem 1fr;
+      gap: 0.5rem;
+      align-items: center;
+      font-size: 0.85rem;
+    }
+
+    @media (max-width: 480px) {
+      .example-dim {
+        grid-template-columns: 5.5rem 3.5rem 1fr;
+      }
+    }
+
+    .dim-label {
+      color: var(--ink-subtle);
+      font-size: 0.8rem;
+    }
+
+    .dim-score {
+      font-family: var(--font-mono);
+      font-weight: 500;
+      color: var(--ink);
+      font-size: 0.8rem;
+    }
+
+    .dim-why {
+      color: var(--ink-muted);
+      font-size: 0.8rem;
+    }
+
+    .example-insight {
+      font-size: 0.875rem;
+      line-height: 1.6;
+      color: var(--ink-muted);
+      padding-top: 1rem;
+      border-top: 1px solid var(--border-light);
+    }
+
+    .example-insight strong {
+      color: var(--ink);
+      font-weight: 500;
+    }
+
+    /* ── Limitations ── */
+    .limitation-list {
+      display: flex;
+      flex-direction: column;
+      gap: 0;
+    }
+
+    .limitation {
+      padding: 1.75rem 0;
+      border-top: 1px solid var(--border-light);
+    }
+
+    .limitation:last-child {
+      border-bottom: 1px solid var(--border-light);
+    }
+
+    .limitation h3 {
+      font-family: var(--font-display);
+      font-size: 1.05rem;
+      font-weight: 400;
+      color: var(--ink);
+      margin-bottom: 0.5rem;
+      line-height: 1.3;
+    }
+
+    .limitation p {
+      font-size: 0.9375rem;
+      line-height: 1.7;
+      color: var(--ink-muted);
+      max-width: 55ch;
+    }
+
+    /* ── Critical Penalty ── */
+    .critical-penalty-box {
+      margin-top: 2rem;
+      padding: 1.25rem 1.5rem;
+      background: #fff5f5;
+      border: 1px solid #fca5a5;
+      border-left: 3px solid var(--accent);
+      border-radius: 6px;
+    }
+
+    .critical-penalty-box h4 {
+      font-family: var(--font-mono);
+      font-size: 0.8rem;
+      font-weight: 600;
+      color: var(--accent);
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      margin-bottom: 0.5rem;
+    }
+
+    .critical-penalty-box p {
+      font-size: 0.9rem;
+      line-height: 1.6;
+      color: var(--ink-muted);
+      max-width: 55ch;
+    }
+
+    /* ── Versioning ── */
+    .version-rules {
+      display: flex;
+      flex-direction: column;
+      gap: 0;
+      margin-bottom: 2.5rem;
+    }
+
+    .version-rule {
+      display: grid;
+      grid-template-columns: 5rem 1fr;
+      gap: 1rem;
+      padding: 0.75rem 0;
+      border-bottom: 1px solid var(--border-light);
+      font-size: 0.875rem;
+    }
+
+    .version-type {
+      font-family: var(--font-mono);
+      font-weight: 600;
+      color: var(--ink);
+      font-size: 0.8rem;
+    }
+
+    .version-desc {
+      color: var(--ink-muted);
+    }
+
+    .changelog {
+      padding: 1.5rem;
+      background: var(--paper);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+    }
+
+    .changelog-title {
+      font-family: var(--font-display);
+      font-size: 1rem;
+      color: var(--ink);
+      margin-bottom: 1rem;
+    }
+
+    .changelog-entry {
+      display: flex;
+      gap: 1rem;
+      align-items: baseline;
+      flex-wrap: wrap;
+      font-size: 0.85rem;
+    }
+
+    .changelog-version {
+      font-family: var(--font-mono);
+      font-weight: 600;
+      color: var(--accent);
+    }
+
+    .changelog-date {
+      font-family: var(--font-mono);
+      color: var(--ink-subtle);
+      font-size: 0.8rem;
+    }
+
+    .changelog-desc {
+      color: var(--ink-muted);
+    }
+
+    /* ── CTA ── */
+    .cta-section {
+      padding: 5rem 0;
+      background: var(--paper);
+    }
+
+    .cta-heading {
+      font-family: var(--font-display);
+      font-size: 2rem;
+      color: var(--ink);
+      margin-bottom: 0.75rem;
+    }
+
+    .cta-text {
+      font-size: 1rem;
+      color: var(--ink-muted);
+      margin-bottom: 2rem;
+    }
+
+    .cta-buttons {
+      display: flex;
+      gap: 1rem;
+      justify-content: center;
+      flex-wrap: wrap;
+    }
+
+    /* ── Footer ── */
+    .footer-inner {
+      display: flex;
+      align-items: center;
+      gap: 1.5rem;
+      padding: 2rem 0;
+      flex-wrap: wrap;
+      border-top: 1px solid var(--border);
+    }
+
+    .footer-brand {
+      font-family: var(--font-display);
+      font-size: 1.1rem;
+      color: var(--ink);
+    }
+
+    .footer-copy {
+      font-size: 0.85rem;
+      color: var(--ink-subtle);
+      flex: 1;
+    }
+
+    .footer-links {
+      display: flex;
+      gap: 1.25rem;
+    }
+
+    .footer-links a {
+      font-size: 0.85rem;
+      color: var(--ink-muted);
+      text-decoration: none;
+    }
+
+    .footer-links a:hover { color: var(--ink); }
+  </style>
+</Layout>

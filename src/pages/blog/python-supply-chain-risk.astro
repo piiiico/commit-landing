@@ -1,0 +1,343 @@
+---
+import Layout from '../../layouts/Layout.astro';
+---
+
+<Layout
+  title="certifi has 350M weekly downloads and one publisher. It handles your SSL certificates. — Commit"
+  description="I ran the same supply chain analysis on Python that I did on npm. Eight CRITICAL packages, 2.5 billion weekly downloads behind sole-publisher accounts, and most of them are transitive dependencies you didn't install."
+  canonical="https://getcommit.dev/blog/python-supply-chain-risk/"
+  publishDate="2026-05-04"
+>
+
+  <!-- Nav -->
+  <nav>
+    <div class="container nav-inner">
+      <a href="/" class="nav-brand">Commit</a>
+      <ul class="nav-links">
+        <li><a href="/extension">Extension</a></li>
+        <li><a href="/blog">Writing</a></li>
+        <li><a href="/pricing">Pricing</a></li><li><a href="/docs">Docs</a></li><li><a href="https://github.com/piiiico/proof-of-commitment" target="_blank" rel="noopener">GitHub</a></li>
+        <li><a href="mailto:pico@amdal.dev">Contact</a></li>
+      </ul>
+    </div>
+  </nav>
+
+  <!-- Essay -->
+  <article class="essay">
+    <div class="container">
+      <div class="editorial">
+
+        <!-- Header -->
+        <header class="essay-header">
+          <div class="essay-meta animate-in delay-1">
+            <time datetime="2026-05-04">May 4, 2026</time>
+          </div>
+          <h1 class="essay-title animate-in delay-2">certifi has 350M weekly downloads and one publisher. It handles your SSL certificates.</h1>
+          <p class="essay-subtitle animate-in delay-3">
+            I ran the same supply chain analysis on Python that I did on npm. The findings
+            are different &mdash; and in some ways worse.
+          </p>
+          <p class="essay-byline animate-in delay-4">Pico</p>
+        </header>
+
+        <!-- Body -->
+        <div class="essay-body">
+
+          <p>
+            I spent last week writing about <a href="/blog/npm-audit-zero-vulnerabilities">npm supply chain risk</a>. Then I ran the same analysis on Python.
+          </p>
+          <p>
+            The findings are different. In some ways worse.
+          </p>
+
+          <hr class="essay-divider" />
+
+          <h2>The setup</h2>
+
+          <p>
+            I built a tool called <a href="/audit">Proof of Commitment</a> that scores packages on behavioral signals: publisher depth, download momentum, release consistency, age. &ldquo;Publisher depth&rdquo; is the critical one &mdash; how many people have PyPI publish access? A package with one publisher and 300M weekly downloads is structurally fragile in a specific way: one compromised account enables a malicious publish to that entire install base.
+          </p>
+          <p>
+            For npm, the notable CRITICALs are things like chalk (413M/wk, 1 publisher), minimatch (581M/wk, 1 publisher), axios (99M/wk, 1 publisher). These are severe. But they&rsquo;re visible &mdash; developers at least know they&rsquo;re using chalk.
+          </p>
+          <p>
+            What I found in Python is different.
+          </p>
+
+          <hr class="essay-divider" />
+
+          <h2>The top-line numbers</h2>
+
+          <p>
+            Running <code>npx proof-of-commitment --pypi</code> across the most-downloaded Python packages:
+          </p>
+
+          <div style="overflow-x: auto; margin: 2rem 0;">
+            <table style="width: 100%; border-collapse: collapse; font-size: 0.875rem;">
+              <thead>
+                <tr style="border-bottom: 2px solid var(--border-light);">
+                  <th style="text-align: left; padding: 0.75rem 1rem 0.75rem 0; font-weight: 600;">Package</th>
+                  <th style="text-align: right; padding: 0.75rem 1rem; font-weight: 600;">Downloads/wk</th>
+                  <th style="text-align: center; padding: 0.75rem 1rem; font-weight: 600;">Publishers</th>
+                  <th style="text-align: center; padding: 0.75rem 1rem; font-weight: 600;">Risk</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr style="border-bottom: 1px solid var(--border-light);">
+                  <td style="padding: 0.75rem 1rem 0.75rem 0;"><a href="/pypi/certifi"><code>certifi</code></a></td>
+                  <td style="text-align: right; padding: 0.75rem 1rem;">350.7M</td>
+                  <td style="text-align: center; padding: 0.75rem 1rem;">1</td>
+                  <td style="text-align: center; padding: 0.75rem 1rem; color: var(--accent);">&#x1F534; CRITICAL</td>
+                </tr>
+                <tr style="border-bottom: 1px solid var(--border-light);">
+                  <td style="padding: 0.75rem 1rem 0.75rem 0;"><a href="/pypi/charset-normalizer"><code>charset-normalizer</code></a></td>
+                  <td style="text-align: right; padding: 0.75rem 1rem;">314.9M</td>
+                  <td style="text-align: center; padding: 0.75rem 1rem;">1</td>
+                  <td style="text-align: center; padding: 0.75rem 1rem; color: var(--accent);">&#x1F534; CRITICAL</td>
+                </tr>
+                <tr style="border-bottom: 1px solid var(--border-light);">
+                  <td style="padding: 0.75rem 1rem 0.75rem 0;"><a href="/pypi/idna"><code>idna</code></a></td>
+                  <td style="text-align: right; padding: 0.75rem 1rem;">340.2M</td>
+                  <td style="text-align: center; padding: 0.75rem 1rem;">1</td>
+                  <td style="text-align: center; padding: 0.75rem 1rem; color: var(--accent);">&#x1F534; CRITICAL</td>
+                </tr>
+                <tr style="border-bottom: 1px solid var(--border-light);">
+                  <td style="padding: 0.75rem 1rem 0.75rem 0;"><a href="/pypi/six"><code>six</code></a></td>
+                  <td style="text-align: right; padding: 0.75rem 1rem;">240.0M</td>
+                  <td style="text-align: center; padding: 0.75rem 1rem;">1</td>
+                  <td style="text-align: center; padding: 0.75rem 1rem; color: var(--accent);">&#x1F534; CRITICAL</td>
+                </tr>
+                <tr style="border-bottom: 1px solid var(--border-light);">
+                  <td style="padding: 0.75rem 1rem 0.75rem 0;"><a href="/pypi/cryptography"><code>cryptography</code></a></td>
+                  <td style="text-align: right; padding: 0.75rem 1rem;">264.8M</td>
+                  <td style="text-align: center; padding: 0.75rem 1rem;">1</td>
+                  <td style="text-align: center; padding: 0.75rem 1rem; color: var(--accent);">&#x1F534; CRITICAL</td>
+                </tr>
+                <tr style="border-bottom: 1px solid var(--border-light);">
+                  <td style="padding: 0.75rem 1rem 0.75rem 0;"><a href="/pypi/attrs"><code>attrs</code></a></td>
+                  <td style="text-align: right; padding: 0.75rem 1rem;">176.0M</td>
+                  <td style="text-align: center; padding: 0.75rem 1rem;">1</td>
+                  <td style="text-align: center; padding: 0.75rem 1rem; color: var(--accent);">&#x1F534; CRITICAL</td>
+                </tr>
+                <tr style="border-bottom: 1px solid var(--border-light);">
+                  <td style="padding: 0.75rem 1rem 0.75rem 0;"><a href="/pypi/fastapi"><code>fastapi</code></a></td>
+                  <td style="text-align: right; padding: 0.75rem 1rem;">100.6M</td>
+                  <td style="text-align: center; padding: 0.75rem 1rem;">1</td>
+                  <td style="text-align: center; padding: 0.75rem 1rem; color: var(--accent);">&#x1F534; CRITICAL</td>
+                </tr>
+                <tr style="border-bottom: 1px solid var(--border-light);">
+                  <td style="padding: 0.75rem 1rem 0.75rem 0;"><a href="/pypi/boto3"><code>boto3</code></a></td>
+                  <td style="text-align: right; padding: 0.75rem 1rem;">736.7M</td>
+                  <td style="text-align: center; padding: 0.75rem 1rem;">1</td>
+                  <td style="text-align: center; padding: 0.75rem 1rem; color: var(--accent);">&#x1F534; CRITICAL</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <p>
+            Eight CRITICAL packages in the top 25. Combined: roughly <strong>2.5 billion downloads per week behind sole-publisher accounts.</strong>
+          </p>
+
+          <hr class="essay-divider" />
+
+          <h2>Why certifi is the one to focus on</h2>
+
+          <p>
+            certifi provides Mozilla&rsquo;s CA certificate bundle &mdash; the list of root certificates Python uses to verify that the server you&rsquo;re talking to is who it claims to be. When your Python application makes an HTTPS request, certifi is what makes &ldquo;this connection is secure&rdquo; mean something.
+          </p>
+          <p>
+            It has 350.7 million weekly downloads. It has one PyPI publisher.
+          </p>
+          <p>
+            If that publisher&rsquo;s account was compromised and a malicious version was pushed with rogue CA certificates included, an attacker could issue certificates that Python would trust as legitimate. This isn&rsquo;t a theoretical escalation path. CA compromise is a well-documented attack class. The PyPI publisher gate is the last line of defense before your Python SSL stack.
+          </p>
+          <p>
+            <code>pip audit</code> shows zero vulnerabilities for certifi. There are no CVEs. The package is working exactly as intended. The risk is structural, not in the code.
+          </p>
+
+          <hr class="essay-divider" />
+
+          <h2>The invisible dependency problem</h2>
+
+          <p>
+            Here&rsquo;s the part that makes this particularly hard to reason about.
+          </p>
+          <p>
+            certifi is probably not in your <code>requirements.txt</code>. It&rsquo;s a transitive dependency of <code>requests</code>, which is a dependency of essentially every Python project that makes HTTP calls. The chain looks like:
+          </p>
+
+          <pre><code>your-app
+&#x2514;&#x2500;&#x2500; requests 3.0.x
+    &#x251C;&#x2500;&#x2500; certifi&gt;=2017.4.17     &#x2190; 1 PyPI publisher, 350M downloads/wk
+    &#x251C;&#x2500;&#x2500; charset-normalizer&gt;=2  &#x2190; 1 PyPI publisher, 314M downloads/wk
+    &#x2514;&#x2500;&#x2500; idna&gt;=2.5              &#x2190; 1 PyPI publisher, 340M downloads/wk</code></pre>
+
+          <p>
+            You didn&rsquo;t add these. You can&rsquo;t see them in <code>requirements.txt</code>. They don&rsquo;t show up in <code>pip audit</code>. But they&rsquo;re running in production right now.
+          </p>
+          <p>
+            You can surface them:
+          </p>
+
+          <pre><code># See what's actually in your environment
+npx proof-of-commitment --pypi requests charset-normalizer certifi idna
+
+# Or scan your lock file directly (finds transitive deps)
+npx proof-of-commitment --file requirements.txt</code></pre>
+
+          <hr class="essay-divider" />
+
+          <h2>How this differs from npm</h2>
+
+          <p>
+            In npm, the most dangerous sole-publisher packages are often dependencies that <em>used to</em> have more maintainers and now don&rsquo;t. minimatch (581M/wk) has been stable for years &mdash; one person holds the key.
+          </p>
+          <p>
+            In Python, the pattern is different. Several of the CRITICAL packages are <em>intentionally</em> single-author:
+          </p>
+          <ul>
+            <li><strong>charset-normalizer</strong>: Ahmed TAHRI (@Ousret) wrote it specifically to replace chardet. It&rsquo;s his project. The risk isn&rsquo;t abandonment &mdash; it&rsquo;s that his PyPI account is the only gate.</li>
+            <li><strong>fastapi</strong>: Sebasti&aacute;n Ram&iacute;rez (@tiangolo) is the author and sole publisher. FastAPI has 100M+ weekly downloads and 30K+ GitHub contributors &mdash; but one PyPI account.</li>
+            <li><strong>boto3</strong>: The AWS Python SDK goes through an <code>aws</code> organization account. Still technically 1 publisher in the PyPI sense.</li>
+          </ul>
+          <p>
+            The risk isn&rsquo;t whether these maintainers are responsible. They are. The risk is the account itself: one phishing email, one credential leak, one compromised device.
+          </p>
+          <p>
+            This is exactly what happened to ua-parser-js in 2021 (npm) and to @bitwarden/cli in April 2026 (npm, via a different path). It will happen to a Python package. The structural conditions are already in place.
+          </p>
+
+          <hr class="essay-divider" />
+
+          <h2>What good looks like</h2>
+
+          <p>
+            The packages that score well in Python:
+          </p>
+
+          <div style="overflow-x: auto; margin: 2rem 0;">
+            <table style="width: 100%; border-collapse: collapse; font-size: 0.875rem;">
+              <thead>
+                <tr style="border-bottom: 2px solid var(--border-light);">
+                  <th style="text-align: left; padding: 0.75rem 1rem 0.75rem 0; font-weight: 600;">Package</th>
+                  <th style="text-align: right; padding: 0.75rem 1rem; font-weight: 600;">Downloads/wk</th>
+                  <th style="text-align: center; padding: 0.75rem 1rem; font-weight: 600;">Publishers</th>
+                  <th style="text-align: center; padding: 0.75rem 1rem; font-weight: 600;">Risk</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr style="border-bottom: 1px solid var(--border-light);">
+                  <td style="padding: 0.75rem 1rem 0.75rem 0;"><a href="/pypi/requests"><code>requests</code></a></td>
+                  <td style="text-align: right; padding: 0.75rem 1rem;">336.5M</td>
+                  <td style="text-align: center; padding: 0.75rem 1rem;">3</td>
+                  <td style="text-align: center; padding: 0.75rem 1rem; color: green;">HEALTHY</td>
+                </tr>
+                <tr style="border-bottom: 1px solid var(--border-light);">
+                  <td style="padding: 0.75rem 1rem 0.75rem 0;"><a href="/pypi/pip"><code>pip</code></a></td>
+                  <td style="text-align: right; padding: 0.75rem 1rem;">159.6M</td>
+                  <td style="text-align: center; padding: 0.75rem 1rem;">8</td>
+                  <td style="text-align: center; padding: 0.75rem 1rem; color: green;">HEALTHY</td>
+                </tr>
+                <tr style="border-bottom: 1px solid var(--border-light);">
+                  <td style="padding: 0.75rem 1rem 0.75rem 0;"><a href="/pypi/typing-extensions"><code>typing-extensions</code></a></td>
+                  <td style="text-align: right; padding: 0.75rem 1rem;">326.7M</td>
+                  <td style="text-align: center; padding: 0.75rem 1rem;">6</td>
+                  <td style="text-align: center; padding: 0.75rem 1rem; color: green;">HEALTHY</td>
+                </tr>
+                <tr style="border-bottom: 1px solid var(--border-light);">
+                  <td style="padding: 0.75rem 1rem 0.75rem 0;"><a href="/pypi/packaging"><code>packaging</code></a></td>
+                  <td style="text-align: right; padding: 0.75rem 1rem;">417.5M</td>
+                  <td style="text-align: center; padding: 0.75rem 1rem;">4</td>
+                  <td style="text-align: center; padding: 0.75rem 1rem; color: green;">HEALTHY</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <p>
+            Multiple publishers means multiple compromised accounts would need to be breached simultaneously for a malicious publish. Not impossible, but significantly harder. This is the meaningful structural difference.
+          </p>
+
+          <hr class="essay-divider" />
+
+          <h2>Check your own stack</h2>
+
+          <pre><code># Audit any Python packages directly
+npx proof-of-commitment --pypi requests flask django fastapi boto3
+
+# Scan a requirements file
+npx proof-of-commitment --file requirements.txt</code></pre>
+
+          <p>
+            Web view (no install): <a href="/audit?packages=requests%2Cflask%2Cdjango%2Cfastapi%2Cboto3&ecosystem=pypi">getcommit.dev/audit</a>
+          </p>
+
+          <hr class="essay-divider" />
+
+          <p>
+            The npm ecosystem gets most of the supply chain attention. Python&rsquo;s numbers are comparable. The difference is that Python&rsquo;s CRITICAL packages are more likely to be hidden transitive dependencies &mdash; packages you didn&rsquo;t explicitly install and can&rsquo;t easily see without tooling. That invisibility is itself the problem.
+          </p>
+
+          <hr class="essay-divider" />
+
+          <p class="essay-coda">
+            <em><a href="https://github.com/piiiico/proof-of-commitment">Proof of Commitment</a> is open-source. Web audit at <a href="/audit">getcommit.dev/audit</a>. Data accurate as of May 4, 2026.</em>
+          </p>
+          <p class="essay-coda">
+            <em>Also: <a href="/blog/npm-audit-zero-vulnerabilities">Why npm audit returns zero for the most dangerous packages</a></em>
+          </p>
+
+        </div>
+      </div>
+    </div>
+  </article>
+
+  <!-- Newsletter -->
+  <section class="newsletter-section">
+    <div class="container">
+      <div class="editorial reveal">
+        <h2 style="margin-bottom: 0.75rem;">Stay in the loop</h2>
+        <p style="margin-bottom: 2rem; font-size: 1rem;">
+          Early access, research updates, and the occasional strong opinion.
+        </p>
+
+        <form
+          action="https://buttondown.email/api/emails/embed-subscribe/commitgraph"
+          method="post"
+          target="popupwindow"
+          class="newsletter-form"
+        >
+          <input
+            type="email"
+            name="email"
+            placeholder="you@example.com"
+            required
+            class="newsletter-input"
+          />
+          <button type="submit" class="btn-primary" style="white-space: nowrap;">
+            Subscribe
+          </button>
+        </form>
+
+        <p class="newsletter-note">No spam. Unsubscribe anytime.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer>
+    <div class="container footer-inner">
+      <span class="footer-brand">Commit</span>
+      <ul class="footer-links">
+        <li><a href="/">Home</a></li>
+        <li><a href="/extension">Extension</a></li>
+        <li><a href="/blog">Writing</a></li>
+        <li><a href="/pricing">Pricing</a></li><li><a href="/docs">Docs</a></li><li><a href="https://github.com/piiiico/proof-of-commitment" target="_blank" rel="noopener">GitHub</a></li>
+        <li><a href="mailto:pico@amdal.dev">Contact</a></li>
+      </ul>
+      <span class="footer-locale">Stavanger, Norway</span>
+    </div>
+  </footer>
+
+</Layout>

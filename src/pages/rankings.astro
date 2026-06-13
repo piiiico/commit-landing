@@ -1,0 +1,774 @@
+---
+import Layout from '../layouts/Layout.astro';
+import rankingsData from '../data/rankings.json';
+
+const { stats, packages } = rankingsData;
+
+function fmtDownloads(n: number): string {
+  if (n >= 1_000_000_000) return (n / 1_000_000_000).toFixed(1) + 'B';
+  if (n >= 1_000_000) return (n / 1_000_000).toFixed(0) + 'M';
+  if (n >= 1_000) return (n / 1_000).toFixed(0) + 'K';
+  return String(n);
+}
+
+function fmtDate(iso: string): string {
+  return new Date(iso).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+}
+
+const totalDownloadsStr = fmtDownloads(stats.totalWeeklyDownloads);
+---
+
+<Layout
+  title={`npm Trust Rankings — ${stats.total} Most-Downloaded Packages by Trust Score | Commit`}
+  description={`We scored the ${stats.total} most-downloaded npm packages — including the agent stack (MCP SDK, Vercel AI SDK, LangChain, x402). ${stats.critical} are CRITICAL risk.`}
+  canonical="https://getcommit.dev/rankings/"
+>
+  <!-- Nav -->
+  <nav>
+    <div class="container nav-inner">
+      <a href="/" class="nav-brand">Commit</a>
+      <ul class="nav-links">
+        <li><a href="/rankings" style="font-weight:600;color:var(--accent)">Rankings</a></li>
+        <li><a href="/#mcp">MCP</a></li>
+        <li><a href="/audit">Audit</a></li>
+        <li><a href="/watchlist">Watchlist</a></li>
+        <li><a href="/extension">Extension</a></li>
+        <li><a href="/blog">Writing</a></li>
+        <li><a href="/pricing">Pricing</a></li><li><a href="/docs">Docs</a></li>
+        <li><a href="https://github.com/piiiico/proof-of-commitment" target="_blank" rel="noopener">GitHub</a></li>
+        <li><a href="mailto:pico@amdal.dev">Contact</a></li>
+      </ul>
+    </div>
+  </nav>
+
+  <!-- Hero -->
+  <section class="rankings-hero">
+    <div class="container">
+      <div class="editorial" style="max-width: var(--max-content); margin: 0 auto;">
+        <span class="hero-eyebrow">npm trust leaderboard</span>
+        <h1 class="rankings-title">
+          We scored the {stats.total} most-downloaded<br />
+          npm packages. <em>Here's what we found.</em>
+        </h1>
+        <p class="rankings-lead">
+          Every week, these packages are installed <strong>{totalDownloadsStr} times</strong>.
+          Most are safe. Some are structural time bombs — one compromised credential
+          away from a supply chain attack affecting millions of developers.
+        </p>
+
+        <!-- Summary stats -->
+        <div class="stats-row">
+          <div class="stat-card stat-critical">
+            <div class="stat-number">{stats.critical}</div>
+            <div class="stat-label">CRITICAL risk</div>
+            <div class="stat-note">single maintainer, massive reach</div>
+          </div>
+          <div class="stat-card stat-safe">
+            <div class="stat-number">{stats.safe}</div>
+            <div class="stat-label">SAFE</div>
+            <div class="stat-note">multiple maintainers, healthy signals</div>
+          </div>
+          <div class="stat-card stat-total">
+            <div class="stat-number">{totalDownloadsStr}</div>
+            <div class="stat-label">weekly installs</div>
+            <div class="stat-note">combined across all {stats.total} packages</div>
+          </div>
+          <div class="stat-card stat-updated">
+            <div class="stat-number" style="font-size: 1rem; font-weight: 500;">{fmtDate(stats.generatedAt)}</div>
+            <div class="stat-label">last updated</div>
+            <div class="stat-note">live data from npm registry</div>
+          </div>
+        </div>
+
+        <div class="key-insight">
+          <span class="insight-icon">⚠</span>
+          <span class="insight-text">
+            <strong>CRITICAL</strong> = 1 maintainer controlling millions of weekly installs.
+            No malicious code detected — just the structural condition that makes an attack
+            catastrophic if it happens. <a href="/compare" style="color: var(--accent);">How we score →</a>
+          </span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <hr class="section-divider" />
+
+  <!-- Rankings table -->
+  <section class="rankings-section">
+    <div class="container">
+      <!-- Filter bar -->
+      <div class="filter-bar">
+        <div class="search-wrap">
+          <input
+            type="text"
+            id="pkg-search"
+            placeholder="Filter packages…"
+            autocomplete="off"
+          />
+        </div>
+        <div class="filter-buttons">
+          <button class="filter-btn active" data-filter="all">All ({stats.total})</button>
+          <button class="filter-btn filter-btn-critical" data-filter="CRITICAL">CRITICAL ({stats.critical})</button>
+          <button class="filter-btn filter-btn-safe" data-filter="SAFE">SAFE ({stats.safe})</button>
+        </div>
+      </div>
+
+      <!-- Table -->
+      <div class="table-wrapper">
+        <table class="rankings-table" id="rankings-table">
+          <thead>
+            <tr>
+              <th class="col-rank sortable" data-col="rank">Rank <span class="sort-icon">↕</span></th>
+              <th class="col-pkg">Package</th>
+              <th class="col-dl sortable" data-col="downloads">Downloads/wk <span class="sort-icon">↕</span></th>
+              <th class="col-score sortable active-sort" data-col="score">Trust Score <span class="sort-icon">↓</span></th>
+              <th class="col-risk sortable" data-col="risk">Risk Level <span class="sort-icon">↕</span></th>
+              <th class="col-maintainers sortable" data-col="maintainers">Maintainers <span class="sort-icon">↕</span></th>
+              <th class="col-age sortable" data-col="age">Age <span class="sort-icon">↕</span></th>
+            </tr>
+          </thead>
+          <tbody id="rankings-tbody">
+            {packages.map((pkg) => (
+              <tr
+                class={`pkg-row risk-${pkg.riskLevel.toLowerCase()}`}
+                data-name={pkg.name}
+                data-risk={pkg.riskLevel}
+                data-score={pkg.score}
+                data-downloads={pkg.weeklyDownloads}
+                data-maintainers={pkg.maintainers}
+                data-age={pkg.ageYears}
+                data-rank={pkg.rank}
+              >
+                <td class="col-rank">
+                  <span class="rank-num">#{pkg.rank}</span>
+                </td>
+                <td class="col-pkg">
+                  <a href={`/package/${pkg.name.replace(/\//g, '__')}/`} class="pkg-link">
+                    <span class="pkg-name">{pkg.name}</span>
+                  </a>
+                  {pkg.trend === 'growing' && <span class="trend-badge">↑ trending</span>}
+                </td>
+                <td class="col-dl">
+                  <span class="dl-num">{fmtDownloads(pkg.weeklyDownloads)}</span>
+                </td>
+                <td class="col-score">
+                  <div class="score-cell">
+                    <span class={`score-num score-${pkg.score >= 80 ? 'high' : pkg.score >= 60 ? 'mid' : 'low'}`}>
+                      {pkg.score}
+                    </span>
+                    <div class="score-bar">
+                      <div
+                        class={`score-fill score-fill-${pkg.score >= 80 ? 'high' : pkg.score >= 60 ? 'mid' : 'low'}`}
+                        style={`width: ${pkg.score}%`}
+                      />
+                    </div>
+                  </div>
+                </td>
+                <td class="col-risk">
+                  <span class={`risk-badge risk-${pkg.riskLevel.toLowerCase()}-badge`}>
+                    {pkg.riskLevel}
+                  </span>
+                </td>
+                <td class="col-maintainers">
+                  <span class={pkg.maintainers === 1 ? 'maintainer-solo' : 'maintainer-multi'}>
+                    {pkg.maintainers}
+                  </span>
+                </td>
+                <td class="col-age">
+                  <span class="age-num">{pkg.ageYears}y</span>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+
+      <p class="table-note">
+        Trust Score measures behavioral commitment signals: publish frequency, maintainer depth,
+        download momentum, and age. It does <em>not</em> scan for malicious code —
+        use <a href="https://socket.dev" target="_blank" rel="noopener">Socket</a> for that.
+        <a href="/compare">How Commit compares to other tools →</a>
+      </p>
+    </div>
+  </section>
+
+  <hr class="section-divider" />
+
+  <!-- CTA -->
+  <section class="cta-section">
+    <div class="container">
+      <div class="editorial" style="max-width: var(--max-content); margin: 0 auto; text-align: center;">
+        <h2>Audit your own dependencies</h2>
+        <p style="color: var(--ink-muted); margin: 1rem 0 2rem;">
+          Paste your package.json and get a full trust audit of every dependency —
+          including transitive ones you never chose.
+        </p>
+        <div style="display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap;">
+          <a href="/audit" class="btn-primary">Audit my dependencies →</a>
+          <a href="/compare" class="btn-ghost">How we score</a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <script>
+    // Sorting
+    type SortCol = 'rank' | 'downloads' | 'score' | 'risk' | 'maintainers' | 'age';
+    let sortCol: SortCol = 'score';
+    let sortAsc = false;
+    let activeFilter = 'all';
+    let searchQuery = '';
+
+    const tbody = document.getElementById('rankings-tbody')!;
+    const rows = Array.from(tbody.querySelectorAll<HTMLTableRowElement>('tr.pkg-row'));
+
+    const RISK_ORDER: Record<string, number> = {
+      CRITICAL: 0, HIGH: 1, MODERATE: 2, LOW: 3, SAFE: 4,
+    };
+
+    function getVal(row: HTMLTableRowElement, col: SortCol): number | string {
+      switch (col) {
+        case 'rank':        return parseInt(row.dataset.rank || '0');
+        case 'downloads':   return parseInt(row.dataset.downloads || '0');
+        case 'score':       return parseInt(row.dataset.score || '0');
+        case 'risk':        return RISK_ORDER[row.dataset.risk || 'SAFE'] ?? 4;
+        case 'maintainers': return parseInt(row.dataset.maintainers || '0');
+        case 'age':         return parseFloat(row.dataset.age || '0');
+      }
+    }
+
+    function applySort() {
+      const sorted = [...rows].sort((a, b) => {
+        const av = getVal(a, sortCol);
+        const bv = getVal(b, sortCol);
+        const cmp = av < bv ? -1 : av > bv ? 1 : 0;
+        return sortAsc ? cmp : -cmp;
+      });
+      sorted.forEach(r => tbody.appendChild(r));
+    }
+
+    function applyFilter() {
+      const q = searchQuery.toLowerCase();
+      rows.forEach(row => {
+        const name = (row.dataset.name || '').toLowerCase();
+        const risk = row.dataset.risk || '';
+        const matchesFilter = activeFilter === 'all' || risk === activeFilter;
+        const matchesSearch = !q || name.includes(q);
+        row.style.display = matchesFilter && matchesSearch ? '' : 'none';
+      });
+    }
+
+    // Sort click handlers
+    document.querySelectorAll<HTMLElement>('th.sortable').forEach(th => {
+      th.addEventListener('click', () => {
+        const col = th.dataset.col as SortCol;
+        if (sortCol === col) {
+          sortAsc = !sortAsc;
+        } else {
+          sortCol = col;
+          // Default: higher is better for score, lower is better for risk/rank
+          sortAsc = col === 'rank' || col === 'risk';
+        }
+        // Update icons
+        document.querySelectorAll<HTMLElement>('th.sortable').forEach(h => {
+          h.classList.remove('active-sort');
+          const icon = h.querySelector('.sort-icon');
+          if (icon) icon.textContent = '↕';
+        });
+        th.classList.add('active-sort');
+        const icon = th.querySelector('.sort-icon');
+        if (icon) icon.textContent = sortAsc ? '↑' : '↓';
+        applySort();
+      });
+    });
+
+    // Filter buttons
+    document.querySelectorAll<HTMLElement>('.filter-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        activeFilter = btn.dataset.filter || 'all';
+        document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        applyFilter();
+      });
+    });
+
+    // Search
+    document.getElementById('pkg-search')?.addEventListener('input', (e) => {
+      searchQuery = (e.target as HTMLInputElement).value;
+      applyFilter();
+    });
+
+    // Initial sort
+    applySort();
+  </script>
+
+  <style>
+    /* ─── Hero ─── */
+    .rankings-hero {
+      padding: 5rem 0 3rem;
+    }
+
+    .rankings-title {
+      font-family: var(--font-display);
+      font-size: clamp(2rem, 4vw, 3.25rem);
+      line-height: 1.15;
+      color: var(--ink);
+      margin: 1rem 0;
+    }
+
+    .rankings-title em {
+      color: var(--accent);
+      font-style: italic;
+    }
+
+    .rankings-lead {
+      font-size: 1.1rem;
+      color: var(--ink-muted);
+      max-width: 640px;
+      line-height: 1.7;
+      margin-bottom: 2rem;
+    }
+
+    /* ─── Stats Row ─── */
+    .stats-row {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+      gap: 1rem;
+      margin: 2rem 0;
+    }
+
+    .stat-card {
+      padding: 1.25rem;
+      border-radius: 8px;
+      border: 1px solid var(--border);
+    }
+
+    .stat-number {
+      font-size: 2.25rem;
+      font-weight: 700;
+      line-height: 1;
+      margin-bottom: 0.25rem;
+    }
+
+    .stat-label {
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      font-weight: 600;
+    }
+
+    .stat-note {
+      font-size: 0.72rem;
+      color: var(--ink-subtle);
+      margin-top: 0.35rem;
+    }
+
+    .stat-critical {
+      background: #fff5f5;
+      border-color: #fca5a5;
+    }
+    .stat-critical .stat-number { color: #dc2626; }
+    .stat-critical .stat-label  { color: #dc2626; }
+
+    .stat-safe {
+      background: #f0fdf4;
+      border-color: #86efac;
+    }
+    .stat-safe .stat-number { color: #16a34a; }
+    .stat-safe .stat-label  { color: #16a34a; }
+
+    .stat-total {
+      background: var(--paper-dim);
+    }
+    .stat-total .stat-number { color: var(--ink); }
+    .stat-total .stat-label  { color: var(--ink-muted); }
+
+    .stat-updated {
+      background: var(--paper-dim);
+    }
+    .stat-updated .stat-label  { color: var(--ink-muted); }
+
+    /* ─── Insight ─── */
+    .key-insight {
+      display: flex;
+      align-items: flex-start;
+      gap: 0.75rem;
+      padding: 1rem 1.25rem;
+      background: var(--paper-dim);
+      border: 1px solid var(--border);
+      border-left: 3px solid var(--accent);
+      border-radius: 0 6px 6px 0;
+      font-size: 0.875rem;
+      color: var(--ink-muted);
+      line-height: 1.6;
+      margin-top: 1rem;
+    }
+
+    .insight-icon {
+      font-size: 1rem;
+      color: var(--accent);
+      flex-shrink: 0;
+      margin-top: 0.1rem;
+    }
+
+    /* ─── Filters ─── */
+    .rankings-section {
+      padding: 3rem 0;
+    }
+
+    .filter-bar {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      margin-bottom: 1.25rem;
+      flex-wrap: wrap;
+    }
+
+    .search-wrap {
+      flex: 1;
+      min-width: 200px;
+    }
+
+    .search-wrap input {
+      width: 100%;
+      padding: 0.55rem 1rem;
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      background: var(--paper-dim);
+      font-family: var(--font-body);
+      font-size: 0.9rem;
+      color: var(--ink);
+      outline: none;
+      box-sizing: border-box;
+    }
+
+    .search-wrap input:focus {
+      border-color: var(--ink-muted);
+    }
+
+    .filter-buttons {
+      display: flex;
+      gap: 0.5rem;
+      flex-wrap: wrap;
+    }
+
+    .filter-btn {
+      padding: 0.45rem 1rem;
+      border: 1px solid var(--border);
+      border-radius: 999px;
+      background: transparent;
+      font-family: var(--font-body);
+      font-size: 0.8rem;
+      color: var(--ink-muted);
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+
+    .filter-btn:hover,
+    .filter-btn.active {
+      background: var(--ink);
+      color: var(--paper);
+      border-color: var(--ink);
+    }
+
+    .filter-btn-critical.active {
+      background: #dc2626;
+      border-color: #dc2626;
+    }
+
+    .filter-btn-safe.active {
+      background: #16a34a;
+      border-color: #16a34a;
+    }
+
+    /* ─── Table ─── */
+    .table-wrapper {
+      overflow-x: auto;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+    }
+
+    .rankings-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.875rem;
+    }
+
+    .rankings-table thead {
+      background: var(--paper-dim);
+      border-bottom: 2px solid var(--border);
+    }
+
+    .rankings-table th {
+      padding: 0.75rem 1rem;
+      text-align: left;
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      color: var(--ink-muted);
+      font-weight: 600;
+      white-space: nowrap;
+    }
+
+    .rankings-table th.sortable {
+      cursor: pointer;
+      user-select: none;
+    }
+
+    .rankings-table th.sortable:hover {
+      color: var(--ink);
+    }
+
+    .rankings-table th.active-sort {
+      color: var(--ink);
+    }
+
+    .sort-icon {
+      font-size: 0.7rem;
+      margin-left: 0.25rem;
+    }
+
+    .rankings-table td {
+      padding: 0.75rem 1rem;
+      border-bottom: 1px solid var(--border);
+      vertical-align: middle;
+    }
+
+    .pkg-row:last-child td {
+      border-bottom: none;
+    }
+
+    .pkg-row:hover {
+      background: var(--paper-dim);
+    }
+
+    /* Risk row backgrounds */
+    .risk-critical {
+      background: #fff8f8;
+    }
+    .risk-critical:hover {
+      background: #fff0f0;
+    }
+
+    /* Columns */
+    .col-rank { width: 60px; }
+    .col-pkg  { min-width: 160px; }
+    .col-dl   { width: 120px; }
+    .col-score { width: 140px; }
+    .col-risk { width: 110px; }
+    .col-maintainers { width: 100px; }
+    .col-age  { width: 70px; }
+
+    .rank-num {
+      font-family: var(--font-mono);
+      font-size: 0.8rem;
+      color: var(--ink-subtle);
+    }
+
+    .pkg-link {
+      text-decoration: none;
+      color: inherit;
+    }
+
+    .pkg-link:hover .pkg-name {
+      color: var(--accent);
+    }
+
+    .pkg-name {
+      font-family: var(--font-mono);
+      font-size: 0.88rem;
+      font-weight: 600;
+      color: var(--ink);
+    }
+
+    .trend-badge {
+      display: inline-block;
+      margin-left: 0.5rem;
+      font-size: 0.65rem;
+      color: #16a34a;
+      font-weight: 500;
+    }
+
+    .dl-num {
+      font-family: var(--font-mono);
+      font-size: 0.85rem;
+      color: var(--ink-muted);
+    }
+
+    /* Score cell */
+    .score-cell {
+      display: flex;
+      align-items: center;
+      gap: 0.6rem;
+    }
+
+    .score-num {
+      font-family: var(--font-mono);
+      font-size: 1.1rem;
+      font-weight: 700;
+      min-width: 28px;
+    }
+
+    .score-high { color: #16a34a; }
+    .score-mid  { color: #b45309; }
+    .score-low  { color: #dc2626; }
+
+    .score-bar {
+      flex: 1;
+      height: 4px;
+      background: var(--border);
+      border-radius: 2px;
+      overflow: hidden;
+      max-width: 60px;
+    }
+
+    .score-fill {
+      height: 100%;
+      border-radius: 2px;
+      transition: width 0.3s ease;
+    }
+
+    .score-fill-high { background: #16a34a; }
+    .score-fill-mid  { background: #b45309; }
+    .score-fill-low  { background: #dc2626; }
+
+    /* Risk badges */
+    .risk-badge {
+      display: inline-block;
+      padding: 0.2rem 0.55rem;
+      border-radius: 4px;
+      font-size: 0.7rem;
+      font-weight: 700;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+    }
+
+    .risk-critical-badge {
+      background: #fef2f2;
+      color: #dc2626;
+      border: 1px solid #fca5a5;
+    }
+
+    .risk-high-badge {
+      background: #fff7ed;
+      color: #c2410c;
+      border: 1px solid #fdba74;
+    }
+
+    .risk-moderate-badge {
+      background: #fefce8;
+      color: #a16207;
+      border: 1px solid #fde047;
+    }
+
+    .risk-low-badge {
+      background: #f0fdf4;
+      color: #15803d;
+      border: 1px solid #86efac;
+    }
+
+    .risk-safe-badge {
+      background: #f0fdf4;
+      color: #16a34a;
+      border: 1px solid #86efac;
+    }
+
+    .maintainer-solo {
+      font-family: var(--font-mono);
+      font-size: 0.85rem;
+      color: #dc2626;
+      font-weight: 600;
+    }
+
+    .maintainer-multi {
+      font-family: var(--font-mono);
+      font-size: 0.85rem;
+      color: var(--ink-muted);
+    }
+
+    .age-num {
+      font-family: var(--font-mono);
+      font-size: 0.8rem;
+      color: var(--ink-subtle);
+    }
+
+    /* ─── Table note ─── */
+    .table-note {
+      margin-top: 1.25rem;
+      font-size: 0.8rem;
+      color: var(--ink-subtle);
+      line-height: 1.6;
+      max-width: 680px;
+    }
+
+    .table-note a {
+      color: var(--accent);
+      text-decoration: none;
+    }
+
+    .table-note a:hover {
+      text-decoration: underline;
+    }
+
+    /* ─── CTA ─── */
+    .cta-section {
+      padding: 4rem 0;
+      background: var(--paper-dim);
+    }
+
+    .btn-primary {
+      display: inline-block;
+      padding: 0.75rem 1.5rem;
+      background: var(--ink);
+      color: var(--paper);
+      border-radius: 6px;
+      font-family: var(--font-body);
+      font-size: 0.9rem;
+      font-weight: 500;
+      text-decoration: none;
+      transition: background 0.15s;
+    }
+
+    .btn-primary:hover {
+      background: var(--accent);
+    }
+
+    .btn-ghost {
+      display: inline-block;
+      padding: 0.75rem 1.5rem;
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      font-family: var(--font-body);
+      font-size: 0.9rem;
+      color: var(--ink-muted);
+      text-decoration: none;
+      transition: all 0.15s;
+    }
+
+    .btn-ghost:hover {
+      border-color: var(--ink-muted);
+      color: var(--ink);
+    }
+
+    /* ─── Mobile ─── */
+    @media (max-width: 640px) {
+      .rankings-hero {
+        padding: 3rem 0 2rem;
+      }
+
+      .col-maintainers,
+      .col-age {
+        display: none;
+      }
+
+      .rankings-title {
+        font-size: 1.75rem;
+      }
+
+      .stats-row {
+        grid-template-columns: 1fr 1fr;
+      }
+    }
+  </style>
+</Layout>

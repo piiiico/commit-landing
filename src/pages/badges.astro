@@ -1,0 +1,772 @@
+---
+import Layout from '../layouts/Layout.astro';
+---
+
+<Layout
+  title="README Badges — Commit"
+  description="Add a Commitment Score badge to your README. Live security signal from the npm and PyPI ecosystems — updated automatically."
+  canonical="https://getcommit.dev/badges/"
+>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg: #FFFCF0;
+      --fg: #1a1a1a;
+      --muted: #6b6b6b;
+      --border: #e5e0d0;
+      --accent: #D14D41;
+      --max: 960px;
+    }
+
+    body {
+      background: var(--bg);
+      color: var(--fg);
+      font-family: 'Georgia', serif;
+      line-height: 1.6;
+    }
+
+    nav {
+      border-bottom: 1px solid var(--border);
+      padding: 14px 24px;
+    }
+
+    .nav-inner {
+      max-width: var(--max);
+      margin: 0 auto;
+      display: flex;
+      align-items: center;
+      gap: 32px;
+    }
+
+    .nav-brand {
+      font-weight: 700;
+      font-size: 1.1rem;
+      color: var(--fg);
+      text-decoration: none;
+    }
+
+    .nav-links {
+      list-style: none;
+      display: flex;
+      gap: 24px;
+      margin-left: auto;
+    }
+
+    .nav-links a {
+      color: var(--muted);
+      text-decoration: none;
+      font-family: 'system-ui', sans-serif;
+      font-size: 0.875rem;
+    }
+
+    .nav-links a:hover, .nav-links a.nav-active { color: var(--fg); }
+
+    .container { max-width: var(--max); margin: 0 auto; padding: 0 24px; }
+
+    .hero {
+      padding: 56px 24px 40px;
+      max-width: var(--max);
+      margin: 0 auto;
+    }
+
+    .hero-eyebrow {
+      display: block;
+      font-family: 'system-ui', sans-serif;
+      font-size: 0.8rem;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--muted);
+      margin-bottom: 12px;
+    }
+
+    h1 {
+      font-size: clamp(1.8rem, 4vw, 2.8rem);
+      line-height: 1.15;
+      margin-bottom: 20px;
+      font-weight: 700;
+    }
+
+    h1 em { font-style: italic; }
+
+    .hero-lead {
+      font-size: 1.05rem;
+      color: var(--muted);
+      max-width: 640px;
+      margin-bottom: 32px;
+    }
+
+    /* Section divider */
+    .section-divider {
+      border: none;
+      border-top: 1px solid var(--border);
+      margin: 0;
+    }
+
+    /* Live previews */
+    .previews-section {
+      padding: 48px 0;
+    }
+
+    .section-label {
+      font-family: 'system-ui', sans-serif;
+      font-size: 0.75rem;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--muted);
+      margin-bottom: 20px;
+    }
+
+    .previews-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      gap: 16px;
+      margin-bottom: 12px;
+    }
+
+    .preview-card {
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 16px 20px;
+      background: #FAFAF5;
+    }
+
+    .preview-card-pkg {
+      font-family: 'system-ui', sans-serif;
+      font-size: 0.8rem;
+      color: var(--muted);
+      margin-bottom: 10px;
+    }
+
+    .preview-card-badge {
+      display: block;
+      min-height: 20px;
+    }
+
+    .preview-card-badge img {
+      height: 20px;
+      border-radius: 3px;
+    }
+
+    .preview-card-link {
+      display: block;
+      margin-top: 10px;
+      font-family: 'system-ui', sans-serif;
+      font-size: 0.78rem;
+      color: var(--muted);
+      text-decoration: none;
+    }
+
+    .preview-card-link:hover { color: var(--fg); text-decoration: underline; }
+
+    /* Copy-paste sections */
+    .snippet-section {
+      padding: 48px 0;
+    }
+
+    .snippet-section h2 {
+      font-size: 1.3rem;
+      font-weight: 700;
+      margin-bottom: 8px;
+    }
+
+    .snippet-section p {
+      color: var(--muted);
+      font-size: 0.95rem;
+      margin-bottom: 24px;
+    }
+
+    .snippet-tabs {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 0;
+    }
+
+    .tab-btn {
+      padding: 6px 14px;
+      font-family: 'system-ui', sans-serif;
+      font-size: 0.8rem;
+      font-weight: 600;
+      border: 1px solid var(--border);
+      background: transparent;
+      color: var(--muted);
+      border-radius: 6px 6px 0 0;
+      cursor: pointer;
+      border-bottom: none;
+    }
+
+    .tab-btn.active {
+      background: #F2F0E5;
+      color: var(--fg);
+      border-bottom: 1px solid #F2F0E5;
+    }
+
+    .tab-content {
+      display: none;
+      background: #F2F0E5;
+      border: 1px solid var(--border);
+      border-radius: 0 8px 8px 8px;
+      padding: 0;
+      overflow: hidden;
+    }
+
+    .tab-content.active { display: block; }
+
+    .code-block {
+      font-family: 'JetBrains Mono', 'Courier New', monospace;
+      font-size: 0.82rem;
+      line-height: 1.6;
+      padding: 16px 20px;
+      white-space: pre-wrap;
+      word-break: break-all;
+      color: var(--fg);
+      margin: 0;
+    }
+
+    .copy-bar {
+      display: flex;
+      justify-content: flex-end;
+      padding: 8px 12px;
+      border-top: 1px solid var(--border);
+    }
+
+    .copy-btn {
+      font-family: 'system-ui', sans-serif;
+      font-size: 0.78rem;
+      font-weight: 600;
+      padding: 4px 12px;
+      border: 1px solid var(--border);
+      background: var(--bg);
+      color: var(--fg);
+      border-radius: 4px;
+      cursor: pointer;
+    }
+
+    .copy-btn:hover { background: #fff; }
+    .copy-btn.copied { color: #166534; border-color: #166534; }
+
+    .eco-switcher {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 20px;
+      font-family: 'system-ui', sans-serif;
+      font-size: 0.875rem;
+    }
+
+    .eco-switcher label { color: var(--muted); }
+
+    .eco-select {
+      padding: 6px 10px;
+      border: 1px solid var(--border);
+      background: var(--bg);
+      border-radius: 6px;
+      font-family: 'system-ui', sans-serif;
+      font-size: 0.875rem;
+      color: var(--fg);
+    }
+
+    .pkg-input-row {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 20px;
+    }
+
+    .pkg-input {
+      flex: 1;
+      padding: 8px 14px;
+      border: 1px solid var(--border);
+      background: var(--bg);
+      border-radius: 6px;
+      font-family: 'system-ui', sans-serif;
+      font-size: 0.9rem;
+      color: var(--fg);
+    }
+
+    .pkg-input:focus { outline: 2px solid var(--fg); outline-offset: 1px; }
+
+    .update-btn {
+      padding: 8px 18px;
+      background: var(--fg);
+      color: #fff;
+      border: none;
+      border-radius: 6px;
+      font-family: 'system-ui', sans-serif;
+      font-size: 0.875rem;
+      font-weight: 600;
+      cursor: pointer;
+    }
+
+    .update-btn:hover { opacity: 0.85; }
+
+    /* Try your package */
+    .try-section {
+      padding: 48px 0;
+    }
+
+    .try-section h2 {
+      font-size: 1.3rem;
+      font-weight: 700;
+      margin-bottom: 8px;
+    }
+
+    .try-section p {
+      color: var(--muted);
+      font-size: 0.95rem;
+      margin-bottom: 24px;
+    }
+
+    .try-box {
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 24px;
+      background: #FAFAF5;
+    }
+
+    .try-preview {
+      margin-top: 20px;
+      padding-top: 20px;
+      border-top: 1px solid var(--border);
+      display: none;
+    }
+
+    .try-preview.visible { display: block; }
+
+    .try-preview-label {
+      font-family: 'system-ui', sans-serif;
+      font-size: 0.78rem;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      margin-bottom: 10px;
+    }
+
+    .try-badge-img {
+      height: 20px;
+      display: block;
+      margin-bottom: 12px;
+    }
+
+    .try-snippet {
+      font-family: 'JetBrains Mono', 'Courier New', monospace;
+      font-size: 0.8rem;
+      background: #F2F0E5;
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      padding: 10px 14px;
+      white-space: pre-wrap;
+      word-break: break-all;
+      color: var(--fg);
+      margin-bottom: 8px;
+    }
+
+    /* Color legend */
+    .legend-section {
+      padding: 48px 0;
+    }
+
+    .legend-section h2 {
+      font-size: 1.3rem;
+      font-weight: 700;
+      margin-bottom: 24px;
+    }
+
+    .legend-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+      gap: 16px;
+    }
+
+    .legend-card {
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 16px 20px;
+    }
+
+    .legend-swatch {
+      display: inline-block;
+      padding: 3px 10px;
+      border-radius: 4px;
+      font-family: 'system-ui', sans-serif;
+      font-size: 0.75rem;
+      font-weight: 700;
+      letter-spacing: 0.04em;
+      margin-bottom: 10px;
+    }
+
+    .swatch-green { background: #dcfce7; color: #166534; }
+    .swatch-yellow { background: #fef9c3; color: #854d0e; }
+    .swatch-red { background: #fee2e2; color: #991b1b; }
+    .swatch-critical { background: #fef2f2; color: #7f1d1d; font-weight: 900; }
+
+    .legend-range {
+      font-family: 'system-ui', sans-serif;
+      font-size: 0.85rem;
+      font-weight: 700;
+      color: var(--fg);
+      margin-bottom: 4px;
+    }
+
+    .legend-desc {
+      font-family: 'system-ui', sans-serif;
+      font-size: 0.8rem;
+      color: var(--muted);
+      line-height: 1.5;
+    }
+
+    /* CTA */
+    .cta-row {
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+      padding: 32px 0 56px;
+    }
+
+    .btn {
+      display: inline-block;
+      padding: 10px 20px;
+      border-radius: 6px;
+      font-family: 'system-ui', sans-serif;
+      font-size: 0.875rem;
+      font-weight: 600;
+      text-decoration: none;
+      cursor: pointer;
+    }
+
+    .btn-primary { background: var(--fg); color: #fff; }
+    .btn-secondary { background: transparent; color: var(--fg); border: 1px solid var(--border); }
+    .btn:hover { opacity: 0.85; }
+
+    /* Footer */
+    footer {
+      border-top: 1px solid var(--border);
+      padding: 32px 24px;
+    }
+
+    .footer-inner {
+      max-width: var(--max);
+      margin: 0 auto;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 16px;
+    }
+
+    .footer-brand {
+      font-weight: 700;
+      color: var(--fg);
+      text-decoration: none;
+    }
+
+    .footer-links {
+      list-style: none;
+      display: flex;
+      gap: 20px;
+    }
+
+    .footer-links a {
+      font-family: 'system-ui', sans-serif;
+      font-size: 0.8rem;
+      color: var(--muted);
+      text-decoration: none;
+    }
+
+    .footer-links a:hover { color: var(--fg); }
+  </style>
+
+  <!-- Nav -->
+  <nav>
+    <div class="nav-inner">
+      <a href="/" class="nav-brand">Commit</a>
+      <ul class="nav-links">
+        <li><a href="/#mcp">MCP</a></li>
+        <li><a href="/audit">Audit</a></li>
+        <li><a href="/watchlist">Watchlist</a></li>
+        <li><a href="/extension">Extension</a></li>
+        <li><a href="/badges" class="nav-active">Badges</a></li>
+        <li><a href="/blog">Writing</a></li>
+        <li><a href="/pricing">Pricing</a></li><li><a href="/docs">Docs</a></li>
+        <li><a href="https://github.com/piiiico/proof-of-commitment" target="_blank" rel="noopener">GitHub</a></li>
+      </ul>
+    </div>
+  </nav>
+
+  <div class="container">
+    <!-- Hero -->
+    <section class="hero">
+      <span class="hero-eyebrow">README Badges</span>
+      <h1>Show your Commitment Score<br /><em>right in your README</em></h1>
+      <p class="hero-lead">
+        One line of Markdown. Live security signal from Commit — automatically updated
+        whenever your package's risk profile changes.
+      </p>
+    </section>
+
+    <hr class="section-divider" />
+
+    <!-- Live previews -->
+    <section class="previews-section">
+      <p class="section-label">Live badge previews</p>
+      <div class="previews-grid" id="previews-grid">
+        <!-- populated by JS -->
+      </div>
+      <p style="font-family:system-ui;font-size:0.78rem;color:var(--muted);">
+        Badges are served as SVG — no external tracking, no JavaScript required.
+      </p>
+    </section>
+
+    <hr class="section-divider" />
+
+    <!-- Copy-paste section -->
+    <section class="snippet-section">
+      <h2>Add to your README</h2>
+      <p>Copy the snippet for your package. Click the badge to open the full audit.</p>
+
+      <div class="eco-switcher">
+        <label for="snippet-eco">Ecosystem:</label>
+        <select class="eco-select" id="snippet-eco">
+          <option value="npm">npm</option>
+          <option value="pypi">PyPI</option>
+        </select>
+        <label for="snippet-pkg" style="margin-left:8px;">Package:</label>
+        <input type="text" id="snippet-pkg" class="pkg-input" style="max-width:200px;" value="axios" placeholder="package name" />
+        <button class="update-btn" id="snippet-update-btn">Update</button>
+      </div>
+
+      <div class="snippet-tabs">
+        <button class="tab-btn active" data-tab="markdown">Markdown</button>
+        <button class="tab-btn" data-tab="html">HTML</button>
+        <button class="tab-btn" data-tab="rst">RST</button>
+      </div>
+
+      <div class="tab-content active" id="tab-markdown">
+        <pre class="code-block" id="snippet-markdown"></pre>
+        <div class="copy-bar">
+          <button class="copy-btn" data-target="snippet-markdown">Copy</button>
+        </div>
+      </div>
+
+      <div class="tab-content" id="tab-html">
+        <pre class="code-block" id="snippet-html"></pre>
+        <div class="copy-bar">
+          <button class="copy-btn" data-target="snippet-html">Copy</button>
+        </div>
+      </div>
+
+      <div class="tab-content" id="tab-rst">
+        <pre class="code-block" id="snippet-rst"></pre>
+        <div class="copy-bar">
+          <button class="copy-btn" data-target="snippet-rst">Copy</button>
+        </div>
+      </div>
+    </section>
+
+    <hr class="section-divider" />
+
+    <!-- Try your package -->
+    <section class="try-section">
+      <h2>Try your package</h2>
+      <p>Enter any npm or PyPI package name to preview its badge.</p>
+
+      <div class="try-box">
+        <div class="eco-switcher" style="margin-bottom:12px;">
+          <label for="try-eco">Ecosystem:</label>
+          <select class="eco-select" id="try-eco">
+            <option value="npm">npm</option>
+            <option value="pypi">PyPI</option>
+          </select>
+        </div>
+        <div class="pkg-input-row">
+          <input type="text" id="try-pkg" class="pkg-input" placeholder="e.g. express, requests, zod…" />
+          <button class="update-btn" id="try-btn">Preview</button>
+        </div>
+
+        <div class="try-preview" id="try-preview">
+          <p class="try-preview-label">Badge preview</p>
+          <img class="try-badge-img" id="try-badge-img" src="" alt="Commitment Score badge" />
+          <pre class="try-snippet" id="try-snippet-md"></pre>
+          <button class="copy-btn" id="try-copy-btn">Copy Markdown</button>
+        </div>
+      </div>
+    </section>
+
+    <hr class="section-divider" />
+
+    <!-- Color legend -->
+    <section class="legend-section">
+      <h2>Score legend</h2>
+      <div class="legend-grid">
+        <div class="legend-card">
+          <span class="legend-swatch swatch-green">● Good</span>
+          <p class="legend-range">70–100</p>
+          <p class="legend-desc">Low structural risk. Multiple maintainers, active development, reasonable download exposure.</p>
+        </div>
+        <div class="legend-card">
+          <span class="legend-swatch swatch-yellow">● Fair</span>
+          <p class="legend-range">40–69</p>
+          <p class="legend-desc">Moderate concern. May have sole maintainer or high downloads — worth monitoring.</p>
+        </div>
+        <div class="legend-card">
+          <span class="legend-swatch swatch-red">● Poor</span>
+          <p class="legend-range">&lt; 40</p>
+          <p class="legend-desc">High structural risk. Significant exposure if credentials are compromised.</p>
+        </div>
+        <div class="legend-card">
+          <span class="legend-swatch swatch-critical">⚑ CRITICAL</span>
+          <p class="legend-range">Any score</p>
+          <p class="legend-desc">Sole maintainer + 10M+ weekly downloads. The structural profile shared by ua-parser-js (2021) and event-stream (2018) before they were compromised.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- CTA -->
+    <div class="cta-row">
+      <a href="/audit" class="btn btn-primary">Audit your dependencies</a>
+      <a href="/watchlist" class="btn btn-secondary">View watchlist</a>
+      <a href="/docs" class="btn btn-secondary">API docs</a>
+    </div>
+  </div>
+
+  <footer>
+    <div class="footer-inner">
+      <a href="/" class="footer-brand">Commit</a>
+      <ul class="footer-links">
+        <li><a href="/audit">Audit</a></li>
+        <li><a href="/watchlist">Watchlist</a></li>
+        <li><a href="/badges">Badges</a></li>
+        <li><a href="/pricing">Pricing</a></li><li><a href="/docs">Docs</a></li>
+        <li><a href="/privacy">Privacy</a></li>
+        <li><a href="https://github.com/piiiico/proof-of-commitment" target="_blank" rel="noopener">GitHub</a></li>
+      </ul>
+    </div>
+  </footer>
+
+  <script>
+    const API_BASE = 'https://getcommit.dev';
+
+    const PREVIEW_PACKAGES = [
+      { eco: 'npm', name: 'axios' },
+      { eco: 'npm', name: 'chalk' },
+      { eco: 'npm', name: 'zod' },
+      { eco: 'npm', name: 'express' },
+      { eco: 'pypi', name: 'requests' },
+    ];
+
+    function badgeUrl(eco: string, pkg: string): string {
+      if (eco === 'npm') return `${API_BASE}/badge/npm/${encodeURIComponent(pkg)}`;
+      return `${API_BASE}/badge/pypi/${encodeURIComponent(pkg)}`;
+    }
+
+    function auditUrl(eco: string, pkg: string): string {
+      return `https://getcommit.dev/audit?packages=${encodeURIComponent(pkg)}&ecosystem=${eco}`;
+    }
+
+    function markdownSnippet(eco: string, pkg: string): string {
+      return `[![Commitment Score](${badgeUrl(eco, pkg)})](${auditUrl(eco, pkg)})`;
+    }
+
+    function htmlSnippet(eco: string, pkg: string): string {
+      return `<a href="${auditUrl(eco, pkg)}">\n  <img src="${badgeUrl(eco, pkg)}" alt="Commitment Score: ${pkg}" />\n</a>`;
+    }
+
+    function rstSnippet(eco: string, pkg: string): string {
+      return `.. image:: ${badgeUrl(eco, pkg)}\n   :target: ${auditUrl(eco, pkg)}\n   :alt: Commitment Score: ${pkg}`;
+    }
+
+    // Render live previews
+    function renderPreviews() {
+      const grid = document.getElementById('previews-grid')!;
+      grid.innerHTML = PREVIEW_PACKAGES.map(({ eco, name }) => `
+        <div class="preview-card">
+          <p class="preview-card-pkg">${eco} / ${name}</p>
+          <span class="preview-card-badge">
+            <a href="${auditUrl(eco, name)}" target="_blank" rel="noopener">
+              <img src="${badgeUrl(eco, name)}" alt="Commitment Score: ${name}" style="height:20px;" />
+            </a>
+          </span>
+          <a href="${auditUrl(eco, name)}" class="preview-card-link" target="_blank" rel="noopener">
+            View full audit →
+          </a>
+        </div>
+      `).join('');
+    }
+
+    // Snippet tabs
+    function updateSnippets() {
+      const eco = (document.getElementById('snippet-eco') as HTMLSelectElement).value;
+      const pkg = (document.getElementById('snippet-pkg') as HTMLInputElement).value.trim() || 'axios';
+
+      (document.getElementById('snippet-markdown') as HTMLPreElement).textContent = markdownSnippet(eco, pkg);
+      (document.getElementById('snippet-html') as HTMLPreElement).textContent = htmlSnippet(eco, pkg);
+      (document.getElementById('snippet-rst') as HTMLPreElement).textContent = rstSnippet(eco, pkg);
+    }
+
+    document.getElementById('snippet-update-btn')!.addEventListener('click', updateSnippets);
+    document.getElementById('snippet-pkg')!.addEventListener('keydown', (e) => {
+      if ((e as KeyboardEvent).key === 'Enter') updateSnippets();
+    });
+    document.getElementById('snippet-eco')!.addEventListener('change', updateSnippets);
+
+    // Tab switching
+    document.querySelectorAll('.tab-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+        document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+        btn.classList.add('active');
+        const tab = btn.getAttribute('data-tab')!;
+        document.getElementById(`tab-${tab}`)!.classList.add('active');
+      });
+    });
+
+    // Copy buttons
+    document.querySelectorAll('.copy-btn[data-target]').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const targetId = btn.getAttribute('data-target')!;
+        const text = document.getElementById(targetId)!.textContent || '';
+        navigator.clipboard.writeText(text).then(() => {
+          btn.textContent = 'Copied!';
+          btn.classList.add('copied');
+          setTimeout(() => {
+            btn.textContent = 'Copy';
+            btn.classList.remove('copied');
+          }, 1800);
+        });
+      });
+    });
+
+    // Try your package
+    function runPreview() {
+      const eco = (document.getElementById('try-eco') as HTMLSelectElement).value;
+      const pkg = (document.getElementById('try-pkg') as HTMLInputElement).value.trim();
+      if (!pkg) return;
+
+      const img = document.getElementById('try-badge-img') as HTMLImageElement;
+      const snippetEl = document.getElementById('try-snippet-md')!;
+      const preview = document.getElementById('try-preview')!;
+
+      const md = markdownSnippet(eco, pkg);
+      img.src = badgeUrl(eco, pkg);
+      img.alt = `Commitment Score: ${pkg}`;
+      snippetEl.textContent = md;
+      preview.classList.add('visible');
+
+      document.getElementById('try-copy-btn')!.onclick = () => {
+        navigator.clipboard.writeText(md).then(() => {
+          const copyBtn = document.getElementById('try-copy-btn')!;
+          copyBtn.textContent = 'Copied!';
+          setTimeout(() => { copyBtn.textContent = 'Copy Markdown'; }, 1800);
+        });
+      };
+    }
+
+    document.getElementById('try-btn')!.addEventListener('click', runPreview);
+    document.getElementById('try-pkg')!.addEventListener('keydown', (e) => {
+      if ((e as KeyboardEvent).key === 'Enter') runPreview();
+    });
+
+    // Init
+    renderPreviews();
+    updateSnippets();
+  </script>
+</Layout>

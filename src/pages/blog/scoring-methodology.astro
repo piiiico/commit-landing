@@ -1,0 +1,449 @@
+---
+import Layout from '../../layouts/Layout.astro';
+---
+
+<Layout
+  title="How Commit Scores npm Packages: The Methodology — Commit"
+  description="How behavioral commitment scoring identifies supply chain risk that npm audit misses. Five dimensions, all public data, deterministic CRITICAL flag. The full methodology, inspectable and debatable."
+  canonical="https://getcommit.dev/blog/scoring-methodology/"
+  publishDate="2026-04-20"
+>
+
+  <!-- Nav -->
+  <nav>
+    <div class="container nav-inner">
+      <a href="/" class="nav-brand">Commit</a>
+      <ul class="nav-links">
+        <li><a href="/quickstart" style="font-weight:600;color:var(--accent)">Quickstart</a></li>
+        <li><a href="/audit">Audit</a></li>
+        <li><a href="/rankings">Rankings</a></li>
+        <li><a href="/watchlist">Watchlist</a></li>
+        <li><a href="/blog">Writing</a></li>
+        <li><a href="/pricing">Pricing</a></li><li><a href="/docs">Docs</a></li>
+        <li><a href="https://github.com/piiiico/proof-of-commitment" target="_blank" rel="noopener">GitHub</a></li>
+        <li><a href="mailto:pico@amdal.dev">Contact</a></li>
+      </ul>
+    </div>
+  </nav>
+
+  <!-- Essay -->
+  <article class="essay">
+    <div class="container">
+      <div class="editorial">
+
+        <!-- Header -->
+        <header class="essay-header">
+          <div class="essay-meta animate-in delay-1">
+            <time datetime="2026-04-20">April 20, 2026</time>
+          </div>
+          <h1 class="essay-title animate-in delay-2">How Commit Scores npm Packages</h1>
+          <p class="essay-subtitle animate-in delay-3">
+            The methodology behind <a href="https://getcommit.dev/audit">getcommit.dev/audit</a> &mdash;
+            five behavioral dimensions, all public data, deterministic CRITICAL flag.
+            Inspectable, debatable, reproducible.
+          </p>
+          <p class="essay-byline animate-in delay-4">Pico</p>
+        </header>
+
+        <!-- Body -->
+        <div class="essay-body">
+
+          <p style="font-size: 1.05rem; font-style: italic; border-left: 3px solid var(--border); padding-left: 1rem; margin-bottom: 2rem; color: var(--ink-muted);">
+            In October 2021, ua-parser-js was compromised. ~8 million downloads per week.
+            <code>npm audit</code> showed zero issues. The structural risk &mdash; a sole maintainer
+            controlling a widely-used package &mdash; was visible in public registry data long before
+            anyone filed a CVE (CVE-2021-4229). This article explains how behavioral
+            commitment scoring identifies that risk.
+          </p>
+
+          <p>
+            When I published the supply chain risk analysis, the most common question was:
+            <strong>"How does your scoring actually work? Show me the math."</strong>
+          </p>
+
+          <p>
+            Fair question. If you're going to trust a tool with your dependency decisions, you should
+            be able to inspect, debate, and reject specific choices in the methodology. This is that article.
+          </p>
+
+          <h2>The Problem: npm audit Answers the Wrong Question</h2>
+
+          <p>
+            <code>npm audit</code> is a CVE scanner. It checks a package's version against a database of
+            <em>known</em> vulnerabilities. When a CVE is filed, catalogued, and propagated, your tool will catch it.
+          </p>
+
+          <p>
+            That's useful. But it answers the wrong question for a specific class of supply chain risk.
+          </p>
+
+          <p>
+            The question that matters is: <strong>what is the structural likelihood that this package becomes
+            a future attack vector?</strong>
+          </p>
+
+          <p>Known CVEs are the output of an attack. What we can observe before the attack is the <em>conditions</em> that made it possible:</p>
+
+          <ul>
+            <li>Single person controlling the publish credentials for a package with 100M weekly downloads</li>
+            <li>No corporate backing &mdash; one compromised GitHub account is a supply chain event</li>
+            <li>High download trend attracting attacker attention</li>
+            <li>Long project age with accumulated legacy access and inertia</li>
+          </ul>
+
+          <p>Before the October 2021 ua-parser-js attack, running <code>npm audit</code> on a project that depended on ua-parser-js returned:</p>
+
+          <pre><code>found 0 vulnerabilities</code></pre>
+
+          <p>The behavioral commitment score would have returned:</p>
+
+          <pre><code>ua-parser-js  sole maintainer  ~8M downloads/week  🔴 CRITICAL</code></pre>
+
+          <p>The difference isn't that one tool was smarter. It's that they answer different questions.</p>
+
+          <h2>The Five Scoring Dimensions</h2>
+
+          <p>
+            Every package gets scored on five behavioral dimensions. All inputs are public data from the
+            npm registry and GitHub API &mdash; no scraping, no proprietary data sources.
+          </p>
+
+          <h3>1. Longevity (25 points)</h3>
+
+          <p><strong>What it measures:</strong> Project age, weighted by consistency.</p>
+
+          <p>
+            <strong>Why it matters:</strong> Older projects have accumulated more dependents, more integration depth,
+            and more attack interest. A 12-year-old package embedded in thousands of production systems is a different
+            risk profile than a 6-month-old experimental library.
+          </p>
+
+          <p>
+            <strong>Scoring:</strong> Full marks (25/25) for packages with 10+ years of consistent maintenance.
+            Scales down for younger projects or projects with significant inactive periods.
+          </p>
+
+          <p><strong>axios in practice:</strong> 11.6 years old &rarr; <strong>25/25</strong></p>
+
+          <p style="color: var(--ink-muted); font-size: 0.9rem;">
+            Note: high longevity is <em>not</em> inherently risky. It's the combination of longevity + single maintainer + high downloads that creates the dangerous profile.
+          </p>
+
+          <h3>2. Download Momentum (25 points)</h3>
+
+          <p><strong>What it measures:</strong> Download trend direction, not raw count.</p>
+
+          <p>
+            <strong>Why it matters:</strong> A package with 100M weekly downloads and a declining trend is a different
+            risk than one with 100M and a growing trend. Growing packages are attracting more attention &mdash; from
+            users and attackers both.
+          </p>
+
+          <p>
+            <strong>Scoring:</strong> Full marks for packages with growing or stable trends at high volume.
+            The raw download count matters (it sets the "blast radius"), but trend direction matters more
+            for predictive scoring.
+          </p>
+
+          <p><strong>axios in practice:</strong> 101M/week, growing &rarr; <strong>25/25</strong></p>
+
+          <h3>3. Release Consistency (20 points)</h3>
+
+          <p><strong>What it measures:</strong> Regularity of releases over time, recency of last publish.</p>
+
+          <p>
+            <strong>Why it matters:</strong> Packages with consistent release cadences signal active, engaged
+            maintainers. Packages that haven't released in 12+ months while maintaining high traffic are
+            "zombie" packages &mdash; still widely depended on, but potentially unmaintained, with old access
+            still live.
+          </p>
+
+          <p>
+            <strong>Scoring:</strong> Full marks for packages releasing regularly (monthly or better).
+            Scaled down for packages with 90+ day gaps. Significant deductions for 12+ month inactivity
+            while still seeing significant traffic.
+          </p>
+
+          <p><strong>axios in practice:</strong> Last published 6 days ago, consistent history &rarr; <strong>20/20</strong></p>
+          <p><strong>Contrast &mdash; chalk:</strong> Last published 171 days ago &rarr; <strong>13/20</strong></p>
+
+          <h3>4. Maintainer Depth (15 points)</h3>
+
+          <p><strong>Why it matters:</strong> This is the key signal for the CRITICAL risk flag.</p>
+
+          <p>
+            A sole maintainer controlling a package with massive download volume creates a single point of failure.
+            One compromised npm token, one phished account, one person's bad day &mdash; and millions of weekly
+            downloads receive a malicious update. The LiteLLM attack (March 2026) and the ua-parser-js attack
+            (October 2021) both followed this pattern exactly.
+          </p>
+
+          <p><strong>Scoring:</strong></p>
+
+          <table style="width:100%; border-collapse: collapse; margin: 1rem 0; font-size: 0.9rem;">
+            <thead>
+              <tr style="border-bottom: 2px solid var(--border);">
+                <th style="text-align:left; padding: 0.5rem 0.75rem;">Maintainers</th>
+                <th style="text-align:left; padding: 0.5rem 0.75rem;">Score</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr style="border-bottom: 1px solid var(--border-light, rgba(0,0,0,.06));">
+                <td style="padding: 0.5rem 0.75rem;">1 (sole)</td>
+                <td style="padding: 0.5rem 0.75rem;">4/15</td>
+              </tr>
+              <tr style="border-bottom: 1px solid var(--border-light, rgba(0,0,0,.06));">
+                <td style="padding: 0.5rem 0.75rem;">2</td>
+                <td style="padding: 0.5rem 0.75rem;">7/15</td>
+              </tr>
+              <tr style="border-bottom: 1px solid var(--border-light, rgba(0,0,0,.06));">
+                <td style="padding: 0.5rem 0.75rem;">3&ndash;4</td>
+                <td style="padding: 0.5rem 0.75rem;">10/15</td>
+              </tr>
+              <tr style="border-bottom: 1px solid var(--border-light, rgba(0,0,0,.06));">
+                <td style="padding: 0.5rem 0.75rem;">5&ndash;9</td>
+                <td style="padding: 0.5rem 0.75rem;">12/15</td>
+              </tr>
+              <tr style="border-bottom: 1px solid var(--border-light, rgba(0,0,0,.06));">
+                <td style="padding: 0.5rem 0.75rem;">10&ndash;14</td>
+                <td style="padding: 0.5rem 0.75rem;">14/15</td>
+              </tr>
+              <tr>
+                <td style="padding: 0.5rem 0.75rem;">15+</td>
+                <td style="padding: 0.5rem 0.75rem;">15/15</td>
+              </tr>
+            </tbody>
+          </table>
+
+          <p>
+            Single maintainer scores 4/15 &mdash; the lowest non-zero score. It's intentionally low because
+            the credential-compromise risk is structural, not speculative.
+          </p>
+
+          <p>
+            <strong>axios in practice:</strong> 1 maintainer &rarr; <strong>4/15</strong><br>
+            <strong>express in practice:</strong> 5 maintainers &rarr; <strong>15/15</strong>
+          </p>
+
+          <h3>5. GitHub Backing (15 points)</h3>
+
+          <p><strong>What it measures:</strong> Organizational backing, community engagement, repository health signals.</p>
+
+          <p>
+            <strong>Why it matters:</strong> Packages maintained under a corporate GitHub organization have different
+            risk profiles than personal repos. An organization means multiple people have access, there are usually
+            internal security practices, and there's institutional continuity if the primary maintainer leaves.
+          </p>
+
+          <p>
+            <strong>Scoring:</strong> Organization-backed repos score higher. Personal repos with high engagement
+            score mid-range. Personal repos with declining engagement score lower.
+          </p>
+
+          <h2>The CRITICAL Flag</h2>
+
+          <p>A package is flagged CRITICAL when <strong>both conditions are true</strong>:</p>
+          <ol>
+            <li>Single maintainer (maintainerDepth = 4/15)</li>
+            <li>&gt;10M weekly downloads</li>
+          </ol>
+
+          <p>
+            Both conditions must hold. The threshold is explicit and deterministic &mdash; you can reproduce
+            the flag yourself from npm registry data.
+          </p>
+
+          <p>
+            The reasoning: &gt;10M weekly downloads is the point where a compromised package becomes a supply
+            chain event. 16 of the 41 npm packages with &gt;10M weekly downloads have a single maintainer.
+            Together: 2.82 billion downloads per week.
+          </p>
+
+          <h2>Walking Through a Real Scoring: axios</h2>
+
+          <pre><code>curl -X POST https://poc-backend.amdal-dev.workers.dev/api/audit \
+  -H "Content-Type: application/json" \
+  -d '&#123;"packages": ["axios"]&#125;'</code></pre>
+
+          <p>Response (April 2026):</p>
+
+          <pre><code>&#123;
+  "name": "axios",
+  "ecosystem": "npm",
+  "score": 89,
+  "maintainers": 1,
+  "weeklyDownloads": 100837905,
+  "ageYears": 11.6,
+  "trend": "growing",
+  "daysSinceLastPublish": 6,
+  "riskFlags": ["CRITICAL"],
+  "scoreBreakdown": &#123;
+    "longevity": 25,
+    "downloadMomentum": 25,
+    "releaseConsistency": 20,
+    "maintainerDepth": 4,
+    "githubBacking": 15
+  &#125;
+&#125;</code></pre>
+
+          <p>
+            <strong>Score interpretation:</strong> 89/100 looks healthy. Most "package health" tools would pass
+            this with flying colors. The project is 11.6 years old (full longevity), actively downloaded with
+            growing trend (full momentum), consistently releasing (full consistency), well-backed on GitHub
+            (full backing).
+          </p>
+
+          <p>
+            The CRITICAL flag comes entirely from one number: <strong>maintainerDepth: 4/15</strong>.
+          </p>
+
+          <h2>Comparison Table</h2>
+
+          <table style="width:100%; border-collapse: collapse; margin: 1rem 0; font-size: 0.88rem;">
+            <thead>
+              <tr style="border-bottom: 2px solid var(--border);">
+                <th style="text-align:left; padding: 0.5rem 0.75rem;">Package</th>
+                <th style="text-align:left; padding: 0.5rem 0.75rem;">Score</th>
+                <th style="text-align:left; padding: 0.5rem 0.75rem;">Maintainers</th>
+                <th style="text-align:left; padding: 0.5rem 0.75rem;">Weekly Downloads</th>
+                <th style="text-align:left; padding: 0.5rem 0.75rem;">Risk</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr style="border-bottom: 1px solid var(--border-light, rgba(0,0,0,.06));">
+                <td style="padding: 0.5rem 0.75rem;"><code>axios</code></td>
+                <td style="padding: 0.5rem 0.75rem;">89</td>
+                <td style="padding: 0.5rem 0.75rem;">1</td>
+                <td style="padding: 0.5rem 0.75rem;">101M</td>
+                <td style="padding: 0.5rem 0.75rem;">🔴 CRITICAL</td>
+              </tr>
+              <tr style="border-bottom: 1px solid var(--border-light, rgba(0,0,0,.06));">
+                <td style="padding: 0.5rem 0.75rem;"><code>zod</code></td>
+                <td style="padding: 0.5rem 0.75rem;">83</td>
+                <td style="padding: 0.5rem 0.75rem;">1</td>
+                <td style="padding: 0.5rem 0.75rem;">159M</td>
+                <td style="padding: 0.5rem 0.75rem;">🔴 CRITICAL</td>
+              </tr>
+              <tr style="border-bottom: 1px solid var(--border-light, rgba(0,0,0,.06));">
+                <td style="padding: 0.5rem 0.75rem;"><code>chalk</code></td>
+                <td style="padding: 0.5rem 0.75rem;">75</td>
+                <td style="padding: 0.5rem 0.75rem;">1</td>
+                <td style="padding: 0.5rem 0.75rem;">411M</td>
+                <td style="padding: 0.5rem 0.75rem;">🔴 CRITICAL</td>
+              </tr>
+              <tr style="border-bottom: 1px solid var(--border-light, rgba(0,0,0,.06));">
+                <td style="padding: 0.5rem 0.75rem;"><code>react</code></td>
+                <td style="padding: 0.5rem 0.75rem;">91</td>
+                <td style="padding: 0.5rem 0.75rem;">2</td>
+                <td style="padding: 0.5rem 0.75rem;">123M</td>
+                <td style="padding: 0.5rem 0.75rem;">✅ No flag</td>
+              </tr>
+              <tr>
+                <td style="padding: 0.5rem 0.75rem;"><code>express</code></td>
+                <td style="padding: 0.5rem 0.75rem;">97</td>
+                <td style="padding: 0.5rem 0.75rem;">5</td>
+                <td style="padding: 0.5rem 0.75rem;">93M</td>
+                <td style="padding: 0.5rem 0.75rem;">✅ No flag</td>
+              </tr>
+            </tbody>
+          </table>
+
+          <h2>Validation: How the Scores Performed Before the Attacks</h2>
+
+          <h3>The ua-parser-js Attack (October 2021)</h3>
+
+          <p>
+            <strong>Structural profile (before attack):</strong> CRITICAL &mdash; sole maintainer, ~8M downloads/week,
+            no organizational backing.
+          </p>
+
+          <p><strong>npm audit (before attack):</strong> <code>found 0 vulnerabilities</code></p>
+
+          <p>
+            The attack followed the exact pattern the profile predicted: credential compromise (account phishing),
+            malicious versions published with credential harvesting and crypto mining code.
+          </p>
+
+          <h3>The LiteLLM Attack (March 2026)</h3>
+
+          <p>
+            Same profile: sole maintainer, 10M+ weekly downloads on the PyPI side. CRITICAL by behavioral scoring.
+            npm audit and PyPI audit tools clean.
+          </p>
+
+          <h2>What the Scores Don't Tell You</h2>
+
+          <p>
+            <strong>CRITICAL packages that never get attacked will always outnumber the ones that do.</strong>
+            The score identifies exposure, not certainty. Most sole-maintained packages are run by talented,
+            security-conscious people who never become targets.
+          </p>
+
+          <p>
+            <strong>A high overall score with a CRITICAL flag can be misleading.</strong> axios at 89/100 looks
+            like a model of open source health. One person's credentials stand between 100M weekly installs and
+            a supply chain event. This is precisely what makes the risk insidious.
+          </p>
+
+          <p>
+            <strong>The methodology weights are a first pass, not ground truth.</strong> I weighted maintainerDepth
+            at 15 points total. A reasonable argument exists for weighting it differently. The weights are published,
+            the logic is open, the API returns full breakdown. If you'd weight things differently, I want to know.
+          </p>
+
+          <p>
+            <strong>The score doesn't cover behavioral changes over time.</strong> A package that was maintained
+            by a 5-person team for 10 years but just lost 4 of those maintainers gets the same maintainerDepth
+            score as one that's always been sole-maintained. The current implementation is a snapshot, not a trajectory.
+          </p>
+
+          <h2>The Short Version</h2>
+
+          <pre><code>Longevity           25 pts  — project age + consistency
+Download Momentum   25 pts  — trend direction at current volume
+Release Consistency 20 pts  — release cadence + recency
+Maintainer Depth    15 pts  — credential concentration risk
+GitHub Backing      15 pts  — organizational support + engagement
+
+CRITICAL = sole maintainer + >10M weekly downloads</code></pre>
+
+          <p>Try it on your own stack:</p>
+
+          <pre><code>npx proof-of-commitment --file package.json</code></pre>
+
+          <p>Or in the browser: <a href="https://getcommit.dev/audit?packages=chalk,zod,axios,hono,express">getcommit.dev/audit</a></p>
+
+          <p style="margin-top: 2rem; padding-top: 1.5rem; border-top: 1px solid var(--border); color: var(--ink-muted); font-size: 0.9rem;">
+            Source: <a href="https://github.com/piiiico/proof-of-commitment">github.com/piiiico/proof-of-commitment</a><br>
+            Web audit: <a href="https://getcommit.dev/audit">getcommit.dev/audit</a><br>
+            Live watchlist: <a href="https://getcommit.dev/watchlist">getcommit.dev/watchlist</a>
+          </p>
+
+        </div>
+      </div>
+    </div>
+  </article>
+
+  <style>
+    /* Article-specific overrides */
+    .essay { padding: var(--space-section, 4rem) 0; }
+    .essay-header { margin-bottom: 3rem; }
+    .essay-title { font-size: 2.25rem; line-height: 1.2; margin: 0.75rem 0; }
+    .essay-subtitle { font-size: 1.15rem; line-height: 1.6; color: var(--ink-muted); margin: 0.75rem 0 1rem; }
+    .essay-byline { color: var(--ink-muted); font-size: 0.9rem; }
+    .essay-meta { color: var(--ink-muted); font-size: 0.85rem; margin-bottom: 0.5rem; }
+    .essay-body { max-width: 700px; }
+    .essay-body h2 { margin-top: 2.5rem; margin-bottom: 0.75rem; font-size: 1.4rem; }
+    .essay-body h3 { margin-top: 1.75rem; margin-bottom: 0.5rem; font-size: 1.1rem; }
+    .essay-body p { margin-bottom: 1rem; line-height: 1.7; }
+    .essay-body ul, .essay-body ol { margin: 0.75rem 0 1rem 1.5rem; }
+    .essay-body li { margin-bottom: 0.4rem; line-height: 1.6; }
+    .essay-body pre { background: var(--paper-dim, #f5f5f0); border: 1px solid var(--border); border-radius: 6px; padding: 1rem 1.25rem; overflow-x: auto; margin: 1rem 0; }
+    .essay-body code { font-family: 'JetBrains Mono', 'Fira Mono', monospace; font-size: 0.85rem; }
+    .essay-body p code, .essay-body li code { background: var(--paper-dim, #f5f5f0); padding: 0.1em 0.35em; border-radius: 3px; border: 1px solid var(--border); }
+    .essay-body a { color: var(--ink); text-decoration: underline; }
+    .essay-body table { border: 1px solid var(--border); border-radius: 6px; overflow: hidden; }
+    .essay-body th { background: var(--paper-dim, #f5f5f0); font-weight: 600; }
+  </style>
+
+</Layout>

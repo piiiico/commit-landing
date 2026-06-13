@@ -1,0 +1,273 @@
+---
+import Layout from '../../layouts/Layout.astro';
+---
+
+<Layout
+  title="I Ranked AI SDKs by Supply Chain Risk. LangChain Lost. — Commit"
+  description="OpenAI and Vercel AI score clean. Anthropic hides two CRITICAL deps. LangChain has three. A depth-2 supply chain audit of every major AI SDK."
+  canonical="https://getcommit.dev/blog/ai-sdk-supply-chain-ranking/"
+  publishDate="2026-05-13"
+>
+
+  <!-- Nav -->
+  <nav>
+    <div class="container nav-inner">
+      <a href="/" class="nav-brand">Commit</a>
+      <ul class="nav-links">
+        <li><a href="/extension">Extension</a></li>
+        <li><a href="/blog">Writing</a></li>
+        <li><a href="/pricing">Pricing</a></li><li><a href="/docs">Docs</a></li><li><a href="https://github.com/piiiico/proof-of-commitment" target="_blank" rel="noopener">GitHub</a></li>
+        <li><a href="mailto:pico@amdal.dev">Contact</a></li>
+      </ul>
+    </div>
+  </nav>
+
+  <!-- Essay -->
+  <article class="essay">
+    <div class="container">
+      <div class="editorial">
+
+        <!-- Header -->
+        <header class="essay-header">
+          <div class="essay-meta animate-in delay-1">
+            <time datetime="2026-05-13">May 13, 2026</time>
+          </div>
+          <h1 class="essay-title animate-in delay-2">I Ranked AI SDKs by Supply Chain Risk. LangChain Lost.</h1>
+          <p class="essay-subtitle animate-in delay-3">
+            OpenAI and Vercel AI score clean. Anthropic hides two CRITICAL deps. LangChain has three.
+          </p>
+          <p class="essay-byline animate-in delay-4">H&aring;kon &Aring;mdal</p>
+        </header>
+
+        <!-- Body -->
+        <div class="essay-body">
+
+          <p>
+            The March 2026 LiteLLM supply chain attack followed a pattern that was visible beforehand:
+            a single maintainer, millions of downloads, no organizational backing. The attack came via
+            a backdoored Trivy GitHub Action in LiteLLM&rsquo;s CI pipeline. Behavioral signals were
+            pointing at the risk before the incident happened.
+          </p>
+
+          <p>
+            I built <a href="https://getcommit.dev">getcommit.dev</a> to surface exactly these signals.
+            This week I ran it against the dependency trees of every major AI SDK to answer a simple question:
+            which one is safest to depend on?
+          </p>
+
+          <p>The answer surprised me.</p>
+
+          <h2>The method</h2>
+
+          <p>
+            Running <code>npx proof-of-commitment @anthropic-ai/sdk</code> gives you the surface-level score.
+            That&rsquo;s the direct package.
+          </p>
+
+          <p>
+            The more interesting test is depth 2: scan what the SDK&rsquo;s own dependencies depend on.
+            That&rsquo;s where hidden risk lives.
+          </p>
+
+          <pre><code># Surface scan
+npx proof-of-commitment openai @anthropic-ai/sdk @langchain/core ai
+
+# Depth-2 scan (any package)
+curl -X POST https://poc-backend.amdal-dev.workers.dev/api/graph/npm \
+  -H "Content-Type: application/json" \
+  -d '&#123;"package": "@langchain/core", "depth": 2&#125;'</code></pre>
+
+          <h2>Surface level: everything looks fine</h2>
+
+          <p>At depth 1, all four SDKs score healthy:</p>
+
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr><th>SDK</th><th>Score</th><th>Maintainers</th><th>Downloads/wk</th><th>Risk</th></tr>
+              </thead>
+              <tbody>
+                <tr><td><a href="/package/openai/"><code>openai</code></a></td><td>94</td><td>17</td><td>19.5M</td><td>HEALTHY</td></tr>
+                <tr><td><code>ai</code> (Vercel AI)</td><td>94</td><td>4</td><td>13M</td><td>HEALTHY</td></tr>
+                <tr><td><a href="/package/@anthropic-ai__sdk/"><code>@anthropic-ai/sdk</code></a></td><td>86</td><td>14</td><td>17.6M</td><td>HEALTHY</td></tr>
+                <tr><td><code>@langchain/core</code></td><td>84</td><td>13</td><td>4.4M</td><td>HEALTHY</td></tr>
+              </tbody>
+            </table>
+          </div>
+
+          <p>Large teams. Active maintenance. All pass. Surface-level tools stop here.</p>
+
+          <h2>Depth 2: the picture changes</h2>
+
+          <h3>openai: clean tree</h3>
+
+          <p>
+            Zero dependencies. Zero critical transitive paths. OpenAI&rsquo;s SDK has no runtime deps at all.
+            Safest of the four by a wide margin.
+          </p>
+
+          <h3>ai (Vercel AI SDK): mostly clean</h3>
+
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr><th>Package</th><th>Maintainers</th><th>Downloads/wk</th><th>Risk</th></tr>
+              </thead>
+              <tbody>
+                <tr><td><code>@ai-sdk/gateway</code></td><td>3</td><td>10.5M</td><td>HIGH (new, &lt;1yr)</td></tr>
+                <tr><td><code>@vercel/oidc</code></td><td>3</td><td>11.8M</td><td>HIGH (new, &lt;1yr)</td></tr>
+              </tbody>
+            </table>
+          </div>
+
+          <p>
+            Two HIGH flags, both Vercel-backed and less than a year old with 10M+ weekly downloads.
+            The organizational backing reduces risk significantly. Not CRITICAL, but worth monitoring &mdash;
+            young packages with high adoption are the ones where a compromised CI pipeline hurts the most.
+          </p>
+
+          <h3>@anthropic-ai/sdk: two hidden CRITICAL deps</h3>
+
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr><th>Package</th><th>Maintainers</th><th>Downloads/wk</th><th>Risk</th></tr>
+              </thead>
+              <tbody>
+                <tr><td><code>json-schema-to-ts</code></td><td>1</td><td>17.3M</td><td>CRITICAL + stale</td></tr>
+                <tr><td><code>ts-algebra</code></td><td>1</td><td>14.2M</td><td>CRITICAL + stale</td></tr>
+              </tbody>
+            </table>
+          </div>
+
+          <p>
+            <code>json-schema-to-ts</code> is the Anthropic SDK&rsquo;s runtime dependency. One maintainer.
+            17.3 million weekly downloads. No new release in over 12 months.
+          </p>
+
+          <p>
+            That&rsquo;s the structural profile &mdash; sole publisher, massive scale, stalled activity &mdash;
+            that preceded the ua-parser-js compromise in 2021 and the axios incident in 2026.
+          </p>
+
+          <p>
+            <code>ts-algebra</code> sits one level deeper. Same profile: one maintainer, 14.2 million
+            downloads per week, dormant for over a year.
+          </p>
+
+          <p>Neither shows up if you audit only your direct dependencies.</p>
+
+          <p>
+            Plus three HIGH-risk deps: <code>standardwebhooks</code> (sole publisher, 6.3M/wk, stale),
+            <code>@stablelib/base64</code> and <code>fast-sha256</code> (both sole publisher, ~7M/wk, stale).
+            The Anthropic SDK&rsquo;s dependency tree is small but concentrated.
+          </p>
+
+          <h3>@langchain/core: three CRITICAL transitive paths</h3>
+
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr><th>Package</th><th>Maintainers</th><th>Downloads/wk</th><th>Risk</th></tr>
+              </thead>
+              <tbody>
+                <tr><td><a href="/package/zod/"><code>zod</code></a></td><td>1</td><td>171M</td><td>CRITICAL</td></tr>
+                <tr><td><code>p-queue</code></td><td>1</td><td>23M</td><td>CRITICAL</td></tr>
+                <tr><td><code>p-timeout</code></td><td>1</td><td>35M</td><td>CRITICAL</td></tr>
+              </tbody>
+            </table>
+          </div>
+
+          <p>
+            Three CRITICAL transitive dependencies. <code>zod</code> alone: 171 million weekly downloads,
+            one npm publisher. GitHub shows 30+ contributors. But npm publish access &mdash; the actual
+            attack surface &mdash; is held by a single account.
+          </p>
+
+          <p>
+            Plus two HIGH-risk deps: <code>@cfworker/json-schema</code> (sole publisher, 4.8M/wk, stale)
+            and <code>js-tiktoken</code> (sole publisher, 5.4M/wk).
+          </p>
+
+          <p>
+            Any one of these is a high-value target. Combined: over 229 million weekly downloads behind
+            single-person publish credentials in LangChain&rsquo;s transitive tree.
+          </p>
+
+          <h2>The ranking</h2>
+
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr><th>Rank</th><th>SDK</th><th>Critical transitive deps</th><th>Worst transitive score</th></tr>
+              </thead>
+              <tbody>
+                <tr><td>1</td><td><code>openai</code></td><td>0</td><td>&mdash;</td></tr>
+                <tr><td>2</td><td><code>ai</code> (Vercel AI)</td><td>0</td><td>69</td></tr>
+                <tr><td>3</td><td><code>@anthropic-ai/sdk</code></td><td>2</td><td>52</td></tr>
+                <tr><td>4</td><td><code>@langchain/core</code></td><td>3</td><td>56</td></tr>
+              </tbody>
+            </table>
+          </div>
+
+          <p>
+            OpenAI wins by having no dependencies at all. Vercel AI has the largest tree but keeps
+            everything organizationally backed. Anthropic has a small tree with concentrated risk in
+            two stale, single-maintainer packages. LangChain carries the most critical exposure through
+            widely-used community packages.
+          </p>
+
+          <h2>What to do with this</h2>
+
+          <p>
+            Surface scans aren&rsquo;t enough. The attack surface for your AI application includes
+            every transitive dependency, not just the ones in your <code>package.json</code>.
+            I walked through the depth-2 metric and replicated it on 5 popular packages in <a href="/blog/transitive-risk-methodology">a separate methodology piece</a> &mdash; it covers the formula, the data sources, and how to run it yourself.
+          </p>
+
+          <p>To check your own project:</p>
+
+          <pre><code># Scan your lock file (finds transitive deps automatically)
+npx proof-of-commitment --file package-lock.json
+
+# Scan a specific SDK at depth 2
+curl -X POST https://poc-backend.amdal-dev.workers.dev/api/graph/npm \
+  -H "Content-Type: application/json" \
+  -d '&#123;"package": "@langchain/core", "depth": 2&#125;'</code></pre>
+
+          <p>
+            Or check any package&rsquo;s trust profile at
+            <a href="/package/zod/">getcommit.dev/package/zod/</a> &mdash;
+            every npm package now has a permanent page with live behavioral scoring.
+          </p>
+
+          <p>The data is public. The attack patterns are documented. What you do with it is up to you.</p>
+
+          <hr />
+
+          <p>
+            <em>
+              <a href="https://getcommit.dev">getcommit.dev</a> &mdash; behavioral supply chain scoring
+              for npm, PyPI, Cargo, and Go.
+              <a href="https://github.com/piiiico/proof-of-commitment" target="_blank" rel="noopener">GitHub</a>.
+            </em>
+          </p>
+
+        </div>
+
+        <!-- CTA -->
+        <div class="essay-cta reveal" style="margin-top: var(--space-block);">
+          <div class="cta-box">
+            <p class="cta-text">Scan your own dependency tree</p>
+            <div class="cta-buttons">
+              <a href="/audit" class="btn-primary">Try the scanner</a>
+              <a href="https://github.com/piiiico/proof-of-commitment" target="_blank" rel="noopener" class="btn-secondary">View on GitHub</a>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </article>
+
+</Layout>

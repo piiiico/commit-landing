@@ -1,0 +1,527 @@
+---
+import Layout from '../../layouts/Layout.astro';
+---
+
+<Layout
+  title="Dependency Autopsy: event-stream — Commit"
+  description="We reconstructed Commit's trust scoring at every stage of the 2018 event-stream supply chain attack. The most damning signal wasn't the package that was attacked — it was the one that was injected."
+  canonical="https://getcommit.dev/blog/event-stream-autopsy/"
+  publishDate="2026-04-19"
+>
+
+  <!-- Nav -->
+  <nav>
+    <div class="container nav-inner">
+      <a href="/" class="nav-brand">Commit</a>
+      <ul class="nav-links">
+        <li><a href="/extension">Extension</a></li>
+        <li><a href="/blog">Writing</a></li>
+        <li><a href="/pricing">Pricing</a></li><li><a href="/docs">Docs</a></li><li><a href="https://github.com/piiiico/proof-of-commitment" target="_blank" rel="noopener">GitHub</a></li>
+        <li><a href="mailto:pico@amdal.dev">Contact</a></li>
+      </ul>
+    </div>
+  </nav>
+
+  <!-- Essay -->
+  <article class="essay">
+    <div class="container">
+      <div class="editorial">
+
+        <!-- Header -->
+        <header class="essay-header">
+          <div class="essay-meta animate-in delay-1">
+            <time datetime="2026-04-19">April 19, 2026</time>
+          </div>
+          <h1 class="essay-title animate-in delay-2">Dependency Autopsy: event-stream</h1>
+          <p class="essay-subtitle animate-in delay-3">
+            We applied Commit's trust scoring retrospectively to every stage of the 2018 event-stream supply chain attack. The package itself scored 66 with two risk flags. But the real signal was the dependency it ingested: flatmap-stream, a brand-new package with a trust score of 13. Here's the full breakdown.
+          </p>
+          <p class="essay-byline animate-in delay-4">Pico</p>
+        </header>
+
+        <!-- Body -->
+        <div class="essay-body">
+
+          <p>
+            The event-stream attack is the Rosetta Stone of supply chain security. Everything that has happened since &mdash; ua-parser-js in 2021, colors.js in 2022, node-ipc in 2022 &mdash; follows the pattern it established. And unlike those later incidents, event-stream had time to be studied. We know the exact timeline. We know every commit. We know exactly when each structural signal changed.
+          </p>
+          <p>
+            So we did something we haven't done for any other incident: we reconstructed what <a href="https://github.com/piiiico/proof-of-commitment" target="_blank" rel="noopener">proof-of-commitment</a> scoring would have shown at every stage of the attack, using the <a href="/spec">published specification</a> and the data that was publicly available at each point in time.
+          </p>
+          <p>
+            The results are honest. The tool wouldn't have prevented the attack. But it would have made the signal loud enough to investigate &mdash; and investigation was all that was needed.
+          </p>
+
+          <hr class="essay-divider" />
+
+          <h2>The timeline</h2>
+
+          <p>
+            For anyone unfamiliar: event-stream was a popular Node.js utility for working with streams, created by Dominic Tarr in 2011. By 2018, it had roughly 2 million weekly downloads and was a transitive dependency across thousands of projects. Tarr was the sole maintainer and had publicly lost interest in the package years earlier.
+          </p>
+          <p>
+            In September 2018, a GitHub user called <code>right9ctrl</code> offered to take over maintenance. Tarr agreed and transferred npm publish access. In early October, the new maintainer published event-stream 3.3.6, which added a single new dependency: <code>flatmap-stream</code>. This package, also created by right9ctrl, contained an encrypted payload targeting Copay &mdash; a Bitcoin wallet &mdash; to steal cryptocurrency from users. The attack went undetected for nearly two months until a developer noticed unusual code during a routine dependency check on November 20, 2018.
+          </p>
+          <p>
+            No automated tool caught it. Not npm audit (no CVE existed). Not any static analysis tool (the payload was AES-encrypted and only executed in a specific downstream context). Not GitHub (the code looked like a normal functional programming utility). The attack was invisible to anything that analyzed code.
+          </p>
+          <p>
+            The structural signals, however, were not invisible. They were screaming.
+          </p>
+
+          <hr class="essay-divider" />
+
+          <h2>Trust score timeline</h2>
+
+          <p>
+            We scored both packages &mdash; event-stream and flatmap-stream &mdash; at four key moments. All scores use the <a href="/spec">published specification</a> (v1.0.0) with data that was available at each date. The methodology is fully reproducible; every threshold and weight is documented in the spec.
+          </p>
+
+          <div style="overflow-x: auto; margin: 2rem 0;">
+            <table style="width: 100%; border-collapse: collapse; font-size: 0.875rem;">
+              <thead>
+                <tr style="border-bottom: 2px solid var(--border-light);">
+                  <th style="text-align: left; padding: 0.75rem 0.75rem 0.75rem 0; font-weight: 600;">Date</th>
+                  <th style="text-align: left; padding: 0.75rem; font-weight: 600;">Event</th>
+                  <th style="text-align: center; padding: 0.75rem; font-weight: 600;">event-stream</th>
+                  <th style="text-align: center; padding: 0.75rem; font-weight: 600;">flatmap-stream</th>
+                  <th style="text-align: left; padding: 0.75rem 0 0.75rem 0.75rem; font-weight: 600;">Risk flags</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr style="border-bottom: 1px solid var(--border-light);">
+                  <td style="padding: 0.6rem 0.75rem 0.6rem 0; color: var(--ink-subtle); white-space: nowrap;">Aug 2018</td>
+                  <td style="padding: 0.6rem 0.75rem;">Stable state. Tarr is sole maintainer, package unchanged for years.</td>
+                  <td style="padding: 0.6rem 0.75rem; text-align: center; font-weight: 600;">66</td>
+                  <td style="padding: 0.6rem 0.75rem; text-align: center; color: var(--ink-subtle);">&mdash;</td>
+                  <td style="padding: 0.6rem 0 0.6rem 0.75rem;">&#x1F7E0; HIGH &middot; &#x26A0;&#xFE0F; WARN</td>
+                </tr>
+                <tr style="border-bottom: 1px solid var(--border-light);">
+                  <td style="padding: 0.6rem 0.75rem 0.6rem 0; color: var(--ink-subtle); white-space: nowrap;">Sep 2018</td>
+                  <td style="padding: 0.6rem 0.75rem;">Tarr transfers publish access to right9ctrl.</td>
+                  <td style="padding: 0.6rem 0.75rem; text-align: center; font-weight: 600;">66</td>
+                  <td style="padding: 0.6rem 0.75rem; text-align: center; color: var(--ink-subtle);">&mdash;</td>
+                  <td style="padding: 0.6rem 0 0.6rem 0.75rem;">&#x1F7E0; HIGH &middot; &#x26A0;&#xFE0F; WARN</td>
+                </tr>
+                <tr style="border-bottom: 1px solid var(--border-light); background: rgba(220, 38, 38, 0.04);">
+                  <td style="padding: 0.6rem 0.75rem 0.6rem 0; color: var(--ink-subtle); white-space: nowrap;">Oct 5, 2018</td>
+                  <td style="padding: 0.6rem 0.75rem;">flatmap-stream published. event-stream 3.3.6 adds it as a dependency.</td>
+                  <td style="padding: 0.6rem 0.75rem; text-align: center; font-weight: 600;">73 &#x2191;</td>
+                  <td style="padding: 0.6rem 0.75rem; text-align: center; font-weight: 600; color: #c00;">13</td>
+                  <td style="padding: 0.6rem 0 0.6rem 0.75rem;">&#x1F534; New dep: <strong>MINIMAL</strong></td>
+                </tr>
+                <tr style="border-bottom: 1px solid var(--border-light);">
+                  <td style="padding: 0.6rem 0.75rem 0.6rem 0; color: var(--ink-subtle); white-space: nowrap;">Nov 26, 2018</td>
+                  <td style="padding: 0.6rem 0.75rem;">Attack discovered. npm unpublishes malicious versions.</td>
+                  <td style="padding: 0.6rem 0.75rem; text-align: center; font-weight: 600;">73</td>
+                  <td style="padding: 0.6rem 0.75rem; text-align: center; font-weight: 600; color: #c00;">13</td>
+                  <td style="padding: 0.6rem 0 0.6rem 0.75rem;">(too late)</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <p>
+            Two things jump out of this timeline.
+          </p>
+          <p>
+            First: event-stream's own score <em>went up</em> when the malicious version was published. From 66 to 73. The new release triggered a recency bonus in the Release Consistency dimension. By point-in-time scoring, event-stream looked <em>healthier</em> after the attack than before it. This is a real limitation &mdash; and a lesson about what structural scoring can and cannot do.
+          </p>
+          <p>
+            Second: flatmap-stream scored 13 out of 100. <strong>Thirteen.</strong> In the MINIMAL trust tier. Every dimension was near zero except the recency bonus for having just been published. This is not a marginal signal. A dependency with a trust score of 13 appearing in a package with 2 million weekly downloads is a structural anomaly that should trigger immediate investigation.
+          </p>
+
+          <hr class="essay-divider" />
+
+          <h2>Dimension-by-dimension: event-stream</h2>
+
+          <p>
+            Before the attack (August 2018), event-stream's breakdown:
+          </p>
+
+          <div style="overflow-x: auto; margin: 2rem 0;">
+            <table style="width: 100%; border-collapse: collapse; font-size: 0.875rem;">
+              <thead>
+                <tr style="border-bottom: 2px solid var(--border-light);">
+                  <th style="text-align: left; padding: 0.5rem 0.75rem 0.5rem 0; font-weight: 600;">Dimension</th>
+                  <th style="text-align: right; padding: 0.5rem 0.75rem; font-weight: 600;">Max</th>
+                  <th style="text-align: right; padding: 0.5rem 0.75rem; font-weight: 600;">Score</th>
+                  <th style="text-align: left; padding: 0.5rem 0 0.5rem 0.75rem; font-weight: 600;">Reasoning</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr style="border-bottom: 1px solid var(--border-light);">
+                  <td style="padding: 0.5rem 0.75rem 0.5rem 0;">Longevity</td>
+                  <td style="padding: 0.5rem 0.75rem; text-align: right;">25</td>
+                  <td style="padding: 0.5rem 0.75rem; text-align: right; font-weight: 600;">25</td>
+                  <td style="padding: 0.5rem 0 0.5rem 0.75rem;">Created 2011. 7 years old. Full marks.</td>
+                </tr>
+                <tr style="border-bottom: 1px solid var(--border-light);">
+                  <td style="padding: 0.5rem 0.75rem 0.5rem 0;">Download Momentum</td>
+                  <td style="padding: 0.5rem 0.75rem; text-align: right;">25</td>
+                  <td style="padding: 0.5rem 0.75rem; text-align: right; font-weight: 600;">22</td>
+                  <td style="padding: 0.5rem 0 0.5rem 0.75rem;">~2M/week (&ge;1M = 22 base). Stable trend (+0).</td>
+                </tr>
+                <tr style="border-bottom: 1px solid var(--border-light);">
+                  <td style="padding: 0.5rem 0.75rem 0.5rem 0;">Release Consistency</td>
+                  <td style="padding: 0.5rem 0.75rem; text-align: right;">20</td>
+                  <td style="padding: 0.5rem 0.75rem; text-align: right; font-weight: 600;">12</td>
+                  <td style="padding: 0.5rem 0 0.5rem 0.75rem;">~50 versions (&ge;30 = 12 base). Last publish &gt;365 days (+0 recency).</td>
+                </tr>
+                <tr style="border-bottom: 1px solid var(--border-light);">
+                  <td style="padding: 0.5rem 0.75rem 0.5rem 0;">Maintainer Depth</td>
+                  <td style="padding: 0.5rem 0.75rem; text-align: right;">15</td>
+                  <td style="padding: 0.5rem 0.75rem; text-align: right; font-weight: 600; color: #c00;">4</td>
+                  <td style="padding: 0.5rem 0 0.5rem 0.75rem;">1 maintainer (Dominic Tarr). Minimum score for a registered package.</td>
+                </tr>
+                <tr style="border-bottom: 1px solid var(--border-light);">
+                  <td style="padding: 0.5rem 0.75rem 0.5rem 0;">GitHub Backing</td>
+                  <td style="padding: 0.5rem 0.75rem; text-align: right;">15</td>
+                  <td style="padding: 0.5rem 0.75rem; text-align: right; font-weight: 600;">3</td>
+                  <td style="padding: 0.5rem 0 0.5rem 0.75rem;">Repo ~1.7K stars but &gt;730 days without push &rarr; 0.5&times; penalty. Repo score ~22.</td>
+                </tr>
+                <tr style="border-top: 2px solid var(--border-light);">
+                  <td style="padding: 0.5rem 0.75rem 0.5rem 0; font-weight: 600;">Total</td>
+                  <td style="padding: 0.5rem 0.75rem; text-align: right; font-weight: 600;">100</td>
+                  <td style="padding: 0.5rem 0.75rem; text-align: right; font-weight: 600;">66</td>
+                  <td style="padding: 0.5rem 0 0.5rem 0.75rem;"></td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <p>
+            <strong>Risk flags (pre-attack):</strong>
+          </p>
+          <ul>
+            <li><strong>&#x1F7E0; HIGH</strong> &mdash; Single maintainer AND &gt;1M weekly downloads. The structural profile that attackers select for.</li>
+            <li><strong>&#x26A0;&#xFE0F; WARN</strong> &mdash; No publish in &gt;365 days. The package was abandoned by its creator while still being installed 2 million times a week.</li>
+          </ul>
+          <p>
+            Neither flag alone is a smoking gun. Together, they describe the exact conditions that enabled the attack: an abandoned package with a massive install base, controlled by a single credential, with an owner who had publicly stated he no longer cared about it. That's not an obscure risk factor. That's a neon sign.
+          </p>
+
+          <hr class="essay-divider" />
+
+          <h2>Dimension-by-dimension: flatmap-stream</h2>
+
+          <p>
+            This is where the analysis gets interesting. flatmap-stream was the vehicle for the attack &mdash; the package right9ctrl created to carry the malicious payload. Let's score it at the moment it appeared:
+          </p>
+
+          <div style="overflow-x: auto; margin: 2rem 0;">
+            <table style="width: 100%; border-collapse: collapse; font-size: 0.875rem;">
+              <thead>
+                <tr style="border-bottom: 2px solid var(--border-light);">
+                  <th style="text-align: left; padding: 0.5rem 0.75rem 0.5rem 0; font-weight: 600;">Dimension</th>
+                  <th style="text-align: right; padding: 0.5rem 0.75rem; font-weight: 600;">Max</th>
+                  <th style="text-align: right; padding: 0.5rem 0.75rem; font-weight: 600;">Score</th>
+                  <th style="text-align: left; padding: 0.5rem 0 0.5rem 0.75rem; font-weight: 600;">Reasoning</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr style="border-bottom: 1px solid var(--border-light);">
+                  <td style="padding: 0.5rem 0.75rem 0.5rem 0;">Longevity</td>
+                  <td style="padding: 0.5rem 0.75rem; text-align: right;">25</td>
+                  <td style="padding: 0.5rem 0.75rem; text-align: right; font-weight: 600; color: #c00;">1</td>
+                  <td style="padding: 0.5rem 0 0.5rem 0.75rem;">Brand new. &lt;6 months old. Minimum score.</td>
+                </tr>
+                <tr style="border-bottom: 1px solid var(--border-light);">
+                  <td style="padding: 0.5rem 0.75rem 0.5rem 0;">Download Momentum</td>
+                  <td style="padding: 0.5rem 0.75rem; text-align: right;">25</td>
+                  <td style="padding: 0.5rem 0.75rem; text-align: right; font-weight: 600; color: #c00;">0</td>
+                  <td style="padding: 0.5rem 0 0.5rem 0.75rem;">Zero organic downloads. No install history.</td>
+                </tr>
+                <tr style="border-bottom: 1px solid var(--border-light);">
+                  <td style="padding: 0.5rem 0.75rem 0.5rem 0;">Release Consistency</td>
+                  <td style="padding: 0.5rem 0.75rem; text-align: right;">20</td>
+                  <td style="padding: 0.5rem 0.75rem; text-align: right; font-weight: 600;">8</td>
+                  <td style="padding: 0.5rem 0 0.5rem 0.75rem;">1 version (&ge;1 = 3 base). Recently published (+5 recency).</td>
+                </tr>
+                <tr style="border-bottom: 1px solid var(--border-light);">
+                  <td style="padding: 0.5rem 0.75rem 0.5rem 0;">Maintainer Depth</td>
+                  <td style="padding: 0.5rem 0.75rem; text-align: right;">15</td>
+                  <td style="padding: 0.5rem 0.75rem; text-align: right; font-weight: 600; color: #c00;">4</td>
+                  <td style="padding: 0.5rem 0 0.5rem 0.75rem;">1 maintainer (right9ctrl). Unknown account with no other packages.</td>
+                </tr>
+                <tr style="border-bottom: 1px solid var(--border-light);">
+                  <td style="padding: 0.5rem 0.75rem 0.5rem 0;">GitHub Backing</td>
+                  <td style="padding: 0.5rem 0.75rem; text-align: right;">15</td>
+                  <td style="padding: 0.5rem 0.75rem; text-align: right; font-weight: 600; color: #c00;">0</td>
+                  <td style="padding: 0.5rem 0 0.5rem 0.75rem;">Zero stars. Zero forks. Zero watchers. No community signal whatsoever.</td>
+                </tr>
+                <tr style="border-top: 2px solid var(--border-light); background: rgba(220, 38, 38, 0.04);">
+                  <td style="padding: 0.5rem 0.75rem 0.5rem 0; font-weight: 600;">Total</td>
+                  <td style="padding: 0.5rem 0.75rem; text-align: right; font-weight: 600;">100</td>
+                  <td style="padding: 0.5rem 0.75rem; text-align: right; font-weight: 600; color: #c00;">13</td>
+                  <td style="padding: 0.5rem 0 0.5rem 0.75rem;"><strong>MINIMAL trust</strong> (0&ndash;39 tier)</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <p>
+            Thirteen out of a hundred. Every dimension except Release Consistency scored at or near zero. The only points came from the fact that it existed and had been recently published &mdash; which is true of literally any newly created package.
+          </p>
+          <p>
+            Even after flatmap-stream inherited event-stream's 2 million weekly downloads through transitive installs, the score only climbed to 38 &mdash; still firmly in the MINIMAL tier. Downloads alone cannot rescue a package that has no history, no community, no governance, and no reason to exist except as a dependency of one other package.
+          </p>
+
+          <hr class="essay-divider" />
+
+          <h2>The signal that mattered</h2>
+
+          <p>
+            Here's the critical insight, and the reason this incident is worth a deep autopsy rather than a quick case study.
+          </p>
+          <p>
+            <strong>Scoring event-stream alone would not have caught this attack.</strong> The existing <a href="/blog/three-npm-disasters-that-were-predictable">Three npm Disasters</a> analysis was honest about this. Event-stream's score was 66 with a HIGH flag &mdash; concerning, but millions of packages have concerning profiles. The point-in-time score doesn't isolate the attack.
+          </p>
+          <p>
+            <strong>Scoring the dependency tree catches it.</strong> The question isn't "what does event-stream score?" It's "what changed in my dependency tree, and what does the new entry score?"
+          </p>
+          <p>
+            When event-stream 3.3.6 was published, every project that depended on it gained a new transitive dependency: flatmap-stream. If those projects had been running <code>npx proof-of-commitment --file package.json</code> on each lockfile update, the output would have included a new line:
+          </p>
+
+          <pre><code>flatmap-stream  score=13  1 maintainer  0 downloads/week  &#x1F534; MINIMAL
+  &#x2514; new transitive dependency via event-stream@3.3.6</code></pre>
+
+          <p>
+            A package with a trust score of 13 suddenly appearing in your dependency tree is not a subtle signal. It is the dependency equivalent of a fire alarm. The natural response &mdash; "what is this package, and why was it added?" &mdash; leads directly to the attack. Five minutes of investigation would have revealed that flatmap-stream was created by the same person who just took over event-stream, had no independent purpose, and contained unusual code patterns.
+          </p>
+          <p>
+            No CVE database needed. No malware scanner needed. No code analysis needed. Just the structural question: <em>does this new dependency deserve the trust my project is about to grant it?</em>
+          </p>
+
+          <hr class="essay-divider" />
+
+          <h2>Why event-stream's score went up</h2>
+
+          <p>
+            This is the uncomfortable detail worth examining. When right9ctrl published event-stream 3.3.6, the package's Release Consistency score improved. A new release within the last 30 days earned a +5 recency bonus, pushing the dimension from 12 to 17 and the overall score from 66 to 73.
+          </p>
+          <p>
+            By the numbers, event-stream looked <em>healthier</em> after the attack than before. The WARN flag for staleness would have cleared. To a point-in-time scoring system, the new maintainer appeared to be reviving an abandoned project.
+          </p>
+          <p>
+            This is a real limitation, and we are transparent about it. A static score cannot distinguish between genuine revival and social engineering. The spec scores the <em>current structural state</em>, not the trajectory of change. Detecting maintainer handoffs, sudden dependency additions, and behavioral diffs over time &mdash; these require temporal analysis that goes beyond what the current specification covers.
+          </p>
+          <p>
+            But notice what the <em>dependency tree</em> scoring catches even without temporal analysis: the 73-scoring parent package now depends on a 13-scoring child. The gap &mdash; 73 vs. 13 &mdash; is itself a structural anomaly. A well-established package suddenly depending on an untrusted one is not a pattern that requires sophisticated detection. It requires the right question.
+          </p>
+
+          <hr class="essay-divider" />
+
+          <h2>What we can't catch (and what we can)</h2>
+
+          <p>
+            Being precise about claims matters more than being impressive. Here's the honest ledger:
+          </p>
+
+          <div style="overflow-x: auto; margin: 2rem 0;">
+            <table style="width: 100%; border-collapse: collapse; font-size: 0.875rem;">
+              <thead>
+                <tr style="border-bottom: 2px solid var(--border-light);">
+                  <th style="text-align: left; padding: 0.5rem 0.75rem 0.5rem 0; font-weight: 600;">Attack stage</th>
+                  <th style="text-align: left; padding: 0.5rem 0.75rem; font-weight: 600;">What happened</th>
+                  <th style="text-align: center; padding: 0.5rem 0.75rem; font-weight: 600;">Detectable?</th>
+                  <th style="text-align: left; padding: 0.5rem 0 0.5rem 0.75rem; font-weight: 600;">How</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr style="border-bottom: 1px solid var(--border-light);">
+                  <td style="padding: 0.5rem 0.75rem 0.5rem 0;">Pre-condition</td>
+                  <td style="padding: 0.5rem 0.75rem;">Abandoned package, sole maintainer, 2M installs/week</td>
+                  <td style="padding: 0.5rem 0.75rem; text-align: center;">&#x2705;</td>
+                  <td style="padding: 0.5rem 0 0.5rem 0.75rem;">HIGH + WARN flags. Score 66 &mdash; weakest in peer group.</td>
+                </tr>
+                <tr style="border-bottom: 1px solid var(--border-light);">
+                  <td style="padding: 0.5rem 0.75rem 0.5rem 0;">Social engineering</td>
+                  <td style="padding: 0.5rem 0.75rem;">right9ctrl convinces Tarr to hand over publish access</td>
+                  <td style="padding: 0.5rem 0.75rem; text-align: center;">&#x274C;</td>
+                  <td style="padding: 0.5rem 0 0.5rem 0.75rem;">Not currently scored. Maintainer change detection is on the roadmap.</td>
+                </tr>
+                <tr style="border-bottom: 1px solid var(--border-light);">
+                  <td style="padding: 0.5rem 0.75rem 0.5rem 0;">Dependency injection</td>
+                  <td style="padding: 0.5rem 0.75rem;">flatmap-stream added as new dependency</td>
+                  <td style="padding: 0.5rem 0.75rem; text-align: center;">&#x2705;</td>
+                  <td style="padding: 0.5rem 0 0.5rem 0.75rem;">flatmap-stream scores 13/100 (MINIMAL). Dependency tree diff catches it.</td>
+                </tr>
+                <tr style="border-bottom: 1px solid var(--border-light);">
+                  <td style="padding: 0.5rem 0.75rem 0.5rem 0;">Payload delivery</td>
+                  <td style="padding: 0.5rem 0.75rem;">Encrypted malicious code in flatmap-stream targets Copay wallet</td>
+                  <td style="padding: 0.5rem 0.75rem; text-align: center;">&#x274C;</td>
+                  <td style="padding: 0.5rem 0 0.5rem 0.75rem;">Out of scope. Commit scores structure, not code.</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <p>
+            Two out of four stages are detectable. The two that aren't &mdash; social engineering and payload analysis &mdash; are fundamentally different problems that require different tools. But catching either of the two detectable stages would have been sufficient. Flagging the pre-conditions raises the alarm. Flagging the dependency injection identifies the weapon.
+          </p>
+
+          <hr class="essay-divider" />
+
+          <h2>The pattern since 2018</h2>
+
+          <p>
+            Every major npm supply chain attack since event-stream has exploited the same structural condition: a sole maintainer controlling publish access for a high-traffic package. The attack vectors differ &mdash; social engineering, token compromise, account takeover &mdash; but the structural precondition is identical.
+          </p>
+
+          <div style="overflow-x: auto; margin: 2rem 0;">
+            <table style="width: 100%; border-collapse: collapse; font-size: 0.875rem;">
+              <thead>
+                <tr style="border-bottom: 2px solid var(--border-light);">
+                  <th style="text-align: left; padding: 0.5rem 0.75rem 0.5rem 0; font-weight: 600;">Incident</th>
+                  <th style="text-align: left; padding: 0.5rem 0.75rem; font-weight: 600;">Vector</th>
+                  <th style="text-align: right; padding: 0.5rem 0.75rem; font-weight: 600;">Maintainers</th>
+                  <th style="text-align: right; padding: 0.5rem 0.75rem; font-weight: 600;">Downloads/wk</th>
+                  <th style="text-align: center; padding: 0.5rem 0 0.5rem 0.75rem; font-weight: 600;">Flag</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr style="border-bottom: 1px solid var(--border-light);">
+                  <td style="padding: 0.5rem 0.75rem 0.5rem 0;">event-stream (2018)</td>
+                  <td style="padding: 0.5rem 0.75rem;">Social engineering</td>
+                  <td style="padding: 0.5rem 0.75rem; text-align: right;">1</td>
+                  <td style="padding: 0.5rem 0.75rem; text-align: right;">2M</td>
+                  <td style="padding: 0.5rem 0 0.5rem 0.75rem; text-align: center;">&#x1F7E0; HIGH</td>
+                </tr>
+                <tr style="border-bottom: 1px solid var(--border-light);">
+                  <td style="padding: 0.5rem 0.75rem 0.5rem 0;">ua-parser-js (2021)</td>
+                  <td style="padding: 0.5rem 0.75rem;">Token compromise</td>
+                  <td style="padding: 0.5rem 0.75rem; text-align: right;">1</td>
+                  <td style="padding: 0.5rem 0.75rem; text-align: right;">7M</td>
+                  <td style="padding: 0.5rem 0 0.5rem 0.75rem; text-align: center;">&#x1F7E0; HIGH</td>
+                </tr>
+                <tr style="border-bottom: 1px solid var(--border-light);">
+                  <td style="padding: 0.5rem 0.75rem 0.5rem 0;">LiteLLM (2026)</td>
+                  <td style="padding: 0.5rem 0.75rem;">Token compromise</td>
+                  <td style="padding: 0.5rem 0.75rem; text-align: right;">1</td>
+                  <td style="padding: 0.5rem 0.75rem; text-align: right;">95M/mo</td>
+                  <td style="padding: 0.5rem 0 0.5rem 0.75rem; text-align: center;">&#x1F534; CRITICAL</td>
+                </tr>
+                <tr style="border-bottom: 1px solid var(--border-light);">
+                  <td style="padding: 0.5rem 0.75rem 0.5rem 0;">axios (2026)</td>
+                  <td style="padding: 0.5rem 0.75rem;">Token compromise</td>
+                  <td style="padding: 0.5rem 0.75rem; text-align: right;">1</td>
+                  <td style="padding: 0.5rem 0.75rem; text-align: right;">101M</td>
+                  <td style="padding: 0.5rem 0 0.5rem 0.75rem; text-align: center;">&#x1F534; CRITICAL</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <p>
+            The structural condition was visible before every single one of these attacks. In each case, the flag existed for months or years before the incident. The tools to see it existed. The data was public. The only thing missing was someone asking the right question.
+          </p>
+          <p>
+            Proof-of-commitment asks the right question, automatically, against every package in your dependency tree.
+          </p>
+
+          <hr class="essay-divider" />
+
+          <h2>Try it yourself</h2>
+
+          <p>
+            The entire methodology is open source. Every weight, threshold, and flag is documented in the <a href="/spec">specification</a>. You can verify every number in this analysis.
+          </p>
+
+          <pre style="background: var(--bg-code, #f5f5f5); padding: 1rem; border-radius: 4px; overflow-x: auto; font-size: 0.85rem;"><code># Score event-stream today
+npx proof-of-commitment event-stream
+
+# Audit your whole project
+npx proof-of-commitment --file package.json
+
+# Web interface
+# https://getcommit.dev/audit</code></pre>
+
+          <p>
+            MCP server for Claude Desktop, Cursor, or Windsurf:
+          </p>
+
+          <pre style="background: var(--bg-code, #f5f5f5); padding: 1rem; border-radius: 4px; overflow-x: auto; font-size: 0.85rem;"><code>&#123;
+  "mcpServers": &#123;
+    "proof-of-commitment": &#123;
+      "type": "streamable-http",
+      "url": "https://poc-backend.amdal-dev.workers.dev/mcp"
+    &#125;
+  &#125;
+&#125;</code></pre>
+
+          <p>
+            GitHub Action (runs on every PR):
+          </p>
+
+          <pre style="background: var(--bg-code, #f5f5f5); padding: 1rem; border-radius: 4px; overflow-x: auto; font-size: 0.85rem;"><code>- uses: piiiico/proof-of-commitment@main
+  with:
+    fail-on-critical: false
+    comment-on-pr: true</code></pre>
+
+          <hr class="essay-divider" />
+
+          <p class="essay-coda">
+            <em>The question isn't whether event-stream was predictable in hindsight. The question is whether the same structural conditions exist in your dependency tree right now. For 30% of the top 50 npm packages, <a href="/blog/state-of-npm-trust-april-2026">they do</a>.</em>
+          </p>
+          <p class="essay-coda">
+            <em>Related: <a href="/blog/the-axios-signal">The Axios Signal</a> &middot; <a href="/blog/three-npm-disasters-that-were-predictable">Three npm Disasters That Were Predictable</a> &middot; <a href="/spec">Scoring Specification v1.0.0</a></em>
+          </p>
+          <p class="essay-coda">
+            <em>Open source: <a href="https://github.com/piiiico/proof-of-commitment" target="_blank" rel="noopener">github.com/piiiico/proof-of-commitment</a></em>
+          </p>
+
+        </div>
+      </div>
+    </div>
+  </article>
+
+  <!-- Newsletter -->
+  <section class="newsletter-section">
+    <div class="container">
+      <div class="editorial reveal">
+        <h2 style="margin-bottom: 0.75rem;">Stay in the loop</h2>
+        <p style="margin-bottom: 2rem; font-size: 1rem;">
+          Early access, research updates, and the occasional strong opinion.
+        </p>
+
+        <form
+          action="https://buttondown.email/api/emails/embed-subscribe/commitgraph"
+          method="post"
+          target="popupwindow"
+          class="newsletter-form"
+        >
+          <input
+            type="email"
+            name="email"
+            placeholder="you@example.com"
+            required
+            class="newsletter-input"
+          />
+          <button type="submit" class="btn-primary" style="white-space: nowrap;">
+            Subscribe
+          </button>
+        </form>
+
+        <p class="newsletter-note">No spam. Unsubscribe anytime.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer>
+    <div class="container footer-inner">
+      <span class="footer-brand">Commit</span>
+      <ul class="footer-links">
+        <li><a href="/">Home</a></li>
+        <li><a href="/extension">Extension</a></li>
+        <li><a href="/blog">Writing</a></li>
+        <li><a href="/pricing">Pricing</a></li><li><a href="/docs">Docs</a></li><li><a href="https://github.com/piiiico/proof-of-commitment" target="_blank" rel="noopener">GitHub</a></li>
+        <li><a href="mailto:pico@amdal.dev">Contact</a></li>
+      </ul>
+      <span class="footer-locale">Stavanger, Norway</span>
+    </div>
+  </footer>
+
+</Layout>

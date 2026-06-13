@@ -1,0 +1,285 @@
+---
+import Layout from '../../layouts/Layout.astro';
+---
+
+<Layout
+  title="Seven days our CLI silently lied to 297 users — Commit"
+  description="From May 9 to May 16, every CRITICAL package scanned by proof-of-commitment showed as HEALTHY. 297 weekly users. Zero error. One wrong string comparison."
+  canonical="https://getcommit.dev/blog/critical-flag-silent-regression/"
+  publishDate="2026-05-16"
+>
+
+  <!-- Nav -->
+  <nav>
+    <div class="container nav-inner">
+      <a href="/" class="nav-brand">Commit</a>
+      <ul class="nav-links">
+        <li><a href="/extension">Extension</a></li>
+        <li><a href="/blog">Writing</a></li>
+        <li><a href="/pricing">Pricing</a></li><li><a href="/docs">Docs</a></li><li><a href="https://github.com/piiiico/proof-of-commitment" target="_blank" rel="noopener">GitHub</a></li>
+        <li><a href="mailto:pico@amdal.dev">Contact</a></li>
+      </ul>
+    </div>
+  </nav>
+
+  <!-- Essay -->
+  <article class="essay">
+    <div class="container">
+      <div class="editorial">
+
+        <!-- Header -->
+        <header class="essay-header">
+          <div class="essay-meta animate-in delay-1">
+            <time datetime="2026-05-16">May 16, 2026</time>
+          </div>
+          <h1 class="essay-title animate-in delay-2">Seven days our CLI silently lied to 297 users</h1>
+          <p class="essay-subtitle animate-in delay-3">
+            From May 9 to May 16, every CRITICAL package scanned by <code>proof-of-commitment</code>
+            showed as HEALTHY. 297 weekly users. Zero error message. One wrong string comparison.
+          </p>
+          <p class="essay-byline animate-in delay-4">Pico</p>
+        </header>
+
+        <!-- Body -->
+        <div class="essay-body">
+
+          <p>
+            The analytics number that started this: 297 <code>npx proof-of-commitment</code> runs per week,
+            essentially zero web visitors. People were using the CLI, not the web UI. That&rsquo;s fine.
+            But it meant any CLI output bug would be invisible to me.
+          </p>
+
+          <p>
+            I read the CLI source earlier today for unrelated reasons. Found the bug immediately.
+          </p>
+
+          <hr class="essay-divider" />
+
+          <h2>The broken line</h2>
+
+          <p>In <code>riskColor()</code> and <code>riskLabel()</code>, the CRITICAL check looked like this:</p>
+
+          <pre><code>if (flags && flags.includes('CRITICAL')) return '🔴 CRITICAL';</code></pre>
+
+          <p>
+            <code>Array.prototype.includes</code> does exact equality matching. It returns <code>true</code>
+            only if the array contains a member that is exactly the string <code>'CRITICAL'</code>.
+          </p>
+
+          <p>
+            When we shipped v1.6.0 on May 9 with Cargo and Go ecosystem support, the API backend
+            started returning extended flag strings. Instead of <code>['CRITICAL']</code>, it returned
+            things like <code>['CRITICAL: sole publisher + &gt;10M downloads']</code> or
+            <code>['CRITICAL: sole maintainer + high adoption']</code> &mdash; ecosystem-specific descriptions.
+          </p>
+
+          <p>
+            <code>['CRITICAL: sole publisher + &gt;10M downloads'].includes('CRITICAL')</code> evaluates to <code>false</code>.
+          </p>
+
+          <p>Every CRITICAL package came back rendered as HEALTHY.</p>
+
+          <hr class="essay-divider" />
+
+          <h2>What users saw</h2>
+
+          <p>
+            Running <code>npx proof-of-commitment axios zod chalk</code> between May 9 and May 16
+            would have produced output like this:
+          </p>
+
+          <pre><code>Package  Risk            Score  Publishers  Downloads    Age
+──────────────────────────────────────────────────────────────
+axios    🟢 HEALTHY      89     1           102.0M/wk    11.6y
+zod      🟢 HEALTHY      83     1           154.0M/wk     6.1y
+chalk    🟢 HEALTHY      75     1           414.6M/wk    12.7y
+──────────────────────────────────────────────────────────────
+
+✓  No CRITICAL packages found.</code></pre>
+
+          <p>
+            Axios: 102 million weekly downloads, one npm publisher, previously compromised
+            in March 2026 via stolen credentials. Marked HEALTHY.
+          </p>
+
+          <p>
+            The false negative is the worst kind of failure for a security tool. A false positive
+            is annoying. A false negative sends you home thinking you&rsquo;re safe.
+          </p>
+
+          <hr class="essay-divider" />
+
+          <h2>Seven days, 297 users per week</h2>
+
+          <p>
+            The window opened when v1.6.0 published (2026-05-09T11:51Z). It closed when v1.7.0
+            published this morning (2026-05-16T08:38Z). Seven days.
+          </p>
+
+          <p>
+            Every scan during that window returned incorrect risk data for any package that would
+            have triggered the CRITICAL flag. All of them showed as HEALTHY. The summary line said
+            &ldquo;No CRITICAL packages found&rdquo; regardless of what the API actually returned.
+          </p>
+
+          <p>No error was logged. No exception was thrown. The CLI exited 0.</p>
+
+          <hr class="essay-divider" />
+
+          <h2>The fix: one function, one line</h2>
+
+          <p>v1.7.0 introduces a <code>hasCritical()</code> helper that handles both flag formats:</p>
+
+          <pre><code>// v1.6.0 (broken — exact match only):
+if (flags && flags.includes('CRITICAL')) return '🔴 CRITICAL';
+
+// v1.7.0 (fixed — prefix match handles extended format):
+function hasCritical(flags) &#123;
+  return flags && flags.some(f => typeof f === 'string' && f.startsWith('CRITICAL'));
+&#125;
+
+if (hasCritical(flags)) return '🔴 CRITICAL';</code></pre>
+
+          <p>
+            Every call site that previously used <code>.includes('CRITICAL')</code> now goes through
+            <code>hasCritical()</code>. The logic is the same; the match is no longer brittle
+            against string format changes in the API response.
+          </p>
+
+          <hr class="essay-divider" />
+
+          <h2>Why it survived seven days</h2>
+
+          <p>
+            The CLI has tests. They check that specific packages return expected scores, that lock file
+            parsing works, that the JSON output shape is correct.
+          </p>
+
+          <p>
+            What they don&rsquo;t check: does a known-CRITICAL package actually render with the
+            CRITICAL label in the table? That&rsquo;s a black-box test against a live API result.
+            We had unit tests, not integration tests that would catch this.
+          </p>
+
+          <p>
+            The lesson isn&rsquo;t &ldquo;write more tests.&rdquo; It&rsquo;s more specific:
+            for a tool whose entire purpose is risk classification, the output classification
+            itself has to be tested against known-bad inputs. A regression test that runs
+            <code>npx proof-of-commitment axios</code> and asserts the output contains
+            &ldquo;CRITICAL&rdquo; would have caught this immediately.
+          </p>
+
+          <p>That test now exists in the repo.</p>
+
+          <hr class="essay-divider" />
+
+          <h2>What else shipped in v1.7.0</h2>
+
+          <p>
+            The CRITICAL fix is the main thing. But v1.7.0 also adds a Provenance column for npm packages
+            &mdash; showing whether a package was published with cryptographic Trusted Publishing attestation:
+          </p>
+
+          <pre><code>Package  Risk            Score  Publishers  Downloads    Age    Provenance
+──────────────────────────────────────────────────────────────────────────────
+axios    🔴 CRITICAL      89     1           102.0M/wk   11.6y  🔐 verified
+zod      🔴 CRITICAL      83     1           154.0M/wk    6.1y  —
+chalk    🔴 CRITICAL      75     1           414.6M/wk   12.7y  —</code></pre>
+
+          <p>
+            The &ldquo;🔐 verified&rdquo; column means the published artifact has an OIDC-signed
+            attestation from GitHub Actions, verifiable at <code>registry.npmjs.org/-/npm/v1/attestations/&lt;pkg&gt;</code>.
+            You don&rsquo;t have to take the publisher&rsquo;s word that CI built it.
+          </p>
+
+          <p>
+            Axios has provenance. Zod and chalk don&rsquo;t. That&rsquo;s not a judgment &mdash;
+            it&rsquo;s a data point.
+          </p>
+
+          <hr class="essay-divider" />
+
+          <h2>If you ran the CLI in the last week</h2>
+
+          <p>
+            Update now: <code>npx proof-of-commitment@latest [packages]</code>
+          </p>
+
+          <p>
+            If you scanned anything between May 9 and May 16 and got &ldquo;No CRITICAL packages found,&rdquo;
+            re-scan. The results were wrong. The API data was accurate; only the CLI rendering was broken.
+          </p>
+
+          <p>
+            The packages that should have been flagged are the same ones they&rsquo;ve always been:
+            high-download, single-publisher packages where one stolen credential is the only barrier
+            to a supply chain attack. Axios, chalk, zod, and many others in the transitive graph of
+            most production Node.js apps.
+          </p>
+
+          <p>
+            They&rsquo;re CRITICAL again in v1.7.0. As they should be.
+          </p>
+
+          <hr class="essay-divider" />
+
+          <p class="essay-coda">
+            <em><a href="https://github.com/piiiico/proof-of-commitment">proof-of-commitment</a> is
+            open source. v1.7.0 is on npm now, published with Trusted Publishing provenance
+            &mdash; you can verify the build attestation yourself. If you find issues, open an issue
+            or <a href="mailto:pico@amdal.dev">email directly</a>.</em>
+          </p>
+
+        </div>
+      </div>
+    </div>
+  </article>
+
+  <!-- Newsletter -->
+  <section class="newsletter-section">
+    <div class="container">
+      <div class="editorial reveal">
+        <h2 style="margin-bottom: 0.75rem;">Stay in the loop</h2>
+        <p style="margin-bottom: 2rem; font-size: 1rem;">
+          Early access, research updates, and the occasional strong opinion.
+        </p>
+
+        <form
+          action="https://buttondown.email/api/emails/embed-subscribe/commitgraph"
+          method="post"
+          target="popupwindow"
+          class="newsletter-form"
+        >
+          <input
+            type="email"
+            name="email"
+            placeholder="you@example.com"
+            required
+            class="newsletter-input"
+          />
+          <button type="submit" class="btn-primary" style="white-space: nowrap;">
+            Subscribe
+          </button>
+        </form>
+
+        <p class="newsletter-note">No spam. Unsubscribe anytime.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer>
+    <div class="container footer-inner">
+      <span class="footer-brand">Commit</span>
+      <ul class="footer-links">
+        <li><a href="/">Home</a></li>
+        <li><a href="/extension">Extension</a></li>
+        <li><a href="/blog">Writing</a></li>
+        <li><a href="/pricing">Pricing</a></li><li><a href="/docs">Docs</a></li><li><a href="https://github.com/piiiico/proof-of-commitment" target="_blank" rel="noopener">GitHub</a></li>
+        <li><a href="mailto:pico@amdal.dev">Contact</a></li>
+      </ul>
+      <span class="footer-locale">Stavanger, Norway</span>
+    </div>
+  </footer>
+
+</Layout>

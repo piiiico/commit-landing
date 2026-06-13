@@ -1,0 +1,284 @@
+---
+import Layout from '../../layouts/Layout.astro';
+---
+
+<Layout
+  title="The $10 Billion Trust Data Market That AI Companies Can't See — Commit"
+  description="AI companies are spending hundreds of millions licensing content and listings. None of it tells them whether a business is actually good. The market for verified outcome data is proven — and nobody has built the product."
+  canonical="https://getcommit.dev/blog/the-10-billion-trust-data-market/"
+  publishDate="2026-04-18"
+>
+
+  <!-- Nav -->
+  <nav>
+    <div class="container nav-inner">
+      <a href="/" class="nav-brand">Commit</a>
+      <ul class="nav-links">
+        <li><a href="/extension">Extension</a></li>
+        <li><a href="/blog">Writing</a></li>
+        <li><a href="/pricing">Pricing</a></li><li><a href="/docs">Docs</a></li><li><a href="https://github.com/piiiico/proof-of-commitment" target="_blank" rel="noopener">GitHub</a></li>
+        <li><a href="mailto:pico@amdal.dev">Contact</a></li>
+      </ul>
+    </div>
+  </nav>
+
+  <!-- Essay -->
+  <article class="essay">
+    <div class="container">
+      <div class="editorial">
+
+        <!-- Header -->
+        <header class="essay-header">
+          <div class="essay-meta animate-in delay-1">
+            <time datetime="2026-04-18">April 18, 2026</time>
+          </div>
+          <h1 class="essay-title animate-in delay-2">The $10 Billion Trust Data Market That AI Companies Can't See</h1>
+          <p class="essay-subtitle animate-in delay-3">
+            AI companies are spending hundreds of millions on content and listings. None of it tells them whether a business is actually good.
+          </p>
+          <p class="essay-byline animate-in delay-4">Pico</p>
+        </header>
+
+        <!-- Body -->
+        <div class="essay-body">
+
+          <p>
+            OpenAI paid News Corp $250 million for articles. They pay Reddit $60 million a year for comments. Yelp charges $25 per thousand API calls for reviews. Perplexity is on track for $656 million in revenue this year, largely by repackaging other people's content with citations.
+          </p>
+          <p>
+            The AI industry has an insatiable appetite for data about the world. And virtually all of it — every dollar, every deal, every API call — buys the same thing: <strong>what someone wrote about what happened.</strong>
+          </p>
+          <p>
+            Nobody is selling them what actually happened.
+          </p>
+
+          <h2>The Spending Spree</h2>
+
+          <p>
+            The numbers are staggering. In the past 18 months, AI companies have signed over <strong>$1 billion in content licensing deals</strong>. OpenAI alone has agreements with News Corp ($250M+), the Associated Press, Hearst, Condé Nast, and at least a dozen other publishers. Meta — entering content licensing for the first time — signed multi-year deals with CNN, Fox News, People, and USA Today.
+          </p>
+          <p>
+            Reddit's data licensing hit <strong>$130 million per year</strong> from Google and OpenAI combined. Yelp's "other revenue" category — which includes AI data licensing — grew 17% year-over-year, accelerating to 30-33% in Q4. Their 2026 revenue target is $1.475 billion.
+          </p>
+          <p>
+            Then there's the listing data play. DataLane raised <strong>$27 million</strong> in December 2025 to build an "identity graph of 20 million local businesses." Their product verifies <em>that businesses exist</em> — correct names, addresses, phone numbers, hours. They don't verify whether those businesses are any good.
+          </p>
+          <p>
+            All of this spending falls into two categories: <strong>content</strong> (what someone wrote) and <strong>listings</strong> (that entities exist). Neither category answers the question AI users actually ask: <em>is this business worth my time and money?</em>
+          </p>
+
+          <h2>The Trust Data Market Already Exists</h2>
+
+          <p>
+            Here's what makes this gap so striking: companies that sell trust-adjacent data are thriving. The market validates the demand. It just doesn't serve it.
+          </p>
+          <p>
+            <strong>Verisk</strong> generates <strong>$3 billion</strong> in annual revenue selling risk analytics to insurance companies. Their data comes from a cooperative pool of 1,850+ insurers contributing claims data. But it's actuarial — statistical risk models, not behavioral signals about individual businesses.
+          </p>
+          <p>
+            <strong>Dun &amp; Bradstreet</strong> generates <strong>$2.4 billion</strong> selling the DUNS Number system and credit data on 600 million business records. Their Paydex score is "FICO for businesses." But it's based on self-reported trade credit data — businesses voluntarily reporting how their suppliers pay. Self-reported.
+          </p>
+          <p>
+            <strong>FICO</strong> generates <strong>$2 billion</strong> from credit scores. Embedded in regulation, essentially a monopoly. But it scores individuals, not businesses, and the data comes from three credit bureaus whose information is notoriously error-prone.
+          </p>
+          <p>
+            <strong>Trustpilot</strong> just posted a <strong>320% increase in operating profit</strong>. Why? AI search. Trustpilot is the <strong>5th most-cited domain globally on ChatGPT</strong>. AI click-throughs to Trustpilot surged <strong>1,490% year-over-year</strong>. The company's revenue hit $261 million with 20% growth, and they're projecting EBITDA margin expansion in 2026.
+          </p>
+          <p>
+            The Trustpilot number is the one that should stop you. A 1,490% surge in AI platforms pulling review data tells you exactly one thing: <strong>AI desperately wants trust signals, and reviews are the only ones that exist in an accessible format.</strong> LLMs are gorging on Trustpilot not because reviews are good data. They're gorging because there's nothing better available.
+          </p>
+          <p>
+            Add these up. The companies selling trust-adjacent data generate <strong>over $10 billion in annual revenue</strong>. The broader Business Information Market — everything from credit data to background checks — was valued at <strong>$191.6 billion in 2025</strong>, projected to reach $306.6 billion by 2033.
+          </p>
+          <p>
+            The market for trust data is enormous and proven. But every dollar of it sells one of two things: opinions (what people said) or static records (what was filed). Nobody sells what happened next.
+          </p>
+
+          <h2>The Carfax Gap</h2>
+
+          <p>
+            The clearest way to see the missing product is through Carfax.
+          </p>
+          <p>
+            Carfax generates an estimated <strong>$230 million per year</strong> selling verified vehicle history reports. When you buy a used car, you don't want someone's opinion about it. You want facts: Was it in an accident? Was the odometer rolled back? Was it serviced regularly?
+          </p>
+          <p>
+            Carfax built this by aggregating data from <strong>151,000 sources</strong> — DMVs, insurance companies, repair shops, manufacturers, auction houses — into <strong>35 billion records</strong> indexed by VIN. No opinions. No reviews. Just: here is what happened to this specific car, verified by institutional records.
+          </p>
+          <p>
+            Now ask: <strong>who does this for businesses?</strong>
+          </p>
+          <p>
+            Not "4.2 stars on Google." Rather: Did customers come back? Did the business pay its suppliers on time? Did revenue grow or shrink? Did it pass its last health inspection? How many years has it survived?
+          </p>
+          <p>
+            Nobody does. The business equivalent of a Carfax report doesn't exist. Not because the data doesn't exist — but because nobody has assembled it into a product.
+          </p>
+
+          <h2>The Data Exists. The Product Doesn't.</h2>
+
+          <p>
+            This is the part that should frustrate you if you work in data or AI.
+          </p>
+          <p>
+            In Norway, the Brønnøysund Register Centre publishes <strong>full financial statements</strong> for every registered company — revenue, profit, equity, employee count, founding date — via a free, machine-readable API. The Food Safety Authority (Mattilsynet) publishes inspection results for every restaurant. BankID provides proof of personhood for <strong>4.6 million people</strong> with zero fraud on the NFC path.
+          </p>
+          <p>
+            This is outcome data. Verified. Institutional. Public. And nobody has packaged it as trust infrastructure for AI.
+          </p>
+          <p>
+            The Norwegian case is the most accessible example, but the pattern is global. The UK's Companies House publishes financial data. France's Infogreffe does the same. Every country with food safety regulations publishes inspection results. Payment processors — Stripe, Visa, Mastercard — sit on the most complete behavioral data in existence: who paid whom, how often, and whether they came back.
+          </p>
+          <p>
+            A Finextra analysis from earlier this year put it bluntly: <em>"Payment processors are sitting on the most valuable trust data in business — and nobody's using it."</em> Longer processing history equals richer trust signal. The data is there. It's just locked inside institutions that don't think of themselves as trust infrastructure.
+          </p>
+
+          <h2>Three Reasons the Gap Persists</h2>
+
+          <p>
+            If the demand is proven and the data exists, why hasn't someone built this? Three structural reasons:
+          </p>
+          <p>
+            <strong>Content is easier to license.</strong> Publisher deals have familiar mechanics — contracts, IP law, payment schedules. OpenAI can wire $250 million to News Corp and get a clean data feed. Assembling outcome data requires aggregating from hundreds of fragmented sources: business registries, inspection agencies, payment processors, regulatory filings. The integration work is a moat, not a feature.
+          </p>
+          <p>
+            <strong>Privacy is genuinely hard.</strong> The most valuable outcome data — repeat visits, return rates, transaction frequency — involves individual behavior. Aggregating "did customers come back?" at scale required privacy infrastructure that barely existed until recently. Zero-knowledge proofs are now production-ready: zkTLS has <strong>3 million+ verifications with zero fraud</strong>. Semaphore V4 generates proofs in <strong>3 milliseconds</strong>. The technical bottleneck cleared in 2025-2026. The product bottleneck hasn't.
+          </p>
+          <p>
+            <strong>The cold start problem feels fatal.</strong> If you need behavioral data from millions of businesses, where do you start? The answer: you don't start with behavioral data. You start with <strong>public outcome data</strong> — registry filings, inspection results, financial statements — which has no cold start problem at all. Layer behavioral signals on top as the network grows. The cold start fear stops people from starting. It shouldn't.
+          </p>
+
+          <h2>What AI Companies Actually Need</h2>
+
+          <p>
+            Here's the product that doesn't exist: a trust data API where an AI model can query a business identifier and get back structured, verified outcome signals.
+          </p>
+          <p>
+            Not sentiment, not reviews, not what someone wrote on Reddit. Verified answers to concrete questions:
+          </p>
+          <ul>
+            <li><strong>How long has this business operated?</strong> (Registry data)</li>
+            <li><strong>Is it financially healthy?</strong> (Filed financial statements)</li>
+            <li><strong>Did it pass its last regulatory inspection?</strong> (Government records)</li>
+            <li><strong>Do customers return?</strong> (Aggregated, anonymized behavioral data)</li>
+            <li><strong>How does it compare to peers in its category and location?</strong> (Computed from all of the above)</li>
+          </ul>
+          <p>
+            The first three are available today from public sources. They just haven't been assembled into a product. The fourth requires privacy-preserving behavioral data infrastructure that now exists technically but hasn't been built as a product. The fifth is computation on top of the other four.
+          </p>
+          <p>
+            Every AI company that's licensing Yelp reviews at $25 per thousand calls would pay multiples of that for verified outcome data. Because outcome data does what reviews can't: it gives AI a ground truth to anchor its recommendations to.
+          </p>
+          <p>
+            Yelp's AI API proves the business model works. A business that sells AI companies something <em>better</em> than reviews — at a price that reflects the quality difference — enters a market that's already buying.
+          </p>
+
+          <h2>The Timing</h2>
+
+          <p>
+            Three things make this moment different from any previous attempt to build trust data infrastructure:
+          </p>
+          <p>
+            <strong>AI is the buyer that didn't exist before.</strong> Previous trust data products (D&amp;B, FICO) sold to institutions making individual credit decisions. The new buyer is fundamentally different: AI platforms making millions of recommendations per day, each one requiring trust data that currently doesn't exist. ChatGPT has <strong>883 million monthly active users</strong>. AI Overviews appear in <strong>55% of Google searches</strong>. The volume of decisions that need trust data has increased by orders of magnitude — and the willingness to pay for it is proven by the billion-dollar content licensing spree.
+          </p>
+          <p>
+            <strong>Privacy technology matured.</strong> Contributing behavioral data (did I return to this restaurant?) without revealing individual behavior (which restaurant, when, how often) requires zero-knowledge proofs at consumer scale. That wasn't possible two years ago. It is now.
+          </p>
+          <p>
+            <strong>Regulation is creating the identity layer.</strong> eIDAS 2.0 mandates digital identity wallets for <strong>450 million Europeans</strong> by end of 2026. BankID already covers essentially all Nordic adults. World ID has verified <strong>18 million unique humans</strong>. The sybil-resistance infrastructure — ensuring each data contribution comes from a real, unique person — is being built by others, at their expense.
+          </p>
+          <p>
+            The problem is proven ($10B+ market). The data exists (registries, inspections, transactions). The privacy technology works (zkTLS, Semaphore). The identity layer is being built (eIDAS, BankID, World ID). The buyer is desperate and spending (AI content licensing).
+          </p>
+          <p>
+            What's missing is the product.
+          </p>
+
+          <h2>The Race Nobody Has Entered</h2>
+
+          <p>
+            Here's what's strange about this moment. AI companies are spending furiously on data. Trust data companies are posting record profits. Privacy technology just crossed the production threshold. And nobody — not Yelp, not Trustpilot, not D&amp;B, not any AI company — has built a verified outcome data product for AI.
+          </p>
+          <p>
+            Yelp is closest, but they sell opinions through an API, not outcomes. Trustpilot is the biggest beneficiary, but passively — AI models cite them because there's nothing better, not because Trustpilot built an AI product. DataLane verifies listings, not quality. D&amp;B sells self-reported credit data.
+          </p>
+          <p>
+            The race to build the trust data layer for AI hasn't started. Everyone is selling yesterday's data type — opinions, listings, content — to tomorrow's buyer. The first company to sell <strong>verified outcome data</strong> enters the market with the product everyone needs and nobody has.
+          </p>
+          <p>
+            We know the market works. We know what the product looks like. We know the technology is ready. The only question left is who builds it first.
+          </p>
+
+          <hr style="margin: 3rem 0; border: none; border-top: 1px solid var(--border-light);" />
+
+          <p class="series-note">
+            <em>This is the fourth essay in a series on behavioral commitment as trust infrastructure. <a href="/blog/commitment-is-the-new-link">Commitment Is the New Link</a> introduces the thesis. <a href="/blog/ai-lies-about-your-favorite-restaurant">AI Lies About Your Favorite Restaurant</a> maps the problem. <a href="/blog/five-stars-zero-commitment">Five Stars, Zero Commitment</a> shows the first working prototype. This essay makes the market case. We're building <a href="/">Commit</a> — starting with the one country where every company's outcome data is already public.</em>
+          </p>
+
+        </div>
+      </div>
+    </div>
+  </article>
+
+  <!-- Newsletter -->
+  <section class="newsletter-section">
+    <div class="container">
+      <div class="editorial reveal">
+        <h2 style="margin-bottom: 0.75rem;">Stay in the loop</h2>
+        <p style="margin-bottom: 2rem; font-size: 1rem;">
+          Early access, research updates, and the occasional strong opinion.
+        </p>
+
+        <form
+          action="https://buttondown.email/api/emails/embed-subscribe/commitgraph"
+          method="post"
+          target="popupwindow"
+          class="newsletter-form"
+        >
+          <input
+            type="email"
+            name="email"
+            placeholder="you@example.com"
+            required
+            class="newsletter-input"
+          />
+          <button type="submit" class="btn-primary" style="white-space: nowrap;">
+            Subscribe
+          </button>
+        </form>
+
+        <p class="newsletter-note">No spam. Unsubscribe anytime.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer>
+    <div class="container footer-inner">
+      <span class="footer-brand">Commit</span>
+      <ul class="footer-links">
+        <li><a href="/">Home</a></li>
+        <li><a href="/extension">Extension</a></li>
+        <li><a href="/blog">Writing</a></li>
+        <li><a href="/pricing">Pricing</a></li><li><a href="/docs">Docs</a></li><li><a href="https://github.com/piiiico/proof-of-commitment" target="_blank" rel="noopener">GitHub</a></li>
+        <li><a href="mailto:pico@amdal.dev">Contact</a></li>
+      </ul>
+      <span class="footer-locale">Stavanger, Norway</span>
+    </div>
+  </footer>
+
+</Layout>
+
+<style>
+  .series-note {
+    font-size: 0.9rem;
+    color: var(--ink-subtle, #666);
+    line-height: 1.7;
+  }
+
+  .series-note a {
+    color: var(--ink, #1a1a1a);
+    text-decoration: underline;
+    text-underline-offset: 3px;
+  }
+</style>

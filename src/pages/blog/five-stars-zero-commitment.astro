@@ -1,0 +1,314 @@
+---
+import Layout from '../../layouts/Layout.astro';
+---
+
+<Layout
+  title="Five Stars, Zero Commitment — Commit"
+  description="We scored real Norwegian businesses using government data. The results look nothing like their Yelp ratings. When you measure commitment instead of opinion, a completely different picture of trust emerges."
+  canonical="https://getcommit.dev/blog/five-stars-zero-commitment/"
+  publishDate="2026-04-11"
+>
+
+  <!-- Nav -->
+  <nav>
+    <div class="container nav-inner">
+      <a href="/" class="nav-brand">Commit</a>
+      <ul class="nav-links">
+        <li><a href="/extension">Extension</a></li>
+        <li><a href="/blog">Writing</a></li>
+        <li><a href="/pricing">Pricing</a></li><li><a href="/docs">Docs</a></li><li><a href="https://github.com/piiiico/proof-of-commitment" target="_blank" rel="noopener">GitHub</a></li>
+        <li><a href="mailto:pico@amdal.dev">Contact</a></li>
+      </ul>
+    </div>
+  </nav>
+
+  <!-- Essay -->
+  <article class="essay">
+    <div class="container">
+      <div class="editorial">
+
+        <!-- Header -->
+        <header class="essay-header">
+          <div class="essay-meta animate-in delay-1">
+            <time datetime="2026-04-11">April 11, 2026</time>
+          </div>
+          <h1 class="essay-title animate-in delay-2">Five Stars, Zero Commitment</h1>
+          <p class="essay-subtitle animate-in delay-3">
+            We scored real businesses using government data — not reviews. The results look nothing like what Yelp or Google tell you.
+          </p>
+          <p class="essay-byline animate-in delay-4">Pico</p>
+        </header>
+
+        <!-- Body -->
+        <div class="essay-body">
+
+          <p>
+            Peppes Pizza has a 3.8 on Google. That tells you something about the opinions of people who left reviews. It tells you nothing about whether the company is healthy, growing, or likely to still exist next year.
+          </p>
+          <p>
+            Here's what government records say: Peppes Pizza AS has been operating for <strong>24 years</strong>. It employs <strong>1,001 people</strong>. Last year it generated <strong>525 million NOK</strong> in revenue with a 5.7% profit margin and positive equity. Its commitment score: <strong>83 out of 100</strong>.
+          </p>
+          <p>
+            That number — 83 — captures something no review ever could. It's not an opinion. It's the accumulated weight of <em>sustained commitment</em>: years of operation, capital at risk, jobs maintained, revenue earned. You can't fake 24 years.
+          </p>
+
+          <h2>What Reviews Measure vs. What Matters</h2>
+
+          <p>
+            A Google review measures one thing: whether a self-selected individual felt strongly enough to write something after a single experience. The median business gets reviews from less than 1% of its customers. The people who review are systematically unrepresentative — they skew toward the very satisfied and the very angry.
+          </p>
+          <p>
+            Worse, <strong>30-40% of online reviews are estimated to be fake</strong>. The fake review industry generates billions in revenue. Review platforms know this and fight it constantly, but the economics favor the fakers: a fake five-star review costs about $5. The return on that investment — more customers, higher rankings — can be enormous.
+          </p>
+          <p>
+            So when AI pulls a 4.2-star rating for a restaurant, what has it actually learned? That some fraction of a self-selected, partially-fake sample expressed positive sentiment. This is the data layer we're feeding to systems that make purchasing recommendations for hundreds of millions of people.
+          </p>
+
+          <h2>The Commitment Score</h2>
+
+          <p>
+            We built something different. Instead of asking "what do people say about this business?", we ask: <strong>"what has this business done?"</strong>
+          </p>
+          <p>
+            Norway is uniquely suited for this experiment. The Brønnøysund Register Centre (Brreg) maintains public records on every registered business in the country — founding dates, employee counts, annual financials. All of it free, machine-readable, and updated by law. No scraping. No opinions. Just facts.
+          </p>
+          <p>
+            We compute three commitment signals from this data:
+          </p>
+
+          <ul>
+            <li><strong>Temporal commitment</strong> — how long has the business operated? A 28-year-old restaurant has survived recessions, pandemics, and changing tastes. That longevity is a signal no review can match.</li>
+            <li><strong>Financial commitment</strong> — is the business profitable? Does it have healthy equity? A business that loses money every year is a different kind of entity from one that consistently generates returns.</li>
+            <li><strong>Operational commitment</strong> — does it employ people? Is it active? A dormant shell company and a bustling 74-person operation are both "businesses" on paper.</li>
+          </ul>
+
+          <p>
+            These three signals combine into a single score from 0 to 100. And the results are revealing.
+          </p>
+
+          <h2>Real Businesses, Real Scores</h2>
+
+          <p>
+            Here are commitment scores for real Norwegian businesses, computed from government records right now:
+          </p>
+
+          <div class="score-table">
+            <table>
+              <thead>
+                <tr>
+                  <th>Business</th>
+                  <th>Years</th>
+                  <th>Employees</th>
+                  <th>Revenue</th>
+                  <th>Score</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>Equinor ASA</td>
+                  <td>53</td>
+                  <td>21,408</td>
+                  <td>72.5B NOK</td>
+                  <td><strong>93</strong></td>
+                </tr>
+                <tr>
+                  <td>Peppes Pizza AS</td>
+                  <td>24</td>
+                  <td>1,001</td>
+                  <td>525M NOK</td>
+                  <td><strong>83</strong></td>
+                </tr>
+                <tr>
+                  <td>Fisketorget Stavanger AS</td>
+                  <td>28</td>
+                  <td>74</td>
+                  <td>—</td>
+                  <td><strong>80</strong></td>
+                </tr>
+                <tr>
+                  <td>Hall Toll (Sumo)</td>
+                  <td>7</td>
+                  <td>50</td>
+                  <td>—</td>
+                  <td><strong>72</strong></td>
+                </tr>
+                <tr>
+                  <td>Bellies AS</td>
+                  <td>7</td>
+                  <td>22</td>
+                  <td>9.5M NOK</td>
+                  <td><strong>70</strong></td>
+                </tr>
+                <tr>
+                  <td>Dolly Dimple's AS</td>
+                  <td>5</td>
+                  <td>8</td>
+                  <td>2M NOK</td>
+                  <td><strong>54</strong></td>
+                </tr>
+                <tr>
+                  <td>RE-NAA AS</td>
+                  <td>6</td>
+                  <td>22</td>
+                  <td>—</td>
+                  <td><strong>44</strong></td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <p>
+            RE-NAA is a Michelin two-star restaurant in Stavanger — one of the best restaurants in Norway by critical consensus. Its commitment score is 44. That's not a mistake. It's six years old with modest revenue. It hasn't had time to accumulate the commitment signals that a 28-year-old fish market has.
+          </p>
+          <p>
+            And that's the point. <strong>A commitment score doesn't replace taste — it measures something reviews can't.</strong> RE-NAA might be extraordinary for a special occasion. Fisketorget has proven it can sustain a business for nearly three decades. Those are different kinds of trust, and you need both.
+          </p>
+          <p>
+            Reviews tell you what someone thought about dinner last Tuesday. Commitment data tells you whether the business will still be there next year.
+          </p>
+
+          <h2>Try It Yourself</h2>
+
+          <p>
+            This isn't theoretical. The API is live. You can query any Norwegian business right now:
+          </p>
+
+          <pre><code>curl "https://poc-backend.amdal-dev.workers.dev/api/business/search?q=Peppes+Pizza"</code></pre>
+
+          <p>
+            Or look up a specific business by organization number:
+          </p>
+
+          <pre><code>curl "https://poc-backend.amdal-dev.workers.dev/api/business/923609016"</code></pre>
+
+          <p>
+            The data comes from the Brønnøysund Register Centre — Norway's official business register. It's free, public, and maintained by law. We just made it queryable as trust infrastructure.
+          </p>
+
+          <h2>This Is the Floor, Not the Ceiling</h2>
+
+          <p>
+            Government records are just the cold start. The real power comes when you add <em>behavioral</em> commitment data: verified repeat visits, time spent, transaction patterns. Information contributed by real people, proven via zero-knowledge proofs, aggregated anonymously.
+          </p>
+          <p>
+            Imagine an AI that could query not just "how old is this business and how many people does it employ?" but also "how many verified unique humans visited in the past month, and what percentage came back?" That's the full commitment score — and it's what we're building.
+          </p>
+          <p>
+            Norway is the ideal starting point. BankID provides proof of personhood for 4.6 million people. PSD2 mandates open banking APIs across 3,500+ European banks. Brønnøysund provides the public business data. The infrastructure exists. Nobody has connected it into a trust layer.
+          </p>
+          <p>
+            Five stars is an opinion. Commitment is a fact. AI needs facts.
+          </p>
+
+          <hr class="essay-divider" />
+
+          <p class="essay-coda">
+            <em>This is the third in a series on behavioral commitment as trust infrastructure. <a href="/blog/commitment-is-the-new-link">Commitment Is the New Link</a> introduces the thesis. <a href="/blog/ai-lies-about-your-favorite-restaurant">AI Lies About Your Favorite Restaurant</a> maps the problem. This essay shows the first working prototype. The business lookup API is live — <a href="https://poc-backend.amdal-dev.workers.dev/api/business/search?q=Equinor" target="_blank" rel="noopener">try it</a>. Source code: <a href="https://github.com/piiiico/proof-of-commitment" target="_blank" rel="noopener">proof-of-commitment</a>.</em>
+          </p>
+
+        </div>
+      </div>
+    </div>
+  </article>
+
+  <!-- Newsletter -->
+  <section class="newsletter-section">
+    <div class="container">
+      <div class="editorial reveal">
+        <h2 style="margin-bottom: 0.75rem;">Stay in the loop</h2>
+        <p style="margin-bottom: 2rem; font-size: 1rem;">
+          Early access, research updates, and the occasional strong opinion.
+        </p>
+
+        <form
+          action="https://buttondown.email/api/emails/embed-subscribe/commitgraph"
+          method="post"
+          target="popupwindow"
+          class="newsletter-form"
+        >
+          <input
+            type="email"
+            name="email"
+            placeholder="you@example.com"
+            required
+            class="newsletter-input"
+          />
+          <button type="submit" class="btn-primary" style="white-space: nowrap;">
+            Subscribe
+          </button>
+        </form>
+
+        <p class="newsletter-note">No spam. Unsubscribe anytime.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer>
+    <div class="container footer-inner">
+      <span class="footer-brand">Commit</span>
+      <ul class="footer-links">
+        <li><a href="/">Home</a></li>
+        <li><a href="/extension">Extension</a></li>
+        <li><a href="/blog">Writing</a></li>
+        <li><a href="/pricing">Pricing</a></li><li><a href="/docs">Docs</a></li><li><a href="https://github.com/piiiico/proof-of-commitment" target="_blank" rel="noopener">GitHub</a></li>
+        <li><a href="mailto:pico@amdal.dev">Contact</a></li>
+      </ul>
+      <span class="footer-locale">Stavanger, Norway</span>
+    </div>
+  </footer>
+
+</Layout>
+
+<style>
+  .score-table {
+    margin: 2rem 0;
+    overflow-x: auto;
+  }
+
+  .score-table table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.9rem;
+  }
+
+  .score-table th,
+  .score-table td {
+    padding: 0.75rem 1rem;
+    text-align: left;
+    border-bottom: 1px solid var(--border, #e5e5e5);
+  }
+
+  .score-table th {
+    font-weight: 600;
+    color: var(--muted, #666);
+    font-size: 0.8rem;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+  }
+
+  .score-table td:last-child {
+    font-variant-numeric: tabular-nums;
+    font-weight: 600;
+    color: var(--accent, #333);
+  }
+
+  .score-table tr:hover td {
+    background: rgba(0, 0, 0, 0.02);
+  }
+
+  pre {
+    background: #1a1a2e;
+    color: #e0e0e0;
+    padding: 1rem 1.25rem;
+    border-radius: 6px;
+    overflow-x: auto;
+    font-size: 0.85rem;
+    line-height: 1.5;
+    margin: 1.5rem 0;
+  }
+
+  code {
+    font-family: 'JetBrains Mono', 'SF Mono', 'Fira Code', monospace;
+  }
+</style>

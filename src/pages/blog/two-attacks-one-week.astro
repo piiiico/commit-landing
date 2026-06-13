@@ -1,0 +1,220 @@
+---
+import Layout from '../../layouts/Layout.astro';
+---
+
+<Layout
+  title="node-ipc Had a 69 Trust Score Before It Got Hacked. TanStack Had 91. &mdash; Commit"
+  description="Two npm supply chain attacks hit the same week. One was predictable from behavioral signals. One wasn't. That difference is the entire point of behavioral supply chain scoring."
+  canonical="https://getcommit.dev/blog/two-attacks-one-week/"
+  publishDate="2026-05-21"
+>
+
+  <!-- Nav -->
+  <nav>
+    <div class="container nav-inner">
+      <a href="/" class="nav-brand">Commit</a>
+      <ul class="nav-links">
+        <li><a href="/extension">Extension</a></li>
+        <li><a href="/blog">Writing</a></li>
+        <li><a href="/pricing">Pricing</a></li><li><a href="/docs">Docs</a></li><li><a href="https://github.com/piiiico/proof-of-commitment" target="_blank" rel="noopener">GitHub</a></li>
+        <li><a href="mailto:pico@amdal.dev">Contact</a></li>
+      </ul>
+    </div>
+  </nav>
+
+  <!-- Essay -->
+  <article class="essay">
+    <div class="container">
+      <div class="editorial">
+
+        <!-- Header -->
+        <header class="essay-header">
+          <div class="essay-meta animate-in delay-1">
+            <time datetime="2026-05-21">May 21, 2026</time>
+          </div>
+          <h1 class="essay-title animate-in delay-2">node-ipc Had a 69 Trust Score Before It Got Hacked. TanStack Had 91.</h1>
+          <p class="essay-subtitle animate-in delay-3">
+            Two npm supply chain attacks hit the same week in May 2026. One was predictable from behavioral signals.
+            One wasn&rsquo;t. That difference is the entire point.
+          </p>
+          <p class="essay-byline animate-in delay-4">Pico</p>
+        </header>
+
+        <!-- Body -->
+        <div class="essay-body">
+
+          <p>
+            May 2026 gave us two back-to-back supply chain attacks on npm. Same week. Completely different mechanics.
+            That tells you more about the state of supply chain security than any whitepaper.
+          </p>
+
+          <p>
+            <strong>May 11</strong>: TanStack &mdash; 42 packages, 84 malicious versions in 6 minutes.
+            <code>@tanstack/react-router</code> alone gets 12.7 million weekly downloads.
+          </p>
+
+          <p>
+            <strong>May 14</strong>: node-ipc &mdash; 3 malicious versions. 743K weekly downloads.
+            Stole over 90 categories of credentials, including AWS keys, SSH keys, Kubernetes tokens, and Claude AI settings.
+          </p>
+
+          <p>
+            I ran both through <a href="/audit">getcommit.dev</a> &mdash; a behavioral scoring tool that measures
+            structural risk signals in npm, PyPI, Cargo, and Go packages.
+          </p>
+
+          <p>
+            TanStack scored <a href="/npm/@tanstack/react-router">91</a>.
+            node-ipc scored <a href="/npm/node-ipc">69</a> with a WARN flag.
+          </p>
+
+          <p>
+            The 69 was there <em>before</em> the attack.
+          </p>
+
+          <h2>What happened at node-ipc</h2>
+
+          <p>
+            node-ipc is a 12-year-old inter-process communication library. One npm publisher.
+            35 GitHub contributors who can&rsquo;t publish to npm.
+            Last legitimate release: August 2024 &mdash; 21 months of silence.
+          </p>
+
+          <p>
+            On May 14, someone published three malicious versions simultaneously across two major version lines (9.x and 12.x).
+            The payload was an 80KB obfuscated credential harvester targeting over 90 different secret formats.
+            The compromised npm account had been dormant long enough to steal without anyone noticing.
+          </p>
+
+          <p><strong>The behavioral data before the attack:</strong></p>
+
+          <table>
+            <thead>
+              <tr><th>Signal</th><th>Score</th><th>What it means</th></tr>
+            </thead>
+            <tbody>
+              <tr><td>Longevity</td><td>25/25</td><td>12.2 years. Established.</td></tr>
+              <tr><td>Maintainer depth</td><td>4/15</td><td><strong>1 npm publisher.</strong> Single point of failure.</td></tr>
+              <tr><td>Release consistency</td><td>12/20</td><td><strong>646 days since last publish.</strong> Dormant.</td></tr>
+              <tr><td>Trusted Publishing</td><td>0/2</td><td><strong>No OIDC provenance.</strong> No cryptographic link between source and release.</td></tr>
+              <tr><td><strong>Total</strong></td><td><strong>69</strong></td><td><strong>WARN</strong></td></tr>
+            </tbody>
+          </table>
+
+          <p>
+            A sole publisher. A dormant release cycle. No provenance.
+            Every signal was pointing at the risk. This is the pattern behind the
+            LiteLLM attack (March 2026) and the axios incident (March 30, 2026):
+            steal the credentials of a single person who hasn&rsquo;t published in months,
+            and 743,000 weekly consumers get the payload.
+          </p>
+
+          <h2>What happened at TanStack</h2>
+
+          <p>
+            TanStack was different. Five npm publishers. Active development &mdash; the last publish was 3 days before the attack.
+            Score: <a href="/npm/@tanstack/react-router">91</a>. HEALTHY by every behavioral metric.
+          </p>
+
+          <p>
+            The attacker didn&rsquo;t steal anyone&rsquo;s npm credentials. They exploited a chain of three vulnerabilities
+            in TanStack&rsquo;s GitHub Actions setup:
+          </p>
+
+          <ol>
+            <li><code>pull_request_target</code> in a workflow, which lets fork code run with base repo permissions</li>
+            <li>GitHub Actions cache poisoning across the fork &rarr; base trust boundary</li>
+            <li>Memory extraction of the OIDC token from the GitHub Actions runner process (reading <code>/proc</code> at runtime)</li>
+          </ol>
+
+          <p>
+            The malware published 84 versions across 42 packages in six minutes.
+            It passed SLSA provenance checks. It carried valid signed certificates.
+            Every automated security tool looking at cryptographic proof of origin said &ldquo;this is legitimate.&rdquo;
+          </p>
+
+          <h2>What the scores actually tell you</h2>
+
+          <p>Two attacks. Two completely different risk profiles:</p>
+
+          <table>
+            <thead>
+              <tr><th></th><th>node-ipc</th><th>TanStack</th></tr>
+            </thead>
+            <tbody>
+              <tr><td><strong>Score</strong></td><td>69 (WARN)</td><td>91 (HEALTHY)</td></tr>
+              <tr><td><strong>Publishers</strong></td><td>1</td><td>5</td></tr>
+              <tr><td><strong>Last publish</strong></td><td>21 months ago</td><td>3 days ago</td></tr>
+              <tr><td><strong>Provenance</strong></td><td>No</td><td>Yes</td></tr>
+              <tr><td><strong>Attack vector</strong></td><td>Stolen npm credentials</td><td>CI/CD pipeline compromise</td></tr>
+              <tr><td><strong>Predictable?</strong></td><td>Yes</td><td>No</td></tr>
+            </tbody>
+          </table>
+
+          <p>
+            Behavioral signals caught the node-ipc pattern. They didn&rsquo;t catch TanStack&rsquo;s.
+            SLSA provenance was supposed to catch TanStack&rsquo;s. It didn&rsquo;t.
+          </p>
+
+          <p>
+            No single tool catches both. That&rsquo;s not a failure &mdash; it&rsquo;s the reality.
+            Different attacks exploit different trust boundaries.
+          </p>
+
+          <h2>Which pattern is more common</h2>
+
+          <p>
+            The node-ipc pattern is far more common than the TanStack pattern.
+            The GitHub Actions cache-poisoning chain is sophisticated &mdash; it required chaining three separate vulnerabilities.
+            Stealing a dormant npm account&rsquo;s credentials requires buying them on a dark web marketplace.
+          </p>
+
+          <p>
+            There are 26 npm packages with over 10 million weekly downloads and a single npm publisher.
+            Every one of them has the same structural profile as node-ipc, axios, and LiteLLM before their incidents.
+          </p>
+
+          <pre><code>minimatch    &mdash; 610M/wk, 1 publisher  &#x26A0; CRITICAL
+chalk        &mdash; 436M/wk, 1 publisher  &#x26A0; CRITICAL
+glob         &mdash; 355M/wk, 1 publisher  &#x26A0; CRITICAL
+cross-spawn  &mdash; 168M/wk, 1 publisher  &#x26A0; CRITICAL
+zod          &mdash; 145M/wk, 1 publisher  &#x26A0; CRITICAL</code></pre>
+
+          <p>
+            These won&rsquo;t appear in your <code>package.json</code>. They&rsquo;re in your lock file &mdash;
+            transitive dependencies you&rsquo;ve never audited, installed on every <code>npm install</code>.
+          </p>
+
+          <h2>Check your own project</h2>
+
+          <pre><code>npx proof-of-commitment --file package-lock.json</code></pre>
+
+          <p>
+            This scans your full dependency tree &mdash; direct and transitive &mdash; and flags the structural risks
+            that <code>npm audit</code> doesn&rsquo;t look at.
+          </p>
+
+          <p>
+            It won&rsquo;t predict the next TanStack. But it&rsquo;ll surface every node-ipc-shaped package in your tree.
+            And right now, that&rsquo;s the pattern that keeps repeating.
+          </p>
+
+          <p>
+            Try it on any package: <a href="/npm/node-ipc">getcommit.dev/npm/node-ipc</a>
+          </p>
+
+          <hr />
+
+          <p style="font-size: 0.9rem; color: var(--ink-muted);">
+            <strong>proof-of-commitment</strong> is open-source and free to use.
+            <a href="https://github.com/piiiico/proof-of-commitment">GitHub</a> &middot;
+            <a href="/audit">Web audit</a> &middot;
+            <a href="/docs">API docs</a>
+          </p>
+
+        </div>
+      </div>
+    </div>
+  </article>
+
+</Layout>

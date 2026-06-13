@@ -1,0 +1,975 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import rankingsData from '../../data/rankings.json';
+
+export function getStaticPaths() {
+  return rankingsData.packages.map((pkg) => ({
+    params: { name: pkg.name.replace(/\//g, '__') },
+    props: { pkg },
+  }));
+}
+
+interface Props {
+  pkg: typeof rankingsData.packages[number];
+}
+
+const { pkg } = Astro.props;
+
+// Try to fetch live data from the API at build time, fall back to rankings snapshot
+interface LiveData {
+  score: number;
+  maintainers: number;
+  weeklyDownloads: number;
+  ageYears: number;
+  riskFlags: string[];
+  trend: string | null;
+  scorecardScore: number | null;
+  latestVersion: string | null;
+  compromised?: { attack: string; date: string; url: string } | null;
+}
+
+let live: LiveData | null = null;
+try {
+  const res = await fetch('https://poc-backend.amdal-dev.workers.dev/api/audit', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ packages: [pkg.name] }),
+  });
+  if (res.ok) {
+    const data = await res.json();
+    if (data.results?.[0]) live = data.results[0] as LiveData;
+  }
+} catch {
+  // Use rankings snapshot as fallback
+}
+
+const score = live?.score ?? pkg.score;
+const maintainers = live?.maintainers ?? pkg.maintainers;
+const downloads = live?.weeklyDownloads ?? pkg.weeklyDownloads;
+const ageYears = live?.ageYears ?? pkg.ageYears;
+const riskLevel = pkg.riskLevel;
+const riskFlags = live?.riskFlags ?? pkg.riskFlags;
+const trend = live?.trend ?? pkg.trend;
+const scorecardScore = live?.scorecardScore ?? null;
+const compromised = live?.compromised ?? null;
+const isCritical = riskFlags.some((f: string) => f.includes('CRITICAL'));
+const isHigh = riskFlags.some((f: string) => f.includes('HIGH'));
+const hasWarn = riskFlags.some((f: string) => f.includes('WARN'));
+
+function fmtDownloads(n: number): string {
+  if (n >= 1_000_000_000) return (n / 1_000_000_000).toFixed(1) + 'B';
+  if (n >= 1_000_000) return Math.round(n / 1_000_000) + 'M';
+  if (n >= 1_000) return Math.round(n / 1_000) + 'K';
+  return String(n);
+}
+
+function scoreGrade(s: number): string {
+  if (s >= 90) return 'A';
+  if (s >= 80) return 'B';
+  if (s >= 70) return 'C';
+  if (s >= 60) return 'D';
+  return 'F';
+}
+
+function scoreColor(s: number): string {
+  if (isCritical) return '#D14D41';
+  if (s >= 75) return '#4A7C59';
+  if (s >= 40) return '#D0A215';
+  return '#D14D41';
+}
+
+const grade = scoreGrade(score);
+const color = scoreColor(score);
+
+// Risk explanation
+function riskExplanation(): string {
+  if (isCritical) {
+    return `${pkg.name} has a single npm publisher and ${fmtDownloads(downloads)} weekly downloads. This is the exact structural profile exploited in the axios and LiteLLM supply chain attacks: one compromised credential would expose every downstream project.`;
+  }
+  if (isHigh) {
+    return `${pkg.name} is flagged HIGH risk due to rapid adoption with limited publisher depth. New packages with fast growth are higher-risk targets.`;
+  }
+  if (hasWarn) {
+    return `${pkg.name} has not published a release in over 12 months. Stale packages accumulate vulnerabilities and may indicate abandonment.`;
+  }
+  return `${pkg.name} shows healthy behavioral signals: multiple publishers distribute the credential risk, and the package is actively maintained.`;
+}
+
+// Find related packages (same risk level, similar downloads)
+const related = rankingsData.packages
+  .filter(p => p.name !== pkg.name)
+  .sort((a, b) => {
+    // Prefer same risk level, then closest download count
+    const aMatch = a.riskLevel === pkg.riskLevel ? 0 : 1;
+    const bMatch = b.riskLevel === pkg.riskLevel ? 0 : 1;
+    if (aMatch !== bMatch) return aMatch - bMatch;
+    return Math.abs(a.weeklyDownloads - pkg.weeklyDownloads) - Math.abs(b.weeklyDownloads - pkg.weeklyDownloads);
+  })
+  .slice(0, 6);
+
+const pageTitle = `${pkg.name} npm Security Score: ${score}/100 ${isCritical ? '(CRITICAL)' : ''} — Commit`;
+const pageDesc = isCritical
+  ? `${pkg.name} scores ${score}/100 but is flagged CRITICAL: ${maintainers} npm publisher, ${fmtDownloads(downloads)} weekly downloads. One compromised credential = supply chain attack. See the full behavioral analysis.`
+  : `${pkg.name} scores ${score}/100 on behavioral trust signals. ${maintainers} npm publisher${maintainers > 1 ? 's' : ''}, ${fmtDownloads(downloads)} weekly downloads, ${ageYears.toFixed(1)} years old. Full supply chain risk profile.`;
+
+const npmUrl = pkg.name.startsWith('@')
+  ? `https://www.npmjs.com/package/${pkg.name}`
+  : `https://www.npmjs.com/package/${pkg.name}`;
+
+const badgeUrl = `https://getcommit.dev/badge/npm/${encodeURIComponent(pkg.name)}`;
+
+// Dynamic OG image — renders the package score, alarm state, and download/publisher
+// context. Drives shareability: a CRITICAL preview in Twitter/Slack/HN is a
+// stronger CTA than the generic getcommit.dev card. Scoped names with "/" are
+// handled by the backend's catch-all /og/:ecosystem/* route.
+const ogImageUrl = `https://poc-backend.amdal-dev.workers.dev/og/npm/${pkg.name}`;
+
+// Shareable URL + tweet/post text. The OG image carries the visual alarm state;
+// the share text adds the one-line context that converts viewers to auditors.
+// CRITICAL framing leans on alarm; healthy framing is neutral and factual.
+const pageUrl = `https://getcommit.dev/package/${pkg.name.replace(/\//g, '__')}/`;
+const downloadsShort = fmtDownloads(downloads);
+const shareText = isCritical
+  ? `${pkg.name}: ${score}/100 on Commit — flagged CRITICAL. ${maintainers} publisher controls ${downloadsShort}/wk downloads. What does your supply chain look like?`
+  : isHigh
+  ? `${pkg.name}: ${score}/100 on Commit — flagged HIGH risk. Fast growth, limited publisher depth. Behavioral trust signals matter.`
+  : `${pkg.name} scores ${score}/100 on Commit's behavioral trust signals. Worth comparing against your other dependencies.`;
+const twitterShareUrl = `https://twitter.com/intent/tweet?text=${encodeURIComponent(shareText)}&url=${encodeURIComponent(pageUrl)}`;
+// Bluesky intent: text only, append URL into the body
+const blueskyShareUrl = `https://bsky.app/intent/compose?text=${encodeURIComponent(shareText + ' ' + pageUrl)}`;
+// LinkedIn: URL only (no text param honored by sharing endpoint)
+const linkedinShareUrl = `https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(pageUrl)}`;
+// Hacker News submit (story link + title)
+const hnShareUrl = `https://news.ycombinator.com/submitlink?u=${encodeURIComponent(pageUrl)}&t=${encodeURIComponent(`${pkg.name} npm Security Score: ${score}/100${isCritical ? ' (CRITICAL)' : ''} — Commit`)}`;
+
+// Days since last publish
+const daysSince = pkg.daysSinceLastPublish;
+const lastPublishLabel = daysSince === 0 ? 'today' : daysSince === 1 ? 'yesterday' : `${daysSince} days ago`;
+
+// JSON-LD for the package profile
+const jsonLd = JSON.stringify({
+  "@context": "https://schema.org",
+  "@type": "SoftwareSourceCode",
+  "name": pkg.name,
+  "description": pageDesc,
+  "url": `https://getcommit.dev/package/${pkg.name.replace(/\//g, '__')}/`,
+  "codeRepository": npmUrl,
+  "programmingLanguage": "JavaScript",
+  "runtimePlatform": "Node.js",
+  "review": {
+    "@type": "Review",
+    "reviewRating": {
+      "@type": "Rating",
+      "ratingValue": score,
+      "bestRating": 100,
+      "worstRating": 0,
+    },
+    "author": {
+      "@type": "Organization",
+      "name": "Commit",
+      "url": "https://getcommit.dev"
+    },
+    "reviewBody": riskExplanation(),
+  }
+});
+---
+
+<Layout
+  title={pageTitle}
+  description={pageDesc}
+  canonical={`https://getcommit.dev/package/${pkg.name.replace(/\//g, '__')}/`}
+  ogImage={ogImageUrl}
+>
+  <!-- Nav -->
+  <nav>
+    <div class="container nav-inner">
+      <a href="/" class="nav-brand">Commit</a>
+      <ul class="nav-links">
+        <li><a href="/quickstart">Quickstart</a></li>
+        <li><a href="/audit">Audit</a></li>
+        <li><a href="/rankings">Rankings</a></li>
+        <li><a href="/blog">Writing</a></li>
+        <li><a href="/pricing">Pricing</a></li>
+        <li><a href="/docs">Docs</a></li>
+        <li><a href="https://github.com/piiiico/proof-of-commitment" target="_blank" rel="noopener">GitHub</a></li>
+      </ul>
+    </div>
+  </nav>
+
+  <!-- JSON-LD -->
+  <script type="application/ld+json" set:html={jsonLd} />
+
+  <!-- Package Hero -->
+  <section class="pkg-hero">
+    <div class="container">
+      <div class="pkg-header">
+        <div class="pkg-meta">
+          <a href="/rankings/" class="pkg-breadcrumb">&larr; Rankings</a>
+          <h1 class="pkg-name">{pkg.name}</h1>
+          <p class="pkg-ecosystem">npm &middot; Rank #{pkg.rank} of {rankingsData.stats.total}</p>
+        </div>
+        <div class="pkg-score-ring" style={`--ring-color: ${color}`}>
+          <span class="pkg-score-value">{score}</span>
+          <span class="pkg-score-label">/ 100</span>
+          <span class="pkg-score-grade" style={`color: ${color}`}>{grade}</span>
+        </div>
+      </div>
+
+      {isCritical && (
+        <div class="pkg-alert pkg-alert-critical">
+          <strong>CRITICAL</strong> &mdash; Single npm publisher with {fmtDownloads(downloads)} weekly downloads.
+          One compromised credential could push malicious code to every downstream project.
+          <div class="pkg-alert-action">
+            <code>npx proof-of-commitment</code>
+            <span class="pkg-alert-action-sep">&middot;</span>
+            <a href={`/audit/?packages=${encodeURIComponent(pkg.name)}`}>Audit the rest of your tree &rarr;</a>
+          </div>
+        </div>
+      )}
+
+      {compromised && (
+        <div class="pkg-alert pkg-alert-compromised">
+          <strong>RECENTLY COMPROMISED</strong> &mdash; {compromised.attack} ({compromised.date}).
+          <a href={compromised.url} target="_blank" rel="noopener">Details &rarr;</a>
+          <div class="pkg-alert-action">
+            <code>npx proof-of-commitment</code>
+            <span class="pkg-alert-action-sep">&middot;</span>
+            <a href={`/audit/?packages=${encodeURIComponent(pkg.name)}`}>Check your other deps &rarr;</a>
+          </div>
+        </div>
+      )}
+
+      {!isCritical && hasWarn && (
+        <div class="pkg-alert pkg-alert-warn">
+          <strong>STALE</strong> &mdash; No release in {daysSince} days. Stale packages accumulate
+          unpatched vulnerabilities.
+          <div class="pkg-alert-action">
+            <a href={`/audit/?packages=${encodeURIComponent(pkg.name)}`}>Find other stale packages in your tree &rarr;</a>
+          </div>
+        </div>
+      )}
+    </div>
+  </section>
+
+  <!-- Key Metrics -->
+  <section class="pkg-metrics">
+    <div class="container">
+      <div class="metrics-grid">
+        <div class="metric-card">
+          <div class="metric-value">{maintainers}</div>
+          <div class="metric-label">npm publisher{maintainers > 1 ? 's' : ''}</div>
+          <div class="metric-note">{maintainers === 1 ? 'Single point of failure' : 'Distributed credential risk'}</div>
+        </div>
+        <div class="metric-card">
+          <div class="metric-value">{fmtDownloads(downloads)}</div>
+          <div class="metric-label">downloads/week</div>
+          <div class="metric-note">Blast radius if compromised</div>
+        </div>
+        <div class="metric-card">
+          <div class="metric-value">{ageYears.toFixed(1)}y</div>
+          <div class="metric-label">package age</div>
+          <div class="metric-note">{ageYears >= 5 ? 'Established package' : ageYears >= 2 ? 'Growing maturity' : 'Relatively new'}</div>
+        </div>
+        <div class="metric-card">
+          <div class="metric-value">{lastPublishLabel}</div>
+          <div class="metric-label">last release</div>
+          <div class="metric-note">{daysSince > 365 ? 'Possibly unmaintained' : daysSince > 180 ? 'Infrequent releases' : 'Active maintenance'}</div>
+        </div>
+        {scorecardScore !== null && (
+          <div class="metric-card">
+            <div class="metric-value">{scorecardScore}/10</div>
+            <div class="metric-label">OpenSSF Scorecard</div>
+            <div class="metric-note">Process security score</div>
+          </div>
+        )}
+        {trend && (
+          <div class="metric-card">
+            <div class="metric-value" style="text-transform: capitalize;">{trend}</div>
+            <div class="metric-label">download trend</div>
+            <div class="metric-note">Week-over-week trajectory</div>
+          </div>
+        )}
+      </div>
+    </div>
+  </section>
+
+  <!-- Risk Analysis -->
+  <section class="pkg-analysis">
+    <div class="container">
+      <div class="editorial" style="max-width: var(--max-content); margin: 0 auto;">
+        <h2>Risk analysis</h2>
+        <p>{riskExplanation()}</p>
+
+        {isCritical && (
+          <div class="analysis-detail">
+            <h3>Why "CRITICAL" doesn't mean "bad"</h3>
+            <p>
+              A CRITICAL flag means this package has the <em>structural preconditions</em> for a
+              supply chain attack &mdash; not that an attack is happening. Both
+              <a href="/package/axios/">axios</a> (score 86) and chalk (score 75) are flagged CRITICAL.
+              They're well-maintained. They're also one stolen credential away from a repeat of the
+              <a href="/blog/two-attacks-one-week/">March 2026 attacks</a>.
+            </p>
+            <p>
+              The flag surfaces a fact: {maintainers} person can push code to {fmtDownloads(downloads)}
+              machines per week. Whether that's a problem depends on your risk tolerance.
+            </p>
+          </div>
+        )}
+
+        <h3>What the score measures</h3>
+        <ul class="score-dimensions">
+          <li><strong>Publisher depth</strong> &mdash; How many people can push to npm? Single-publisher packages are the #1 structural risk.</li>
+          <li><strong>Longevity</strong> &mdash; Older packages have track records. New packages with high adoption are higher risk.</li>
+          <li><strong>Release consistency</strong> &mdash; Regular releases signal active oversight. Long gaps mean unpatched vulnerabilities.</li>
+          <li><strong>Download trend</strong> &mdash; Growing packages attract more scrutiny (and more attacks).</li>
+          <li><strong>OpenSSF Scorecard</strong> &mdash; Process security: branch protection, code review, CI/CD safety.</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- CTA -->
+  <section class="pkg-cta">
+    <div class="container">
+      <div class="editorial" style="max-width: var(--max-content); margin: 0 auto;">
+        <h2>{pkg.name} is one package. Score them all.</h2>
+        <p>
+          You came looking for <code>{pkg.name}</code>. Your <code>node_modules</code> has hundreds more.
+          {isCritical && ' Some of them have the same single-publisher profile.'}
+          Run one command to score every dependency you ship:
+        </p>
+        <div class="cta-code">
+          <code>npx proof-of-commitment</code>
+        </div>
+        <p class="cta-sub">
+          Auto-detects your lockfile. Scores every dependency. Zero install.
+        </p>
+        <div class="cta-buttons">
+          <a href={`/audit/?packages=${encodeURIComponent(pkg.name)}`} class="btn-primary">Try online audit &rarr;</a>
+          <a href="/quickstart/" class="btn-ghost">Quickstart &rarr;</a>
+          <a href={`/get-started/?ref=pkg-profile&pkg=${encodeURIComponent(pkg.name)}&eco=npm`} class="btn-ghost">Free API key &rarr;</a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Share -->
+  <section class="pkg-share-section">
+    <div class="container">
+      <div class="editorial" style="max-width: var(--max-content); margin: 0 auto;">
+        <h2>Share this score</h2>
+        <p class="share-hint">
+          The link preview renders {pkg.name}'s score card with its alarm state.
+          One click sends it to your network — and back to the audit they need to run themselves.
+        </p>
+        <div class="share-buttons">
+          <a href={twitterShareUrl} target="_blank" rel="noopener noreferrer" class="share-btn" data-share="x">Post to X</a>
+          <a href={blueskyShareUrl} target="_blank" rel="noopener noreferrer" class="share-btn" data-share="bluesky">Bluesky</a>
+          <a href={linkedinShareUrl} target="_blank" rel="noopener noreferrer" class="share-btn" data-share="linkedin">LinkedIn</a>
+          <a href={hnShareUrl} target="_blank" rel="noopener noreferrer" class="share-btn" data-share="hn">Hacker News</a>
+          <button type="button" class="share-btn share-copy" data-share="copy" data-share-url={pageUrl} aria-label={`Copy link to ${pkg.name} score`}>Copy link</button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Badge -->
+  <section class="pkg-badge-section">
+    <div class="container">
+      <div class="editorial" style="max-width: var(--max-content); margin: 0 auto;">
+        <h2>Add the badge to your README</h2>
+        <div class="badge-preview">
+          <img src={badgeUrl} alt={`Commit trust score for ${pkg.name}`} loading="lazy" />
+        </div>
+        <div class="badge-code">
+          <code>![Commit Trust](https://getcommit.dev/badge/npm/{pkg.name})</code>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Related Packages -->
+  <section class="pkg-related">
+    <div class="container">
+      <div class="editorial" style="max-width: var(--max-content); margin: 0 auto;">
+        <h2>Related packages</h2>
+        <div class="related-grid">
+          {related.map(r => (
+            <a href={`/package/${r.name.replace(/\//g, '__')}/`} class="related-card">
+              <div class="related-name">{r.name}</div>
+              <div class="related-score" style={`color: ${r.riskLevel === 'CRITICAL' ? '#D14D41' : r.score >= 75 ? '#4A7C59' : '#D0A215'}`}>
+                {r.score}
+              </div>
+              <div class="related-meta">
+                {fmtDownloads(r.weeklyDownloads)}/wk &middot; {r.maintainers} pub{r.maintainers > 1 ? 's' : ''}
+                {r.riskLevel === 'CRITICAL' && <span class="related-flag">CRITICAL</span>}
+              </div>
+            </a>
+          ))}
+        </div>
+        <div style="margin-top: 2rem; text-align: center;">
+          <a href="/rankings/" style="color: var(--accent); text-decoration: none; font-weight: 500;">
+            View all {rankingsData.stats.total} ranked packages &rarr;
+          </a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- External links -->
+  <section class="pkg-links">
+    <div class="container">
+      <div class="editorial" style="max-width: var(--max-content); margin: 0 auto;">
+        <p class="pkg-links-row">
+          <a href={npmUrl} target="_blank" rel="noopener">npm registry &rarr;</a>
+          <a href={`/scan/?pkg=${encodeURIComponent(pkg.name)}`}>Live score card &rarr;</a>
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer class="pkg-footer">
+    <div class="container">
+      <p>
+        Data from the npm registry and <a href="https://deps.dev" target="_blank" rel="noopener">deps.dev</a>.
+        Scores computed by <a href="https://getcommit.dev">Commit</a>.
+        Last rankings update: {new Date(rankingsData.stats.generatedAt).toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })}.
+      </p>
+    </div>
+  </footer>
+</Layout>
+
+<style>
+  /* ── Package Profile Styles ── */
+
+  .pkg-hero {
+    padding: 4rem 0 2rem;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .pkg-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 2rem;
+    max-width: var(--max-content);
+    margin: 0 auto;
+  }
+
+  .pkg-breadcrumb {
+    font-size: 0.8rem;
+    color: var(--ink-subtle);
+    text-decoration: none;
+    display: block;
+    margin-bottom: 0.5rem;
+  }
+  .pkg-breadcrumb:hover { color: var(--accent); }
+
+  .pkg-name {
+    font-family: var(--font-mono);
+    font-size: 2rem;
+    font-weight: 500;
+    letter-spacing: -0.02em;
+    line-height: 1.2;
+    word-break: break-all;
+  }
+
+  .pkg-ecosystem {
+    font-size: 0.85rem;
+    color: var(--ink-subtle);
+    margin-top: 0.35rem;
+  }
+
+  .pkg-score-ring {
+    flex-shrink: 0;
+    width: 100px;
+    height: 100px;
+    border-radius: 50%;
+    border: 4px solid var(--ring-color, var(--border));
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    background: var(--paper);
+  }
+
+  .pkg-score-value {
+    font-family: var(--font-display);
+    font-size: 2rem;
+    font-weight: 400;
+    line-height: 1;
+    color: var(--ring-color);
+  }
+
+  .pkg-score-label {
+    font-size: 0.65rem;
+    color: var(--ink-subtle);
+  }
+
+  .pkg-score-grade {
+    font-family: var(--font-body);
+    font-size: 0.7rem;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+
+  /* Alerts */
+  .pkg-alert {
+    max-width: var(--max-content);
+    margin: 1.5rem auto 0;
+    padding: 1rem 1.25rem;
+    border-radius: 6px;
+    font-size: 0.9rem;
+    line-height: 1.5;
+  }
+
+  .pkg-alert-critical {
+    background: #FDF0EF;
+    border: 1px solid #E8B4B0;
+    color: #8B2500;
+  }
+
+  .pkg-alert-compromised {
+    background: #FDF0EF;
+    border: 2px solid #D14D41;
+    color: #8B2500;
+  }
+  .pkg-alert-compromised a { color: #8B2500; font-weight: 500; }
+
+  .pkg-alert-warn {
+    background: #FFF8E1;
+    border: 1px solid #E0CC7A;
+    color: #6B5900;
+  }
+
+  /* Inline action row inside alerts — catches alarm-state intent */
+  .pkg-alert-action {
+    margin-top: 0.75rem;
+    padding-top: 0.65rem;
+    border-top: 1px solid currentColor;
+    border-color: rgba(0, 0, 0, 0.12);
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.6rem;
+    font-size: 0.85rem;
+  }
+  .pkg-alert-action code {
+    background: rgba(0, 0, 0, 0.08);
+    padding: 0.15em 0.5em;
+    border-radius: 3px;
+    font-family: var(--font-mono, 'JetBrains Mono', monospace);
+    font-size: 0.92em;
+  }
+  .pkg-alert-action a {
+    color: inherit;
+    font-weight: 600;
+    text-decoration: underline;
+    text-underline-offset: 2px;
+  }
+  .pkg-alert-action-sep {
+    opacity: 0.45;
+  }
+
+  /* Metrics */
+  .pkg-metrics {
+    padding: 3rem 0;
+    border-bottom: 1px solid var(--border-light);
+  }
+
+  .metrics-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+    gap: 1.25rem;
+    max-width: var(--max-content);
+    margin: 0 auto;
+  }
+
+  .metric-card {
+    background: var(--paper-dim);
+    border: 1px solid var(--border-light);
+    border-radius: 8px;
+    padding: 1.25rem;
+    text-align: center;
+  }
+
+  .metric-value {
+    font-family: var(--font-display);
+    font-size: 1.5rem;
+    color: var(--ink);
+    line-height: 1.2;
+  }
+
+  .metric-label {
+    font-size: 0.75rem;
+    color: var(--ink-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin-top: 0.25rem;
+  }
+
+  .metric-note {
+    font-size: 0.75rem;
+    color: var(--ink-subtle);
+    margin-top: 0.35rem;
+    line-height: 1.3;
+  }
+
+  /* Analysis */
+  .pkg-analysis {
+    padding: 3rem 0;
+    border-bottom: 1px solid var(--border-light);
+  }
+
+  .pkg-analysis h2 {
+    font-family: var(--font-display);
+    font-size: 1.5rem;
+    margin-bottom: 1rem;
+  }
+
+  .pkg-analysis h3 {
+    font-family: var(--font-body);
+    font-size: 1rem;
+    font-weight: 500;
+    margin-top: 2rem;
+    margin-bottom: 0.75rem;
+  }
+
+  .pkg-analysis p {
+    font-size: 0.95rem;
+    line-height: 1.7;
+    color: var(--ink-muted);
+    margin-bottom: 0.75rem;
+  }
+
+  .pkg-analysis a {
+    color: var(--accent);
+    text-decoration: none;
+  }
+
+  .analysis-detail {
+    margin-top: 1.5rem;
+    padding: 1.25rem 1.5rem;
+    background: var(--paper-dim);
+    border-radius: 6px;
+    border: 1px solid var(--border-light);
+  }
+
+  .analysis-detail h3 {
+    margin-top: 0;
+  }
+
+  .score-dimensions {
+    list-style: none;
+    padding: 0;
+  }
+
+  .score-dimensions li {
+    font-size: 0.9rem;
+    color: var(--ink-muted);
+    padding: 0.5rem 0;
+    border-bottom: 1px solid var(--border-light);
+    line-height: 1.5;
+  }
+
+  .score-dimensions li:last-child {
+    border-bottom: none;
+  }
+
+  .score-dimensions strong {
+    color: var(--ink);
+    font-weight: 500;
+  }
+
+  /* Badge */
+  .pkg-badge-section {
+    padding: 3rem 0;
+    border-bottom: 1px solid var(--border-light);
+  }
+
+  .pkg-badge-section h2 {
+    font-family: var(--font-display);
+    font-size: 1.25rem;
+    margin-bottom: 1rem;
+  }
+
+  .badge-preview {
+    margin-bottom: 0.75rem;
+  }
+
+  .badge-preview img {
+    height: 20px;
+  }
+
+  .badge-code {
+    background: var(--paper-dim);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 0.75rem 1rem;
+    overflow-x: auto;
+  }
+
+  .badge-code code {
+    font-family: var(--font-mono);
+    font-size: 0.8rem;
+    color: var(--ink-muted);
+    white-space: nowrap;
+  }
+
+  /* CTA */
+  .pkg-cta {
+    padding: 3rem 0;
+    border-bottom: 1px solid var(--border-light);
+  }
+
+  .pkg-cta h2 {
+    font-family: var(--font-display);
+    font-size: 1.5rem;
+    margin-bottom: 0.75rem;
+  }
+
+  .pkg-cta p {
+    font-size: 0.95rem;
+    color: var(--ink-muted);
+    line-height: 1.6;
+  }
+
+  .pkg-cta code {
+    font-family: var(--font-mono);
+    font-size: 0.85em;
+    background: var(--paper-dim);
+    padding: 0.1em 0.4em;
+    border-radius: 3px;
+  }
+
+  .cta-code {
+    margin: 1.25rem 0;
+    background: var(--ink);
+    border-radius: 8px;
+    padding: 1rem 1.5rem;
+  }
+
+  .cta-code code {
+    font-family: var(--font-mono);
+    font-size: 1rem;
+    color: var(--paper);
+    background: none;
+    padding: 0;
+  }
+
+  .cta-sub {
+    font-size: 0.85rem !important;
+    color: var(--ink-subtle) !important;
+    margin-bottom: 1.25rem;
+  }
+
+  .cta-buttons {
+    display: flex;
+    gap: 0.75rem;
+    flex-wrap: wrap;
+  }
+
+  /* Share */
+  .pkg-share-section {
+    padding: 3rem 0;
+    border-bottom: 1px solid var(--border-light);
+  }
+
+  .pkg-share-section h2 {
+    font-family: var(--font-display);
+    font-size: 1.25rem;
+    margin-bottom: 0.75rem;
+  }
+
+  .share-hint {
+    font-size: 0.9rem;
+    color: var(--ink-muted);
+    margin-bottom: 1.25rem;
+    line-height: 1.5;
+  }
+
+  .share-buttons {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+  }
+
+  .share-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    padding: 0.5rem 0.9rem;
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    background: var(--paper);
+    color: var(--ink);
+    font-family: var(--font-body);
+    font-size: 0.85rem;
+    font-weight: 500;
+    text-decoration: none;
+    cursor: pointer;
+    transition: border-color 0.15s ease, background 0.15s ease, color 0.15s ease;
+  }
+
+  .share-btn:hover {
+    border-color: var(--accent);
+    color: var(--accent);
+  }
+
+  .share-btn.share-copy {
+    font-family: var(--font-body);
+  }
+
+  .share-btn.share-copy.copied {
+    border-color: #4A7C59;
+    color: #4A7C59;
+    background: #F1F7F2;
+  }
+
+  /* Related */
+  .pkg-related {
+    padding: 3rem 0;
+    border-bottom: 1px solid var(--border-light);
+  }
+
+  .pkg-related h2 {
+    font-family: var(--font-display);
+    font-size: 1.25rem;
+    margin-bottom: 1.25rem;
+  }
+
+  .related-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 0.75rem;
+  }
+
+  .related-card {
+    display: block;
+    padding: 1rem;
+    background: var(--paper-dim);
+    border: 1px solid var(--border-light);
+    border-radius: 6px;
+    text-decoration: none;
+    transition: border-color 0.15s ease;
+  }
+
+  .related-card:hover {
+    border-color: var(--accent);
+  }
+
+  .related-name {
+    font-family: var(--font-mono);
+    font-size: 0.85rem;
+    font-weight: 500;
+    color: var(--ink);
+  }
+
+  .related-score {
+    font-family: var(--font-display);
+    font-size: 1.5rem;
+    line-height: 1.2;
+    margin: 0.25rem 0;
+  }
+
+  .related-meta {
+    font-size: 0.75rem;
+    color: var(--ink-subtle);
+  }
+
+  .related-flag {
+    display: inline-block;
+    font-size: 0.65rem;
+    font-weight: 500;
+    color: #D14D41;
+    background: #FDF0EF;
+    padding: 0.1em 0.4em;
+    border-radius: 3px;
+    margin-left: 0.25rem;
+  }
+
+  /* Links */
+  .pkg-links {
+    padding: 2rem 0;
+  }
+
+  .pkg-links-row {
+    display: flex;
+    gap: 1.5rem;
+    flex-wrap: wrap;
+  }
+
+  .pkg-links-row a {
+    font-size: 0.85rem;
+    color: var(--accent);
+    text-decoration: none;
+    font-weight: 500;
+  }
+
+  /* Footer */
+  .pkg-footer {
+    padding: 2rem 0 3rem;
+    border-top: 1px solid var(--border-light);
+  }
+
+  .pkg-footer p {
+    font-size: 0.75rem;
+    color: var(--ink-subtle);
+    text-align: center;
+  }
+
+  .pkg-footer a {
+    color: var(--ink-muted);
+    text-decoration: none;
+  }
+
+  /* Mobile */
+  @media (max-width: 640px) {
+    .pkg-header { flex-direction: column; align-items: flex-start; }
+    .pkg-score-ring { align-self: flex-end; margin-top: -3rem; }
+    .pkg-name { font-size: 1.5rem; }
+    .metrics-grid { grid-template-columns: repeat(2, 1fr); }
+    .related-grid { grid-template-columns: 1fr; }
+    .share-buttons { gap: 0.4rem; }
+    .share-btn { font-size: 0.8rem; padding: 0.45rem 0.75rem; }
+  }
+</style>
+
+<script>
+  // Copy-link button: uses Clipboard API with a textarea fallback for older browsers.
+  // Visual feedback via .copied class (green border + label swap), reverts after 1.5s.
+  document.querySelectorAll<HTMLButtonElement>('.share-copy').forEach((btn) => {
+    btn.addEventListener('click', async () => {
+      const url = btn.getAttribute('data-share-url');
+      if (!url) return;
+      const original = btn.textContent;
+      const restore = () => {
+        btn.textContent = original;
+        btn.classList.remove('copied');
+      };
+      try {
+        if (navigator.clipboard && window.isSecureContext) {
+          await navigator.clipboard.writeText(url);
+        } else {
+          const ta = document.createElement('textarea');
+          ta.value = url;
+          ta.style.position = 'fixed';
+          ta.style.opacity = '0';
+          document.body.appendChild(ta);
+          ta.select();
+          document.execCommand('copy');
+          document.body.removeChild(ta);
+        }
+        btn.textContent = 'Copied';
+        btn.classList.add('copied');
+        setTimeout(restore, 1500);
+      } catch {
+        btn.textContent = 'Copy failed';
+        setTimeout(restore, 1500);
+      }
+    });
+  });
+</script>

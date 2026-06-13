@@ -1,0 +1,237 @@
+---
+import Layout from '../../layouts/Layout.astro';
+---
+
+<Layout
+  title="Bitwarden CLI Scored 92/100. It Just Got Compromised. — Commit"
+  description="@bitwarden/cli has 9 maintainers, 78K weekly downloads, and a behavioral score of 92. Today it was compromised via a CI/CD pipeline attack. Here's what that reveals about the limits — and value — of structural risk scoring."
+  canonical="https://getcommit.dev/blog/bitwarden-cli-scored-92/"
+  publishDate="2026-04-23"
+>
+
+  <!-- Nav -->
+  <nav>
+    <div class="container nav-inner">
+      <a href="/" class="nav-brand">Commit</a>
+      <ul class="nav-links">
+        <li><a href="/extension">Extension</a></li>
+        <li><a href="/blog">Writing</a></li>
+        <li><a href="/pricing">Pricing</a></li><li><a href="/docs">Docs</a></li><li><a href="https://github.com/piiiico/proof-of-commitment" target="_blank" rel="noopener">GitHub</a></li>
+        <li><a href="mailto:pico@amdal.dev">Contact</a></li>
+      </ul>
+    </div>
+  </nav>
+
+  <!-- Essay -->
+  <article class="essay">
+    <div class="container">
+      <div class="editorial">
+
+        <!-- Header -->
+        <header class="essay-header">
+          <div class="essay-meta animate-in delay-1">
+            <time datetime="2026-04-23">April 23, 2026</time>
+          </div>
+          <h1 class="essay-title animate-in delay-2">@bitwarden/cli Scored 92/100. It Just Got Compromised.</h1>
+          <p class="essay-subtitle animate-in delay-3">
+            Nine maintainers. Seven years of development. 78K weekly downloads. A behavioral trust score of 92 out of 100.
+            And today, a malicious version landed on the npm registry via a compromised CI/CD pipeline.
+            Here&rsquo;s what that exposes &mdash; and what it doesn&rsquo;t.
+          </p>
+          <p class="essay-byline animate-in delay-4">Pico</p>
+        </header>
+
+        <!-- Body -->
+        <div class="essay-body">
+
+          <p>
+            Today, <a href="https://socket.dev/blog/bitwarden-cli-compromised" target="_blank" rel="noopener">Socket.dev reported</a> that
+            <code>@bitwarden/cli</code> was compromised as part of an ongoing Checkmarx supply chain campaign.
+            Attackers abused a GitHub Action in Bitwarden&rsquo;s CI/CD pipeline to inject malicious code into
+            version 2026.4.0. The payload scraped GitHub tokens from Runner.Worker memory, exfiltrated npm tokens,
+            and injected persistence code into <code>~/.bashrc</code> and <code>~/.zshrc</code>.
+          </p>
+
+          <p>
+            This was not a typosquatting attack. There was no <code>b1twarden-cli</code> or <code>bitwarden-c1i</code>.
+            Attackers hit the <em>official</em> package &mdash; the one with the verified maintainer team, the corporate
+            backing, the years of documented releases.
+          </p>
+
+          <p>
+            Here&rsquo;s what <a href="https://getcommit.dev/audit?packages=@bitwarden/cli">proof-of-commitment</a> shows for it:
+          </p>
+
+          <pre><code>$ npx proof-of-commitment @bitwarden/cli
+
+Package          Risk      Score  Maintainers  Downloads    Age
+────────────────────────────────────────────────────────────────────
+@bitwarden/cli   ✅ SAFE   92     9            77,980/wk    7.9y
+  └ longevity=25 momentum=17 releases=20 maintainers=15 github=15</code></pre>
+
+          <p>
+            92 out of 100. SAFE. No flags. This score is <em>correct</em> &mdash; and that&rsquo;s exactly the problem.
+          </p>
+
+          <h2>Two different threat models</h2>
+
+          <p>
+            Behavioral scoring like proof-of-commitment measures <strong>structural risk</strong>: the profile of a package
+            that, by its nature, is dangerous to depend on. Single maintainer with massive download volume. Abandoned packages
+            still pulled by millions of projects. No organizational backing. Stale codebases with no release in years.
+          </p>
+
+          <p>
+            The Bitwarden attack is something different: <strong>active supply chain compromise</strong>. The package was
+            structurally sound. The organization, the maintainer team, the release history &mdash; all legitimate.
+            The attack vector was the build pipeline itself.
+          </p>
+
+          <p>
+            These are two distinct threat classes, and they require different tooling:
+          </p>
+
+          <table>
+            <thead>
+              <tr>
+                <th>Threat type</th>
+                <th>Example</th>
+                <th>Detected by behavioral scoring?</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>Single-maintainer concentration</td>
+                <td>axios (1 maintainer, 100M/wk)</td>
+                <td>✅ Yes &mdash; CRITICAL flag</td>
+              </tr>
+              <tr>
+                <td>Abandonment risk</td>
+                <td>left-pad, event-stream</td>
+                <td>✅ Yes &mdash; daysSinceLastPublish</td>
+              </tr>
+              <tr>
+                <td>Typosquatting</td>
+                <td>bitarden-cli vs @bitwarden/cli</td>
+                <td>✅ Partially &mdash; new package with 0 history</td>
+              </tr>
+              <tr>
+                <td>CI/CD pipeline compromise</td>
+                <td>This attack</td>
+                <td>❌ No &mdash; scores the package, not the build</td>
+              </tr>
+              <tr>
+                <td>Account takeover</td>
+                <td>Compromised maintainer credentials</td>
+                <td>❌ No &mdash; same limitation</td>
+              </tr>
+            </tbody>
+          </table>
+
+          <h2>What actually catches CI/CD pipeline attacks</h2>
+
+          <p>
+            The npm ecosystem has a real answer for this: <strong>build provenance</strong>. Since 2023, npm supports
+            <a href="https://docs.npmjs.com/generating-provenance-statements" target="_blank" rel="noopener">provenance statements</a>
+            &mdash; cryptographically signed attestations that link a published package to its source repository and build environment.
+            When a package has provenance, you can verify that version 2026.4.0 was built from commit <code>abc123</code>
+            in a specific GitHub Actions workflow run.
+          </p>
+
+          <p>
+            A compromised GitHub Action that publishes outside the expected workflow breaks the provenance chain.
+            <code>npm audit signatures</code> can detect this.
+          </p>
+
+          <p>
+            Run this right now:
+          </p>
+
+          <pre><code>npm audit signatures</code></pre>
+
+          <p>
+            It checks every installed package for valid provenance. Packages without provenance get flagged as &ldquo;Missing
+            Provenance&rdquo; (not a vulnerability, but a signal). Packages with forged or broken provenance fail the check.
+            As of today, @bitwarden/cli&rsquo;s current version is clean &mdash; provenance was not a vector in this attack,
+            but the tooling exists to catch build-pipeline tampering.
+          </p>
+
+          <h2>The honest picture</h2>
+
+          <p>
+            Here&rsquo;s what I tell people who ask what proof-of-commitment catches:
+          </p>
+
+          <p>
+            It catches the risk profile that <em>makes an attack worth launching</em> &mdash; the structural conditions
+            that create high-value targets. A package with 100 million weekly downloads and one maintainer is worth attacking
+            because the blast radius is enormous and the attack surface is concentrated. Behavioral scoring quantifies that.
+          </p>
+
+          <p>
+            It does <em>not</em> detect in-progress attacks. That requires a different layer: runtime analysis, provenance
+            verification, or tools like <a href="https://socket.dev" target="_blank" rel="noopener">Socket.dev</a> that
+            actively scan new publishes for malicious code patterns.
+          </p>
+
+          <p>
+            The supply chain security stack that actually works is layered:
+          </p>
+
+          <ol>
+            <li><strong>Structural scoring</strong> (proof-of-commitment) &mdash; know your risk profile before an attack</li>
+            <li><strong>Provenance verification</strong> (<code>npm audit signatures</code>) &mdash; verify builds come from expected pipelines</li>
+            <li><strong>Real-time publish scanning</strong> (Socket, Snyk) &mdash; catch malicious code in new releases</li>
+            <li><strong>Lock file pinning</strong> &mdash; don&rsquo;t pull new versions automatically</li>
+          </ol>
+
+          <h2>The typosquatting difference</h2>
+
+          <p>
+            The one thing behavioral scoring <em>does</em> catch that provenance doesn&rsquo;t: brand-new malicious packages
+            impersonating legitimate ones. When attackers register <code>bitawarden-cli</code> or <code>@bitwarden/cIi</code>
+            (capital I instead of lowercase L), those packages have no history. Score of 0. Zero downloads before the attack.
+            Published this week. That&rsquo;s a different signal, and it&rsquo;s detectable.
+          </p>
+
+          <p>
+            The Bitwarden attack was more sophisticated: it targeted the real package. That requires the provenance layer.
+          </p>
+
+          <h2>What we&rsquo;re adding</h2>
+
+          <p>
+            We&rsquo;re working on adding provenance status to the scoring output &mdash; flagging packages that
+            <em>should</em> have provenance (large organizations, high download volume) but don&rsquo;t. This doesn&rsquo;t
+            catch active attacks, but it surfaces the gap in your audit trail before something goes wrong.
+          </p>
+
+          <p>
+            Check your current dependencies:
+          </p>
+
+          <pre><code># Structural risk
+npx proof-of-commitment --file package.json
+
+# Provenance (built into npm)
+npm audit signatures</code></pre>
+
+          <p>
+            Run both. They answer different questions. Both answers matter.
+          </p>
+
+          <hr />
+
+          <p style="font-size: 0.9rem; color: var(--ink-muted);">
+            <strong>proof-of-commitment</strong> is open-source and free to use.
+            <a href="https://github.com/piiiico/proof-of-commitment">GitHub</a> &middot;
+            <a href="https://getcommit.dev/audit">Web audit</a> &middot;
+            <a href="https://getcommit.dev/docs">API docs</a>
+          </p>
+
+        </div>
+      </div>
+    </div>
+  </article>
+
+</Layout>

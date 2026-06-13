@@ -1,0 +1,246 @@
+---
+import Layout from '../../layouts/Layout.astro';
+---
+
+<Layout
+  title="@antv Had 17 npm Publishers When It Was Compromised. That's the Point. &mdash; Commit"
+  description="The @antv supply chain attack on May 20, 2026 compromised packages with 17 publishers. Behavioral signals didn't flag it as CRITICAL. Here's why that's how it should work, and what actually catches each attack type."
+  canonical="https://getcommit.dev/blog/antv-supply-chain-attack/"
+  publishDate="2026-05-23"
+>
+
+  <!-- Nav -->
+  <nav>
+    <div class="container nav-inner">
+      <a href="/" class="nav-brand">Commit</a>
+      <ul class="nav-links">
+        <li><a href="/extension">Extension</a></li>
+        <li><a href="/blog">Writing</a></li>
+        <li><a href="/pricing">Pricing</a></li><li><a href="/docs">Docs</a></li><li><a href="https://github.com/piiiico/proof-of-commitment" target="_blank" rel="noopener">GitHub</a></li>
+        <li><a href="mailto:pico@amdal.dev">Contact</a></li>
+      </ul>
+    </div>
+  </nav>
+
+  <!-- Essay -->
+  <article class="essay">
+    <div class="container">
+      <div class="editorial">
+
+        <!-- Header -->
+        <header class="essay-header">
+          <div class="essay-meta animate-in delay-1">
+            <time datetime="2026-05-23">May 23, 2026</time>
+          </div>
+          <h1 class="essay-title animate-in delay-2">@antv Had 17 npm Publishers When It Was Compromised. That&rsquo;s the Point.</h1>
+          <p class="essay-subtitle animate-in delay-3">
+            Three attacks, three structural profiles, three different detection surfaces.
+          </p>
+          <p class="essay-byline animate-in delay-4">H&aring;kon &Aring;mdal</p>
+        </header>
+
+        <!-- Body -->
+        <div class="essay-body">
+
+          <p>
+            On May 20, 2026, <a href="https://www.microsoft.com/en-us/security/blog/2026/05/20/mini-shai-hulud-compromised-antv-npm-packages-enable-ci-cd-credential-theft/" target="_blank" rel="noopener">Microsoft reported</a> that @antv npm packages were compromised in the Mini Shai-Hulud campaign. A maintainer account was hijacked and malicious versions were published to widely used data-visualization packages, propagating into libraries like echarts-for-react (1M+ weekly downloads).
+          </p>
+
+          <p>
+            I ran the @antv packages through <a href="/audit/">Commit&rsquo;s behavioral audit</a>. None scored CRITICAL. That surprised me for about ten seconds&mdash;then it clicked.
+          </p>
+
+          <hr class="essay-divider" />
+
+          <h2>The @antv audit</h2>
+
+          <div class="essay-table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>Package</th>
+                  <th>Score</th>
+                  <th>Publishers</th>
+                  <th>Downloads/wk</th>
+                  <th>Risk</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr><td>@antv/g6</td><td>89</td><td>17</td><td>228K</td><td>&mdash;</td></tr>
+                <tr><td>@antv/g2</td><td>87</td><td>18</td><td>337K</td><td>&mdash;</td></tr>
+                <tr><td>@antv/x6</td><td>87</td><td>17</td><td>109K</td><td>&mdash;</td></tr>
+                <tr><td>@antv/l7</td><td>83</td><td>17</td><td>45K</td><td>&mdash;</td></tr>
+                <tr><td>@antv/s2</td><td>80</td><td>17</td><td>8K</td><td>&mdash;</td></tr>
+              </tbody>
+            </table>
+          </div>
+
+          <p>
+            Seventeen publishers. Decent Scorecard scores. No CRITICAL flags.
+          </p>
+
+          <p>
+            The attack worked because one of those seventeen accounts was compromised. A single phished credential was enough. Behavioral signals that measure <em>publisher concentration</em> don&rsquo;t catch this shape of attack&mdash;they catch a different one.
+          </p>
+
+          <hr class="essay-divider" />
+
+          <h2>Three attacks in two weeks. Three different profiles.</h2>
+
+          <p>
+            May 2026 gave us three major npm compromises, each with a different structural fingerprint.
+          </p>
+
+          <div class="essay-table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>Attack</th>
+                  <th>Date</th>
+                  <th>Publishers</th>
+                  <th>Vector</th>
+                  <th>Behavioral flag?</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>TanStack</td>
+                  <td>May 11</td>
+                  <td>5</td>
+                  <td>GitHub Actions OIDC token hijack</td>
+                  <td>No &mdash; bypassed publisher layer</td>
+                </tr>
+                <tr>
+                  <td>node-ipc</td>
+                  <td>May 14</td>
+                  <td>1</td>
+                  <td>Sole publisher credential theft</td>
+                  <td>Yes &mdash; CRITICAL before attack</td>
+                </tr>
+                <tr>
+                  <td>@antv</td>
+                  <td>May 20</td>
+                  <td>17</td>
+                  <td>Maintainer account compromise</td>
+                  <td>No &mdash; multi-publisher dilutes risk</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <p>
+            node-ipc is the archetype of publisher concentration risk: one person, 10M+ downloads per week, one compromised credential away from a malicious publish reaching millions of machines. Commit flagged it CRITICAL months before the attack.
+          </p>
+
+          <p>
+            TanStack is a CI/CD pipeline attack. The malicious code ran with valid SLSA provenance because it was published from the legitimate GitHub Actions runner. Publisher count is irrelevant&mdash;the attack bypassed the registry entirely.
+          </p>
+
+          <p>
+            @antv sits between them. Multiple publishers should raise the cost of compromise (you need to phish one of seventeen accounts, not the only one). But &ldquo;harder&rdquo; is not &ldquo;impossible.&rdquo; One compromised account out of seventeen was enough.
+          </p>
+
+          <hr class="essay-divider" />
+
+          <h2>No single signal catches everything</h2>
+
+          <p>
+            This is the uncomfortable truth that tool marketing usually avoids.
+          </p>
+
+          <ul>
+            <li><strong>Publisher concentration</strong> (what Commit measures) catches node-ipc-shaped attacks. Single point of failure, credential theft, massive blast radius. These are the attacks where the structural weakness is visible before the incident.</li>
+            <li><strong>Process security</strong> (OpenSSF Scorecard) catches CI/CD pipeline weaknesses. Dangerous workflows, missing branch protection, no code review. But axios scored 8.0/10 on Scorecard and was still attacked via credential theft.</li>
+            <li><strong>Behavioral analysis</strong> (Socket) catches malicious code patterns at install time. Obfuscated payloads, network calls, filesystem access. But only after the malicious version is published.</li>
+          </ul>
+
+          <p>
+            @antv had 17 publishers and a 4.3/10 Scorecard. TanStack had 5 publishers and valid SLSA. node-ipc had 1 publisher and no Scorecard at all.
+          </p>
+
+          <p>
+            Three attacks, three profiles, three different tools that would have been most useful. The fantasy of one tool to catch them all is marketing, not security.
+          </p>
+
+          <hr class="essay-divider" />
+
+          <h2>What Commit does catch</h2>
+
+          <p>
+            Right now, these npm packages have one publisher and more than 10 million weekly downloads:
+          </p>
+
+          <div class="essay-table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>Package</th>
+                  <th>Downloads/wk</th>
+                  <th>Publishers</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr><td>minimatch</td><td>562M</td><td>1</td></tr>
+                <tr><td>chalk</td><td>413M</td><td>1</td></tr>
+                <tr><td>glob</td><td>333M</td><td>1</td></tr>
+                <tr><td>cross-spawn</td><td>190M</td><td>1</td></tr>
+                <tr><td>zod</td><td>163M</td><td>1</td></tr>
+                <tr><td>lodash</td><td>145M</td><td>1</td></tr>
+                <tr><td>axios</td><td>109M</td><td>1</td></tr>
+                <tr><td>hono</td><td>37M</td><td>1</td></tr>
+              </tbody>
+            </table>
+          </div>
+
+          <p>
+            <code>npm audit</code> shows zero vulnerabilities for all of them. They&rsquo;re working as intended. The risk isn&rsquo;t in the code&mdash;it&rsquo;s in the account that publishes the code.
+          </p>
+
+          <p>
+            When the next credential-theft attack hits npm, it will follow the node-ipc pattern, not the TanStack pattern. Behavioral signals will have flagged it. Process scores won&rsquo;t have helped.
+          </p>
+
+          <p>
+            And when the next CI/CD attack hits, behavioral signals won&rsquo;t help. Scorecard will.
+          </p>
+
+          <p>
+            Use both.
+          </p>
+
+          <hr class="essay-divider" />
+
+          <h2>Check your own stack</h2>
+
+          <pre><code>npx proof-of-commitment --file package-lock.json</code></pre>
+
+          <p>
+            Or scan directly: <a href="/audit/">getcommit.dev/audit</a>. Each result shows publisher count, Scorecard score, provenance status, and risk flags.
+          </p>
+
+          <p>
+            <a href="https://github.com/piiiico/proof-of-commitment" target="_blank" rel="noopener">Open source on GitHub</a>. Free CLI. <a href="/pricing/">Pro tier</a> adds batch API, monitoring, and alerts.
+          </p>
+
+        </div>
+
+      </div>
+    </div>
+  </article>
+
+  <!-- Footer -->
+  <footer>
+    <div class="container footer-inner">
+      <span class="footer-brand">Commit</span>
+      <ul class="footer-links">
+        <li><a href="/">Home</a></li>
+        <li><a href="/audit/">Audit</a></li>
+        <li><a href="/blog/">Writing</a></li>
+        <li><a href="/pricing/">Pricing</a></li>
+        <li><a href="https://github.com/piiiico/proof-of-commitment" target="_blank" rel="noopener">GitHub</a></li>
+        <li><a href="mailto:pico@amdal.dev">Contact</a></li>
+      </ul>
+    </div>
+  </footer>
+
+</Layout>

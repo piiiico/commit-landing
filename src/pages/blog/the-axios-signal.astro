@@ -1,0 +1,473 @@
+---
+import Layout from '../../layouts/Layout.astro';
+---
+
+<Layout
+  title="The Axios Signal — Commit"
+  description="axios scores 86/100 — nearly perfect on every quality dimension. It also scores CRITICAL. These aren't contradictory. This is the most important thing Commit reveals about npm."
+  canonical="https://getcommit.dev/blog/the-axios-signal/"
+  publishDate="2026-04-19"
+>
+
+  <!-- Nav -->
+  <nav>
+    <div class="container nav-inner">
+      <a href="/" class="nav-brand">Commit</a>
+      <ul class="nav-links">
+        <li><a href="/extension">Extension</a></li>
+        <li><a href="/blog">Writing</a></li>
+        <li><a href="/pricing">Pricing</a></li><li><a href="/docs">Docs</a></li><li><a href="https://github.com/piiiico/proof-of-commitment" target="_blank" rel="noopener">GitHub</a></li>
+        <li><a href="mailto:pico@amdal.dev">Contact</a></li>
+      </ul>
+    </div>
+  </nav>
+
+  <!-- Essay -->
+  <article class="essay">
+    <div class="container">
+      <div class="editorial">
+
+        <!-- Header -->
+        <header class="essay-header">
+          <div class="essay-meta animate-in delay-1">
+            <time datetime="2026-04-19">April 19, 2026</time>
+          </div>
+          <h1 class="essay-title animate-in delay-2">The Axios Signal</h1>
+          <p class="essay-subtitle animate-in delay-3">
+            axios scores 86/100 &mdash; nearly perfect on every quality dimension.
+            It also scores CRITICAL. These aren&rsquo;t contradictory.
+            This is the most important thing Commit reveals about npm.
+          </p>
+          <p class="essay-byline animate-in delay-4">Pico</p>
+        </header>
+
+        <!-- Body -->
+        <div class="essay-body">
+
+          <p style="font-size: 1.15rem; font-weight: 500; line-height: 1.6;">
+            Here&rsquo;s what the <a href="https://github.com/piiiico/proof-of-commitment">proof-of-commitment</a> API returns for <a href="/package/axios/">axios</a> right now:
+          </p>
+
+          <pre><code>&#123;
+  "name": "axios",
+  "score": 86,
+  "riskFlags": ["CRITICAL"],
+  "maintainers": 1,
+  "weeklyDownloads": 81672752
+&#125;</code></pre>
+
+          <p>
+            Score 86 out of 100. Nearly perfect on longevity, release consistency, and download momentum. And: <strong>CRITICAL</strong>.
+          </p>
+          <p>
+            These aren&rsquo;t contradictory. They&rsquo;re the most important thing the score reveals: <strong>quality and structural risk are orthogonal.</strong> A package can be excellent on every dimension that matters for code health, and simultaneously be the highest-impact single point of failure in the npm ecosystem.
+          </p>
+          <p>
+            Here&rsquo;s what <code>npm audit</code> returns for axios today:
+          </p>
+
+          <pre><code>found 0 vulnerabilities</code></pre>
+
+          <p>
+            That&rsquo;s the gap this tool is built to fill.
+          </p>
+
+          <hr class="essay-divider" />
+
+          <h2>One line of code</h2>
+
+          <p>
+            Here&rsquo;s the CRITICAL flag logic in proof-of-commitment:
+          </p>
+
+          <pre><code>if (maintainerCount === 1 && weeklyDownloads > 10_000_000)
+  riskFlags.push("CRITICAL");</code></pre>
+
+          <p>
+            That&rsquo;s it. One maintainer. More than 10 million weekly downloads. CRITICAL.
+          </p>
+          <p>
+            No machine learning. No behavioral analysis engine. One conditional that asks: is this package a single point of failure at scale?
+          </p>
+          <p>
+            If your instinct is that this is too simple to be useful &mdash; hold that thought. We&rsquo;ll come back to it.
+          </p>
+
+          <hr class="essay-divider" />
+
+          <h2>Why quality doesn&rsquo;t equal safety</h2>
+
+          <p>
+            The ua-parser-js incident (October 2021) is the template. Faisal Salman was the sole maintainer. His npm credentials were compromised. A malicious version containing a cryptominer and a credential-stealing trojan went live. The package had ~7 million weekly downloads at the time &mdash; used by Facebook, Microsoft, Amazon, and Google. The malicious versions ran for four hours.
+          </p>
+          <p>
+            Here&rsquo;s what <code>npm audit</code> showed before the attack: zero warnings. The package was healthy by every quality metric. Consistent releases. Growing adoption. High longevity. The vulnerability was orthogonal to quality &mdash; it was structural.
+          </p>
+          <p>
+            Proof-of-commitment would have flagged ua-parser-js at minimum as WARN, and CRITICAL at today&rsquo;s volume (25M weekly downloads). Axios has the same structural profile. 82 million weekly downloads. One maintainer. The blast radius is 10x larger.
+          </p>
+
+          <hr class="essay-divider" />
+
+          <h2>Why npm audit can&rsquo;t see this</h2>
+
+          <p>
+            <code>npm audit</code> is a CVE database lookup. It answers one question: &ldquo;has a known vulnerability been discovered, documented, and catalogued for this specific package version?&rdquo;
+          </p>
+          <p>
+            That&rsquo;s useful. But it has a fundamental limitation: it can only see threats that have already happened and been reported. By the time <code>npm audit</code> flags a supply chain compromise, the malicious code has already been running in production. The CVE is the <em>documentation</em> of the attack, not the detection.
+          </p>
+          <p>
+            The ua-parser-js timeline makes this concrete:
+          </p>
+
+          <div style="overflow-x: auto; margin: 2rem 0;">
+            <table style="width: 100%; border-collapse: collapse; font-size: 0.9rem;">
+              <thead>
+                <tr style="border-bottom: 2px solid var(--border-light);">
+                  <th style="text-align: left; padding: 0.75rem 1rem 0.75rem 0; font-weight: 600;">State</th>
+                  <th style="text-align: left; padding: 0.75rem 1rem; font-weight: 600;">npm audit</th>
+                  <th style="text-align: left; padding: 0.75rem 0 0.75rem 1rem; font-weight: 600;">proof-of-commitment</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr style="border-bottom: 1px solid var(--border-light);">
+                  <td style="padding: 0.75rem 1rem 0.75rem 0; color: var(--ink-subtle);">Years before attack</td>
+                  <td style="padding: 0.75rem 1rem;"><code>0 vulnerabilities</code></td>
+                  <td style="padding: 0.75rem 0 0.75rem 1rem;">&#x26A0;&#xFE0F; WARN (structural)</td>
+                </tr>
+                <tr style="border-bottom: 1px solid var(--border-light); background: rgba(220, 38, 38, 0.04);">
+                  <td style="padding: 0.75rem 1rem 0.75rem 0; color: var(--ink-subtle);">Oct 2021: malicious publish</td>
+                  <td style="padding: 0.75rem 1rem;"><code>0 vulnerabilities</code></td>
+                  <td style="padding: 0.75rem 0 0.75rem 1rem;">&#x26A0;&#xFE0F; WARN (structural)</td>
+                </tr>
+                <tr>
+                  <td style="padding: 0.75rem 1rem 0.75rem 0; color: var(--ink-subtle);">CVE filed (hours later)</td>
+                  <td style="padding: 0.75rem 1rem;"><code>1 critical vulnerability</code></td>
+                  <td style="padding: 0.75rem 0 0.75rem 1rem;">&#x26A0;&#xFE0F; WARN (structural)</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <p>
+            The structural flag was there the entire time. <code>npm audit</code> finally caught up after the attack occurred. Axios carries the same structural profile right now &mdash; except at 12x the download volume.
+          </p>
+          <p>
+            This isn&rsquo;t a criticism of <code>npm audit</code> &mdash; it does what it&rsquo;s designed to do. The problem is treating vulnerability scanning as <em>supply chain security</em>. Those are different things.
+          </p>
+
+          <hr class="essay-divider" />
+
+          <h2>The simplicity is the point</h2>
+
+          <p>
+            A skeptical reader is thinking: &ldquo;you flagged a structural condition with one if-statement. That&rsquo;s not sophisticated analysis &mdash; that&rsquo;s a filter.&rdquo;
+          </p>
+          <p>
+            Correct. And that&rsquo;s the argument.
+          </p>
+          <p>
+            The supply chain attack surface isn&rsquo;t complicated. It doesn&rsquo;t require deep learning or behavioral analysis to identify. The structural conditions that attackers select for are simple, public, and computable from the npm registry API in milliseconds:
+          </p>
+          <ol>
+            <li>How many people can push a release? <em>(npm registry)</em></li>
+            <li>How many systems execute this code every week? <em>(npm download stats)</em></li>
+          </ol>
+          <p>
+            If the answer to #1 is &ldquo;one&rdquo; and the answer to #2 is &ldquo;tens of millions,&rdquo; you have a rational attack target. The attacker&rsquo;s calculation is trivial: compromise one credential, get code execution on millions of systems.
+          </p>
+          <p>
+            The sophistication isn&rsquo;t in the detection. The sophistication is in the fact that the entire npm security ecosystem &mdash; <code>npm audit</code>, Dependabot, Snyk, Socket &mdash; is oriented around a different question (&ldquo;does this package have known bugs?&rdquo;) while this question (&ldquo;is this package a single point of failure at scale?&rdquo;) goes unasked.
+          </p>
+
+          <hr class="essay-divider" />
+
+          <h2>The score breakdown</h2>
+
+          <p>
+            Proof-of-commitment does score packages across five dimensions &mdash; all inputs are public data from the npm registry and GitHub API. Here&rsquo;s the actual API response for axios:
+          </p>
+
+          <pre><code>&#123;
+  "name": "axios",
+  "score": 86,
+  "riskFlags": ["CRITICAL"],
+  "scoreBreakdown": &#123;
+    "longevity": 25,
+    "downloadMomentum": 22,
+    "releaseConsistency": 20,
+    "maintainerDepth": 4,
+    "githubBacking": 15
+  &#125;
+&#125;</code></pre>
+
+          <p>
+            <strong>Longevity (25/25).</strong> 11.6 years old. Full marks.
+          </p>
+          <p>
+            <strong>Download momentum (22/25).</strong> 82M/week. Stable, not accelerating.
+          </p>
+          <p>
+            <strong>Release consistency (20/20).</strong> Regular release cadence. Full marks.
+          </p>
+          <p>
+            <strong>Maintainer depth (4/15).</strong> One maintainer. This is the dimension that breaks the curve.
+          </p>
+          <p>
+            <strong>GitHub backing (15/15).</strong> Strong community engagement. Full marks.
+          </p>
+          <p>
+            The compound effect: a score of 86 would pass any reasonable &ldquo;healthy package&rdquo; threshold. The CRITICAL flag exists precisely because the overall score is misleading. A package can be well-maintained, actively developed, widely adopted, and still be structurally dangerous because one compromised credential opens the blast door for 82 million projects.
+          </p>
+
+          <hr class="essay-divider" />
+
+          <h2>The ecosystem view</h2>
+
+          <p>
+            Axios isn&rsquo;t an outlier. It&rsquo;s the norm.
+          </p>
+          <p>
+            When we scored the top 50 most-downloaded npm packages in April 2026, 15 of them &mdash; 30% &mdash; triggered CRITICAL. Together, those 15 packages account for 2.5 billion weekly downloads.
+          </p>
+          <p>
+            Some names from that list:
+          </p>
+
+          <div style="overflow-x: auto; margin: 2rem 0;">
+            <table style="width: 100%; border-collapse: collapse; font-size: 0.9rem;">
+              <thead>
+                <tr style="border-bottom: 2px solid var(--border-light);">
+                  <th style="text-align: left; padding: 0.75rem 1rem 0.75rem 0; font-weight: 600;">Package</th>
+                  <th style="text-align: right; padding: 0.75rem 1rem; font-weight: 600;">Maintainers</th>
+                  <th style="text-align: right; padding: 0.75rem 1rem; font-weight: 600;">Weekly Downloads</th>
+                  <th style="text-align: left; padding: 0.75rem 0 0.75rem 1rem; font-weight: 600;">Risk</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr style="border-bottom: 1px solid var(--border-light);">
+                  <td style="padding: 0.75rem 1rem 0.75rem 0;"><code>minimatch</code></td>
+                  <td style="text-align: right; padding: 0.75rem 1rem;">1</td>
+                  <td style="text-align: right; padding: 0.75rem 1rem;">562M</td>
+                  <td style="padding: 0.75rem 0 0.75rem 1rem;">&#x1F534; CRITICAL</td>
+                </tr>
+                <tr style="border-bottom: 1px solid var(--border-light);">
+                  <td style="padding: 0.75rem 1rem 0.75rem 0;"><code>chalk</code></td>
+                  <td style="text-align: right; padding: 0.75rem 1rem;">1</td>
+                  <td style="text-align: right; padding: 0.75rem 1rem;">413M</td>
+                  <td style="padding: 0.75rem 0 0.75rem 1rem;">&#x1F534; CRITICAL</td>
+                </tr>
+                <tr style="border-bottom: 1px solid var(--border-light);">
+                  <td style="padding: 0.75rem 1rem 0.75rem 0;"><code>glob</code></td>
+                  <td style="text-align: right; padding: 0.75rem 1rem;">1</td>
+                  <td style="text-align: right; padding: 0.75rem 1rem;">332M</td>
+                  <td style="padding: 0.75rem 0 0.75rem 1rem;">&#x1F534; CRITICAL</td>
+                </tr>
+                <tr style="border-bottom: 1px solid var(--border-light);">
+                  <td style="padding: 0.75rem 1rem 0.75rem 0;"><code>@types/node</code></td>
+                  <td style="text-align: right; padding: 0.75rem 1rem;">1</td>
+                  <td style="text-align: right; padding: 0.75rem 1rem;">310M</td>
+                  <td style="padding: 0.75rem 0 0.75rem 1rem;">&#x1F534; CRITICAL</td>
+                </tr>
+                <tr style="border-bottom: 1px solid var(--border-light);">
+                  <td style="padding: 0.75rem 1rem 0.75rem 0;"><code>esbuild</code></td>
+                  <td style="text-align: right; padding: 0.75rem 1rem;">1</td>
+                  <td style="text-align: right; padding: 0.75rem 1rem;">190M</td>
+                  <td style="padding: 0.75rem 0 0.75rem 1rem;">&#x1F534; CRITICAL</td>
+                </tr>
+                <tr style="border-bottom: 1px solid var(--border-light);">
+                  <td style="padding: 0.75rem 1rem 0.75rem 0;"><code>zod</code></td>
+                  <td style="text-align: right; padding: 0.75rem 1rem;">1</td>
+                  <td style="text-align: right; padding: 0.75rem 1rem;">158M</td>
+                  <td style="padding: 0.75rem 0 0.75rem 1rem;">&#x1F534; CRITICAL</td>
+                </tr>
+                <tr style="border-bottom: 1px solid var(--border-light);">
+                  <td style="padding: 0.75rem 1rem 0.75rem 0;"><code>chokidar</code></td>
+                  <td style="text-align: right; padding: 0.75rem 1rem;">1</td>
+                  <td style="text-align: right; padding: 0.75rem 1rem;">158M</td>
+                  <td style="padding: 0.75rem 0 0.75rem 1rem;">&#x1F534; CRITICAL</td>
+                </tr>
+                <tr style="border-bottom: 1px solid var(--border-light);">
+                  <td style="padding: 0.75rem 1rem 0.75rem 0;"><code>lodash</code></td>
+                  <td style="text-align: right; padding: 0.75rem 1rem;">1</td>
+                  <td style="text-align: right; padding: 0.75rem 1rem;">145M</td>
+                  <td style="padding: 0.75rem 0 0.75rem 1rem;">&#x1F534; CRITICAL</td>
+                </tr>
+                <tr>
+                  <td style="padding: 0.75rem 1rem 0.75rem 0;"><code>axios</code></td>
+                  <td style="text-align: right; padding: 0.75rem 1rem;">1</td>
+                  <td style="text-align: right; padding: 0.75rem 1rem;">101M</td>
+                  <td style="padding: 0.75rem 0 0.75rem 1rem;">&#x1F534; CRITICAL</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <p>
+            For comparison, packages with similar download volumes that <em>don&rsquo;t</em> flag:
+          </p>
+
+          <div style="overflow-x: auto; margin: 2rem 0;">
+            <table style="width: 100%; border-collapse: collapse; font-size: 0.9rem;">
+              <thead>
+                <tr style="border-bottom: 2px solid var(--border-light);">
+                  <th style="text-align: left; padding: 0.75rem 1rem 0.75rem 0; font-weight: 600;">Package</th>
+                  <th style="text-align: right; padding: 0.75rem 1rem; font-weight: 600;">Maintainers</th>
+                  <th style="text-align: right; padding: 0.75rem 1rem; font-weight: 600;">Weekly Downloads</th>
+                  <th style="text-align: left; padding: 0.75rem 0 0.75rem 1rem; font-weight: 600;">Risk</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr style="border-bottom: 1px solid var(--border-light);">
+                  <td style="padding: 0.75rem 1rem 0.75rem 0;"><code>semver</code></td>
+                  <td style="text-align: right; padding: 0.75rem 1rem;">5</td>
+                  <td style="text-align: right; padding: 0.75rem 1rem;">633M</td>
+                  <td style="padding: 0.75rem 0 0.75rem 1rem;">&#x2705; Safe</td>
+                </tr>
+                <tr style="border-bottom: 1px solid var(--border-light);">
+                  <td style="padding: 0.75rem 1rem 0.75rem 0;"><code>debug</code></td>
+                  <td style="text-align: right; padding: 0.75rem 1rem;">2</td>
+                  <td style="text-align: right; padding: 0.75rem 1rem;">553M</td>
+                  <td style="padding: 0.75rem 0 0.75rem 1rem;">&#x2705; Safe</td>
+                </tr>
+                <tr style="border-bottom: 1px solid var(--border-light);">
+                  <td style="padding: 0.75rem 1rem 0.75rem 0;"><code>typescript</code></td>
+                  <td style="text-align: right; padding: 0.75rem 1rem;">6</td>
+                  <td style="text-align: right; padding: 0.75rem 1rem;">178M</td>
+                  <td style="padding: 0.75rem 0 0.75rem 1rem;">&#x2705; Safe</td>
+                </tr>
+                <tr style="border-bottom: 1px solid var(--border-light);">
+                  <td style="padding: 0.75rem 1rem 0.75rem 0;"><code>react</code></td>
+                  <td style="text-align: right; padding: 0.75rem 1rem;">2</td>
+                  <td style="text-align: right; padding: 0.75rem 1rem;">122M</td>
+                  <td style="padding: 0.75rem 0 0.75rem 1rem;">&#x2705; Safe</td>
+                </tr>
+                <tr>
+                  <td style="padding: 0.75rem 1rem 0.75rem 0;"><code>express</code></td>
+                  <td style="text-align: right; padding: 0.75rem 1rem;">5</td>
+                  <td style="text-align: right; padding: 0.75rem 1rem;">93M</td>
+                  <td style="padding: 0.75rem 0 0.75rem 1rem;">&#x2705; Safe</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <p>
+            The difference isn&rsquo;t download count, project age, or release cadence. It&rsquo;s the number of people between an attacker and the npm publish button.
+          </p>
+          <p>
+            minimatch, the second most-downloaded package on npm at 562 million weekly downloads, has one maintainer. If that credential is compromised, the supply chain attack makes axios look like a test run.
+          </p>
+
+          <hr class="essay-divider" />
+
+          <h2>The false positive objection</h2>
+
+          <p>
+            &ldquo;You flagged 15 out of 50 packages. Only two got attacked. That&rsquo;s a 13-out-of-15 false positive rate.&rdquo;
+          </p>
+          <p>
+            Fair. Let&rsquo;s be precise about the claim.
+          </p>
+          <p>
+            Proof-of-commitment does not predict <em>which</em> package will be attacked next, or <em>when</em>. It identifies the structural conditions that attackers select for. The distinction matters, and it&rsquo;s the same distinction that separates structural engineering from earthquake prediction.
+          </p>
+          <p>
+            A structural engineer doesn&rsquo;t predict earthquakes. They assess which buildings will collapse <em>when</em> an earthquake happens &mdash; based on construction, materials, load paths, and soil conditions. A building that scores poorly doesn&rsquo;t mean an earthquake is imminent. It means the building is the wrong place to be when one arrives.
+          </p>
+          <p>
+            The CRITICAL flag operates on the same logic. It doesn&rsquo;t predict that an attacker will compromise minimatch&rsquo;s sole maintainer next Tuesday. It identifies that minimatch has the structural profile &mdash; 562 million weekly downloads, one person with the keys &mdash; that makes it a rational target. When supply chain attackers evaluate their options, this is the profile they select.
+          </p>
+          <p>
+            The ua-parser-js attack confirmed the pattern in 2021. event-stream confirmed it in 2018. colors.js confirmed it in 2022. Every package that was exploited or sabotaged via sole-maintainer access shared the same structural profile. The CRITICAL packages in the top 100 haven&rsquo;t been attacked yet. That&rsquo;s not evidence the flag is wrong &mdash; it&rsquo;s evidence the attack hasn&rsquo;t happened yet.
+          </p>
+          <p>
+            The question isn&rsquo;t whether the flag is predictive. It&rsquo;s whether you&rsquo;d rather know about the structural risk before the CVE or after.
+          </p>
+
+          <hr class="essay-divider" />
+
+          <h2>What this means for axios</h2>
+
+          <p>
+            axios is actively maintained. In April 2026, the maintainer coordinated two security-hardening releases (v1.15.1 and v1.15.2) to address CVEs proactively. That&rsquo;s good security practice. It also underscores exactly what the CRITICAL flag measures: one person is making every security decision for 82 million weekly installs. The security hardening happened because that person chose to do it. The risk exists because they&rsquo;re the only person who can.
+          </p>
+          <p>
+            <code>npm audit</code> does its job &mdash; it scans for known vulnerabilities and finds them after they&rsquo;re catalogued. The problem is treating that as supply chain security. Supply chain security is a structural question: <em>is this package a single point of failure at enormous scale?</em>
+          </p>
+          <p>
+            That question has an answer. It&rsquo;s computable from public data. And it&rsquo;s embarrassingly simple to check.
+          </p>
+          <p>
+            For axios, minimatch, chalk, glob, zod, esbuild, and nine other top-100 packages, the answer is CRITICAL. Right now.
+          </p>
+          <p>
+            <code>npm audit</code> will catch the next attack after it happens. The structural signal is visible before.
+          </p>
+
+          <hr class="essay-divider" />
+
+          <p class="essay-coda">
+            <em>Audit your own dependencies: <a href="/audit">getcommit.dev/audit</a> | <a href="https://github.com/piiiico/proof-of-commitment">GitHub Action</a></em>
+          </p>
+          <p class="essay-coda">
+            <em>Full dataset: <a href="/blog/npm-trust-q2-2026">State of npm Supply Chain Trust — Q2 2026</a> (100 packages, 14 CRITICAL)</em>
+          </p>
+          <p class="essay-coda">
+            <em>Open source: <a href="https://github.com/piiiico/proof-of-commitment">github.com/piiiico/proof-of-commitment</a></em>
+          </p>
+
+        </div>
+      </div>
+    </div>
+  </article>
+
+  <!-- Newsletter -->
+  <section class="newsletter-section">
+    <div class="container">
+      <div class="editorial reveal">
+        <h2 style="margin-bottom: 0.75rem;">Stay in the loop</h2>
+        <p style="margin-bottom: 2rem; font-size: 1rem;">
+          Early access, research updates, and the occasional strong opinion.
+        </p>
+
+        <form
+          action="https://buttondown.email/api/emails/embed-subscribe/commitgraph"
+          method="post"
+          target="popupwindow"
+          class="newsletter-form"
+        >
+          <input
+            type="email"
+            name="email"
+            placeholder="you@example.com"
+            required
+            class="newsletter-input"
+          />
+          <button type="submit" class="btn-primary" style="white-space: nowrap;">
+            Subscribe
+          </button>
+        </form>
+
+        <p class="newsletter-note">No spam. Unsubscribe anytime.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer>
+    <div class="container footer-inner">
+      <span class="footer-brand">Commit</span>
+      <ul class="footer-links">
+        <li><a href="/">Home</a></li>
+        <li><a href="/extension">Extension</a></li>
+        <li><a href="/blog">Writing</a></li>
+        <li><a href="/pricing">Pricing</a></li><li><a href="/docs">Docs</a></li><li><a href="https://github.com/piiiico/proof-of-commitment" target="_blank" rel="noopener">GitHub</a></li>
+        <li><a href="mailto:pico@amdal.dev">Contact</a></li>
+      </ul>
+      <span class="footer-locale">Stavanger, Norway</span>
+    </div>
+  </footer>
+
+</Layout>

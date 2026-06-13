@@ -1,0 +1,860 @@
+---
+import Layout from '../../layouts/Layout.astro';
+---
+
+<Layout
+  title="Package Score — Commit"
+  description="Behavioral commitment score for npm packages. See if your dependency is maintained, growing, and safe."
+  canonical="https://getcommit.dev/scan/"
+>
+  <!-- Nav -->
+  <nav>
+    <div class="container nav-inner">
+      <a href="/" class="nav-brand">Commit</a>
+      <ul class="nav-links">
+        <li><a href="/#mcp">MCP</a></li>
+        <li><a href="/audit">Audit</a></li>
+        <li><a href="/watchlist">Watchlist</a></li>
+        <li><a href="/extension">Extension</a></li>
+        <li><a href="/blog">Writing</a></li>
+        <li><a href="/pricing">Pricing</a></li><li><a href="/docs">Docs</a></li><li><a href="https://github.com/piiiico/proof-of-commitment" target="_blank" rel="noopener">GitHub</a></li>
+        <li><a href="mailto:pico@amdal.dev">Contact</a></li>
+      </ul>
+    </div>
+  </nav>
+
+  <!-- Score Card Hero -->
+  <section class="scan-hero">
+    <div class="container">
+      <div class="scan-header">
+        <div class="scan-meta">
+          <span class="scan-eyebrow">Commitment Score</span>
+          <h1 class="scan-pkg-name" id="pkg-title">Loading…</h1>
+          <p class="scan-ecosystem" id="pkg-ecosystem"></p>
+        </div>
+        <div class="score-ring-wrap">
+          <div class="score-ring" id="score-ring">
+            <span class="score-ring-value" id="score-value">—</span>
+            <span class="score-ring-label">/ 100</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Loading state -->
+  <div id="loading-area" class="loading-area">
+    <div class="loading-spinner"></div>
+    <p>Scoring <span id="loading-pkg-name"></span>…</p>
+  </div>
+
+  <!-- Error state -->
+  <div id="error-area" class="error-area" hidden>
+    <p id="error-message"></p>
+  </div>
+
+  <!-- Not found state -->
+  <div id="notfound-area" class="notfound-area" hidden>
+    <p class="notfound-text">Package <strong id="notfound-pkg"></strong> not found in registry.</p>
+    <a href="/audit" class="notfound-cta">Audit different packages →</a>
+  </div>
+
+  <!-- Main results card -->
+  <section id="results-area" class="results-section" hidden>
+    <div class="container">
+      <div class="score-card">
+
+        <!-- Risk flags -->
+        <div class="risk-row" id="risk-row"></div>
+
+        <!-- Stats grid -->
+        <div class="stats-grid">
+          <div class="stat-item">
+            <span class="stat-label">Maintainers</span>
+            <span class="stat-value" id="stat-maintainers">—</span>
+          </div>
+          <div class="stat-item">
+            <span class="stat-label">Weekly Downloads</span>
+            <span class="stat-value" id="stat-downloads">—</span>
+          </div>
+          <div class="stat-item">
+            <span class="stat-label">Age</span>
+            <span class="stat-value" id="stat-age">—</span>
+          </div>
+          <div class="stat-item">
+            <span class="stat-label">Trend</span>
+            <span class="stat-value" id="stat-trend">—</span>
+          </div>
+        </div>
+
+        <!-- Score breakdown -->
+        <div class="breakdown-section" id="breakdown-section" hidden>
+          <h3 class="breakdown-title">Score breakdown</h3>
+          <div class="breakdown-bars" id="breakdown-bars"></div>
+        </div>
+
+        <!-- Risk explanation -->
+        <div class="risk-explain" id="risk-explain" hidden>
+          <h3 class="risk-explain-title">Why this matters</h3>
+          <div id="risk-explain-body"></div>
+        </div>
+
+        <!-- Share + audit more -->
+        <div class="card-actions">
+          <button class="btn-share" id="share-btn">↗ Copy link</button>
+          <span class="share-copied" id="share-copied" hidden>Copied!</span>
+          <a href="/audit" class="btn-audit-more">Audit more packages →</a>
+        </div>
+      </div>
+
+      <!-- Scan another -->
+      <div class="scan-another">
+        <div class="scan-input-row">
+          <input
+            type="text"
+            id="scan-input"
+            class="scan-input"
+            placeholder="Try: zod, lodash, chalk…"
+            autocomplete="off"
+            spellcheck="false"
+          />
+          <button class="btn-scan" id="scan-btn">Score →</button>
+        </div>
+      </div>
+
+      <!-- MCP CTA -->
+      <div class="mcp-cta">
+        <p class="mcp-cta-label">Want this in your AI assistant?</p>
+        <pre class="code-block">{`{
+  "mcpServers": {
+    "commit": {
+      "type": "streamable-http",
+      "url": "https://poc-backend.amdal-dev.workers.dev/mcp"
+    }
+  }
+}`}</pre>
+        <p class="mcp-cta-hint">Add to Claude Desktop, Cursor, or any MCP client. Then: <em>"Audit my package.json for supply chain risk"</em></p>
+      </div>
+    </div>
+  </section>
+
+  <style>
+    .scan-hero {
+      padding: 4rem 0 2rem;
+      background: var(--paper);
+    }
+
+    .scan-header {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 2rem;
+      max-width: 48rem;
+      margin: 0 auto;
+      flex-wrap: wrap;
+    }
+
+    .scan-meta {
+      flex: 1;
+      min-width: 0;
+    }
+
+    .scan-eyebrow {
+      display: block;
+      font-size: 0.75rem;
+      font-weight: 500;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: var(--ink-muted);
+      margin-bottom: 0.5rem;
+    }
+
+    .scan-pkg-name {
+      font-family: var(--font-mono);
+      font-size: clamp(1.8rem, 5vw, 3rem);
+      color: var(--ink);
+      margin: 0 0 0.4rem;
+      word-break: break-all;
+    }
+
+    .scan-ecosystem {
+      font-size: 0.85rem;
+      color: var(--ink-muted);
+      margin: 0;
+    }
+
+    /* ── Score Ring ── */
+    .score-ring-wrap {
+      flex-shrink: 0;
+    }
+
+    .score-ring {
+      width: 7rem;
+      height: 7rem;
+      border-radius: 50%;
+      border: 4px solid var(--border);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      background: var(--paper-dim);
+      transition: border-color 0.4s, background 0.4s;
+    }
+
+    .score-ring.ring-high {
+      border-color: #3d8b3d;
+      background: #f0fdf4;
+    }
+
+    .score-ring.ring-mid {
+      border-color: #c47a0a;
+      background: #fffbeb;
+    }
+
+    .score-ring.ring-low {
+      border-color: var(--accent);
+      background: #fff5f5;
+    }
+
+    .score-ring-value {
+      font-family: var(--font-mono);
+      font-size: 1.8rem;
+      font-weight: 700;
+      color: var(--ink);
+      line-height: 1;
+    }
+
+    .score-ring-value.ring-high { color: #3d8b3d; }
+    .score-ring-value.ring-mid { color: #c47a0a; }
+    .score-ring-value.ring-low { color: var(--accent); }
+
+    .score-ring-label {
+      font-family: var(--font-mono);
+      font-size: 0.7rem;
+      color: var(--ink-subtle);
+    }
+
+    /* ── Loading / Error ── */
+    .loading-area {
+      text-align: center;
+      padding: 3rem 0;
+      color: var(--ink-muted);
+    }
+
+    .loading-spinner {
+      width: 2rem;
+      height: 2rem;
+      border: 2px solid var(--border);
+      border-top-color: var(--accent);
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+      margin: 0 auto 1rem;
+    }
+
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+
+    .error-area {
+      max-width: 48rem;
+      margin: 2rem auto;
+      padding: 1rem 1.25rem;
+      background: #fee2e2;
+      border: 1px solid #fca5a5;
+      border-radius: 6px;
+      color: #991b1b;
+      font-size: 0.9rem;
+    }
+
+    .notfound-area {
+      max-width: 48rem;
+      margin: 2rem auto;
+      padding: 2rem;
+      text-align: center;
+      color: var(--ink-muted);
+    }
+
+    .notfound-text { font-size: 1rem; margin-bottom: 1rem; }
+    .notfound-cta {
+      color: var(--accent);
+      text-decoration: none;
+      font-size: 0.95rem;
+    }
+    .notfound-cta:hover { opacity: 0.8; }
+
+    /* ── Results Section ── */
+    .results-section {
+      padding: 1rem 0 5rem;
+      background: var(--paper);
+    }
+
+    .score-card {
+      max-width: 48rem;
+      margin: 0 auto 2rem;
+      background: var(--paper-dim);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 2rem;
+    }
+
+    /* ── Risk Row ── */
+    .risk-row {
+      display: flex;
+      gap: 0.5rem;
+      flex-wrap: wrap;
+      margin-bottom: 1.5rem;
+    }
+
+    .risk-badge {
+      display: inline-block;
+      padding: 0.25rem 0.6rem;
+      border-radius: 4px;
+      font-size: 0.8rem;
+      font-weight: 700;
+      letter-spacing: 0.03em;
+    }
+
+    .risk-critical { background: #fee2e2; color: #991b1b; }
+    .risk-high { background: #fef3c7; color: #92400e; }
+    .risk-warn { background: #fef9c3; color: #713f12; }
+    .risk-ok { background: #dcfce7; color: #166534; }
+
+    /* ── Stats Grid ── */
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 1rem;
+      margin-bottom: 2rem;
+    }
+
+    @media (max-width: 540px) {
+      .stats-grid { grid-template-columns: repeat(2, 1fr); }
+    }
+
+    .stat-item {
+      display: flex;
+      flex-direction: column;
+      gap: 0.25rem;
+    }
+
+    .stat-label {
+      font-size: 0.7rem;
+      font-weight: 500;
+      text-transform: uppercase;
+      letter-spacing: 0.07em;
+      color: var(--ink-muted);
+    }
+
+    .stat-value {
+      font-family: var(--font-mono);
+      font-size: 1.1rem;
+      color: var(--ink);
+      font-weight: 600;
+    }
+
+    .stat-value.trend-growing { color: #3d8b3d; }
+    .stat-value.trend-declining { color: var(--accent); }
+    .stat-value.stat-critical { color: #991b1b; }
+
+    /* ── Breakdown Bars ── */
+    .breakdown-section {
+      margin-bottom: 1.5rem;
+      padding-top: 1.5rem;
+      border-top: 1px solid var(--border);
+    }
+
+    .breakdown-title {
+      font-size: 0.75rem;
+      font-weight: 500;
+      text-transform: uppercase;
+      letter-spacing: 0.07em;
+      color: var(--ink-muted);
+      margin: 0 0 1rem;
+    }
+
+    .breakdown-bars {
+      display: flex;
+      flex-direction: column;
+      gap: 0.75rem;
+    }
+
+    .breakdown-bar-row {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+    }
+
+    .breakdown-bar-name {
+      font-size: 0.8rem;
+      color: var(--ink-muted);
+      width: 8rem;
+      flex-shrink: 0;
+    }
+
+    .breakdown-bar-track {
+      flex: 1;
+      height: 6px;
+      background: var(--border);
+      border-radius: 3px;
+      overflow: hidden;
+    }
+
+    .breakdown-bar-fill {
+      height: 100%;
+      border-radius: 3px;
+      background: #3d8b3d;
+      transition: width 0.5s ease;
+    }
+
+    .breakdown-bar-fill.bar-warn { background: #c47a0a; }
+    .breakdown-bar-fill.bar-low { background: var(--accent); }
+
+    .breakdown-bar-score {
+      font-family: var(--font-mono);
+      font-size: 0.75rem;
+      color: var(--ink-muted);
+      width: 3.5rem;
+      text-align: right;
+      flex-shrink: 0;
+    }
+
+    /* ── Risk Explanation ── */
+    .risk-explain {
+      margin-top: 1.5rem;
+      padding-top: 1.5rem;
+      border-top: 1px solid var(--border);
+    }
+
+    .risk-explain-title {
+      font-size: 0.75rem;
+      font-weight: 500;
+      text-transform: uppercase;
+      letter-spacing: 0.07em;
+      color: var(--ink-muted);
+      margin: 0 0 0.75rem;
+    }
+
+    .risk-item {
+      padding: 0.6rem 0.75rem;
+      border-radius: 5px;
+      font-size: 0.875rem;
+      line-height: 1.5;
+      margin-bottom: 0.5rem;
+    }
+
+    .risk-item:last-child { margin-bottom: 0; }
+    .risk-item-critical { background: #fff5f5; color: #7f1d1d; border-left: 3px solid #ef4444; }
+    .risk-item-high { background: #fffbeb; color: #78350f; border-left: 3px solid #f59e0b; }
+    .risk-item-warn { background: #fefce8; color: #713f12; border-left: 3px solid #eab308; }
+
+    /* ── Card Actions ── */
+    .card-actions {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      margin-top: 1.5rem;
+      flex-wrap: wrap;
+    }
+
+    .btn-share {
+      background: none;
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      padding: 0.4rem 0.9rem;
+      font-size: 0.85rem;
+      color: var(--ink-muted);
+      cursor: pointer;
+      font-family: var(--font-sans);
+      transition: border-color 0.15s, color 0.15s;
+    }
+
+    .btn-share:hover { border-color: var(--ink-subtle); color: var(--ink); }
+
+    .share-copied {
+      font-size: 0.82rem;
+      color: #166534;
+      font-weight: 500;
+    }
+
+    .btn-audit-more {
+      font-size: 0.85rem;
+      color: var(--accent);
+      text-decoration: none;
+      margin-left: auto;
+    }
+
+    .btn-audit-more:hover { opacity: 0.8; }
+
+    /* ── Scan Another ── */
+    .scan-another {
+      max-width: 48rem;
+      margin: 0 auto 2.5rem;
+    }
+
+    .scan-input-row {
+      display: flex;
+      gap: 0.5rem;
+    }
+
+    .scan-input {
+      flex: 1;
+      padding: 0.65rem 0.9rem;
+      font-family: var(--font-mono);
+      font-size: 0.9rem;
+      background: var(--paper);
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      color: var(--ink);
+      transition: border-color 0.15s;
+    }
+
+    .scan-input:focus {
+      outline: none;
+      border-color: var(--accent);
+    }
+
+    .btn-scan {
+      padding: 0.65rem 1.25rem;
+      background: var(--accent);
+      color: white;
+      border: none;
+      border-radius: 4px;
+      font-family: var(--font-body);
+      font-size: 0.9rem;
+      font-weight: 500;
+      cursor: pointer;
+      transition: background 0.15s;
+      white-space: nowrap;
+    }
+
+    .btn-scan:hover { background: var(--accent-dim); }
+
+    /* ── MCP CTA ── */
+    .mcp-cta {
+      max-width: 48rem;
+      margin: 0 auto;
+      padding: 1.5rem;
+      background: var(--paper-dim);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+    }
+
+    .mcp-cta-label {
+      font-size: 0.82rem;
+      font-weight: 500;
+      color: var(--ink-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      margin-bottom: 0.75rem;
+    }
+
+    .code-block {
+      background: var(--ink);
+      color: #a8c6fa;
+      padding: 1rem;
+      border-radius: 4px;
+      font-family: var(--font-mono);
+      font-size: 0.8rem;
+      line-height: 1.6;
+      overflow-x: auto;
+      margin-bottom: 0.75rem;
+    }
+
+    .mcp-cta-hint {
+      font-size: 0.85rem;
+      color: var(--ink-muted);
+    }
+
+    .mcp-cta-hint em {
+      font-style: italic;
+      color: var(--ink);
+    }
+  </style>
+
+  <script>
+    const API = 'https://poc-backend.amdal-dev.workers.dev/api/audit';
+
+    type ScoreBreakdown = {
+      longevity: number;
+      downloadMomentum: number;
+      releaseConsistency: number;
+      maintainerDepth: number;
+      githubBacking: number;
+    };
+
+    type AuditResult = {
+      name: string;
+      ecosystem: string;
+      score: number | null;
+      maintainers: number | null;
+      weeklyDownloads: number | null;
+      ageYears: number | null;
+      trend: string | null;
+      riskFlags: string[];
+      scoreBreakdown?: ScoreBreakdown;
+      error?: string;
+    };
+
+    const BREAKDOWN_MAXES: Record<keyof ScoreBreakdown, number> = {
+      longevity: 25,
+      downloadMomentum: 25,
+      releaseConsistency: 20,
+      maintainerDepth: 15,
+      githubBacking: 15,
+    };
+
+    const BREAKDOWN_LABELS: Record<keyof ScoreBreakdown, string> = {
+      longevity: 'Longevity',
+      downloadMomentum: 'DL Trend',
+      releaseConsistency: 'Releases',
+      maintainerDepth: 'Maintainers',
+      githubBacking: 'GitHub',
+    };
+
+    const RISK_EXPLANATIONS: Record<string, string> = {
+      CRITICAL: 'Single maintainer with 10M+ weekly downloads — the exact attack profile exploited in the ua-parser-js compromise (October 2021) and event-stream supply chain attack.',
+      HIGH: 'Package is less than 1 year old with rapid adoption. High growth with limited track record.',
+      WARN: 'No release in over 12 months. Maintenance may have stalled, leaving vulnerabilities unpatched.',
+    };
+
+    function fmtNum(n: number | null): string {
+      if (n === null || n === undefined) return '—';
+      if (n >= 1_000_000_000) return (n / 1_000_000_000).toFixed(1) + 'B';
+      if (n >= 1_000_000) return (n / 1_000_000).toFixed(1) + 'M';
+      if (n >= 1_000) return (n / 1_000).toFixed(0) + 'K';
+      return n.toString();
+    }
+
+    function getPackageFromPath(): string {
+      // Support both URL path (/scan/axios) and query param (/scan/?pkg=axios)
+      const params = new URLSearchParams(window.location.search);
+      const pkgParam = params.get('pkg');
+      if (pkgParam) return decodeURIComponent(pkgParam);
+
+      // Path is /scan/PACKAGE_NAME or /scan/PACKAGE_NAME/
+      const path = window.location.pathname;
+      const match = path.match(/^\/scan\/(.+?)\/?$/);
+      return match ? decodeURIComponent(match[1]) : '';
+    }
+
+    function scoreColorClass(score: number | null): string {
+      if (score === null) return '';
+      if (score >= 75) return 'ring-high';
+      if (score >= 50) return 'ring-mid';
+      return 'ring-low';
+    }
+
+    function barColorClass(val: number, max: number): string {
+      const pct = val / max;
+      if (pct >= 0.66) return '';
+      if (pct >= 0.33) return 'bar-warn';
+      return 'bar-low';
+    }
+
+    function showLoading(pkgName: string) {
+      document.getElementById('pkg-title')!.textContent = pkgName;
+      document.getElementById('loading-pkg-name')!.textContent = pkgName;
+      document.getElementById('loading-area')!.style.display = '';
+      document.getElementById('results-area')!.hidden = true;
+      document.getElementById('error-area')!.hidden = true;
+      document.getElementById('notfound-area')!.hidden = true;
+    }
+
+    function showError(msg: string) {
+      document.getElementById('loading-area')!.style.display = 'none';
+      document.getElementById('error-area')!.hidden = false;
+      document.getElementById('error-message')!.textContent = msg;
+    }
+
+    function showNotFound(pkgName: string) {
+      document.getElementById('loading-area')!.style.display = 'none';
+      document.getElementById('notfound-pkg')!.textContent = pkgName;
+      document.getElementById('notfound-area')!.hidden = false;
+    }
+
+    function renderResults(result: AuditResult, packageName: string) {
+      document.getElementById('loading-area')!.style.display = 'none';
+
+      // Update page title for browser
+      if (result.score !== null) {
+        document.title = `${packageName} — ${result.score}/100 — Commit Score`;
+      } else {
+        document.title = `${packageName} — Commit Score`;
+      }
+
+      // Package name + ecosystem
+      document.getElementById('pkg-title')!.textContent = packageName;
+      document.getElementById('pkg-ecosystem')!.textContent =
+        result.ecosystem ? `npm · ${fmtNum(result.weeklyDownloads)} weekly downloads` : '';
+
+      // Score ring
+      const scoreVal = document.getElementById('score-value')!;
+      const scoreRing = document.getElementById('score-ring')!;
+      if (result.score !== null) {
+        scoreVal.textContent = result.score.toString();
+        const cls = scoreColorClass(result.score);
+        scoreRing.className = 'score-ring ' + cls;
+        scoreVal.className = 'score-ring-value ' + cls;
+      } else {
+        scoreVal.textContent = '—';
+      }
+
+      // Risk badges
+      const riskRow = document.getElementById('risk-row')!;
+      if (!result.riskFlags || result.riskFlags.length === 0) {
+        riskRow.innerHTML = '<span class="risk-badge risk-ok">✓ No critical risk flags</span>';
+      } else {
+        riskRow.innerHTML = result.riskFlags.map(f => {
+          const cls = f === 'CRITICAL' ? 'risk-critical' : f === 'HIGH' ? 'risk-high' : 'risk-warn';
+          return `<span class="risk-badge ${cls}">${f}</span>`;
+        }).join('');
+      }
+
+      // Stats
+      document.getElementById('stat-maintainers')!.textContent =
+        result.maintainers !== null ? result.maintainers.toString() : '—';
+      if (result.maintainers === 1) {
+        document.getElementById('stat-maintainers')!.className = 'stat-value stat-critical';
+      }
+
+      document.getElementById('stat-downloads')!.textContent = fmtNum(result.weeklyDownloads);
+
+      document.getElementById('stat-age')!.textContent =
+        result.ageYears !== null ? result.ageYears + ' years' : '—';
+
+      const trendEl = document.getElementById('stat-trend')!;
+      if (result.trend) {
+        const trendClass = result.trend === 'growing' ? 'trend-growing' : result.trend === 'declining' ? 'trend-declining' : '';
+        trendEl.className = `stat-value ${trendClass}`;
+        trendEl.textContent = result.trend.charAt(0).toUpperCase() + result.trend.slice(1);
+      } else {
+        trendEl.textContent = '—';
+      }
+
+      // Score breakdown bars
+      if (result.scoreBreakdown) {
+        const barsEl = document.getElementById('breakdown-bars')!;
+        const dims = Object.keys(BREAKDOWN_MAXES) as (keyof ScoreBreakdown)[];
+        barsEl.innerHTML = dims.map(dim => {
+          const val = result.scoreBreakdown![dim] ?? 0;
+          const max = BREAKDOWN_MAXES[dim];
+          const pct = Math.round((val / max) * 100);
+          const cls = barColorClass(val, max);
+          return `
+            <div class="breakdown-bar-row">
+              <span class="breakdown-bar-name">${BREAKDOWN_LABELS[dim]}</span>
+              <div class="breakdown-bar-track">
+                <div class="breakdown-bar-fill ${cls}" style="width:${pct}%"></div>
+              </div>
+              <span class="breakdown-bar-score">${val}/${max}</span>
+            </div>
+          `;
+        }).join('');
+        document.getElementById('breakdown-section')!.hidden = false;
+      }
+
+      // Risk explanations
+      if (result.riskFlags && result.riskFlags.length > 0) {
+        const explainBody = document.getElementById('risk-explain-body')!;
+        explainBody.innerHTML = result.riskFlags.map(f => {
+          const cls = f === 'CRITICAL' ? 'risk-item-critical' : f === 'HIGH' ? 'risk-item-high' : 'risk-item-warn';
+          const text = RISK_EXPLANATIONS[f] ?? f;
+          return `<div class="risk-item ${cls}"><strong>${f}:</strong> ${text}</div>`;
+        }).join('');
+        document.getElementById('risk-explain')!.hidden = false;
+      }
+
+      document.getElementById('results-area')!.hidden = false;
+    }
+
+    async function scanPackage(pkgName: string, ecosystem = 'npm') {
+      showLoading(pkgName);
+
+      try {
+        const res = await fetch(API, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ packages: [pkgName], ecosystem }),
+        });
+
+        if (!res.ok) {
+          const err = await res.json().catch(() => ({ error: 'Request failed' })) as { error?: string };
+          throw new Error(err.error ?? `HTTP ${res.status}`);
+        }
+
+        const data = await res.json() as { count: number; results: AuditResult[] };
+        const result = data.results?.[0];
+
+        if (!result) {
+          showError('No results returned from API.');
+          return;
+        }
+
+        if (result.error) {
+          showNotFound(pkgName);
+          return;
+        }
+
+        renderResults(result, pkgName);
+
+      } catch (err) {
+        showError('Error: ' + (err instanceof Error ? err.message : 'Unknown error'));
+      }
+    }
+
+    // ── Main init ──
+    (function init() {
+      const pkgName = getPackageFromPath();
+
+      if (!pkgName || pkgName === 'index') {
+        // No package in URL — show input form
+        document.getElementById('loading-area')!.style.display = 'none';
+        document.getElementById('pkg-title')!.textContent = 'Score a package';
+        document.getElementById('results-area')!.hidden = false;
+        // Clear risk row and stats since no result loaded
+        document.getElementById('risk-row')!.innerHTML = '';
+        document.querySelectorAll('.stat-value').forEach(el => (el as HTMLElement).textContent = '—');
+        document.getElementById('breakdown-section')!.hidden = true;
+        document.getElementById('risk-explain')!.hidden = true;
+        return;
+      }
+
+      scanPackage(pkgName);
+    })();
+
+    // ── Scan Another ──
+    function doScanAnother() {
+      const input = document.getElementById('scan-input') as HTMLInputElement;
+      const pkg = input.value.trim();
+      if (!pkg) return;
+      // Navigate to scan page with package as path (302 redirects to query param)
+      window.location.href = '/scan/' + encodeURIComponent(pkg);
+    }
+
+    document.getElementById('scan-btn')!.addEventListener('click', doScanAnother);
+    document.getElementById('scan-input')!.addEventListener('keydown', (e) => {
+      if ((e as KeyboardEvent).key === 'Enter') doScanAnother();
+    });
+
+    // ── Share button ──
+    document.getElementById('share-btn')!.addEventListener('click', () => {
+      // Build a clean /scan/PACKAGE shareable URL
+      const pkg = getPackageFromPath();
+      const url = pkg
+        ? `https://getcommit.dev/scan/${encodeURIComponent(pkg)}`
+        : window.location.href;
+      navigator.clipboard.writeText(url).catch(() => {
+        const tmp = document.createElement('input');
+        tmp.value = url;
+        document.body.appendChild(tmp);
+        tmp.select();
+        document.execCommand('copy');
+        document.body.removeChild(tmp);
+      }).finally(() => {
+        const copied = document.getElementById('share-copied')!;
+        copied.hidden = false;
+        setTimeout(() => { copied.hidden = true; }, 2500);
+      });
+    });
+  </script>
+</Layout>

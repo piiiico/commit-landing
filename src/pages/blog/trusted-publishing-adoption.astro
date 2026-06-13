@@ -1,0 +1,259 @@
+---
+import Layout from '../../layouts/Layout.astro';
+---
+
+<Layout
+  title="Half of npm's Top Packages Don't Use Trusted Publishing — Commit"
+  description="We now detect npm Trusted Publishing (OIDC provenance) in every package score. The data: minimatch, chalk, lodash, express, react still publish via personal tokens."
+  canonical="https://getcommit.dev/blog/trusted-publishing-adoption/"
+  publishDate="2026-05-14"
+>
+
+  <!-- Nav -->
+  <nav>
+    <div class="container nav-inner">
+      <a href="/" class="nav-brand">Commit</a>
+      <ul class="nav-links">
+        <li><a href="/quickstart">Quickstart</a></li>
+        <li><a href="/audit">Audit</a></li>
+        <li><a href="/rankings">Rankings</a></li>
+        <li><a href="/blog">Writing</a></li>
+        <li><a href="https://github.com/piiiico/proof-of-commitment" target="_blank" rel="noopener">GitHub</a></li>
+      </ul>
+    </div>
+  </nav>
+
+  <!-- Essay -->
+  <article class="essay">
+    <div class="container">
+      <div class="editorial">
+
+        <!-- Header -->
+        <header class="essay-header">
+          <div class="essay-meta animate-in delay-1">
+            <time datetime="2026-05-14">May 14, 2026</time>
+          </div>
+          <h1 class="essay-title animate-in delay-2">Half of npm&rsquo;s Top Packages Don&rsquo;t Use Trusted Publishing</h1>
+          <p class="essay-subtitle animate-in delay-3">
+            We now detect OIDC provenance in every npm package score. Here&rsquo;s what the data shows.
+          </p>
+          <p class="essay-byline animate-in delay-4">H&aring;kon &Aring;mdal</p>
+        </header>
+
+        <!-- Body -->
+        <div class="essay-body">
+
+          <p>
+            npm introduced <a href="https://docs.npmjs.com/generating-provenance-statements">Trusted Publishing</a>
+            in 2023. Instead of publishing with a personal access token stored in your local environment,
+            packages are published from CI via OIDC &mdash; the registry verifies
+            the identity of the build pipeline, not a human. If a maintainer&rsquo;s laptop is compromised,
+            the attacker can&rsquo;t publish a malicious version because there&rsquo;s no token to steal.
+          </p>
+
+          <p>
+            This is the single most effective defense against credential-theft attacks &mdash;
+            the attack vector that hit <a href="/blog/axios-attack-prediction">axios in March 2026</a>
+            and <a href="/blog/python-supply-chain-risk">LiteLLM the same month</a>.
+          </p>
+
+          <p>
+            As of today, Commit detects Trusted Publishing for every npm package we score.
+            Here&rsquo;s what we found.
+          </p>
+
+          <h2>The data</h2>
+
+          <p>
+            We checked the 27 most-downloaded npm packages. Thirteen use Trusted Publishing. Fourteen don&rsquo;t.
+          </p>
+
+          <div class="table-wrap">
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th>Package</th>
+                  <th>Weekly dl</th>
+                  <th>Publishers</th>
+                  <th>Trusted Publishing</th>
+                  <th>Score</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr><td><a href="/npm/semver">semver</a></td><td>660M</td><td>4</td><td class="tp-yes">OIDC &check;</td><td>93</td></tr>
+                <tr class="row-warn"><td><a href="/npm/minimatch">minimatch</a></td><td>613M</td><td>1</td><td class="tp-no">No</td><td>78</td></tr>
+                <tr><td><a href="/npm/debug">debug</a></td><td>563M</td><td>2</td><td class="tp-no">No</td><td>78</td></tr>
+                <tr><td><a href="/npm/commander">commander</a></td><td>416M</td><td>2</td><td class="tp-no">No</td><td>84</td></tr>
+                <tr class="row-warn"><td><a href="/npm/glob">glob</a></td><td>360M</td><td>1</td><td class="tp-no">No</td><td>80</td></tr>
+                <tr><td><a href="/npm/uuid">uuid</a></td><td>198M</td><td>2</td><td class="tp-yes">OIDC &check;</td><td>87</td></tr>
+                <tr><td><a href="/npm/fs-extra">fs-extra</a></td><td>190M</td><td>3</td><td class="tp-no">No</td><td>89</td></tr>
+                <tr><td><a href="/npm/yargs">yargs</a></td><td>161M</td><td>2</td><td class="tp-no">No</td><td>81</td></tr>
+                <tr class="row-warn"><td><a href="/npm/cross-spawn">cross-spawn</a></td><td>148M</td><td>1</td><td class="tp-no">No</td><td>72</td></tr>
+                <tr><td><a href="/npm/dotenv">dotenv</a></td><td>136M</td><td>3</td><td class="tp-no">No</td><td>89</td></tr>
+                <tr><td><a href="/npm/webpack">webpack</a></td><td>~99M</td><td>4+</td><td class="tp-yes">OIDC &check;</td><td>99</td></tr>
+                <tr><td><a href="/npm/express">express</a></td><td>~95M</td><td>5</td><td class="tp-no">No</td><td>93</td></tr>
+                <tr><td><a href="/npm/vite">vite</a></td><td>~94M</td><td>3+</td><td class="tp-yes">OIDC &check;</td><td>94</td></tr>
+                <tr><td><a href="/npm/react">react</a></td><td>~91M</td><td>3+</td><td class="tp-no">No</td><td>91</td></tr>
+                <tr class="row-warn"><td><a href="/npm/axios">axios</a></td><td>~88M</td><td>1</td><td class="tp-yes">OIDC &check;</td><td>88</td></tr>
+                <tr><td><a href="/npm/esbuild">esbuild</a></td><td>~85M</td><td>1</td><td class="tp-yes">OIDC &check;</td><td>85</td></tr>
+                <tr class="row-warn"><td><a href="/npm/chalk">chalk</a></td><td>~75M</td><td>1</td><td class="tp-no">No</td><td>75</td></tr>
+                <tr class="row-warn"><td><a href="/npm/lodash">lodash</a></td><td>~84M</td><td>1</td><td class="tp-no">No</td><td>84</td></tr>
+                <tr><td><a href="/npm/zod">zod</a></td><td>~163M</td><td>1</td><td class="tp-yes">OIDC &check;</td><td>91</td></tr>
+                <tr><td><a href="/npm/next">next</a></td><td>~95M</td><td>3+</td><td class="tp-yes">OIDC &check;</td><td>95</td></tr>
+                <tr><td><a href="/npm/typescript">typescript</a></td><td>~97M</td><td>3+</td><td class="tp-no">No</td><td>97</td></tr>
+                <tr><td><a href="/npm/eslint">eslint</a></td><td>~92M</td><td>3+</td><td class="tp-no">No</td><td>92</td></tr>
+                <tr><td><a href="/npm/prettier">prettier</a></td><td>~97M</td><td>3+</td><td class="tp-no">No</td><td>97</td></tr>
+                <tr><td><a href="/npm/jest">jest</a></td><td>~97M</td><td>3+</td><td class="tp-no">No</td><td>97</td></tr>
+                <tr><td><a href="/npm/rollup">rollup</a></td><td>~90M</td><td>2+</td><td class="tp-yes">OIDC &check;</td><td>101</td></tr>
+              </tbody>
+            </table>
+          </div>
+
+          <p class="table-note">
+            Highlighted rows have a single npm publisher and no Trusted Publishing &mdash; the highest-risk combination.
+            axios adopted Trusted Publishing <em>after</em> the March 2026 attack.
+          </p>
+
+          <h2>What stands out</h2>
+
+          <p>
+            <strong>The build tool ecosystem adopted faster.</strong> Webpack, vite, esbuild, rollup
+            all use OIDC. They publish from CI as a natural consequence of how they&rsquo;re developed &mdash;
+            automated release pipelines.
+          </p>
+
+          <p>
+            <strong>Utility packages are exposed.</strong> minimatch (613M/wk), glob (360M/wk),
+            cross-spawn (148M/wk) &mdash; all have a single npm publisher and no Trusted Publishing.
+            These packages rarely show up in your <code>package.json</code>, but they&rsquo;re in your
+            <code>node_modules</code>. A credential theft on any of them follows the
+            <a href="/blog/two-types-npm-attacks">same pattern</a> that compromised axios.
+          </p>
+
+          <p>
+            <strong>Big orgs aren&rsquo;t consistent.</strong> React and TypeScript don&rsquo;t use Trusted Publishing.
+            Next.js does. Express doesn&rsquo;t. The pattern isn&rsquo;t about org size &mdash;
+            it&rsquo;s about whether the specific package&rsquo;s release pipeline was modernized.
+          </p>
+
+          <p>
+            <strong>axios adopted it post-attack.</strong> After the
+            <a href="/blog/axios-attack-prediction">March 30 credential compromise</a>,
+            axios enabled OIDC publishing. It now scores 88 with Trusted Publishing (+2 points from
+            the new dimension). The attack was preventable.
+          </p>
+
+          <h2>How we detect it</h2>
+
+          <p>
+            When you query any npm package through Commit &mdash;
+            <a href="/audit">the web audit</a>,
+            <a href="/quickstart">the CLI</a>,
+            or the <a href="https://github.com/piiiico/proof-of-commitment">MCP server</a> &mdash;
+            we check the latest version&rsquo;s <code>dist.attestations</code> in the npm registry.
+            If OIDC-based attestations are present, the package uses Trusted Publishing.
+          </p>
+
+          <p>
+            The signal adds up to 2 points to the commitment score (out of 102 max) and
+            appears in the score breakdown on every <a href="/npm/axios">package profile page</a>.
+            It&rsquo;s a small bonus, not a cure &mdash; a sole publisher with Trusted Publishing is still
+            a concentration risk. But it eliminates the most common attack vector.
+          </p>
+
+          <h2>What you can do</h2>
+
+          <p>
+            If you maintain an npm package, <a href="https://docs.npmjs.com/generating-provenance-statements">enable Trusted Publishing</a>.
+            It takes one flag in your CI workflow: <code>--provenance</code>.
+          </p>
+
+          <p>
+            If you depend on packages, check which ones use it:
+          </p>
+
+          <pre><code>npx proof-of-commitment --file package-lock.json</code></pre>
+
+          <p>
+            The CRITICAL packages in your lock file &mdash; single publisher, high downloads,
+            no OIDC &mdash; are where a stolen credential does the most damage.
+            Those are the ones to watch.
+          </p>
+
+          <div class="essay-cta">
+            <a href="/audit" class="btn btn-primary">Audit your dependencies</a>
+            <a href="/npm/minimatch" class="btn btn-ghost">See minimatch&rsquo;s profile</a>
+          </div>
+
+        </div>
+      </div>
+    </div>
+  </article>
+
+  <style>
+    /* ── Resets ── */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { font-size: 16px; scroll-behavior: smooth; }
+    body { font-family: 'Inter', system-ui, -apple-system, sans-serif; font-weight: 300; font-size: 1rem; line-height: 1.7; color: #1C1B1A; background: #FFFCF0; }
+
+    /* ── Nav ── */
+    nav { padding: 1.25rem 0; border-bottom: 1px solid #E6E4D9; }
+    .container { max-width: 880px; margin: 0 auto; padding: 0 1.5rem; }
+    .nav-inner { display: flex; align-items: center; justify-content: space-between; max-width: 880px; margin: 0 auto; padding: 0 1.5rem; }
+    .nav-brand { font-family: 'Instrument Serif', Georgia, serif; font-size: 1.4rem; color: #1C1B1A; text-decoration: none; }
+    .nav-links { display: flex; list-style: none; gap: 1.5rem; }
+    .nav-links a { color: #6F6E69; text-decoration: none; font-size: .85rem; letter-spacing: .03em; }
+    .nav-links a:hover { color: #1C1B1A; }
+
+    /* ── Essay ── */
+    .essay { padding: 4rem 0 6rem; }
+    .editorial { max-width: 640px; }
+    .essay-header { margin-bottom: 3rem; }
+    .essay-meta { font-size: .8rem; color: #878580; letter-spacing: .06em; text-transform: uppercase; margin-bottom: .75rem; }
+    .essay-title { font-family: 'Instrument Serif', Georgia, serif; font-size: clamp(1.8rem, 4vw, 2.6rem); font-weight: 400; line-height: 1.15; color: #1C1B1A; margin-bottom: 1rem; }
+    .essay-subtitle { font-size: 1.1rem; color: #6F6E69; font-weight: 300; line-height: 1.5; }
+    .essay-byline { font-size: .85rem; color: #878580; margin-top: 1rem; }
+    .essay-body p { margin-bottom: 1.5rem; color: #343331; }
+    .essay-body h2 { font-family: 'Instrument Serif', Georgia, serif; font-size: 1.4rem; font-weight: 400; color: #1C1B1A; margin: 2.5rem 0 1rem; }
+    .essay-body a { color: #6F6E69; text-decoration: underline; text-underline-offset: 3px; }
+    .essay-body a:hover { color: #1C1B1A; }
+    .essay-body code { font-size: .88em; background: #F2F0E5; padding: .15em .4em; border-radius: 3px; }
+    .essay-body pre { background: #F2F0E5; padding: 1rem 1.25rem; border-radius: 6px; overflow-x: auto; margin-bottom: 1.5rem; }
+    .essay-body pre code { background: none; padding: 0; font-size: .85rem; }
+    .essay-body strong { font-weight: 500; color: #1C1B1A; }
+
+    /* ── Data table ── */
+    .table-wrap { overflow-x: auto; margin: 1.5rem 0; }
+    .data-table { width: 100%; border-collapse: collapse; font-size: .88rem; }
+    .data-table th { text-align: left; font-weight: 500; color: #878580; font-size: .78rem; letter-spacing: .04em; text-transform: uppercase; padding: .6rem .75rem; border-bottom: 2px solid #E6E4D9; white-space: nowrap; }
+    .data-table td { padding: .55rem .75rem; border-bottom: 1px solid #F2F0E5; color: #343331; }
+    .data-table td a { color: #343331; text-decoration: underline; text-underline-offset: 2px; }
+    .data-table td a:hover { color: #1C1B1A; }
+    .tp-yes { color: #3D7A1A; font-weight: 400; }
+    .tp-no { color: #878580; }
+    .row-warn { background: #FFF8E8; }
+    .table-note { font-size: .85rem; color: #878580; margin-top: .5rem; font-style: italic; }
+
+    /* ── CTA ── */
+    .essay-cta { margin-top: 2.5rem; display: flex; gap: 1rem; flex-wrap: wrap; }
+    .btn { display: inline-block; padding: .65rem 1.5rem; border-radius: 6px; text-decoration: none; font-size: .9rem; font-weight: 400; transition: all .2s; }
+    .btn-primary { background: #1C1B1A; color: #FFFCF0; }
+    .btn-primary:hover { background: #343331; }
+    .btn-ghost { border: 1px solid #E6E4D9; color: #343331; }
+    .btn-ghost:hover { border-color: #1C1B1A; }
+
+    /* ── Animations ── */
+    .animate-in { opacity: 0; transform: translateY(12px); animation: fadeUp .5s ease forwards; }
+    .delay-1 { animation-delay: .1s; }
+    .delay-2 { animation-delay: .2s; }
+    .delay-3 { animation-delay: .3s; }
+    .delay-4 { animation-delay: .4s; }
+    @keyframes fadeUp { to { opacity: 1; transform: translateY(0); } }
+
+    @media (max-width: 640px) {
+      .nav-links { display: none; }
+      .essay { padding: 2rem 0 4rem; }
+    }
+  </style>
+
+</Layout>

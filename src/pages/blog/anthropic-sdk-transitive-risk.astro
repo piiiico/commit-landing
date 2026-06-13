@@ -1,0 +1,229 @@
+---
+import Layout from '../../layouts/Layout.astro';
+---
+
+<Layout
+  title="The Anthropic SDK Looks Safe. Two of Its Transitive Dependencies Aren't. — Commit"
+  description="@anthropic-ai/sdk scores HEALTHY at depth 1. At depth 2, two of its dependencies are CRITICAL: sole maintainer, 12–15M weekly downloads, no release in over a year. Here's what the full dependency tree shows."
+  canonical="https://getcommit.dev/blog/anthropic-sdk-transitive-risk/"
+  publishDate="2026-04-26"
+>
+
+  <!-- Nav -->
+  <nav>
+    <div class="container nav-inner">
+      <a href="/" class="nav-brand">Commit</a>
+      <ul class="nav-links">
+        <li><a href="/extension">Extension</a></li>
+        <li><a href="/blog">Writing</a></li>
+        <li><a href="/pricing">Pricing</a></li><li><a href="/docs">Docs</a></li><li><a href="https://github.com/piiiico/proof-of-commitment" target="_blank" rel="noopener">GitHub</a></li>
+        <li><a href="mailto:pico@amdal.dev">Contact</a></li>
+      </ul>
+    </div>
+  </nav>
+
+  <!-- Essay -->
+  <article class="essay">
+    <div class="container">
+      <div class="editorial">
+
+        <!-- Header -->
+        <header class="essay-header">
+          <div class="essay-meta animate-in delay-1">
+            <time datetime="2026-04-26">April 26, 2026</time>
+          </div>
+          <h1 class="essay-title animate-in delay-2">The Anthropic SDK Looks Safe. Two of Its Transitive Dependencies Aren&rsquo;t.</h1>
+          <p class="essay-subtitle animate-in delay-3">
+            Sole maintainer. 10M+ weekly downloads. No release in over a year.
+            <code>@anthropic-ai/sdk</code> scores HEALTHY at depth 1. At depth 2, two packages are CRITICAL.
+          </p>
+          <p class="essay-byline animate-in delay-4">H&aring;kon &Aring;mdal</p>
+        </header>
+
+        <!-- Body -->
+        <div class="essay-body">
+
+          <p>
+            Run a standard supply chain audit on <a href="/package/@anthropic-ai__sdk/"><code>@anthropic-ai/sdk</code></a>. You get this:
+          </p>
+
+          <pre><code>@anthropic-ai/sdk: score=86  14 maintainers  15.1M downloads/week  &#x2705; HEALTHY</code></pre>
+
+          <p>
+            Looks fine. Anthropic maintains it actively, large team, widely used. Move on.
+          </p>
+
+          <p>
+            Run it again at depth 2 &mdash; checking what the SDK&rsquo;s dependencies depend on:
+          </p>
+
+          <pre><code>@anthropic-ai/sdk         score=86  14 maint  15.1M/wk  &#x2705; HEALTHY
+  &#x2514;&#x2500; json-schema-to-ts    score=71   1 maint  14.9M/wk  &#x1F534; CRITICAL: sole maintainer + &gt;10M/wk
+       &#x2514;&#x2500; ts-algebra       score=64   1 maint  12.3M/wk  &#x1F534; CRITICAL: sole maintainer + no release in 12+ months
+       &#x2514;&#x2500; @babel/runtime   score=93   4 maint  139M/wk   &#x2705; HEALTHY</code></pre>
+
+          <p>
+            <code>json-schema-to-ts</code> is the only runtime dependency of the Anthropic SDK. One maintainer.
+            Nearly 15 million weekly downloads. The exact attack profile that hit LiteLLM in March 2026
+            and axios in March 2026.
+          </p>
+
+          <p>
+            <code>ts-algebra</code> &mdash; one level deeper &mdash; is also CRITICAL: sole maintainer,
+            12 million downloads per week, no release in over a year.
+          </p>
+
+          <p>
+            Neither shows up if you only audit your direct dependencies.
+          </p>
+
+          <h2>Why transitive risks are harder to see</h2>
+
+          <p>
+            When you run <code>npm audit</code>, it checks for known CVEs in your dependency tree. That&rsquo;s good.
+            But it doesn&rsquo;t tell you:
+          </p>
+
+          <ul>
+            <li>Which packages have a single maintainer who could be social-engineered</li>
+            <li>Which widely-used packages haven&rsquo;t been actively maintained</li>
+            <li>Which small packages have become load-bearing infrastructure without anyone noticing</li>
+          </ul>
+
+          <p>
+            <code>json-schema-to-ts</code> is a perfect example of the last one. It&rsquo;s a type utility,
+            so it looks like a dev dependency. It&rsquo;s not. The Anthropic SDK ships it as a runtime
+            dependency &mdash; meaning it runs in production in every app using Claude&rsquo;s API.
+          </p>
+
+          <p>
+            Nearly 15 million downloads a week. One maintainer. No public corporate backing.
+          </p>
+
+          <h2>The attack pattern</h2>
+
+          <p>
+            The attacks we&rsquo;ve seen follow a consistent pattern:
+          </p>
+
+          <ol>
+            <li>Find a widely-used package with a single maintainer</li>
+            <li>Acquire access (account takeover, social engineering, or the maintainer transfers it)</li>
+            <li>Publish a malicious version that looks like a routine update</li>
+            <li>Wait</li>
+          </ol>
+
+          <p>
+            The LiteLLM compromise in March 2026 came via a backdoored Trivy GitHub Action in LiteLLM&rsquo;s
+            CI pipeline &mdash; the supply chain attack was at the build tooling layer, not a direct package dependency.
+            The ua-parser-js attack in October 2021 (CVE-2021-4229) targeted the package directly via
+            credential compromise.
+          </p>
+
+          <p>
+            In both cases, the attack surface was visible in behavioral signals before the attack:
+            single maintainer, high download volume, no organizational backing.
+          </p>
+
+          <h2>Scanning the full tree</h2>
+
+          <p>
+            The <a href="https://getcommit.dev/audit">Commit supply chain scanner</a> supports depth-2
+            tree traversal. Try it directly via API:
+          </p>
+
+          <pre><code>curl -X POST https://poc-backend.amdal-dev.workers.dev/api/graph/npm \
+  -H "Content-Type: application/json" \
+  -d '&#123;"package": "@anthropic-ai/sdk", "depth": 2&#125;'</code></pre>
+
+          <p>Or via MCP (zero install &mdash; add to Claude Desktop, Cursor, or Windsurf):</p>
+
+          <pre><code>&#123;
+  "mcpServers": &#123;
+    "commit": &#123;
+      "type": "streamable-http",
+      "url": "https://poc-backend.amdal-dev.workers.dev/mcp"
+    &#125;
+  &#125;
+&#125;</code></pre>
+
+          <p>Then ask: <em>&ldquo;Map the dependency tree risk for @anthropic-ai/sdk at depth 2&rdquo;</em></p>
+
+          <h2>A few more examples</h2>
+
+          <p>
+            I ran the same depth-2 audit on a few popular packages:
+          </p>
+
+          <p>
+            <strong><code>express</code></strong> at depth 2: no CRITICAL flags, but <code>escape-html</code>
+            (1 maintainer, no release in 13 months) shows up as a transitive dependency with a score of 39.
+            Not critical volume, but worth knowing.
+          </p>
+
+          <p>
+            <strong><code>vercel/ai</code></strong>: <code>husky</code> shows up as CRITICAL &mdash;
+            1 maintainer, 24.6M downloads/week. It&rsquo;s a devDependency, so lower risk than a runtime dep.
+            But it runs in CI for most projects using this framework.
+          </p>
+
+          <p>
+            <strong><code>langchain</code></strong>: several transitive dependencies with single maintainers
+            and no recent releases.
+          </p>
+
+          <p>
+            The pattern: packages that look healthy at depth 1 often have riskier dependencies one level deeper.
+          </p>
+
+          <h2>What to do with this</h2>
+
+          <p>
+            A CRITICAL flag doesn&rsquo;t mean &ldquo;stop using this package immediately.&rdquo;
+            It means &ldquo;this is your attack surface &mdash; know it.&rdquo;
+          </p>
+
+          <p>
+            For <code>json-schema-to-ts</code>: it&rsquo;s used by the Anthropic SDK for schema validation.
+            There&rsquo;s not much you can do about it directly. But you can:
+          </p>
+
+          <ul>
+            <li>Pin to a known-good version and verify on updates</li>
+            <li>Monitor the package for unusual activity</li>
+            <li>Understand that if this package gets compromised, your app gets compromised</li>
+          </ul>
+
+          <p>
+            The first step is visibility. Most teams don&rsquo;t know what&rsquo;s in their transitive
+            dependency tree, and that&rsquo;s exactly the gap these attacks exploit.
+          </p>
+
+          <hr />
+
+          <p>
+            <em>
+              The supply chain scanner at <a href="https://getcommit.dev/audit">getcommit.dev/audit</a> is open source:
+              <a href="https://github.com/piiiico/proof-of-commitment" target="_blank" rel="noopener">github.com/piiiico/proof-of-commitment</a>.
+              No install, no API key &mdash; paste a package name and see what&rsquo;s hiding.
+            </em>
+          </p>
+
+        </div>
+
+        <!-- CTA -->
+        <div class="essay-cta reveal" style="margin-top: var(--space-block);">
+          <div class="cta-box">
+            <p class="cta-text">Scan your own dependency tree</p>
+            <div class="cta-buttons">
+              <a href="/audit" class="btn-primary">Try the scanner</a>
+              <a href="https://github.com/piiiico/proof-of-commitment" target="_blank" rel="noopener" class="btn-secondary">View on GitHub</a>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </article>
+
+</Layout>

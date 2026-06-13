@@ -1,0 +1,303 @@
+---
+import { posts } from '../data/posts';
+
+export interface Props {
+  title?: string;
+  description?: string;
+  canonical?: string;
+  ogImage?: string;
+  publishDate?: string; // ISO date string, e.g. "2026-05-15"
+  modifiedDate?: string;
+}
+
+const {
+  title = "Commit — Indexing Reality",
+  description = "Google indexed the web. The next step is indexing reality. Commit captures behavioral commitment signals — the data layer AI needs to give trustworthy recommendations.",
+  canonical = "https://getcommit.dev",
+  publishDate,
+  modifiedDate,
+} = Astro.props;
+
+// Strip " — Commit" suffix from title for structured data headline and OG cards
+const headline = title.replace(/\s*[—–-]\s*Commit\s*$/, "");
+
+// Dynamic OG image: blog posts get a generated card, everything else uses the default
+const OG_API = "https://poc-backend.amdal-dev.workers.dev";
+const isBlogPost = canonical.includes("/blog/") && canonical !== "https://getcommit.dev/blog" && canonical !== "https://getcommit.dev/blog/";
+const ogImage =
+  Astro.props.ogImage ??
+  (isBlogPost
+    ? `${OG_API}/og/blog?title=${encodeURIComponent(headline)}`
+    : "https://getcommit.dev/og-default.png");
+
+// Related posts for blog pages — keyword overlap in title + description
+const STOP_WORDS = new Set([
+  'the','a','an','is','are','was','were','in','on','at','to','for','of','with',
+  'by','from','and','or','not','no','but','what','how','why','when','where',
+  'who','which','that','this','it','its','here','there','has','have','had',
+  'do','does','did','will','would','could','should','can','may','might',
+  'just','about','over','i','you','we','they','my','your','our','their',
+  'if','than','then','so','too','very','all','any','each','every','both',
+  'few','more','most','other','some','such','only','same','own','one','two',
+  'now','new','also','been','being','get','got','dont','heres','whats','thats',
+]);
+
+function tokenize(text: string): Set<string> {
+  return new Set(
+    text.toLowerCase()
+      .replace(/[^a-z0-9\s-]/g, ' ')
+      .split(/\s+/)
+      .filter(w => w.length > 2 && !STOP_WORDS.has(w))
+  );
+}
+
+type ScoredPost = typeof posts[number] & { _score: number };
+let relatedPosts: typeof posts = [];
+
+if (isBlogPost) {
+  const currentSlug = canonical
+    .replace('https://getcommit.dev/blog/', '')
+    .replace(/\/$/, '');
+  const currentPost = posts.find(p => p.slug === currentSlug);
+
+  if (currentPost) {
+    // Author-curated override beats the token-overlap heuristic. Used when
+    // the algorithm sends engaged readers to a tangential post instead of the
+    // intended deep-dive. Unknown slugs are silently dropped so a typo can't
+    // surface a missing post.
+    if (currentPost.relatedSlugs && currentPost.relatedSlugs.length > 0) {
+      relatedPosts = currentPost.relatedSlugs
+        .map(slug => posts.find(p => p.slug === slug))
+        .filter((p): p is typeof posts[number] => p !== undefined)
+        .slice(0, 3);
+    } else {
+      const currentTokens = tokenize(currentPost.title + ' ' + currentPost.description);
+
+      relatedPosts = (posts
+        .filter(p => p.slug !== currentSlug)
+        .map(p => {
+          const tokens = tokenize(p.title + ' ' + p.description);
+          let score = 0;
+          for (const t of tokens) {
+            if (currentTokens.has(t)) score++;
+          }
+          return { ...p, _score: score } as ScoredPost;
+        })
+        .sort((a, b) => b._score - a._score)
+        .slice(0, 3) as typeof posts);
+    }
+  }
+}
+
+// JSON-LD structured data
+function buildJsonLd(): string | null {
+  if (isBlogPost) {
+    const article: Record<string, any> = {
+      "@context": "https://schema.org",
+      "@type": "BlogPosting",
+      "headline": headline,
+      "description": description,
+      "url": canonical,
+      "image": ogImage,
+      "author": {
+        "@type": "Person",
+        "name": "Håkon Åmdal",
+        "url": "https://getcommit.dev"
+      },
+      "publisher": {
+        "@type": "Organization",
+        "name": "Commit",
+        "url": "https://getcommit.dev",
+        "logo": {
+          "@type": "ImageObject",
+          "url": "https://getcommit.dev/og-default.png"
+        }
+      },
+      "mainEntityOfPage": {
+        "@type": "WebPage",
+        "@id": canonical
+      }
+    };
+    if (publishDate) article.datePublished = publishDate;
+    if (modifiedDate) article.dateModified = modifiedDate;
+    return JSON.stringify(article);
+  }
+
+  if (canonical === "https://getcommit.dev" || canonical === "https://getcommit.dev/") {
+    return JSON.stringify({
+      "@context": "https://schema.org",
+      "@type": "WebSite",
+      "name": "Commit",
+      "url": "https://getcommit.dev",
+      "description": description,
+      "potentialAction": {
+        "@type": "SearchAction",
+        "target": "https://getcommit.dev/audit?packages={search_term_string}",
+        "query-input": "required name=search_term_string"
+      }
+    });
+  }
+
+  // Software tool pages
+  if (canonical.includes("/audit") || canonical.includes("/scan")) {
+    return JSON.stringify({
+      "@context": "https://schema.org",
+      "@type": "SoftwareApplication",
+      "name": "Commit — Supply Chain Auditing",
+      "url": canonical,
+      "description": description,
+      "applicationCategory": "DeveloperApplication",
+      "operatingSystem": "Web",
+      "offers": {
+        "@type": "Offer",
+        "price": "0",
+        "priceCurrency": "USD"
+      }
+    });
+  }
+
+  return null;
+}
+
+const jsonLd = buildJsonLd();
+---
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>{title}</title>
+  <meta name="description" content={description} />
+  <link rel="canonical" href={canonical} />
+
+  <!-- Open Graph -->
+  <meta property="og:title" content={title} />
+  <meta property="og:description" content={description} />
+  <meta property="og:type" content="website" />
+  <meta property="og:url" content={canonical} />
+  <meta property="og:image" content={ogImage} />
+  <meta property="og:image:width" content="1200" />
+  <meta property="og:image:height" content="630" />
+  <meta property="og:image:type" content="image/png" />
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:image" content={ogImage} />
+
+  <!-- Theme color (warm paper) -->
+  <meta name="theme-color" content="#FFFCF0" />
+
+  <!-- Feed discovery -->
+  <link rel="alternate" type="application/rss+xml" title="Commit Blog" href="https://getcommit.dev/blog/rss.xml" />
+  <link rel="alternate" type="application/feed+json" title="Commit Blog" href="https://getcommit.dev/blog/feed.json" />
+
+  <!-- JSON-LD Structured Data -->
+  {jsonLd && <script type="application/ld+json" set:html={jsonLd} />}
+
+  {/*
+    First-party visit beacon — replaces CF Web Analytics, which has been
+    silently producing zero data since 2026-05-24 (POST /cdn-cgi/rum 404s).
+    Posts to poc-backend with utm_* preserved so funnel-attribution surfaces
+    (audit-overshoot, audit-compromised-key, audit-web-compromised, key-upgrade)
+    show up in /api/v1/visits/stats. Fire-and-forget; sendBeacon when available
+    so navigation isn't blocked. No cookies, no fingerprinting, no PII.
+  */}
+  <script is:inline>
+    (function() {
+      try {
+        var url = new URL(window.location.href);
+        var params = url.searchParams;
+        var payload = {
+          path: url.pathname,
+          referrer: document.referrer || "",
+          utm_source: params.get("utm_source") || undefined,
+          utm_medium: params.get("utm_medium") || undefined,
+          utm_campaign: params.get("utm_campaign") || undefined,
+          utm_content: params.get("utm_content") || undefined,
+          utm_term: params.get("utm_term") || undefined
+        };
+        // Strip undefined keys so the JSON stays compact.
+        Object.keys(payload).forEach(function(k) {
+          if (payload[k] === undefined) delete payload[k];
+        });
+        var endpoint = "https://poc-backend.amdal-dev.workers.dev/api/v1/visit";
+        var body = JSON.stringify(payload);
+        // Send as text/plain — CORS-safelisted content-type, so no preflight
+        // OPTIONS is required. Backend parses text body as JSON regardless of
+        // Content-Type. Skipping preflight is faster AND sidesteps a
+        // headless-chromium preflight glitch (cors-error 11) reproducible
+        // 2026-06-10 with application/json Blobs.
+        var blob = new Blob([body], { type: "text/plain" });
+        // Prefer sendBeacon — fire-and-forget, navigation-safe.
+        if (navigator.sendBeacon && navigator.sendBeacon(endpoint, blob)) return;
+        // Fallback: keepalive fetch with text/plain so the simple-request path
+        // is still used (no preflight). Don't await — beacon must not block paint.
+        fetch(endpoint, {
+          method: "POST",
+          headers: { "Content-Type": "text/plain" },
+          body: body,
+          keepalive: true,
+          credentials: "omit"
+        }).catch(function() { /* swallow — analytics never breaks the page */ });
+      } catch (e) { /* swallow — analytics never breaks the page */ }
+    })();
+  </script>
+</head>
+<body>
+  <slot />
+
+  {isBlogPost && relatedPosts.length > 0 && (
+    <section class="related-posts-section">
+      <div class="container" style="max-width: var(--max-content); margin: 0 auto; padding: 0 2rem;">
+        <hr style="border: none; border-top: 1px solid var(--border); margin-bottom: 2rem;" />
+        <p style="font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.1em; color: var(--ink-subtle); margin-bottom: 1.25rem; font-family: var(--font-body);">Keep reading</p>
+        <ul style="list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 1rem;">
+          {relatedPosts.map(p => (
+            <li>
+              <a href={`/blog/${p.slug}`} style="text-decoration: none; display: block; padding: 1rem 1.25rem; border: 1px solid var(--border-light); border-radius: 6px; background: var(--paper-dim); transition: border-color 0.15s ease;">
+                <span style="display: block; font-family: var(--font-body); font-size: 0.95rem; font-weight: 500; color: var(--ink); line-height: 1.4;">{p.title}</span>
+                <span style="display: block; font-size: 0.8rem; color: var(--ink-subtle); margin-top: 0.35rem; font-family: var(--font-body);">{p.dateLabel}</span>
+              </a>
+            </li>
+          ))}
+        </ul>
+        <div style="margin-top: 1.5rem; margin-bottom: 3rem;">
+          <a href="/blog" style="font-size: 0.85rem; color: var(--accent); text-decoration: none; font-family: var(--font-body); font-weight: 500;">&larr; All writing</a>
+        </div>
+      </div>
+    </section>
+  )}
+
+  <script is:inline>
+    // Route handler for /scan/* — when served as SPA fallback, redirect to scan page
+    // Must be inline (not bundled) so it runs before any rendering
+    // Excludes /scan/repo which is a real page (repo scanner)
+    (function() {
+      var p = window.location.pathname;
+      if (p === '/scan/repo' || p === '/scan/repo/') return;
+      var m = p.match(/^\/scan\/([^/]+)\/?$/);
+      if (m) window.location.replace('/scan/?pkg=' + encodeURIComponent(decodeURIComponent(m[1])));
+    })();
+  </script>
+
+  <script>
+    // Scroll reveal — IntersectionObserver
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            entry.target.classList.add('visible');
+            observer.unobserve(entry.target);
+          }
+        });
+      },
+      { threshold: 0.12, rootMargin: '0px 0px -48px 0px' }
+    );
+
+    document.querySelectorAll('.reveal').forEach((el) => observer.observe(el));
+  </script>
+</body>
+</html>
+
+<style is:global>
+  @import '../styles/global.css';
+</style>

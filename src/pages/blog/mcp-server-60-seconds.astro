@@ -1,0 +1,219 @@
+---
+import Layout from '../../layouts/Layout.astro';
+---
+
+<Layout
+  title="Add Real Business Trust Signals to Claude Desktop in 60 Seconds — Commit"
+  description="A zero-install MCP server that lets you ask Claude: How trustworthy is Equinor? Verified data from Norwegian government registers — not reviews."
+  canonical="https://getcommit.dev/blog/mcp-server-60-seconds/"
+  publishDate="2026-04-03"
+>
+
+  <!-- Nav -->
+  <nav>
+    <div class="container nav-inner">
+      <a href="/" class="nav-brand">Commit</a>
+      <ul class="nav-links">
+        <li><a href="/extension">Extension</a></li>
+        <li><a href="/blog">Writing</a></li>
+        <li><a href="/pricing">Pricing</a></li><li><a href="/docs">Docs</a></li><li><a href="https://github.com/piiiico/proof-of-commitment" target="_blank" rel="noopener">GitHub</a></li>
+        <li><a href="mailto:pico@amdal.dev">Contact</a></li>
+      </ul>
+    </div>
+  </nav>
+
+  <!-- Article -->
+  <article class="essay">
+    <div class="container">
+      <div class="editorial">
+
+        <!-- Header -->
+        <header class="essay-header">
+          <div class="essay-meta animate-in delay-1">
+            <time datetime="2026-04-03">April 3, 2026</time>
+          </div>
+          <h1 class="essay-title animate-in delay-2">Add Real Business Trust Signals to Claude Desktop in 60 Seconds</h1>
+          <p class="essay-subtitle animate-in delay-3">
+            A zero-install MCP server. Ask Claude "How trustworthy is Equinor?" and get verified data from Norwegian government registers — not reviews.
+          </p>
+          <p class="essay-byline animate-in delay-4">Pico</p>
+        </header>
+
+        <!-- Body -->
+        <div class="essay-body">
+
+          <p>
+            Reviews are fake. Ratings are gamed. What if your AI could check verified behavioral data instead?
+          </p>
+          <p>
+            <strong>This is a 60-second setup.</strong> No code. No install. Just add two lines to your MCP config.
+          </p>
+
+          <h2>What You Get</h2>
+
+          <p>Ask Claude, Cursor, or Windsurf:</p>
+
+          <blockquote>
+            "How trustworthy is Equinor?"
+          </blockquote>
+
+          <p>And get:</p>
+
+          <pre><code>EQUINOR ASA (923609016)
+Operating for 53.5 years (founded 1972-09-18)
+21,408 employees
+Revenue: 72,543M NOK
+Equity ratio: 37.6%
+
+Commitment signals:
+  Temporal (longevity): 95/100
+  Financial (health): 90/100
+  Operational (activity): 95/100
+  Overall commitment: 93/100</code></pre>
+
+          <p>
+            This is not a review. This is structural data — years operating, employee count, financial ratios — sourced from <a href="https://www.brreg.no/" target="_blank" rel="noopener">Brønnøysundregistrene</a>, the Norwegian government business register. It cannot be gamed. It cannot be bought.
+          </p>
+
+          <h2>The Setup (60 Seconds)</h2>
+
+          <p><strong>Claude Desktop</strong> — edit <code>~/.claude/claude_desktop_config.json</code>:</p>
+
+          <pre><code>{`{
+  "mcpServers": {
+    "proof-of-commitment": {
+      "type": "streamable-http",
+      "url": "https://poc-backend.amdal-dev.workers.dev/mcp"
+    }
+  }
+}`}</code></pre>
+
+          <p><strong>Cursor</strong> — go to Settings → MCP, add:</p>
+
+          <pre><code>{`{
+  "proof-of-commitment": {
+    "type": "streamable-http",
+    "url": "https://poc-backend.amdal-dev.workers.dev/mcp"
+  }
+}`}</code></pre>
+
+          <p>
+            That is it. Restart the app. Done.
+          </p>
+
+          <h2>What You Can Ask</h2>
+
+          <p>Once connected, try:</p>
+
+          <ul>
+            <li><em>"How trustworthy is Equinor?"</em> → full commitment profile</li>
+            <li><em>"Look up Norwegian business by org number 923609016"</em> → direct lookup</li>
+            <li><em>"Is Avinor a reliable company?"</em> → Norwegian state-owned airports operator</li>
+            <li><em>"What's the financial health of Storebrand?"</em> → insurance and asset management</li>
+          </ul>
+
+          <p>The MCP server exposes three tools:</p>
+
+          <table>
+            <thead>
+              <tr><th>Tool</th><th>What it does</th></tr>
+            </thead>
+            <tbody>
+              <tr><td><code>query_commitment</code></td><td>Query behavioral data for any domain</td></tr>
+              <tr><td><code>lookup_business</code></td><td>Search by business name</td></tr>
+              <tr><td><code>lookup_business_by_org</code></td><td>Lookup by 9-digit org number</td></tr>
+            </tbody>
+          </table>
+
+          <h2>Why This Matters</h2>
+
+          <p>
+            The entire trust data market — $10B+ annually (Verisk, D&amp;B, FICO, Trustpilot) — is built on <strong>opinions and declarations</strong>. Nobody sells AI what actually happened: how long a business has operated, how many employees stayed, whether their financials are solid.
+          </p>
+          <p>
+            This is a narrow wedge: Norwegian businesses, government data. But the architecture is the point. Behavioral commitment data is structurally harder to fake than any review. That is the primitive that is missing from how AI evaluates trust.
+          </p>
+
+          <h2>Source</h2>
+
+          <p>
+            Open source: <a href="https://github.com/piiiico/proof-of-commitment" target="_blank" rel="noopener">github.com/piiiico/proof-of-commitment</a>
+          </p>
+          <p>
+            Built on: Cloudflare Workers + D1, MCP Streamable HTTP protocol, Brønnøysund API.
+          </p>
+          <p>
+            The bigger vision — verifiable behavioral commitments from browser extension data, staked endorsements on Base L2 — is the <a href="/">Commit protocol</a>.
+          </p>
+
+          <hr />
+
+          <p style="color: var(--ink-muted); font-size: 0.9rem;">
+            If you add this to your Claude Desktop or Cursor setup, I would love to hear what you try asking it. <a href="mailto:pico@amdal.dev">pico@amdal.dev</a>
+          </p>
+
+        </div>
+      </div>
+    </div>
+  </article>
+
+  <footer>
+    <div class="container footer-inner">
+      <span class="footer-brand">Commit</span>
+      <ul class="footer-links">
+        <li><a href="/blog">Writing</a></li>
+        <li><a href="/pricing">Pricing</a></li><li><a href="/docs">Docs</a></li><li><a href="https://github.com/piiiico/proof-of-commitment" target="_blank" rel="noopener">GitHub</a></li>
+        <li><a href="mailto:pico@amdal.dev">Contact</a></li>
+      </ul>
+      <span class="footer-locale">Stavanger, Norway</span>
+    </div>
+  </footer>
+
+</Layout>
+
+<style>
+  pre {
+    background: var(--paper-dim);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 1.25rem;
+    overflow-x: auto;
+    margin: 1.5rem 0;
+    font-size: 0.85rem;
+    line-height: 1.5;
+  }
+  code {
+    font-family: 'Fira Code', 'Cascadia Code', 'JetBrains Mono', monospace;
+  }
+  blockquote {
+    border-left: 3px solid var(--accent);
+    padding-left: 1.25rem;
+    margin: 1.5rem 0;
+    font-style: italic;
+    color: var(--ink-muted);
+  }
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 1.5rem 0;
+    font-size: 0.9rem;
+  }
+  th, td {
+    text-align: left;
+    padding: 0.6rem 1rem;
+    border-bottom: 1px solid var(--border);
+  }
+  th {
+    color: var(--ink-muted);
+    font-weight: 500;
+  }
+  ul {
+    margin: 1rem 0 1rem 1.5rem;
+    line-height: 1.8;
+  }
+  hr {
+    border: none;
+    border-top: 1px solid var(--border);
+    margin: 2.5rem 0;
+  }
+</style>

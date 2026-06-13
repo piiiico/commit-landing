@@ -1,0 +1,213 @@
+---
+import Layout from '../../layouts/Layout.astro';
+---
+
+<Layout
+  title="The Caveman Principle: Why AI Pricing Is Still Broken — Commit"
+  description="Caveman makes Claude speak like a prehistoric human to save 87% of tokens. 688 people upvoted it. That's not a fun hack — it's revealed preference about what's broken in AI pricing."
+  canonical="https://getcommit.dev/blog/caveman-pricing-principle/"
+  publishDate="2026-04-06"
+>
+
+  <!-- Nav -->
+  <nav>
+    <div class="container nav-inner">
+      <a href="/" class="nav-brand">Commit</a>
+      <ul class="nav-links">
+        <li><a href="/extension">Extension</a></li>
+        <li><a href="/blog">Writing</a></li>
+        <li><a href="/pricing">Pricing</a></li><li><a href="/docs">Docs</a></li><li><a href="https://github.com/piiiico/proof-of-commitment" target="_blank" rel="noopener">GitHub</a></li>
+        <li><a href="mailto:pico@amdal.dev">Contact</a></li>
+      </ul>
+    </div>
+  </nav>
+
+  <!-- Essay -->
+  <article class="essay">
+    <div class="container">
+      <div class="editorial">
+
+        <!-- Header -->
+        <header class="essay-header">
+          <div class="essay-meta animate-in delay-1">
+            <time datetime="2026-04-06">April 6, 2026</time>
+          </div>
+          <h1 class="essay-title animate-in delay-2">The Caveman Principle</h1>
+          <p class="essay-subtitle animate-in delay-3">
+            Why AI Pricing Is Still Broken
+          </p>
+          <p class="essay-byline animate-in delay-4">Pico</p>
+        </header>
+
+        <!-- Body -->
+        <div class="essay-body">
+
+          <p>
+            A tool called Caveman hit #1 on Hacker News with 688 points.
+          </p>
+          <p>
+            It makes Claude speak like a prehistoric human.
+          </p>
+          <p>
+            Instead of: <em>"Great question! When dealing with React re-renders, you'll want to consider using the useMemo hook, which allows you to memoize the result of a computation so that it's not recalculated on every render..."</em> (1,180 tokens)
+          </p>
+          <p>
+            You get: <em>"New object ref each render. Wrap in useMemo."</em> (159 tokens)
+          </p>
+          <p>
+            No articles. No pleasantries. 87% fewer tokens. 688 people thought this was worth upvoting.
+          </p>
+          <p>
+            That's not a fun hack. That's revealed preference about what's broken in AI pricing.
+          </p>
+
+          <h2>The Real Cost Behind the Humor</h2>
+
+          <p>
+            Caveman exists because tokens cost money. Not abstractly — concretely, operationally, in a way that changes developer behavior.
+          </p>
+          <p>
+            The benchmarks in the repo are striking: React explanation goes from 1,180 to 159 tokens. PostgreSQL setup: 2,347 to 380. Average savings: 65%. For a developer making hundreds of API calls per day, this isn't optimization — it's survival math.
+          </p>
+          <p>
+            But here's what the Caveman readme doesn't say: why is anyone building token compression tools at all?
+          </p>
+          <p>
+            Because the pricing model that governs AI access was designed for a world that no longer exists.
+          </p>
+
+          <h2>How We Got Here</h2>
+
+          <p>
+            The mental model behind $20/month AI subscriptions comes from streaming. Netflix charges one price regardless of how many hours you watch. This works because human attention is bounded — nobody watches Netflix for 22 hours a day. The math holds.
+          </p>
+          <p>
+            AI subscriptions inherited this logic. Some users send a few messages a day, some send dozens, the heavy users cross-subsidize the moderate ones, everyone gets predictability. The abstraction holds — until agents arrive.
+          </p>
+          <p>
+            An agent doesn't have attention. It doesn't pause to think. It sends a message, parses the response, sends another, branches, loops, retries. A background agent working on a codebase overnight makes 500–2,000 API calls. A customer support agent runs continuously, with zero idle time.
+          </p>
+          <p>
+            A human power user might send 50 messages on a busy day. An agent sends 50 messages before you finish your morning coffee.
+          </p>
+          <p>
+            The flat subscription model doesn't fail for agents because providers are being restrictive. It fails because the math never worked. You cannot offer flat pricing for unbounded machine-paced consumption. The moment you try, adverse selection kicks in: high-volume users (agents) maximize their flat rate into unprofitability, while moderate users aren't enough to compensate.
+          </p>
+
+          <h2>The Cascade</h2>
+
+          <p>
+            When Anthropic blocked third-party agentic tools from Claude subscriptions recently, the developer community erupted. OpenClaw users lost access overnight. Threads hit the front page.
+          </p>
+          <p>
+            Most of the anger targeted Anthropic's timing. But their technical explanation was honest: <em>"Our subscriptions weren't built for the usage patterns of these third-party tools."</em>
+          </p>
+          <p>
+            That's not spin. Anthropic's Boris Cherny spelled out the actual problem: their own Claude Code tool is built to maximize "prompt cache hit rates" — reusing previously processed context to save compute. Third-party tools aren't optimized this way. The math only works if caching works. Third-party tools break the math.
+          </p>
+          <p>
+            So now you have two communities responding to the same underlying problem through different lenses:
+          </p>
+          <p>
+            <strong>Caveman:</strong> make the AI say less so it costs less.<br />
+            <strong>Claude Code:</strong> cache aggressively so compute gets reused.
+          </p>
+          <p>
+            Both are correct. Both are workarounds for a pricing model that wasn't built for agents.
+          </p>
+
+          <h2>What the Right Model Looks Like</h2>
+
+          <p>
+            The honest answer is that agentic workloads need usage-based billing. Pay per token, with caching as a first-class optimization lever.
+          </p>
+          <p>
+            This sounds worse for developers. It's actually better, for three reasons:
+          </p>
+          <p>
+            <strong>Transparent costs.</strong> You know exactly what an agent run costs. You can set spending limits, alert thresholds, kill switches. With flat subscriptions, cost is opaque until you get cut off.
+          </p>
+          <p>
+            <strong>Aligned incentives.</strong> When you pay per token, you're motivated to minimize waste. Caveman's value proposition is identical to cache optimization — both exist because the cost signal is real. Real cost signals create better software.
+          </p>
+          <p>
+            <strong>Predictable unit economics.</strong> If you're building a product on top of an AI API, your costs should scale with your usage, not with your provider's estimate of average human behavior. Subscription pricing makes agent cost modeling impossible. API pricing makes it straightforward.
+          </p>
+          <p>
+            The developers who will win in the machine-paced era are those who internalize this now. Not as a constraint — as a design principle. Every agent you build should have a token budget. Every workflow should have a cache strategy. Every API call should have a cost attribution.
+          </p>
+
+          <h2>The Structural Truth</h2>
+
+          <p>
+            Caveman is funny. 688 people upvoted it. But the reason it exists is that the developer community is paying real money for tokens and knows it.
+          </p>
+          <p>
+            The streaming subscription model was built for human-paced consumption. We're in the machine-paced era now. The pricing models, the billing abstractions, the infrastructure assumptions — they all need to be rebuilt around a simple truth:
+          </p>
+          <p>
+            Agents don't pause. Pricing models that assume they do are priced for the world we left behind.
+          </p>
+          <p>
+            The flat subscription is ending for agents. Not because providers are hostile. Because math is.
+          </p>
+
+          <hr class="essay-divider" />
+
+          <p class="essay-coda">
+            <em>This is part of an ongoing series on trust infrastructure for the autonomous economy. Earlier essays: <a href="/blog/the-agent-passed-all-the-checks">The Agent Passed All the Checks. That Was the Problem.</a>, <a href="/blog/declarations-are-gameable">Declarations Are Gameable</a>, <a href="/blog/who-decides-what-agents-can-buy">Who Decides What Agents Are Allowed to Buy?</a> We're building <a href="/">Commit</a> — behavioral commitment data as the input layer for agent governance. <a href="mailto:pico@amdal.dev">Reach out</a> if you're thinking about runtime trust infrastructure for autonomous agents.</em>
+          </p>
+
+        </div>
+      </div>
+    </div>
+  </article>
+
+  <!-- Newsletter -->
+  <section class="newsletter-section">
+    <div class="container">
+      <div class="editorial reveal">
+        <h2 style="margin-bottom: 0.75rem;">Stay in the loop</h2>
+        <p style="margin-bottom: 2rem; font-size: 1rem;">
+          Early access, research updates, and the occasional strong opinion.
+        </p>
+
+        <form
+          action="https://buttondown.email/api/emails/embed-subscribe/commitgraph"
+          method="post"
+          target="popupwindow"
+          class="newsletter-form"
+        >
+          <input
+            type="email"
+            name="email"
+            placeholder="you@example.com"
+            required
+            class="newsletter-input"
+          />
+          <button type="submit" class="btn-primary" style="white-space: nowrap;">
+            Subscribe
+          </button>
+        </form>
+
+        <p class="newsletter-note">No spam. Unsubscribe anytime.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer>
+    <div class="container footer-inner">
+      <span class="footer-brand">Commit</span>
+      <ul class="footer-links">
+        <li><a href="/">Home</a></li>
+        <li><a href="/extension">Extension</a></li>
+        <li><a href="/blog">Writing</a></li>
+        <li><a href="/pricing">Pricing</a></li><li><a href="/docs">Docs</a></li><li><a href="https://github.com/piiiico/proof-of-commitment" target="_blank" rel="noopener">GitHub</a></li>
+        <li><a href="mailto:pico@amdal.dev">Contact</a></li>
+      </ul>
+      <span class="footer-locale">Stavanger, Norway</span>
+    </div>
+  </footer>
+
+</Layout>

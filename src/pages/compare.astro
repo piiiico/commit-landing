@@ -1,0 +1,1206 @@
+---
+import Layout from '../layouts/Layout.astro';
+---
+
+<Layout
+  title="Commit vs Socket, OpenSSF Scorecard, Snyk — What's different?"
+  description="Socket finds malicious code. Scorecard checks repo hygiene. Snyk tracks CVEs. Commit measures something none of them do: behavioral commitment signals. They're complementary."
+  canonical="https://getcommit.dev/compare/"
+>
+  <!-- Nav -->
+  <nav>
+    <div class="container nav-inner">
+      <a href="/" class="nav-brand">Commit</a>
+      <ul class="nav-links">
+        <li><a href="/#mcp">MCP</a></li>
+        <li><a href="/audit">Audit</a></li>
+        <li><a href="/watchlist">Watchlist</a></li>
+        <li><a href="/extension">Extension</a></li>
+        <li><a href="/blog">Writing</a></li>
+        <li><a href="/pricing">Pricing</a></li><li><a href="/docs">Docs</a></li><li><a href="https://github.com/piiiico/proof-of-commitment" target="_blank" rel="noopener">GitHub</a></li>
+        <li><a href="mailto:pico@amdal.dev">Contact</a></li>
+      </ul>
+    </div>
+  </nav>
+
+  <!-- Hero -->
+  <section class="compare-hero">
+    <div class="container">
+      <div class="editorial" style="max-width: var(--max-content); margin: 0 auto;">
+        <span class="hero-eyebrow">Tool comparison</span>
+        <h1 class="compare-title">
+          Different tools.<br />
+          <em>Different questions.</em>
+        </h1>
+        <p class="compare-lead">
+          Socket, OpenSSF Scorecard, Snyk, and npm audit are excellent tools.
+          None of them measure <strong>behavioral commitment signals</strong> —
+          the structural conditions that make a package a high-value target
+          <em>before</em> any attack code is published.
+        </p>
+        <div class="key-insight">
+          <span class="insight-icon">↓</span>
+          <span class="insight-text">
+            The ua-parser-js supply chain attack (October 2021) triggered <strong>zero warnings</strong> in Socket, Snyk, or npm audit beforehand.
+            The structural signal — 1 maintainer, 7M+ downloads/week — was visible for years.
+          </span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <hr class="section-divider" />
+
+  <!-- Comparison table -->
+  <section class="table-section">
+    <div class="container">
+      <div class="table-wrapper">
+        <table class="comparison-table">
+          <thead>
+            <tr>
+              <th class="col-tool">Tool</th>
+              <th class="col-what">What it measures</th>
+              <th class="col-center">Commitment<br />signals?</th>
+              <th class="col-center">Supply chain<br />depth?</th>
+              <th class="col-center">Free tier?</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr class="row-commit">
+              <td class="tool-name">
+                <span class="tool-tag commit-tag">Commit</span>
+              </td>
+              <td class="tool-desc-cell">
+                Behavioral commitment signals — publish frequency, maintainer count,
+                download/maintainer ratio, lock file hygiene, deprecation handling
+              </td>
+              <td class="center-cell"><span class="check-yes">✅ Core focus</span></td>
+              <td class="center-cell"><span class="check-yes">✅ Full tree</span></td>
+              <td class="center-cell"><span class="check-yes">✅ Unlimited</span></td>
+            </tr>
+            <tr>
+              <td class="tool-name">
+                <span class="tool-tag socket-tag">Socket.dev</span>
+              </td>
+              <td class="tool-desc-cell">
+                Code-level analysis — static inspection for malicious patterns,
+                network calls, obfuscated code, typosquatting, known malware
+              </td>
+              <td class="center-cell"><span class="check-no">❌</span></td>
+              <td class="center-cell"><span class="check-partial">Partial</span></td>
+              <td class="center-cell"><span class="check-partial">Freemium</span></td>
+            </tr>
+            <tr>
+              <td class="tool-name">
+                <span class="tool-tag scorecard-tag">OpenSSF<br />Scorecard</span>
+              </td>
+              <td class="tool-desc-cell">
+                Repository security practices — branch protection, CI/CD,
+                signed releases, SAST, fuzzing, token permissions
+              </td>
+              <td class="center-cell"><span class="check-no">❌</span></td>
+              <td class="center-cell"><span class="check-no">❌ Single repo</span></td>
+              <td class="center-cell"><span class="check-yes">✅ Free</span></td>
+            </tr>
+            <tr>
+              <td class="tool-name">
+                <span class="tool-tag snyk-tag">Snyk</span>
+              </td>
+              <td class="tool-desc-cell">
+                Known vulnerabilities — CVE database, exploit availability,
+                fix guidance, dependency upgrade paths
+              </td>
+              <td class="center-cell"><span class="check-no">❌</span></td>
+              <td class="center-cell"><span class="check-yes">✅</span></td>
+              <td class="center-cell"><span class="check-partial">Freemium</span></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <p class="table-note">
+        A package can score A+ on Snyk (no known CVEs), 9/10 on Scorecard (great practices), pass Socket inspection —
+        and still be CRITICAL on Commit because one credential controls 100M weekly installs with no org backup.
+        They answer different questions.
+      </p>
+    </div>
+  </section>
+
+  <hr class="section-divider" />
+
+  <!-- What each tool actually checks — 4 cards -->
+  <section class="methods-section">
+    <div class="container">
+      <div class="editorial" style="max-width: var(--max-content); margin: 0 auto;">
+        <h2 class="section-heading">What each tool actually checks</h2>
+        <div class="methods-grid">
+          <div class="method-card">
+            <div class="method-tool socket-tool">Socket.dev</div>
+            <ul class="method-list">
+              <li>✓ Malicious code patterns (network calls, obfuscation)</li>
+              <li>✓ Typosquatting detection</li>
+              <li>✓ Known malware in published versions</li>
+              <li>✓ Install scripts, permission escalation</li>
+              <li class="miss">✗ Who controls the publish credentials</li>
+              <li class="miss">✗ Credential concentration vs download volume</li>
+              <li class="miss">✗ Structural conditions before any code is written</li>
+            </ul>
+            <p class="method-note">
+              Best for: detecting active attacks after malicious code is published.
+            </p>
+          </div>
+          <div class="method-card">
+            <div class="method-tool scorecard-tool">OpenSSF Scorecard</div>
+            <ul class="method-list">
+              <li>✓ Branch protection and code review</li>
+              <li>✓ CI/CD configuration and SAST</li>
+              <li>✓ Signed releases and token permissions</li>
+              <li>✓ Fuzzing participation</li>
+              <li class="miss">✗ Requires a GitHub repo (npm-only packages = no data)</li>
+              <li class="miss">✗ Transitive dependency risk</li>
+              <li class="miss">✗ Download volume vs maintainer ratio</li>
+            </ul>
+            <p class="method-note">
+              Best for: auditing whether a project follows security best practices.
+            </p>
+          </div>
+          <div class="method-card">
+            <div class="method-tool snyk-tool">Snyk / npm audit</div>
+            <ul class="method-list">
+              <li>✓ Known CVEs in the National Vulnerability Database</li>
+              <li>✓ Exploit availability and severity scoring</li>
+              <li>✓ Fix guidance and upgrade paths</li>
+              <li>✓ License compliance</li>
+              <li class="miss">✗ Who maintains the package</li>
+              <li class="miss">✗ Whether the project is actively maintained</li>
+              <li class="miss">✗ Structural conditions for the <em>next</em> attack</li>
+            </ul>
+            <p class="method-note">
+              Best for: finding known vulnerabilities with published fixes.
+            </p>
+          </div>
+          <div class="method-card method-card-commit">
+            <div class="method-tool commit-tool">Commit</div>
+            <ul class="method-list">
+              <li>✓ Maintainer count (credential concentration)</li>
+              <li>✓ Download volume vs maintainer ratio</li>
+              <li>✓ Release consistency and cadence</li>
+              <li>✓ Package age and momentum</li>
+              <li>✓ CI/CD presence and process signals</li>
+              <li>✓ Full transitive dependency tree</li>
+              <li class="miss">✗ Malicious code detection (use Socket for that)</li>
+              <li class="miss">✗ Known CVEs (use Snyk for that)</li>
+            </ul>
+            <p class="method-note">
+              Best for: mapping structural exposure before any attack occurs.
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <hr class="section-divider" />
+
+  <!-- Comparison rows — live data -->
+  <section class="compare-section">
+    <div class="container">
+      <div class="editorial" style="max-width: var(--max-content); margin: 0 auto 2rem;">
+        <h2 class="section-heading">npm audit vs Commit — same packages, different answers</h2>
+        <p style="font-size:0.95rem; color: var(--ink-muted); margin-bottom: 0;">
+          Five widely-used packages. npm audit (and by extension Snyk/Socket for CVEs) shows zero issues.
+          Commit shows which ones are structurally exposed.
+        </p>
+      </div>
+
+      <!-- Column headers -->
+      <div class="compare-header-row">
+        <div class="compare-pkg-label">Package</div>
+        <div class="compare-col-header npm-header">
+          <span class="tool-badge npm-badge">npm audit</span>
+          <span class="tool-desc">Checks known CVEs</span>
+        </div>
+        <div class="compare-col-header commit-header">
+          <span class="tool-badge commit-badge">Commit</span>
+          <span class="tool-desc">Checks structural risk</span>
+        </div>
+      </div>
+
+      <!-- Loading state -->
+      <div id="loading-state" class="loading-state">
+        <div class="loading-spinner"></div>
+        <p>Loading live data…</p>
+      </div>
+
+      <!-- Error state -->
+      <div id="error-state" class="error-state" hidden>
+        <p id="error-msg">Failed to load data.</p>
+      </div>
+
+      <!-- Package rows (populated by JS) -->
+      <div id="compare-rows" class="compare-rows" hidden></div>
+
+      <!-- Legend -->
+      <div class="legend">
+        <span class="legend-item"><span class="risk-badge risk-critical">CRITICAL</span> single maintainer + &gt;10M downloads/week</span>
+        <span class="legend-sep">·</span>
+        <span class="legend-item"><span class="risk-badge risk-ok">OK</span> healthy structural signals</span>
+      </div>
+    </div>
+  </section>
+
+  <hr class="section-divider" />
+
+  <!-- FAQ -->
+  <section class="faq-section">
+    <div class="container">
+      <div class="editorial" style="max-width: var(--max-content); margin: 0 auto;">
+        <h2 class="section-heading">Frequently asked</h2>
+
+        <div class="faq-list">
+          <div class="faq-item">
+            <h3 class="faq-q">Should I use Commit instead of Socket?</h3>
+            <p class="faq-a">
+              No. Use both. Socket detects malicious code <em>after</em> it's published — it's an active threat detector.
+              Commit identifies structural exposure <em>before</em> any code changes — it's a risk map.
+              They're complementary: Socket tells you "this version is compromised," Commit tells you
+              "this package is the kind of thing that gets targeted."
+            </p>
+          </div>
+
+          <div class="faq-item">
+            <h3 class="faq-q">OpenSSF Scorecard already measures repository security. What does Commit add?</h3>
+            <p class="faq-a">
+              Scorecard checks whether a project <em>follows security practices</em> — branch protection, signed commits, fuzzing.
+              A project can score 9/10 on Scorecard and still have one person controlling the npm publish token for 100M weekly installs.
+              Scorecard also requires a GitHub repo; it can't assess npm-only packages or walk your full transitive tree.
+              Commit focuses specifically on credential concentration at scale.
+            </p>
+          </div>
+
+          <div class="faq-item">
+            <h3 class="faq-q">Snyk already does dependency scanning. Why isn't that enough?</h3>
+            <p class="faq-a">
+              Snyk is excellent at finding <em>known</em> vulnerabilities — CVEs with published exploits.
+              But supply chain attacks are not exploits of known CVEs. The ua-parser-js attack in October 2021
+              had zero Snyk warnings beforehand. The attacker didn't exploit a CVE — they compromised
+              a single maintainer's credentials. Snyk can't warn you about a vulnerability that doesn't exist yet.
+              Commit flags the structural conditions that make that attack possible.
+            </p>
+          </div>
+
+          <div class="faq-item">
+            <h3 class="faq-q">Is this just fear-mongering about solo maintainers?</h3>
+            <p class="faq-a">
+              CRITICAL isn't a judgment on the maintainer or the code. chalk is excellent. esbuild is extraordinary.
+              The flag means "one set of credentials controls infrastructure-level download volume with no organizational backup."
+              That's a structural observation about the ecosystem, not the person.
+              If anything, it's an argument that the ecosystem should be funding and backing these maintainers —
+              not leaving them as single points of failure for billions of installs.
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <hr class="section-divider" />
+
+  <!-- CTA -->
+  <section class="cta-section">
+    <div class="container">
+      <div class="editorial" style="max-width: var(--max-content); margin: 0 auto; text-align: center;">
+        <h2 class="cta-heading">Audit your dependencies now</h2>
+        <p class="cta-text">Paste your package list. See which ones are structurally exposed.</p>
+        <div class="cta-buttons">
+          <a href="/audit" class="btn-primary">Run a free audit →</a>
+          <a href="/#mcp" class="btn-secondary">Add to Claude / Cursor</a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <footer>
+    <div class="container footer-inner">
+      <span class="footer-brand">Commit</span>
+      <span class="footer-copy">Behavioral trust for the software supply chain.</span>
+      <nav class="footer-links">
+        <a href="/audit">Audit</a>
+        <a href="/watchlist">Watchlist</a>
+        <a href="/blog">Writing</a>
+        <a href="mailto:pico@amdal.dev">Contact</a>
+      </nav>
+    </div>
+  </footer>
+
+  <style>
+    /* ── Hero ── */
+    .compare-hero {
+      padding: 6rem 0 3rem;
+      background: var(--paper);
+    }
+
+    .compare-title {
+      font-family: var(--font-display);
+      font-size: clamp(2.2rem, 5vw, 3.5rem);
+      line-height: 1.12;
+      color: var(--ink);
+      margin: 1rem 0 1.5rem;
+    }
+
+    .compare-title em {
+      font-style: italic;
+      color: var(--accent);
+    }
+
+    .compare-lead {
+      font-size: 1.05rem;
+      line-height: 1.7;
+      color: var(--ink-muted);
+      max-width: 46rem;
+      margin-bottom: 2rem;
+    }
+
+    .compare-lead strong {
+      color: var(--ink);
+      font-weight: 600;
+    }
+
+    .compare-lead em {
+      font-style: italic;
+      color: var(--accent);
+    }
+
+    .key-insight {
+      display: flex;
+      gap: 1rem;
+      align-items: flex-start;
+      padding: 1.25rem 1.5rem;
+      background: #fff8f5;
+      border: 1px solid #fca5a5;
+      border-left: 3px solid var(--accent);
+      border-radius: 6px;
+      max-width: 46rem;
+    }
+
+    .insight-icon {
+      font-size: 1.2rem;
+      color: var(--accent);
+      flex-shrink: 0;
+      margin-top: 0.1rem;
+    }
+
+    .insight-text {
+      font-size: 0.95rem;
+      line-height: 1.6;
+      color: var(--ink-muted);
+    }
+
+    .insight-text strong {
+      color: var(--ink);
+    }
+
+    /* ── Comparison Table ── */
+    .table-section {
+      padding: 4rem 0;
+      background: var(--paper-dim);
+    }
+
+    .table-wrapper {
+      overflow-x: auto;
+      margin-bottom: 1.5rem;
+    }
+
+    .comparison-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.875rem;
+    }
+
+    .comparison-table thead th {
+      padding: 0.75rem 1rem;
+      text-align: left;
+      font-weight: 500;
+      font-size: 0.75rem;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--ink-subtle);
+      border-bottom: 2px solid var(--border);
+      background: var(--paper-dim);
+    }
+
+    .comparison-table th.col-center,
+    .comparison-table td.center-cell {
+      text-align: center;
+    }
+
+    .col-tool { width: 9rem; }
+    .col-what { }
+    .col-center { width: 8rem; }
+
+    .comparison-table tbody tr {
+      border-bottom: 1px solid var(--border-light);
+    }
+
+    .comparison-table tbody tr:hover {
+      background: var(--paper);
+    }
+
+    .row-commit {
+      background: #fff8f5;
+    }
+
+    .row-commit:hover {
+      background: #fff3ee !important;
+    }
+
+    .comparison-table td {
+      padding: 1rem 1rem;
+      vertical-align: top;
+      color: var(--ink-muted);
+      line-height: 1.5;
+    }
+
+    .tool-name {
+      padding-top: 1.1rem !important;
+    }
+
+    .tool-tag {
+      display: inline-block;
+      padding: 0.25rem 0.6rem;
+      border-radius: 3px;
+      font-size: 0.75rem;
+      font-weight: 600;
+      font-family: var(--font-mono);
+      white-space: nowrap;
+    }
+
+    .commit-tag {
+      background: #fee2e2;
+      color: #991b1b;
+      border: 1px solid var(--accent);
+    }
+
+    .socket-tag {
+      background: #ede9fe;
+      color: #5b21b6;
+      border: 1px solid #c4b5fd;
+    }
+
+    .scorecard-tag {
+      background: #dbeafe;
+      color: #1e40af;
+      border: 1px solid #93c5fd;
+    }
+
+    .snyk-tag {
+      background: #d1fae5;
+      color: #065f46;
+      border: 1px solid #6ee7b7;
+    }
+
+    .check-yes {
+      font-size: 0.85rem;
+      color: #166534;
+    }
+
+    .check-no {
+      font-size: 0.85rem;
+      color: var(--ink-subtle);
+    }
+
+    .check-partial {
+      font-size: 0.82rem;
+      color: #92400e;
+    }
+
+    .table-note {
+      font-size: 0.875rem;
+      color: var(--ink-muted);
+      max-width: 58rem;
+      line-height: 1.65;
+      padding: 1rem 1.25rem;
+      background: var(--paper);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+    }
+
+    /* ── Methods section ── */
+    .methods-section {
+      padding: 4rem 0;
+      background: var(--paper);
+    }
+
+    .section-heading {
+      font-family: var(--font-display);
+      font-size: 1.8rem;
+      color: var(--ink);
+      margin-bottom: 2rem;
+    }
+
+    .methods-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1.5rem;
+    }
+
+    @media (max-width: 640px) {
+      .methods-grid { grid-template-columns: 1fr; }
+    }
+
+    .method-card {
+      padding: 1.5rem;
+      background: var(--paper-dim);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+    }
+
+    .method-card-commit {
+      background: var(--paper);
+      border-color: var(--accent);
+      border-width: 2px;
+    }
+
+    .method-tool {
+      font-size: 0.8rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      margin-bottom: 1rem;
+      padding-bottom: 0.75rem;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .socket-tool  { color: #5b21b6; }
+    .scorecard-tool { color: #1e40af; }
+    .snyk-tool { color: #065f46; }
+    .commit-tool { color: var(--accent); }
+
+    .method-list {
+      list-style: none;
+      padding: 0;
+      margin: 0 0 1rem;
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+    }
+
+    .method-list li {
+      font-size: 0.875rem;
+      line-height: 1.5;
+      color: var(--ink-muted);
+    }
+
+    .method-list li.miss {
+      color: var(--ink-subtle);
+      opacity: 0.7;
+    }
+
+    .method-note {
+      font-size: 0.8rem;
+      font-style: italic;
+      color: var(--ink-muted);
+      border-top: 1px solid var(--border);
+      padding-top: 0.75rem;
+      margin: 0;
+    }
+
+    /* ── Compare section ── */
+    .compare-section {
+      padding: 3rem 0 4rem;
+      background: var(--paper-dim);
+    }
+
+    .compare-header-row {
+      display: grid;
+      grid-template-columns: 10rem 1fr 1fr;
+      gap: 1rem;
+      padding: 0 0 1rem;
+      border-bottom: 2px solid var(--border);
+      margin-bottom: 0;
+      align-items: end;
+      max-width: 56rem;
+      margin: 0 auto 0;
+    }
+
+    .compare-pkg-label {
+      font-size: 0.75rem;
+      font-weight: 500;
+      color: var(--ink-subtle);
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+    }
+
+    .compare-col-header {
+      display: flex;
+      flex-direction: column;
+      gap: 0.25rem;
+    }
+
+    .tool-badge {
+      display: inline-block;
+      padding: 0.25rem 0.75rem;
+      border-radius: 4px;
+      font-size: 0.8rem;
+      font-weight: 600;
+      font-family: var(--font-mono);
+      letter-spacing: 0.02em;
+    }
+
+    .npm-badge {
+      background: #fff3cd;
+      color: #856404;
+      border: 1px solid #ffc107;
+    }
+
+    .commit-badge {
+      background: #fee2e2;
+      color: #991b1b;
+      border: 1px solid var(--accent);
+    }
+
+    .tool-desc {
+      font-size: 0.75rem;
+      color: var(--ink-subtle);
+    }
+
+    /* ── Compare rows ── */
+    .compare-rows {
+      max-width: 56rem;
+      margin: 0 auto;
+    }
+
+    .compare-row {
+      display: grid;
+      grid-template-columns: 10rem 1fr 1fr;
+      gap: 1rem;
+      padding: 1.25rem 0;
+      border-bottom: 1px solid var(--border-light);
+      align-items: start;
+    }
+
+    .compare-row:last-child {
+      border-bottom: none;
+    }
+
+    .pkg-info {
+      display: flex;
+      flex-direction: column;
+      gap: 0.25rem;
+      padding-top: 0.5rem;
+    }
+
+    .pkg-name {
+      font-family: var(--font-mono);
+      font-size: 0.95rem;
+      font-weight: 600;
+      color: var(--ink);
+    }
+
+    .pkg-downloads {
+      font-size: 0.75rem;
+      color: var(--ink-subtle);
+    }
+
+    .compare-cell {
+      padding: 0.75rem 1rem;
+      border-radius: 6px;
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+    }
+
+    .npm-cell {
+      background: #fffdf0;
+      border: 1px solid #e9d96b;
+    }
+
+    .npm-result {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .npm-count {
+      font-family: var(--font-mono);
+      font-size: 1.2rem;
+      font-weight: 700;
+      color: #856404;
+    }
+
+    .npm-label {
+      font-size: 0.8rem;
+      color: var(--ink-muted);
+    }
+
+    .npm-caveat {
+      font-size: 0.75rem;
+      color: var(--ink-subtle);
+      font-style: italic;
+      border-top: 1px solid #e9d96b;
+      padding-top: 0.4rem;
+      margin-top: 0.1rem;
+    }
+
+    .commit-cell {
+      border: 1px solid var(--border);
+    }
+
+    .commit-cell.is-critical {
+      background: #fff5f5;
+      border-color: #fca5a5;
+    }
+
+    .commit-cell.is-ok {
+      background: #f0fdf4;
+      border-color: #bbf7d0;
+    }
+
+    .commit-score-row {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+    }
+
+    .commit-score {
+      font-family: var(--font-mono);
+      font-size: 1.2rem;
+      font-weight: 700;
+    }
+
+    .score-high { color: #3d8b3d; }
+    .score-mid { color: #c47a0a; }
+    .score-low { color: var(--accent); }
+
+    .risk-badge {
+      display: inline-block;
+      padding: 0.2rem 0.5rem;
+      border-radius: 3px;
+      font-size: 0.75rem;
+      font-weight: 700;
+      letter-spacing: 0.04em;
+    }
+
+    .risk-critical {
+      background: #fee2e2;
+      color: #991b1b;
+    }
+
+    .risk-ok {
+      background: #dcfce7;
+      color: #166534;
+    }
+
+    .commit-signals {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.4rem;
+      margin-top: 0.25rem;
+    }
+
+    .signal-chip {
+      font-size: 0.72rem;
+      padding: 0.15rem 0.5rem;
+      background: var(--paper-dim);
+      border: 1px solid var(--border);
+      border-radius: 3px;
+      color: var(--ink-muted);
+      font-family: var(--font-mono);
+      white-space: nowrap;
+    }
+
+    .signal-chip.danger {
+      background: #fee2e2;
+      border-color: #fca5a5;
+      color: #991b1b;
+    }
+
+    .signal-chip.warn {
+      background: #fef3c7;
+      border-color: #fde68a;
+      color: #92400e;
+    }
+
+    .signal-chip.good {
+      background: #dcfce7;
+      border-color: #bbf7d0;
+      color: #166534;
+    }
+
+    .commit-note {
+      font-size: 0.75rem;
+      color: var(--ink-muted);
+      line-height: 1.4;
+    }
+
+    /* ── Legend ── */
+    .legend {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      flex-wrap: wrap;
+      max-width: 56rem;
+      margin: 1.5rem auto 0;
+      padding: 0.75rem 0;
+      border-top: 1px solid var(--border);
+      font-size: 0.8rem;
+      color: var(--ink-muted);
+    }
+
+    .legend-sep { color: var(--border); }
+
+    /* ── FAQ ── */
+    .faq-section {
+      padding: 4rem 0;
+      background: var(--paper);
+    }
+
+    .faq-list {
+      display: flex;
+      flex-direction: column;
+      gap: 0;
+    }
+
+    .faq-item {
+      padding: 2rem 0;
+      border-top: 1px solid var(--border-light);
+    }
+
+    .faq-item:last-child {
+      border-bottom: 1px solid var(--border-light);
+    }
+
+    .faq-q {
+      font-family: var(--font-display);
+      font-size: 1.1rem;
+      font-weight: 400;
+      color: var(--ink);
+      margin-bottom: 0.75rem;
+      line-height: 1.3;
+    }
+
+    .faq-a {
+      font-size: 0.9375rem;
+      color: var(--ink-muted);
+      line-height: 1.7;
+      max-width: 58ch;
+    }
+
+    .faq-a em {
+      font-style: italic;
+    }
+
+    /* ── CTA ── */
+    .cta-section {
+      padding: 5rem 0;
+      background: var(--paper-dim);
+    }
+
+    .cta-heading {
+      font-family: var(--font-display);
+      font-size: 2rem;
+      color: var(--ink);
+      margin-bottom: 0.75rem;
+    }
+
+    .cta-text {
+      font-size: 1rem;
+      color: var(--ink-muted);
+      margin-bottom: 2rem;
+    }
+
+    .cta-buttons {
+      display: flex;
+      gap: 1rem;
+      justify-content: center;
+      flex-wrap: wrap;
+    }
+
+    .btn-primary {
+      padding: 0.85rem 2rem;
+      background: var(--accent);
+      color: white;
+      text-decoration: none;
+      border-radius: 4px;
+      font-weight: 500;
+      font-size: 0.95rem;
+      transition: background 0.15s;
+    }
+
+    .btn-primary:hover { background: var(--accent-dim); }
+
+    .btn-secondary {
+      padding: 0.85rem 2rem;
+      background: transparent;
+      color: var(--ink);
+      text-decoration: none;
+      border-radius: 4px;
+      font-weight: 500;
+      font-size: 0.95rem;
+      border: 1px solid var(--border);
+      transition: border-color 0.15s;
+    }
+
+    .btn-secondary:hover { border-color: var(--ink-subtle); }
+
+    /* ── Loading / Error ── */
+    .loading-state {
+      text-align: center;
+      padding: 3rem 0;
+      color: var(--ink-muted);
+      max-width: 56rem;
+      margin: 0 auto;
+    }
+
+    .loading-spinner {
+      width: 2rem;
+      height: 2rem;
+      border: 2px solid var(--border);
+      border-top-color: var(--accent);
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+      margin: 0 auto 1rem;
+    }
+
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    .error-state {
+      max-width: 56rem;
+      margin: 1rem auto;
+      padding: 1rem 1.25rem;
+      background: #fee2e2;
+      border: 1px solid #fca5a5;
+      border-radius: 6px;
+      color: #991b1b;
+      font-size: 0.9rem;
+    }
+
+    /* ── Responsive ── */
+    @media (max-width: 700px) {
+      .compare-header-row,
+      .compare-row {
+        grid-template-columns: 1fr;
+      }
+      .compare-pkg-label { display: none; }
+      .compare-header-row { display: none; }
+      .compare-row { gap: 0.75rem; }
+
+      .comparison-table th.col-center,
+      .comparison-table td.center-cell {
+        display: none;
+      }
+    }
+
+    /* ── Footer ── */
+    .footer-inner {
+      display: flex;
+      align-items: center;
+      gap: 1.5rem;
+      padding: 2rem 0;
+      flex-wrap: wrap;
+      border-top: 1px solid var(--border);
+    }
+
+    .footer-brand {
+      font-family: var(--font-display);
+      font-size: 1.1rem;
+      color: var(--ink);
+    }
+
+    .footer-copy {
+      font-size: 0.85rem;
+      color: var(--ink-subtle);
+      flex: 1;
+    }
+
+    .footer-links {
+      display: flex;
+      gap: 1.25rem;
+    }
+
+    .footer-links a {
+      font-size: 0.85rem;
+      color: var(--ink-muted);
+      text-decoration: none;
+    }
+
+    .footer-links a:hover { color: var(--ink); }
+  </style>
+
+  <script>
+    const API = 'https://poc-backend.amdal-dev.workers.dev/api/audit';
+
+    const PACKAGES = [
+      {
+        name: 'axios',
+        npmVulns: 0,
+        npmNote: 'No known CVEs in current version. No attack has occurred.',
+        story: 'CRITICAL structural risk: single maintainer holds npm publish access for 82M weekly downloads. Same profile as ua-parser-js before October 2021 attack.',
+      },
+      {
+        name: 'chalk',
+        npmVulns: 0,
+        npmNote: 'No known CVEs in current version.',
+        story: 'Single maintainer controls 411M downloads/week. One compromised account = instant impact.',
+      },
+      {
+        name: 'lodash',
+        npmVulns: 0,
+        npmNote: 'Prototype pollution CVEs patched in v4.17.21.',
+        story: 'Minimal recent updates. Single maintainer. Still CRITICAL by download volume.',
+      },
+      {
+        name: 'express',
+        npmVulns: 0,
+        npmNote: 'No known CVEs in current version.',
+        story: 'Active multi-maintainer team. Healthy release cadence. Structural risk is low.',
+      },
+      {
+        name: 'esbuild',
+        npmVulns: 0,
+        npmNote: 'No known CVEs.',
+        story: 'Exceptional tool, single author. 194M downloads/week, one person maintains it all.',
+      },
+    ];
+
+    type AuditResult = {
+      name: string;
+      score: number | null;
+      maintainers: number | null;
+      weeklyDownloads: number | null;
+      ageYears: number | null;
+      trend: string | null;
+      riskFlags: string[];
+    };
+
+    function fmtDownloads(n: number | null): string {
+      if (n === null || n === undefined) return '—';
+      if (n >= 1_000_000_000) return (n / 1_000_000_000).toFixed(1) + 'B';
+      if (n >= 1_000_000) return (n / 1_000_000).toFixed(0) + 'M';
+      if (n >= 1_000) return (n / 1_000).toFixed(0) + 'K';
+      return n.toString();
+    }
+
+    function scoreClass(score: number | null): string {
+      if (score === null) return '';
+      if (score >= 75) return 'score-high';
+      if (score >= 50) return 'score-mid';
+      return 'score-low';
+    }
+
+    function renderRow(pkg: typeof PACKAGES[0], data: AuditResult): string {
+      const isCritical = data.riskFlags?.includes('CRITICAL');
+      const riskBadge = isCritical
+        ? '<span class="risk-badge risk-critical">CRITICAL</span>'
+        : '<span class="risk-badge risk-ok">OK</span>';
+
+      const dlDisplay = fmtDownloads(data.weeklyDownloads);
+
+      const chips: string[] = [];
+      if (data.maintainers !== null) {
+        const cls = data.maintainers === 1 ? 'danger' : 'good';
+        chips.push(`<span class="signal-chip ${cls}">${data.maintainers} maintainer${data.maintainers !== 1 ? 's' : ''}</span>`);
+      }
+      if (data.weeklyDownloads !== null) {
+        const cls = data.weeklyDownloads > 10_000_000 ? 'danger' : '';
+        chips.push(`<span class="signal-chip ${cls}">${dlDisplay}/wk</span>`);
+      }
+      if (data.ageYears !== null) {
+        chips.push(`<span class="signal-chip">${data.ageYears}y old</span>`);
+      }
+      if (data.trend) {
+        const cls = data.trend === 'growing' && isCritical ? 'warn' : '';
+        chips.push(`<span class="signal-chip ${cls}">${data.trend}</span>`);
+      }
+
+      const commitCellClass = isCritical ? 'is-critical' : 'is-ok';
+
+      return `
+        <div class="compare-row">
+          <div class="pkg-info">
+            <span class="pkg-name">${pkg.name}</span>
+            <span class="pkg-downloads">${dlDisplay}/wk</span>
+          </div>
+
+          <div class="compare-cell npm-cell">
+            <div class="npm-result">
+              <span class="npm-count">${pkg.npmVulns}</span>
+              <span class="npm-label">vulnerabilities</span>
+            </div>
+            <div class="npm-caveat">${pkg.npmNote}</div>
+          </div>
+
+          <div class="compare-cell commit-cell ${commitCellClass}">
+            <div class="commit-score-row">
+              <span class="commit-score ${scoreClass(data.score)}">${data.score !== null ? data.score + '/100' : '—'}</span>
+              ${riskBadge}
+            </div>
+            <div class="commit-signals">${chips.join('')}</div>
+            <div class="commit-note">${pkg.story}</div>
+          </div>
+        </div>
+      `;
+    }
+
+    async function loadData() {
+      const loadingEl = document.getElementById('loading-state')!;
+      const errorEl = document.getElementById('error-state')!;
+      const rowsEl = document.getElementById('compare-rows')!;
+
+      try {
+        const res = await fetch(API, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            packages: PACKAGES.map(p => p.name),
+            ecosystem: 'npm',
+          }),
+        });
+
+        if (!res.ok) throw new Error(`HTTP ${res.status}`);
+        const data = await res.json() as { results: AuditResult[] };
+
+        const byName: Record<string, AuditResult> = {};
+        data.results.forEach(r => { byName[r.name] = r; });
+
+        rowsEl.innerHTML = PACKAGES.map(pkg => {
+          const result = byName[pkg.name];
+          if (!result) return '';
+          return renderRow(pkg, result);
+        }).join('');
+
+        loadingEl.hidden = true;
+        rowsEl.hidden = false;
+      } catch (err) {
+        loadingEl.hidden = true;
+        document.getElementById('error-msg')!.textContent =
+          'Could not load live data: ' + (err instanceof Error ? err.message : String(err));
+        errorEl.hidden = false;
+        showFallback();
+        rowsEl.hidden = false;
+      }
+    }
+
+    function showFallback() {
+      const fallback: AuditResult[] = [
+        { name: 'axios', score: 89, maintainers: 1, weeklyDownloads: 100837905, ageYears: 11.6, trend: 'growing', riskFlags: ['CRITICAL'] },
+        { name: 'chalk', score: 75, maintainers: 1, weeklyDownloads: 411150684, ageYears: 12.7, trend: 'stable', riskFlags: ['CRITICAL'] },
+        { name: 'lodash', score: 87, maintainers: 1, weeklyDownloads: 145226382, ageYears: 14, trend: 'growing', riskFlags: ['CRITICAL'] },
+        { name: 'express', score: 97, maintainers: 5, weeklyDownloads: 92917741, ageYears: 15.3, trend: 'growing', riskFlags: [] },
+        { name: 'esbuild', score: 88, maintainers: 1, weeklyDownloads: 193690280, ageYears: 8.4, trend: 'growing', riskFlags: ['CRITICAL'] },
+      ];
+
+      const byName: Record<string, AuditResult> = {};
+      fallback.forEach(r => { byName[r.name] = r; });
+
+      const rowsEl = document.getElementById('compare-rows')!;
+      rowsEl.innerHTML = PACKAGES.map(pkg => {
+        const result = byName[pkg.name];
+        if (!result) return '';
+        return renderRow(pkg, result);
+      }).join('');
+    }
+
+    loadData();
+  </script>
+</Layout>

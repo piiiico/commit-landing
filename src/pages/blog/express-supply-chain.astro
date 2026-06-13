@@ -1,0 +1,206 @@
+---
+import Layout from '../../layouts/Layout.astro';
+---
+
+<Layout
+  title="Express depends on escape-html. It hasn't been updated since 2015. — Commit"
+  description="96 million developers install Express weekly. Its dependency tree contains packages that haven't been touched in 10 years — but still accept npm publishes."
+  canonical="https://getcommit.dev/blog/express-supply-chain/"
+  publishDate="2026-04-29"
+>
+
+  <!-- Nav -->
+  <nav>
+    <div class="container nav-inner">
+      <a href="/" class="nav-brand">Commit</a>
+      <ul class="nav-links">
+        <li><a href="/extension">Extension</a></li>
+        <li><a href="/blog">Writing</a></li>
+        <li><a href="/pricing">Pricing</a></li><li><a href="/docs">Docs</a></li><li><a href="https://github.com/piiiico/proof-of-commitment" target="_blank" rel="noopener">GitHub</a></li>
+        <li><a href="mailto:pico@amdal.dev">Contact</a></li>
+      </ul>
+    </div>
+  </nav>
+
+  <!-- Essay -->
+  <article class="essay">
+    <div class="container">
+      <div class="editorial">
+
+        <!-- Header -->
+        <header class="essay-header">
+          <div class="essay-meta animate-in delay-1">
+            <time datetime="2026-04-29">April 29, 2026</time>
+          </div>
+          <h1 class="essay-title animate-in delay-2">Express depends on <code style="font-size:0.85em">escape-html</code>. It hasn&rsquo;t been updated since 2015.</h1>
+          <p class="essay-subtitle animate-in delay-3">
+            96 million weekly Express installs flow through a dependency tree containing packages
+            that haven&rsquo;t been touched in a decade &mdash; but still have active npm publish keys.
+          </p>
+          <p class="essay-byline animate-in delay-4">H&aring;kon &Aring;mdal</p>
+        </header>
+
+        <!-- Body -->
+        <div class="essay-body">
+
+          <p>
+            Run <a href="/audit?packages=express" target="_blank"><code>npx proof-of-commitment express</code></a>.
+            <a href="/package/express/">Express</a> itself scores 89/100 &mdash; consistent releases, broad maintainer team, 12+ years of history.
+            But Express&rsquo;s direct dependencies tell a different story.
+          </p>
+
+          <p>Two of them score CRITICAL:</p>
+
+          <ul>
+            <li>
+              <strong>escape-html</strong> &mdash; score 61, 1 maintainer, 77.9M downloads/week.
+              Last published: <strong>September 1, 2015</strong>. That&rsquo;s not a typo. Version 1.0.3 is the
+              only version this package has ever had, and it was pushed nearly 11 years ago.
+            </li>
+            <li>
+              <strong>once</strong> &mdash; score 68, 1 maintainer (isaacs), 114M downloads/week.
+              Last published: <strong>September 2016</strong>. Nearly 10 years of no changes, still pulling
+              114 million weekly installs.
+            </li>
+          </ul>
+
+          <p>
+            Neither of these packages has a CVE. <code>npm audit</code> shows zero issues. But each one
+            has an npm token that can publish a new version &mdash; and there&rsquo;s no mechanism in the
+            npm registry that prevents a compromised token from pushing 1.0.4 or 1.4.1 tomorrow.
+          </p>
+
+          <h2>What &ldquo;no updates since 2015&rdquo; actually means</h2>
+
+          <p>
+            The intuitive read is: <em>it&rsquo;s stable, nothing needs to change</em>. That&rsquo;s often true.
+            escape-html is a 20-line utility. Once you correctly escape <code>&lt;</code>, <code>&gt;</code>,
+            and <code>&amp;</code>, you&rsquo;re done.
+          </p>
+
+          <p>But &ldquo;hasn&rsquo;t changed&rdquo; is not the same as &ldquo;can&rsquo;t change.&rdquo;</p>
+
+          <p>
+            The npm account that published escape-html v1.0.3 in 2015 can still publish v1.0.4 today.
+            The only thing standing between that action and 77.9 million weekly installs picking up the
+            new version is the security of that npm token &mdash; a credential that may not have been
+            rotated since the Obama administration.
+          </p>
+
+          <p>
+            This is the attack vector. Not a code vulnerability. Not a dependency chain. A credential
+            that hasn&rsquo;t been revoked because there was no reason to revoke it.
+          </p>
+
+          <h2>The axios parallel</h2>
+
+          <p>
+            On March 30, 2026, axios was compromised. One maintainer, 99M weekly downloads, stolen npm token.
+            Malicious versions published. The attack lasted hours before detection. The structural conditions
+            that enabled it were visible for years: sole maintainer, massive install base, single point of
+            failure.
+          </p>
+
+          <p>
+            escape-html is not identical to axios. The package is genuinely small and stable.
+            But the structural condition is the same: one person holds the publish key for a package
+            that installs on tens of millions of machines weekly.
+          </p>
+
+          <p>
+            Our tool flagged axios as CRITICAL before the attack. escape-html scores 61 &mdash; CRITICAL.
+            Not because it has bad code, but because it has structural fragility.
+          </p>
+
+          <h2>What else is in Express&rsquo;s tree</h2>
+
+          <p>Express has 27 direct dependencies. Here&rsquo;s how they score:</p>
+
+          <table style="width:100%; border-collapse: collapse; font-size:0.9rem; margin: 1.5rem 0;">
+            <thead>
+              <tr style="border-bottom: 2px solid var(--border);">
+                <th style="text-align:left; padding: 0.5rem 0.75rem;">Package</th>
+                <th style="text-align:right; padding: 0.5rem 0.75rem;">Downloads/wk</th>
+                <th style="text-align:right; padding: 0.5rem 0.75rem;">Maintainers</th>
+                <th style="text-align:right; padding: 0.5rem 0.75rem;">Score</th>
+                <th style="text-align:left; padding: 0.5rem 0.75rem;">Risk</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr style="border-bottom: 1px solid var(--border-light);">
+                <td style="padding: 0.5rem 0.75rem;"><code>escape-html</code></td>
+                <td style="text-align:right; padding: 0.5rem 0.75rem;">77.9M</td>
+                <td style="text-align:right; padding: 0.5rem 0.75rem;">1</td>
+                <td style="text-align:right; padding: 0.5rem 0.75rem;">61</td>
+                <td style="padding: 0.5rem 0.75rem; color: #dc2626; font-weight:600;">CRITICAL</td>
+              </tr>
+              <tr style="border-bottom: 1px solid var(--border-light);">
+                <td style="padding: 0.5rem 0.75rem;"><code>once</code></td>
+                <td style="text-align:right; padding: 0.5rem 0.75rem;">114M</td>
+                <td style="text-align:right; padding: 0.5rem 0.75rem;">1</td>
+                <td style="text-align:right; padding: 0.5rem 0.75rem;">68</td>
+                <td style="padding: 0.5rem 0.75rem; color: #dc2626; font-weight:600;">CRITICAL</td>
+              </tr>
+            </tbody>
+          </table>
+
+          <p>
+            The rest of Express&rsquo;s direct dependencies are reasonably well-maintained.
+            But these two account for 192 million combined weekly downloads behind a single npm token each.
+          </p>
+
+          <h2>The broader picture</h2>
+
+          <p>Express isn&rsquo;t uniquely problematic. The pattern shows up everywhere we look:</p>
+
+          <ul>
+            <li><strong>supports-color</strong> &mdash; 422M downloads/week, 1 maintainer (sindresorhus), last release 233 days ago. Pulled by virtually every CLI tool and test runner in existence.</li>
+            <li><strong>rimraf</strong> &mdash; 138M downloads/week, 1 maintainer, CRITICAL. The <code>rm -rf</code> utility of Node.js.</li>
+            <li><strong>@types/node</strong> &mdash; 315M downloads/week, 1 maintainer, CRITICAL. In every TypeScript project.</li>
+            <li><strong>chokidar</strong> &mdash; 167M downloads/week, 1 maintainer, CRITICAL. Watches your files in Vite, webpack, and nodemon.</li>
+          </ul>
+
+          <p>
+            None of these have CVEs. All of them have a sole npm token that, if compromised, would
+            reach hundreds of millions of weekly installs within 24 hours.
+          </p>
+
+          <h2>What you can do</h2>
+
+          <p>
+            Understanding the structural risk in your dependency tree is step one. You can&rsquo;t patch
+            this the way you patch a CVE &mdash; there&rsquo;s no fix to apply. What you can do:
+          </p>
+
+          <ol>
+            <li>Know which packages in your tree are structurally fragile</li>
+            <li>Monitor for unexpected new versions from sole-maintainer packages</li>
+            <li>Use package version pinning in lock files (which you&rsquo;re probably already doing)</li>
+            <li>Check npm provenance when available: <code>npm audit signatures</code></li>
+          </ol>
+
+          <p>
+            Audit your dependencies now &mdash; zero install:
+          </p>
+
+          <pre><code>npx proof-of-commitment express    # scores express + direct deps
+npx proof-of-commitment --file package-lock.json  # scores full tree</code></pre>
+
+          <p>
+            Or use the browser demo at <a href="/audit?packages=express,escape-html,once">getcommit.dev/audit</a>
+            &mdash; paste your own packages or drop a lock file.
+          </p>
+
+          <p style="margin-top: 2rem; padding-top: 1.5rem; border-top: 1px solid var(--border-light); font-size: 0.875rem; color: var(--ink-muted);">
+            This scoring is behavioral, not code-scanning. It identifies structural conditions that correlate
+            with successful supply chain attacks &mdash; it doesn&rsquo;t predict <em>which</em> packages will be attacked
+            or <em>when</em>. Some sole-maintained packages are more carefully secured than team projects.
+            The score is a risk signal, not a verdict.
+          </p>
+
+        </div>
+      </div>
+    </div>
+  </article>
+
+</Layout>

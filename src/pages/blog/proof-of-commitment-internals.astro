@@ -1,0 +1,436 @@
+---
+import Layout from '../../layouts/Layout.astro';
+---
+
+<Layout
+  title="Proof-of-Commitment Internals: How the Scoring Algorithm Works — Commit"
+  description="How proof-of-commitment scores npm packages: the five behavioral dimensions, the CRITICAL flag, the bulk download optimization, and real benchmark data for chalk, express, and hono."
+  canonical="https://getcommit.dev/blog/proof-of-commitment-internals/"
+  publishDate="2026-04-29"
+>
+
+  <!-- Nav -->
+  <nav>
+    <div class="container nav-inner">
+      <a href="/" class="nav-brand">Commit</a>
+      <ul class="nav-links">
+        <li><a href="/quickstart" style="font-weight:600;color:var(--accent)">Quickstart</a></li>
+        <li><a href="/audit">Audit</a></li>
+        <li><a href="/rankings">Rankings</a></li>
+        <li><a href="/watchlist">Watchlist</a></li>
+        <li><a href="/blog">Writing</a></li>
+        <li><a href="/pricing">Pricing</a></li><li><a href="/docs">Docs</a></li>
+        <li><a href="https://github.com/piiiico/proof-of-commitment" target="_blank" rel="noopener">GitHub</a></li>
+        <li><a href="mailto:pico@amdal.dev">Contact</a></li>
+      </ul>
+    </div>
+  </nav>
+
+  <!-- Essay -->
+  <article class="essay">
+    <div class="container">
+      <div class="editorial">
+
+        <!-- Header -->
+        <header class="essay-header">
+          <div class="essay-meta animate-in delay-1">
+            <time datetime="2026-04-29">April 29, 2026</time>
+          </div>
+          <h1 class="essay-title animate-in delay-2">Proof-of-Commitment Internals</h1>
+          <p class="essay-subtitle animate-in delay-3">
+            The scoring algorithm, the CRITICAL flag, the bulk download optimization,
+            and real benchmark data for chalk, express, and hono. All public data.
+            All reproducible.
+          </p>
+          <p class="essay-byline animate-in delay-4">Pico</p>
+        </header>
+
+        <!-- Body -->
+        <div class="essay-body">
+
+          <p>
+            <code>npm audit</code> is a CVE scanner. It queries a database of known vulnerabilities
+            against the package versions in your lockfile. When a CVE is filed, catalogued,
+            and propagated, it will appear. Before that: silence.
+          </p>
+          <p>
+            The problem with that model is that supply chain attacks don't announce themselves.
+            Before the ua-parser-js attack (October 2021, 8M weekly downloads), before the
+            LiteLLM attack (March 2026), before the Bitwarden CLI incident — every tool
+            returned clean. The structural preconditions for compromise were visible in public
+            registry data. The tools just weren't looking.
+          </p>
+          <p>
+            Proof-of-commitment measures those preconditions. Here's how the scoring works,
+            from registry data to CRITICAL flag.
+          </p>
+
+          <h2>Five Dimensions, All Public Data</h2>
+
+          <p>
+            Every package gets scored across five behavioral dimensions. No proprietary data
+            sources, no scraping, no access required beyond the public npm registry and GitHub API.
+          </p>
+
+          <h3>1. Longevity (25 pts)</h3>
+
+          <p>
+            Package age in years, from <code>pkg.time["created"]</code> in the registry response.
+            Time is an unfakeable signal — you can't buy 10 years of operational history.
+          </p>
+
+          <pre><code>function scoreLongevity(ageYears: number): number &#123;
+  if (ageYears >= 6) return 25;
+  if (ageYears >= 4) return 20;
+  if (ageYears >= 2) return 14;
+  if (ageYears >= 1) return 8;
+  if (ageYears >= 0.5) return 4;
+  return 1;
+&#125;</code></pre>
+
+          <p>
+            The scoring is deliberately nonlinear. The difference between 1 and 6 years
+            isn't linear in risk — a 6-year-old package is embedded in thousands of production
+            systems. A 1-year-old package mostly isn't.
+          </p>
+
+          <h3>2. Download Momentum (25 pts)</h3>
+
+          <p>
+            Weekly download volume sets the blast radius. Trend direction (growing vs.
+            declining) captures attacker attention — growing packages attract more eyes,
+            malicious and otherwise.
+          </p>
+
+          <pre><code>function scoreDownloads(
+  weeklyAvg: number,
+  trend: "growing" | "stable" | "declining" | null
+): number &#123;
+  let base = 0;
+  if (weeklyAvg >= 1_000_000) base = 22;
+  else if (weeklyAvg >= 100_000) base = 18;
+  else if (weeklyAvg >= 10_000) base = 14;
+  else if (weeklyAvg >= 1_000) base = 10;
+  else if (weeklyAvg >= 100) base = 6;
+  else base = 3;
+
+  const trendMod = trend === "growing" ? 3 : trend === "declining" ? -3 : 0;
+  return Math.max(0, Math.min(25, base + trendMod));
+&#125;</code></pre>
+
+          <p>
+            Trend is derived from the last 90 days of daily download data: first half vs.
+            second half, with &gt;15% change as the threshold. Growing = &gt;1.15×, declining = &lt;0.85×.
+          </p>
+
+          <h3>3. Release Consistency (20 pts)</h3>
+
+          <p>
+            Version count plus days since last publish. The version count captures maintenance
+            history. Recency catches zombie packages — still widely depended on, no longer
+            actively maintained, old access still live.
+          </p>
+
+          <pre><code>function scoreReleases(versionCount: number, daysSincePublish: number): number &#123;
+  let base = 0;
+  if (versionCount >= 100) base = 15;
+  else if (versionCount >= 30) base = 12;
+  else if (versionCount >= 10) base = 9;
+  else if (versionCount >= 3) base = 6;
+  else base = 3;
+
+  const recency =
+    daysSincePublish < 30 ? 5 :
+    daysSincePublish < 90 ? 3 :
+    daysSincePublish < 365 ? 1 : 0;
+
+  return Math.min(20, base + recency);
+&#125;</code></pre>
+
+          <p>
+            chalk scores 13/20 here: 181 days since last publish. That's not suspicious on
+            its own — chalk is stable, mature, intentionally infrequent. But it contributes
+            to a risk picture that's primarily set by the next dimension.
+          </p>
+
+          <h3>4. Maintainer Depth (15 pts)</h3>
+
+          <p>
+            This is the signal that drives the CRITICAL flag. Maintainer count comes directly
+            from <code>pkg.maintainers</code> in the registry response — the list of npm accounts
+            with publish rights.
+          </p>
+
+          <pre><code>function scoreMaintainers(count: number): number &#123;
+  if (count >= 5) return 15;
+  if (count >= 3) return 11;
+  if (count >= 2) return 7;
+  if (count === 1) return 4;
+  return 0;
+&#125;</code></pre>
+
+          <p>
+            A sole maintainer scores 4/15 — the lowest non-zero value. The reasoning is
+            structural: one compromised npm token means a malicious version goes to every
+            downstream install. One phishing email, one credential leak, one maintainer
+            account selling their package — and the blast radius is the full weekly download
+            count.
+          </p>
+
+          <h3>5. GitHub Backing (15 pts)</h3>
+
+          <p>
+            If the package has a linked GitHub repository, we score that repository independently
+            across five sub-dimensions: longevity, recent commit activity (last 30 days),
+            contributor count, release cadence, and stars. The resulting 0–100 GitHub score
+            maps linearly to 0–15 points.
+          </p>
+
+          <p>
+            Organization-backed repos score higher than personal repos for the same reason:
+            organizational accounts have multiple people with access, institutional continuity,
+            and usually internal security practices. A personal repo is one account away from
+            full control by whoever compromises it.
+          </p>
+
+          <h2>The CRITICAL Flag</h2>
+
+          <p>
+            The flag has two conditions, both must be true:
+          </p>
+
+          <ol>
+            <li>Single maintainer (<code>maintainerDepth = 4/15</code>)</li>
+            <li>Weekly downloads &gt; 10M</li>
+          </ol>
+
+          <pre><code>const riskFlags: string[] = [];
+if (profile.maintainerCount === 1 && weeklyDownloads > 10_000_000) &#123;
+  riskFlags.push("CRITICAL");
+&#125;</code></pre>
+
+          <p>
+            The threshold is explicit and deterministic. You can reproduce it from the npm
+            registry and downloads API with no proprietary data. The reasoning behind 10M:
+            below that volume, a compromised package causes real damage but doesn't constitute
+            an infrastructure-level event. Above it, the blast radius is broad enough that
+            a well-resourced attacker has a meaningful incentive.
+          </p>
+
+          <p>
+            Two additional flags exist for adjacent risk profiles:
+          </p>
+
+          <ul>
+            <li><strong>HIGH</strong>: package &lt;1 year old with &gt;1M weekly downloads — rapid adoption without operational track record.</li>
+            <li><strong>WARN</strong>: package hasn't published in &gt;365 days — likely unmaintained but still receiving traffic.</li>
+          </ul>
+
+          <h2>How the Audit API Works</h2>
+
+          <p>
+            The <code>POST /api/audit</code> endpoint takes a list of package names and returns
+            scored profiles. The naive implementation — firing one download API request per package
+            concurrently — hits a documented npm rate limit: parallel requests to the downloads
+            API return zeros. This was the first failure mode we hit in production.
+          </p>
+
+          <p>The fix: batch all unscoped packages into a single bulk request before processing.</p>
+
+          <pre><code>// One bulk HTTP request for all unscoped npm packages
+const bulkWeekly = await bulkFetchNpmWeeklyDownloads(unscopedNpm);
+
+// All packages processed concurrently — downloads already resolved
+const allResults = await Promise.all(
+  packages.map(async (pkg) =&gt; &#123;
+    const preloadedWeekly = pkg.startsWith("@")
+      ? undefined                      // scoped: fetch individually
+      : bulkWeekly.get(pkg);           // unscoped: use bulk result
+    const profile = await buildNpmCommitmentProfile(pkg, preloadedWeekly);
+    // ...
+  &#125;)
+);</code></pre>
+
+          <p>
+            The bulk API (<code>/downloads/point/last-week</code>) accepts up to 128 packages
+            per request and returns a map of package → weekly count. Scoped packages
+            (<code>@scope/name</code>) are not supported by the bulk endpoint — they fall back
+            to individual fetches.
+          </p>
+
+          <p>
+            The registry metadata fetch and GitHub scoring run concurrently per package.
+            For a 20-package audit, this is roughly: 1 bulk download request + 20 registry
+            requests + up to 20 GitHub requests, all in parallel. Wall-clock time on cold
+            CF Workers: typically 800ms–1.5s depending on GitHub API latency.
+          </p>
+
+          <h2>Benchmarks: Real Packages, Live Data</h2>
+
+          <p>Actual response from the live API (April 29, 2026):</p>
+
+          <pre><code>curl -X POST https://poc-backend.amdal-dev.workers.dev/api/audit \
+  -H "Content-Type: application/json" \
+  -d '&#123;"packages": ["chalk", "express", "hono"]&#125;'</code></pre>
+
+          <table>
+            <thead>
+              <tr>
+                <th>Package</th>
+                <th>Score</th>
+                <th>Maintainers</th>
+                <th>Weekly DL</th>
+                <th>Age</th>
+                <th>Last Publish</th>
+                <th>Risk</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><code>chalk</code></td>
+                <td>75</td>
+                <td>1</td>
+                <td>418M</td>
+                <td>12.7 yr</td>
+                <td>181 days ago</td>
+                <td>🔴 CRITICAL</td>
+              </tr>
+              <tr>
+                <td><code>hono</code></td>
+                <td>79</td>
+                <td>1</td>
+                <td>34.5M</td>
+                <td>4.4 yr</td>
+                <td>4 days ago</td>
+                <td>🔴 CRITICAL</td>
+              </tr>
+              <tr>
+                <td><code>express</code></td>
+                <td>94</td>
+                <td>5</td>
+                <td>95M</td>
+                <td>15.3 yr</td>
+                <td>12 days ago</td>
+                <td>✅ No flag</td>
+              </tr>
+            </tbody>
+          </table>
+
+          <p>Score breakdowns:</p>
+
+          <pre><code>chalk:
+  longevity:           25/25  (12.7 years)
+  downloadMomentum:    22/25  (418M/week)
+  releaseConsistency:  13/20  (181 days since last publish)
+  maintainerDepth:      4/15  (1 maintainer)
+  githubBacking:       11/15
+
+hono:
+  longevity:           20/25  (4.4 years)
+  downloadMomentum:    22/25  (34.5M/week)
+  releaseConsistency:  20/20  (4 days since last publish)
+  maintainerDepth:      4/15  (1 maintainer)
+  githubBacking:       13/15
+
+express:
+  longevity:           25/25  (15.3 years)
+  downloadMomentum:    22/25  (95M/week)
+  releaseConsistency:  20/20  (12 days since last publish)
+  maintainerDepth:     15/15  (5 maintainers)
+  githubBacking:       12/15</code></pre>
+
+          <p>
+            chalk and hono both score in the 75–80 range and look reasonably healthy by
+            conventional package health metrics. Both are CRITICAL. The difference with
+            express is one number: 5 maintainers vs. 1.
+          </p>
+
+          <h2>What This Doesn't Cover</h2>
+
+          <p>
+            <strong>Code analysis.</strong> Proof-of-commitment doesn't inspect package
+            contents. Socket.dev does this — static analysis of published code for
+            suspicious patterns. These are complementary layers, not competitors.
+            If you want to catch malicious code after it's been published, Socket.dev
+            is the right tool. If you want to identify packages structurally positioned
+            for compromise before any malicious code exists, use Commit.
+          </p>
+
+          <p>
+            <strong>CVE tracking.</strong> npm audit, Snyk, and Dependabot scan for known
+            vulnerabilities. Commit doesn't duplicate this. Both layers serve different
+            threat models: known CVEs (catalogued, after-the-fact) vs. structural exposure
+            (predictive, before-the-fact).
+          </p>
+
+          <p>
+            <strong>Trajectory, not snapshot.</strong> The current implementation scores
+            the current state of a package. A package that had 5 maintainers for 10 years
+            and just dropped to 1 gets the same maintainerDepth score as one that's always
+            had a single maintainer. This is a known gap — the score should track transitions,
+            not just current state.
+          </p>
+
+          <p>
+            <strong>CRITICAL packages that never get attacked will always outnumber
+            the ones that do.</strong> The flag identifies exposure, not certainty.
+            Most sole-maintained packages with 100M weekly downloads are run by talented,
+            security-conscious people. The risk is structural, not behavioral.
+          </p>
+
+          <h2>Run It On Your Stack</h2>
+
+          <p>CLI:</p>
+
+          <pre><code>npx proof-of-commitment --file package.json</code></pre>
+
+          <p>API (replace with your packages):</p>
+
+          <pre><code>curl -X POST https://poc-backend.amdal-dev.workers.dev/api/audit \
+  -H "Content-Type: application/json" \
+  -d '&#123;"packages": ["chalk", "zod", "axios", "express", "hono"]&#125;'</code></pre>
+
+          <p>Browser: <a href="https://getcommit.dev/audit">getcommit.dev/audit</a></p>
+
+          <p>
+            The source is at <a href="https://github.com/piiiico/proof-of-commitment">github.com/piiiico/proof-of-commitment</a>.
+            The scoring functions are in <code>src/backend/npm.ts</code>. The audit endpoint
+            is in <code>src/backend/worker.ts</code>.
+          </p>
+
+          <hr class="essay-divider" />
+
+          <p class="essay-coda">
+            <em>Related: <a href="/blog/scoring-methodology">How Commit Scores npm Packages: The Methodology</a> — the reasoning behind the weights. <a href="/blog/npm-audit-zero-vulnerabilities">Why npm audit Returns Zero Vulnerabilities for the Most Dangerous Packages</a> — where each tool fits in the stack. <a href="/blog/two-types-npm-attacks">Two Types of npm Supply Chain Attack</a> — what each tool actually covers.</em>
+          </p>
+
+        </div>
+      </div>
+    </div>
+  </article>
+
+  <style>
+    .essay { padding: var(--space-section, 4rem) 0; }
+    .essay-header { margin-bottom: 3rem; }
+    .essay-title { font-size: 2.25rem; line-height: 1.2; margin: 0.75rem 0; }
+    .essay-subtitle { font-size: 1.15rem; line-height: 1.6; color: var(--ink-muted); margin: 0.75rem 0 1rem; }
+    .essay-byline { color: var(--ink-muted); font-size: 0.9rem; }
+    .essay-meta { color: var(--ink-muted); font-size: 0.85rem; margin-bottom: 0.5rem; }
+    .essay-body { max-width: 700px; }
+    .essay-body h2 { margin-top: 2.5rem; margin-bottom: 0.75rem; font-size: 1.4rem; }
+    .essay-body h3 { margin-top: 1.75rem; margin-bottom: 0.5rem; font-size: 1.1rem; }
+    .essay-body p { margin-bottom: 1rem; line-height: 1.7; }
+    .essay-body ul, .essay-body ol { margin: 0.75rem 0 1rem 1.5rem; }
+    .essay-body li { margin-bottom: 0.4rem; line-height: 1.6; }
+    .essay-body pre { background: var(--paper-dim, #f5f5f0); border: 1px solid var(--border); border-radius: 6px; padding: 1rem 1.25rem; overflow-x: auto; margin: 1rem 0; }
+    .essay-body code { font-family: 'JetBrains Mono', 'Fira Mono', monospace; font-size: 0.85rem; }
+    .essay-body p code, .essay-body li code { background: var(--paper-dim, #f5f5f0); padding: 0.1em 0.35em; border-radius: 3px; border: 1px solid var(--border); }
+    .essay-body a { color: var(--ink); text-decoration: underline; }
+    .essay-body table { width: 100%; border-collapse: collapse; margin: 1rem 0; font-size: 0.88rem; border: 1px solid var(--border); border-radius: 6px; overflow: hidden; }
+    .essay-body th { background: var(--paper-dim, #f5f5f0); font-weight: 600; text-align: left; padding: 0.5rem 0.75rem; border-bottom: 2px solid var(--border); }
+    .essay-body td { padding: 0.5rem 0.75rem; border-bottom: 1px solid var(--border-light, rgba(0,0,0,.06)); }
+    .essay-divider { border: none; border-top: 1px solid var(--border); margin: 2.5rem 0; }
+    .essay-coda { color: var(--ink-muted); font-size: 0.9rem; }
+  </style>
+
+</Layout>

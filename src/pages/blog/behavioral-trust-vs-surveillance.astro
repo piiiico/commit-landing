@@ -1,0 +1,285 @@
+---
+import Layout from '../../layouts/Layout.astro';
+---
+
+<Layout
+  title="Behavioral Trust Without Surveillance Infrastructure — Commit"
+  description="The signals that make trust legible are already being collected — covertly, at scale, without consent. The question isn't whether to use behavioral data. The question is who controls it, and what architecture they use."
+  canonical="https://getcommit.dev/blog/behavioral-trust-vs-surveillance/"
+  publishDate="2026-04-30"
+>
+
+  <!-- Nav -->
+  <nav>
+    <div class="container nav-inner">
+      <a href="/" class="nav-brand">Commit</a>
+      <ul class="nav-links">
+        <li><a href="/extension">Extension</a></li>
+        <li><a href="/blog">Writing</a></li>
+        <li><a href="/pricing">Pricing</a></li><li><a href="/docs">Docs</a></li><li><a href="https://github.com/piiiico/proof-of-commitment" target="_blank" rel="noopener">GitHub</a></li>
+        <li><a href="mailto:pico@amdal.dev">Contact</a></li>
+      </ul>
+    </div>
+  </nav>
+
+  <!-- Essay -->
+  <article class="essay">
+    <div class="container">
+      <div class="editorial">
+
+        <!-- Header -->
+        <header class="essay-header">
+          <div class="essay-meta animate-in delay-1">
+            <time datetime="2026-04-30">April 30, 2026</time>
+          </div>
+          <h1 class="essay-title animate-in delay-2">Behavioral Trust Without Surveillance Infrastructure</h1>
+          <p class="essay-subtitle animate-in delay-3">
+            The signals that make trust legible are already being collected &mdash; covertly, at scale, without
+            your consent. The question isn&rsquo;t whether to use behavioral data. The question is who controls
+            it, and what architecture they choose.
+          </p>
+          <p class="essay-byline animate-in delay-4">Pico</p>
+        </header>
+
+        <!-- Body -->
+        <div class="essay-body">
+
+          <p>
+            A security research team recently published a technical breakdown of what happens when you complete
+            an &ldquo;age verification&rdquo; check powered by Persona.
+          </p>
+
+          <p>
+            What they found wasn&rsquo;t an age check. It was a behavioral biometrics pipeline.
+          </p>
+
+          <p>
+            Persona&rsquo;s SDK &mdash; used by hundreds of companies including Anthropic and OpenAI as listed
+            data processors &mdash; captures hesitation patterns, touch pressure, typing cadence, and screen-gaze
+            during the verification flow. 269 separate behavioral checks in the decompiled code. FingerprintJS
+            tracking with a 365-day cookie. No zero-knowledge proofs. No cryptographic privacy guarantees. A
+            hardcoded AES key the researchers decrypted themselves.
+          </p>
+
+          <p>
+            Persona has raised <strong>$350 million</strong>. Founders Fund &mdash; Peter Thiel&rsquo;s venture
+            firm, and the co-founder of Palantir, the company that built surveillance infrastructure for
+            population-level monitoring &mdash; has led both the Series C and Series D rounds.
+          </p>
+
+          <p>
+            This is not an edge case. This is the direction the market chose.
+          </p>
+
+          <hr class="essay-divider" />
+
+          <h2>The behavioral data ship has sailed</h2>
+
+          <p>
+            Here is the uncomfortable truth: <strong>the behavioral signals that make trust legible are already
+            being collected.</strong> They didn&rsquo;t wait for your permission. They didn&rsquo;t wait for a
+            regulatory framework. They&rsquo;re embedded in SDKs that developers drop into apps without reading
+            the fine print.
+          </p>
+
+          <p>
+            The research team wasn&rsquo;t shocked that Persona collected behavioral data. They were shocked by
+            <em>how it was collected</em>: covertly, without disclosure, under the guise of age verification,
+            with data flowing to third parties the user never agreed to.
+          </p>
+
+          <p>
+            The behavioral signals themselves &mdash; hesitation before submitting, touch pressure patterns,
+            typing cadence &mdash; are legitimate trust signals. These patterns do reveal something true about
+            users. That&rsquo;s <em>why</em> they&rsquo;re valuable. A person who types their own name with the
+            cadence of someone filling out a real form behaves differently than a bot cycling through synthetic
+            identities.
+          </p>
+
+          <p>The problem isn&rsquo;t that Persona uses behavioral signals. The problem is the architecture:</p>
+
+          <ul>
+            <li><strong>Covert collection.</strong> Users don&rsquo;t know what&rsquo;s being captured.</li>
+            <li><strong>No privacy guarantees.</strong> Behavioral data transmitted in full to Persona&rsquo;s servers.</li>
+            <li><strong>No user control.</strong> You can&rsquo;t opt out, audit, or revoke.</li>
+            <li><strong>Concentrated custody.</strong> $350M company with Palantir-adjacent ownership holds your behavioral profile.</li>
+            <li><strong>Opaque data flows.</strong> 269 checks, FingerprintJS, third-party processors &mdash; none disclosed.</li>
+          </ul>
+
+          <p>This is surveillance infrastructure wearing a verification mask.</p>
+
+          <hr class="essay-divider" />
+
+          <h2>Two architectures for the same signal</h2>
+
+          <p>
+            The behavioral signals are real. The use case is real. Trust verification at scale requires
+            <em>something</em> that can distinguish genuine human behavior from synthetic noise &mdash; and
+            behavioral biometrics work better than static document checks for exactly that purpose.
+          </p>
+
+          <p>The question is the architecture.</p>
+
+          <p>
+            <strong>Architecture A: Surveillance.</strong> Collect behavioral data in full. Store it on your
+            servers. Sell access to it. Use it to build profiles. Repeat for 365 days with FingerprintJS. The
+            user is the product. The data is the asset. Trust for the platform means opacity for the user.
+          </p>
+
+          <p>This is Persona. This is FingerprintJS. This is the default path when you optimize for platform-side value extraction.</p>
+
+          <p>
+            <strong>Architecture B: Zero-knowledge.</strong> The user&rsquo;s behavioral signals are processed
+            locally. A cryptographic proof is generated: &ldquo;this behavior pattern falls within the range
+            consistent with genuine human intent.&rdquo; The proof is attested on-chain. The raw signals never
+            leave the user&rsquo;s device. The verifying party learns only: <em>true</em> or <em>false</em>.
+          </p>
+
+          <p>&ldquo;Contribute everything, reveal nothing.&rdquo;</p>
+
+          <p>
+            The user gets the benefit of behavioral trust without giving up behavioral data. The platform gets a
+            valid trust signal without gaining surveillance infrastructure. The behavioral commitment &mdash; this
+            person behaved this way, at this time, in this context &mdash; is verifiable without being
+            observable.
+          </p>
+
+          <p>
+            This is what zkTLS and Semaphore V4 now make possible at scale. Millions of verifications.
+            Milliseconds for proof verification. The cryptographic infrastructure was theoretical in 2020.
+            It&rsquo;s production-ready in 2026.
+          </p>
+
+          <hr class="essay-divider" />
+
+          <h2>Why this matters beyond age verification</h2>
+
+          <p>
+            Persona&rsquo;s use case is age and identity verification. But the pattern it represents &mdash;
+            behavioral data collection at the identity chokepoint &mdash; is the template for the entire agentic
+            economy.
+          </p>
+
+          <p>
+            As AI agents proliferate, every significant transaction will pass through an identity check.
+            Visa&rsquo;s Trusted Agent Protocol identifies <em>which</em> agent. Mastercard&rsquo;s Verifiable
+            Intent verifies <em>what</em> the agent was delegated to do. x402 handles the payment transport.
+          </p>
+
+          <p>None of these layers answers the harder question: <em>should I trust this agent&rsquo;s behavior?</em></p>
+
+          <p>
+            That question requires behavioral signals. Not static credentials. Not payment authorizations.
+            Behavioral patterns over time &mdash; does this agent behave consistently with its stated purpose?
+            Does its hesitation pattern match genuine deliberation or adversarial probing? Does its transaction
+            cadence look like a user&rsquo;s regular behavior or a bot exhausting a stolen credential?
+          </p>
+
+          <p>
+            The market will answer this question. The question is whether the answer looks like Persona &mdash;
+            behavioral surveillance at scale, covert, centralized, Palantir-adjacent &mdash; or something built
+            on different foundations.
+          </p>
+
+          <hr class="essay-divider" />
+
+          <h2>Commit&rsquo;s architecture</h2>
+
+          <p>
+            Commit is building the trust layer for the agentic economy. Not surveillance infrastructure. The
+            design constraints are non-negotiable.
+          </p>
+
+          <p>
+            <strong>Behavioral commitments, not behavioral surveillance.</strong> A behavioral commitment is a
+            cryptographically attested fact: <em>this agent, with this identity, took this action, under these
+            conditions, at this time.</em> It&rsquo;s verifiable. It&rsquo;s attributable. It&rsquo;s evidence
+            of real behavior. It is not a full behavioral profile stored on Commit&rsquo;s servers to be sold,
+            cross-referenced, and subpoenaed.
+          </p>
+
+          <p>
+            <strong>ZK-native from the start.</strong> Every trust signal in Commit&rsquo;s architecture is
+            designed for zero-knowledge proof generation from day one &mdash; not retrofitted with privacy
+            theater after scale. The architecture determines what&rsquo;s possible: surveillance infrastructure
+            cannot become privacy infrastructure without a rebuild.
+          </p>
+
+          <p>
+            <strong>User-controlled.</strong> The behavioral data you contribute to the trust network is yours.
+            You can audit what&rsquo;s been attested. You can revoke. You decide what trust signals you make
+            available to which verifiers. This isn&rsquo;t a consent checkbox on a 47-page terms of service.
+            It&rsquo;s cryptographic control.
+          </p>
+
+          <p>
+            <strong>Open verification.</strong> Trust signals in Commit&rsquo;s network are verifiable by anyone
+            with the public proof. Not by anyone with access to Commit&rsquo;s database. The distinction matters
+            enormously: one creates lock-in and a surveillance asset, the other creates a commons.
+          </p>
+
+          <hr class="essay-divider" />
+
+          <h2>The anti-Persona</h2>
+
+          <p>
+            Persona&rsquo;s architecture makes behavioral data legible to Persona. Commit&rsquo;s architecture
+            makes behavioral trust legible to the parties who need it &mdash; without making behavioral data
+            legible to anyone.
+          </p>
+
+          <p>
+            The difference is the architecture, not the signal. Both use behavioral patterns to establish trust.
+            One does it by centralizing surveillance. One does it with cryptographic commitment.
+          </p>
+
+          <p>
+            The Persona story reveals something important about the default path: when you optimize for
+            platform-side value extraction, behavioral biometrics become a surveillance asset. When you optimize
+            for genuine trust infrastructure, they become something else entirely &mdash; verifiable evidence
+            that a specific behavior happened, attested in a way that&rsquo;s useful without being invasive.
+          </p>
+
+          <p>The behavioral data ship has sailed. The architecture ship hasn&rsquo;t.</p>
+
+          <p>That&rsquo;s the window.</p>
+
+          <hr class="essay-divider" />
+
+          <p style="font-size: 0.875rem; color: var(--ink-subtle);">
+            <em>Sources: TBOTE Project technical investigation (tboteproject.com/surveillancefindings/).
+            Founders Fund investment in Persona: Series C and Series D lead investor. x402 Foundation: Linux
+            Foundation, April 2026. Visa TAP and Mastercard Verifiable Intent: published specifications.</em>
+          </p>
+
+        </div>
+
+        <!-- CTA -->
+        <div style="margin-top: 3rem; padding-top: 2rem; border-top: 1px solid var(--border-light);">
+          <p style="font-size: 0.9375rem; color: var(--ink-subtle);">
+            Commit scores npm packages and GitHub repos on behavioral signals that are harder to fake than stars
+            or downloads. <a href="/audit">Try the audit tool</a> or
+            <a href="https://github.com/piiiico/proof-of-commitment" target="_blank" rel="noopener">explore the code</a>.
+          </p>
+        </div>
+
+      </div>
+    </div>
+  </article>
+
+  <!-- Footer -->
+  <footer>
+    <div class="container footer-inner">
+      <span class="footer-brand">Commit</span>
+      <ul class="footer-links">
+        <li><a href="/blog">Writing</a></li>
+        <li><a href="/pricing">Pricing</a></li>
+        <li><a href="/docs">Docs</a></li>
+        <li><a href="https://github.com/piiiico/proof-of-commitment" target="_blank" rel="noopener">GitHub</a></li>
+        <li><a href="mailto:pico@amdal.dev">Contact</a></li>
+      </ul>
+      <span class="footer-locale">Stavanger, Norway</span>
+    </div>
+  </footer>
+
+</Layout>

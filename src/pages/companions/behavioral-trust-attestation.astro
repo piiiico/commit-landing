@@ -1,0 +1,517 @@
+---
+import Layout from '../../layouts/Layout.astro';
+
+const schemeExample = `"agent_attestation": {
+  "type": "commit-behavioral-attestation/v1",
+  "value": { ... }
+}`;
+
+const integrationExample = `{
+  "iss": "did:web:vi.mastercard.com",
+  "sub": "did:web:agent.example.com",
+  "vi_mandate": {
+    "merchant_allow_list": ["merchant_abc"],
+    "amount_max": 500,
+    "currency": "USD"
+  },
+  "agent_attestation": {
+    "type": "commit-behavioral-attestation/v1",
+    "value": {
+      "trust_score": 742,
+      "score_basis": 183,
+      "behavioral_fingerprint": "a3f4c2e1b8d976...",
+      "confidence": 0.87,
+      "issuer_did": "did:web:attest.getcommit.dev",
+      "issued_at": 1743724800,
+      "expires_at": 1743811200,
+      "anomaly_flag": false
+    }
+  }
+}`;
+---
+
+<Layout
+  title="Behavioral Trust Attestation — Companion Document — Commit"
+  description="Full companion document for the commit-behavioral-attestation/v1 scheme proposed as a VI extension point. Covers verification, failure handling, security considerations, and privacy analysis."
+  canonical="https://getcommit.dev/companions/behavioral-trust-attestation/"
+>
+
+  <!-- Nav -->
+  <nav>
+    <div class="container nav-inner">
+      <a href="/" class="nav-brand">Commit</a>
+      <ul class="nav-links">
+        <li><a href="/extension">Extension</a></li>
+        <li><a href="/blog">Writing</a></li>
+        <li><a href="/pricing">Pricing</a></li><li><a href="/docs">Docs</a></li><li><a href="https://github.com/piiiico/proof-of-commitment" target="_blank" rel="noopener">GitHub</a></li>
+        <li><a href="mailto:pico@amdal.dev">Contact</a></li>
+      </ul>
+    </div>
+  </nav>
+
+  <!-- Document -->
+  <article class="essay">
+    <div class="container">
+      <div class="editorial">
+
+        <!-- Header -->
+        <header class="essay-header">
+          <div class="essay-meta animate-in delay-1">
+            <time datetime="2026-04-04">April 4, 2026</time>
+            <span>&nbsp;·&nbsp;Companion Document&nbsp;·&nbsp;v0.1-draft</span>
+          </div>
+          <h1 class="essay-title animate-in delay-2">Behavioral Trust Attestation</h1>
+          <p class="essay-subtitle animate-in delay-3">
+            Companion document for <code>commit-behavioral-attestation/v1</code> — a proposed extension to the Mastercard Verifiable Intent <code>agent_attestation</code> field.
+          </p>
+          <p class="essay-byline animate-in delay-4">Commit Protocol</p>
+        </header>
+
+        <!-- Body -->
+        <div class="essay-body">
+
+          <div class="doc-notice">
+            <strong>Status:</strong> Draft. This document accompanies <a href="https://github.com/agent-intent/verifiable-intent/issues/20" target="_blank" rel="noopener">VI Issue #20</a>. Feedback welcome via that issue or <a href="mailto:pico@amdal.dev">pico@amdal.dev</a>.
+          </div>
+
+          <h2>1. Overview</h2>
+
+          <p>
+            Mastercard Verifiable Intent (VI) establishes that a consumer authorized a specific agent action. The <code>agent_attestation</code> extension point (reserved in VI v0.1, <code>security-model.md</code> &sect;6.3) allows companion schemes to carry additional trust signals alongside VI credentials.
+          </p>
+          <p>
+            <code>commit-behavioral-attestation/v1</code> fills the behavioral trust gap identified in that section: <strong>whether the agent exhibiting a valid authorization has behaved consistently and reliably across prior interactions with other counterparties.</strong>
+          </p>
+          <p>
+            This document specifies the verification procedure, failure handling, security considerations, and privacy analysis for relying parties and issuers implementing the scheme.
+          </p>
+
+          <h2>2. Scheme Identifier</h2>
+
+          <pre><code set:text={schemeExample}></code></pre>
+
+          <p>
+            The scheme identifier <code>commit-behavioral-attestation/v1</code> is namespaced to the Commit Protocol. Future versions will increment the version suffix. Relying parties MUST reject unknown scheme identifiers rather than attempting partial parsing.
+          </p>
+
+          <h2>3. Field Definitions</h2>
+
+          <h3>3.1 Required Fields</h3>
+
+          <table>
+            <thead>
+              <tr><th>Field</th><th>Type</th><th>Description</th></tr>
+            </thead>
+            <tbody>
+              <tr><td><code>trust_score</code></td><td>integer [0, 1000]</td><td>Behavioral trust score across prior interactions</td></tr>
+              <tr><td><code>score_basis</code></td><td>integer &ge; 0</td><td>Number of discrete commitment observations underlying the score</td></tr>
+              <tr><td><code>behavioral_fingerprint</code></td><td>string</td><td>Hex-encoded SHA-256 hash of the normalized behavioral feature vector</td></tr>
+              <tr><td><code>confidence</code></td><td>number [0, 1]</td><td>Issuer's confidence in the score given current data density</td></tr>
+              <tr><td><code>issuer_did</code></td><td>string</td><td>DID of the attestation issuer (must resolve to a valid DID Document)</td></tr>
+              <tr><td><code>issued_at</code></td><td>integer</td><td>Unix timestamp of attestation generation</td></tr>
+              <tr><td><code>expires_at</code></td><td>integer</td><td>Unix timestamp after which attestation SHOULD NOT be relied upon</td></tr>
+            </tbody>
+          </table>
+
+          <h3>3.2 Optional Fields</h3>
+
+          <table>
+            <thead>
+              <tr><th>Field</th><th>Type</th><th>Description</th></tr>
+            </thead>
+            <tbody>
+              <tr><td><code>evidence_uri</code></td><td>string (URI)</td><td>URI for additional evidence (audit log, ZK proof, behavioral trace)</td></tr>
+              <tr><td><code>scope_restriction</code></td><td>string</td><td>If present, scopes attestation to a transaction category (e.g., <code>travel</code>, <code>saas</code>)</td></tr>
+              <tr><td><code>anomaly_flag</code></td><td>boolean</td><td>If <code>true</code>, a behavioral anomaly was detected in the current observation window</td></tr>
+            </tbody>
+          </table>
+
+          <h2>4. Verification Procedure</h2>
+
+          <p>
+            A relying party receiving a VI credential containing a <code>commit-behavioral-attestation/v1</code> attestation MUST execute the following verification steps in order. If any step fails, the attestation MUST be treated as absent (not as negative signal).
+          </p>
+
+          <h3>Step 1: Scheme Type Check</h3>
+          <p>
+            Verify that <code>agent_attestation.type</code> equals exactly <code>"commit-behavioral-attestation/v1"</code>. Unknown type values MUST be rejected.
+          </p>
+
+          <h3>Step 2: Structural Validation</h3>
+          <p>
+            Verify all required fields are present and conform to their type constraints:
+          </p>
+          <ul>
+            <li><code>trust_score</code>: integer, 0 &le; value &le; 1000</li>
+            <li><code>score_basis</code>: integer, value &ge; 0</li>
+            <li><code>behavioral_fingerprint</code>: 64-character hex string (SHA-256)</li>
+            <li><code>confidence</code>: number, 0 &le; value &le; 1</li>
+            <li><code>issuer_did</code>: valid DID string (must match <code>did:&lt;method&gt;:&lt;method-specific-id&gt;</code>)</li>
+            <li><code>issued_at</code>: positive integer (Unix timestamp)</li>
+            <li><code>expires_at</code>: positive integer, strictly greater than <code>issued_at</code></li>
+          </ul>
+
+          <h3>Step 3: Temporal Validation</h3>
+          <p>
+            Verify that the current time is between <code>issued_at</code> and <code>expires_at</code>. An attestation outside its validity window MUST be treated as expired (see &sect;5.2).
+          </p>
+          <p>
+            <strong>Clock skew tolerance:</strong> Relying parties SHOULD allow up to 60 seconds of clock skew in either direction for <code>issued_at</code>. No skew tolerance for <code>expires_at</code>.
+          </p>
+
+          <h3>Step 4: Issuer Resolution</h3>
+          <p>
+            Resolve <code>issuer_did</code> to a DID Document. The DID Document MUST contain a verification method that can be used to verify the enclosing VI credential's signature chain. If the DID does not resolve, or the resolved document lacks appropriate verification methods, the attestation MUST be treated as absent.
+          </p>
+
+          <h3>Step 5: Score Interpretation</h3>
+          <p>
+            Apply the relying party's local policy to the validated attestation. The following bands are RECOMMENDED but not normative:
+          </p>
+
+          <table>
+            <thead>
+              <tr><th>Band</th><th>Range</th><th>Indicative Meaning</th></tr>
+            </thead>
+            <tbody>
+              <tr><td>No signal</td><td>0</td><td>Insufficient data <em>or</em> active negative signal (disambiguate via <code>score_basis</code>)</td></tr>
+              <tr><td>Low</td><td>1&ndash;299</td><td>Limited history or elevated failure rate</td></tr>
+              <tr><td>Moderate</td><td>300&ndash;599</td><td>Adequate history, mixed performance</td></tr>
+              <tr><td>High</td><td>600&ndash;849</td><td>Strong history, low failure rate</td></tr>
+              <tr><td>Exceptional</td><td>850&ndash;1000</td><td>Extensive history, very low failure rate</td></tr>
+            </tbody>
+          </table>
+
+          <p>
+            <strong>Score 0 disambiguation:</strong> <code>trust_score: 0</code> combined with <code>score_basis: 0</code> indicates no observed data. <code>trust_score: 0</code> combined with <code>score_basis &gt; 0</code> indicates observed poor performance. Relying parties SHOULD treat these cases differently.
+          </p>
+
+          <h3>Step 6: Anomaly Check</h3>
+          <p>
+            If <code>anomaly_flag</code> is present and <code>true</code>, the issuer has detected a behavioral anomaly in the current observation window. Relying parties SHOULD apply elevated scrutiny regardless of the <code>trust_score</code> value. See &sect;5.3 for handling guidance.
+          </p>
+
+          <h2>5. Failure Handling</h2>
+
+          <h3>5.1 Missing Attestation</h3>
+          <p>
+            A VI credential with no <code>agent_attestation</code> field, or with an unrecognized scheme type, carries no behavioral trust signal. This is explicitly <strong>not negative signal</strong>. The VI authorization proof stands independently.
+          </p>
+          <p>
+            Relying parties MAY apply a default policy for missing attestations (e.g., require human approval for transactions above a threshold), but MUST NOT reject the VI credential itself on this basis.
+          </p>
+
+          <h3>5.2 Expired Attestation</h3>
+          <p>
+            An attestation where <code>expires_at</code> has passed MUST NOT be used for trust decisions. The recommended response is:
+          </p>
+          <ul>
+            <li>Log the expiry event for audit purposes</li>
+            <li>Fall back to the missing-attestation policy (&sect;5.1)</li>
+            <li>If the relying party has a cached previous attestation for the same agent, it MUST NOT substitute it — each attestation is bound to a specific temporal window</li>
+          </ul>
+          <p>
+            <strong>Recommended TTL:</strong> Issuers SHOULD set attestation validity windows between 1 hour and 24 hours. Windows shorter than 1 hour create excessive issuance overhead. Windows longer than 24 hours reduce the signal value of behavioral monitoring.
+          </p>
+
+          <h3>5.3 Anomaly Flag Handling</h3>
+          <p>
+            When <code>anomaly_flag: true</code>, the issuer detected behavior that deviates from the agent's established pattern. This may indicate:
+          </p>
+          <ul>
+            <li>Agent compromise or key theft</li>
+            <li>Agent repurposing (same identity, different operator)</li>
+            <li>Legitimate behavior change (new use case, different merchant category)</li>
+            <li>Adversarial probing from the agent</li>
+          </ul>
+          <p>
+            Relying parties SHOULD NOT automatically reject transactions with <code>anomaly_flag: true</code>. The recommended handling is:
+          </p>
+          <ol>
+            <li>Apply the relying party's elevated-risk policy (e.g., require additional human approval, reduce transaction limit)</li>
+            <li>If <code>evidence_uri</code> is present, the relying party MAY fetch the evidence to understand the anomaly type</li>
+            <li>Log the anomaly for the relying party's own behavioral monitoring</li>
+          </ol>
+
+          <h3>5.4 Issuer Unavailability</h3>
+          <p>
+            If the issuer's DID does not resolve or the issuer's infrastructure is unreachable:
+          </p>
+          <ul>
+            <li>Do NOT cache and reuse a previous attestation</li>
+            <li>Treat as missing attestation (&sect;5.1)</li>
+            <li>Relying parties MAY maintain a circuit breaker: if an issuer is persistently unreachable, reduce trust in that issuer's future attestations</li>
+          </ul>
+
+          <h2>6. Security Considerations</h2>
+
+          <h3>6.1 Score Manipulation</h3>
+          <p>
+            <strong>Threat:</strong> An agent (or its operator) attempts to inflate its trust score by generating synthetic commitment data — e.g., creating small, low-risk transactions that always succeed to build a high <code>trust_score</code> before executing a high-value fraudulent transaction.
+          </p>
+          <p>
+            <strong>Mitigations:</strong>
+          </p>
+          <ul>
+            <li><strong>Score basis weighting:</strong> Issuers SHOULD weight observations by transaction value, risk category, and counterparty diversity — not just count. A <code>score_basis</code> of 1,000 micro-transactions to the same merchant is less informative than 50 diverse transactions.</li>
+            <li><strong>Velocity detection:</strong> Issuers SHOULD flag unusual score-improvement velocity as an anomaly. A score jumping from 200 to 800 in a short window is suspicious regardless of the underlying observations.</li>
+            <li><strong>Confidence decay:</strong> The <code>confidence</code> field SHOULD reflect data quality, not just quantity. Score basis concentrated in a single merchant category or time window yields lower confidence.</li>
+            <li><strong>Cross-issuer comparison:</strong> Relying parties maintaining relationships with multiple issuers MAY compare attestations for the same agent. Divergent scores from independent issuers are a signal worth investigating.</li>
+          </ul>
+
+          <h3>6.2 Issuer Collusion</h3>
+          <p>
+            <strong>Threat:</strong> An issuer deliberately provides inflated attestations — either because the issuer is compromised, economically incentivized (pay-for-score), or colluding with the agent operator.
+          </p>
+          <p>
+            <strong>Mitigations:</strong>
+          </p>
+          <ul>
+            <li><strong>Issuer reputation:</strong> Relying parties SHOULD maintain their own assessment of issuer quality. An issuer whose attestations consistently fail to predict agent behavior is providing noise, not signal.</li>
+            <li><strong>Methodology transparency:</strong> Issuers MUST publish a scoring methodology document (see &sect;7). An issuer that refuses or provides only vague methodology should be weighted lower.</li>
+            <li><strong>Outcome tracking:</strong> Relying parties that track transaction outcomes can calibrate issuer accuracy empirically. If Issuer A's "High trust" agents fail 20% of the time while Issuer B's fail 2%, the relying party has a quantitative basis for differential weighting.</li>
+            <li><strong>Multi-issuer requirement:</strong> For high-value transactions, relying parties MAY require attestations from multiple independent issuers. Collusion becomes exponentially harder with each additional independent issuer.</li>
+          </ul>
+
+          <h3>6.3 Replay Attacks</h3>
+          <p>
+            <strong>Threat:</strong> An attacker captures a valid attestation and replays it in a different context — attaching a legitimate agent's high-trust attestation to a different agent's transaction.
+          </p>
+          <p>
+            <strong>Mitigations:</strong>
+          </p>
+          <ul>
+            <li><strong>VI binding:</strong> The attestation is carried inside a VI credential that is itself bound to a specific agent, consumer, and transaction via the SD-JWT delegation chain. Replaying the attestation requires forging or replaying the entire VI credential.</li>
+            <li><strong>Temporal constraints:</strong> The <code>issued_at</code>/<code>expires_at</code> window limits replay viability. Recommended TTL of 1&ndash;24 hours means a captured attestation degrades quickly.</li>
+            <li><strong>Behavioral fingerprint continuity:</strong> If a relying party tracks <code>behavioral_fingerprint</code> values over time, a sudden fingerprint change accompanying the same agent identity is a signal of potential credential theft.</li>
+            <li><strong>Nonce binding (recommended):</strong> Issuers SHOULD bind attestations to a specific VI credential nonce when available. This prevents attestation reuse across different VI sessions.</li>
+          </ul>
+
+          <h3>6.4 Sybil Attacks</h3>
+          <p>
+            <strong>Threat:</strong> An operator creates many agent identities, builds trust on each independently, and uses the clean identities to execute fraud while sacrificing others.
+          </p>
+          <p>
+            <strong>Mitigations:</strong>
+          </p>
+          <ul>
+            <li><strong>Identity-layer linkage:</strong> This is fundamentally an L3 problem (TAP, DID registration). Behavioral attestation can contribute by identifying agents whose behavioral fingerprints are suspiciously similar despite distinct identities.</li>
+            <li><strong>Operator-level aggregation:</strong> Issuers MAY track trust at the operator level (the entity behind one or more agents) in addition to individual agent level, if operator identity is available through the VI delegation chain.</li>
+          </ul>
+
+          <h3>6.5 Model Extraction</h3>
+          <p>
+            <strong>Threat:</strong> An adversary uses the attestation responses to reverse-engineer the issuer's scoring model, then games it.
+          </p>
+          <p>
+            <strong>Mitigations:</strong>
+          </p>
+          <ul>
+            <li><strong>Score quantization:</strong> The integer [0, 1000] range is intentionally coarse — 1,001 possible values resist fine-grained model probing.</li>
+            <li><strong>Methodology publication paradox:</strong> Issuers are required to publish methodology (&sect;7) but NOT the specific weights, features, or thresholds. Transparency about <em>what</em> is measured, opacity about <em>how</em> it is weighted.</li>
+            <li><strong>Fingerprint opacity:</strong> The <code>behavioral_fingerprint</code> is a hash — it reveals drift but not the underlying features.</li>
+          </ul>
+
+          <h2>7. Score Methodology Transparency</h2>
+
+          <p>
+            Issuers implementing <code>commit-behavioral-attestation/v1</code> MUST publish a scoring methodology document that covers the following:
+          </p>
+
+          <ol>
+            <li><strong>Data sources:</strong> What types of behavioral data contribute to the score (e.g., transaction completion rates, response time patterns, counterparty diversity, dispute history)</li>
+            <li><strong>Observation window:</strong> The temporal window over which observations are aggregated (rolling, fixed-period, or event-based)</li>
+            <li><strong>Score update frequency:</strong> How often the score is recalculated and new attestations can be issued</li>
+            <li><strong>Anomaly detection criteria:</strong> What classes of behavioral change trigger <code>anomaly_flag: true</code> (without revealing specific thresholds)</li>
+            <li><strong>Confidence calculation:</strong> How the <code>confidence</code> value relates to data density, diversity, and recency</li>
+            <li><strong>Dispute and correction process:</strong> How an agent operator can challenge an incorrect score, and the timeline for resolution</li>
+          </ol>
+
+          <p>
+            The methodology document SHOULD be published at a stable URI derived from the issuer's DID. For example: <code>https://attest.getcommit.dev/.well-known/scoring-methodology</code>.
+          </p>
+
+          <p>
+            <strong>What issuers MUST NOT disclose:</strong> Specific feature weights, detection thresholds, or internal model architecture. Transparency serves relying party assessment of issuer quality — it is not a recipe for gaming.
+          </p>
+
+          <h2>8. Privacy Analysis</h2>
+
+          <h3>8.1 Behavioral Fingerprint Linkability</h3>
+          <p>
+            <strong>Risk:</strong> The <code>behavioral_fingerprint</code> is deterministic for a given behavioral profile. If two relying parties compare fingerprints, they can determine whether they are seeing the same agent — even if the agent's DID differs between contexts.
+          </p>
+          <p>
+            <strong>Assessment:</strong> This is a feature for fraud detection (Sybil resistance) and a risk for privacy. The tension is structural.
+          </p>
+          <p>
+            <strong>Mitigations:</strong>
+          </p>
+          <ul>
+            <li><strong>Salted fingerprints:</strong> Issuers MAY salt the fingerprint per relying party, producing different hashes for the same behavioral profile. This preserves drift detection (same RP sees fingerprint changes over time) while preventing cross-RP linkage. The trade-off is loss of cross-RP Sybil detection.</li>
+            <li><strong>Fingerprint rotation:</strong> Issuers SHOULD rotate the feature vector normalization parameters periodically (e.g., monthly), causing fingerprint values to change even for stable behavioral profiles. This limits long-term tracking.</li>
+            <li><strong>Selective disclosure:</strong> VI's SD-JWT structure allows the <code>behavioral_fingerprint</code> field to be selectively disclosed. Relying parties that don't need drift detection can receive attestations without the fingerprint.</li>
+          </ul>
+
+          <h3>8.2 Evidence URI Leakage</h3>
+          <p>
+            <strong>Risk:</strong> The optional <code>evidence_uri</code> may contain identifying information in the URI itself (agent identifiers, tokens, sequential IDs) or may be hosted on infrastructure that logs access patterns, allowing the issuer to track which relying parties are checking which agents.
+          </p>
+          <p>
+            <strong>Mitigations:</strong>
+          </p>
+          <ul>
+            <li><strong>Opaque URI design:</strong> Issuers SHOULD use opaque, non-sequential identifiers in evidence URIs. A URI like <code>/evidence/v1/agt_01JQXYZ</code> leaks less than <code>/evidence/v1/agent/42/session/17</code>.</li>
+            <li><strong>Token-scoped access:</strong> Evidence URIs SHOULD require a time-limited access token (as shown in the example: <code>?token=eyJ...</code>). The token SHOULD be scoped to the specific VI credential and expire with the attestation.</li>
+            <li><strong>ZK evidence (recommended):</strong> Where feasible, evidence SHOULD be provided as a zero-knowledge proof that the relying party can verify without learning the underlying behavioral data. This eliminates the need to contact the issuer's infrastructure at verification time.</li>
+            <li><strong>Relying party guidance:</strong> Relying parties SHOULD fetch evidence URIs through a privacy-preserving proxy or at randomized intervals to prevent the issuer from inferring transaction timing.</li>
+          </ul>
+
+          <h3>8.3 Score as Behavioral Proxy</h3>
+          <p>
+            <strong>Risk:</strong> Even without the fingerprint, the combination of <code>trust_score</code>, <code>score_basis</code>, <code>confidence</code>, and <code>issued_at</code> narrows the anonymity set. An agent with <code>score_basis: 3</code> is identifiable within a small cohort.
+          </p>
+          <p>
+            <strong>Mitigations:</strong>
+          </p>
+          <ul>
+            <li><strong>Score quantization:</strong> The [0, 1000] range with recommended bands reduces precision. Issuers MAY further quantize to band boundaries (0, 150, 450, 725, 925) for privacy-sensitive contexts.</li>
+            <li><strong>Minimum score basis:</strong> Issuers SHOULD NOT issue attestations with <code>score_basis</code> below a minimum threshold (recommended: 5 observations) to prevent de-anonymization of new agents.</li>
+            <li><strong>Timestamp rounding:</strong> Issuers MAY round <code>issued_at</code> to hour boundaries to reduce temporal fingerprinting.</li>
+          </ul>
+
+          <h3>8.4 Consumer Privacy</h3>
+          <p>
+            <strong>Commitment:</strong> The behavioral attestation describes the <em>agent's</em> behavior, not the consumer's. The attestation MUST NOT contain or leak information about the consumer who delegated authority via the VI credential. The VI delegation chain already handles consumer privacy through its SD-JWT selective disclosure mechanism.
+          </p>
+
+          <h2>9. Integration with VI Delegation Chain</h2>
+
+          <p>
+            VI uses SD-JWT with a three-layer delegation chain: issuer &rarr; user &rarr; agent. The behavioral attestation integrates at the agent layer:
+          </p>
+
+          <pre><code set:text={integrationExample}></code></pre>
+
+          <p>
+            The <code>agent_attestation</code> field is independent of VI's authorization constraints. A merchant receiving this credential can verify both (a) that the consumer authorized this specific transaction via VI, and (b) that the agent has a behavioral trust history via the attestation. Neither layer depends on or invalidates the other.
+          </p>
+
+          <h2>10. Conformance</h2>
+
+          <p>
+            An issuer conforms to this specification if it:
+          </p>
+          <ol>
+            <li>Produces attestations containing all required fields with correct types</li>
+            <li>Publishes a scoring methodology document per &sect;7</li>
+            <li>Maintains a resolvable DID with appropriate verification methods</li>
+            <li>Respects the temporal validity constraints (does not issue backdated attestations)</li>
+          </ol>
+
+          <p>
+            A relying party conforms to this specification if it:
+          </p>
+          <ol>
+            <li>Follows the verification procedure in &sect;4 in order</li>
+            <li>Treats failed verification as absent (not negative) signal</li>
+            <li>Does not reject VI credentials solely because <code>agent_attestation</code> is missing</li>
+            <li>Applies its own policy to validated attestations (the scheme is informational, not prescriptive)</li>
+          </ol>
+
+          <hr />
+
+          <div class="doc-footer">
+            <p>
+              <strong>Authors:</strong> Commit Protocol<br />
+              <strong>License:</strong> CC BY 4.0<br />
+              <strong>Discussion:</strong> <a href="https://github.com/agent-intent/verifiable-intent/issues/20" target="_blank" rel="noopener">VI Issue #20</a><br />
+              <strong>Repository:</strong> <a href="https://github.com/piiiico/proof-of-commitment" target="_blank" rel="noopener">github.com/piiiico/proof-of-commitment</a>
+            </p>
+          </div>
+
+        </div>
+      </div>
+    </div>
+  </article>
+
+  <!-- Footer -->
+  <footer class="site-footer">
+    <div class="container">
+      <p>&copy; 2026 Commit Protocol</p>
+    </div>
+  </footer>
+
+</Layout>
+
+<style>
+  .doc-notice {
+    background: var(--paper-dim);
+    border-left: 3px solid var(--accent);
+    padding: 1rem 1.5rem;
+    margin: 2rem 0;
+    font-size: 0.9rem;
+    line-height: 1.6;
+  }
+
+  .doc-notice a {
+    color: var(--accent-dim);
+  }
+
+  .doc-footer {
+    margin-top: 3rem;
+    padding-top: 2rem;
+    border-top: 1px solid var(--border);
+    font-size: 0.9rem;
+    line-height: 1.8;
+  }
+
+  .doc-footer a {
+    color: var(--accent-dim);
+  }
+
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 1.5rem 0;
+    font-size: 0.88rem;
+  }
+
+  th, td {
+    text-align: left;
+    padding: 0.6rem 0.8rem;
+    border-bottom: 1px solid var(--border-light);
+  }
+
+  th {
+    font-weight: 500;
+    color: var(--ink-muted);
+    border-bottom-color: var(--border);
+  }
+
+  td code {
+    font-size: 0.82rem;
+  }
+
+  pre {
+    background: var(--paper-dim);
+    padding: 1.25rem;
+    border-radius: 4px;
+    overflow-x: auto;
+    margin: 1.5rem 0;
+    font-size: 0.85rem;
+    line-height: 1.5;
+  }
+
+  pre code {
+    background: none;
+    padding: 0;
+  }
+
+  .site-footer {
+    padding: 3rem 0;
+    text-align: center;
+    color: var(--ink-subtle);
+    font-size: 0.85rem;
+  }
+</style>

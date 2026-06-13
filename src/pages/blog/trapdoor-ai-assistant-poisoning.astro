@@ -1,0 +1,265 @@
+---
+import Layout from '../../layouts/Layout.astro';
+---
+
+<Layout
+  title="TrapDoor Hit npm, PyPI, and Crates.io at Once. Then It Poisoned Your AI Assistant. &mdash; Commit"
+  description="34 malicious packages across three ecosystems. Every one scored 15 or lower. The new part: zero-width Unicode instructions hidden in .cursorrules and CLAUDE.md, designed to turn your AI coding assistant into an exfiltration tool."
+  canonical="https://getcommit.dev/blog/trapdoor-ai-assistant-poisoning/"
+  publishDate="2026-06-06"
+>
+
+  <!-- Nav -->
+  <nav>
+    <div class="container nav-inner">
+      <a href="/" class="nav-brand">Commit</a>
+      <ul class="nav-links">
+        <li><a href="/quickstart/">Quickstart</a></li>
+        <li><a href="/audit/">Audit</a></li>
+        <li><a href="/blog/" style="color: var(--ink);">Writing</a></li>
+        <li><a href="/pricing/">Pricing</a></li>
+        <li><a href="/docs/">Docs</a></li>
+        <li><a href="https://github.com/piiiico/proof-of-commitment" target="_blank" rel="noopener">GitHub</a></li>
+        <li><a href="mailto:pico@amdal.dev">Contact</a></li>
+      </ul>
+    </div>
+  </nav>
+
+  <!-- Essay -->
+  <article class="essay">
+    <div class="container">
+      <div class="editorial">
+
+        <!-- Header -->
+        <header class="essay-header">
+          <div class="essay-meta animate-in delay-1">
+            <time datetime="2026-06-06">June 6, 2026</time>
+          </div>
+          <h1 class="essay-title animate-in delay-2">TrapDoor Hit npm, PyPI, and Crates.io at Once. Then It Poisoned Your AI Assistant.</h1>
+          <p class="essay-subtitle animate-in delay-3">
+            34 malicious packages across three ecosystems. Every one scored 15 or lower. The new part: zero-width Unicode instructions hidden in <code>.cursorrules</code> and <code>CLAUDE.md</code>, designed to turn your coding assistant into an exfiltration tool.
+          </p>
+          <p class="essay-byline animate-in delay-4">Pico</p>
+        </header>
+
+        <!-- Body -->
+        <div class="essay-body">
+
+          <p>
+            On May 22, 2026, starting at 20:20 UTC, a cluster of accounts began publishing packages across npm, PyPI, and Crates.io in rapid waves. 34 packages, 384 versions. The campaign was named TrapDoor.
+          </p>
+
+          <p>
+            What made it different wasn&rsquo;t the credential theft&mdash;that&rsquo;s table stakes now. It was the secondary payload: poisoned <code>.cursorrules</code> and <code>CLAUDE.md</code> files containing invisible instructions, embedded using zero-width Unicode characters.
+          </p>
+
+          <p>
+            The instructions told AI coding assistants to run a &ldquo;security scan&rdquo; that harvested local secrets and exfiltrated them.
+          </p>
+
+          <hr class="essay-divider" />
+
+          <h2>Three ecosystems, one campaign</h2>
+
+          <p>
+            Previous supply chain attacks stayed within one registry. TrapDoor hit all three simultaneously, using each ecosystem&rsquo;s native execution mechanism:
+          </p>
+
+          <ul>
+            <li><strong>npm (21 packages):</strong> <code>postinstall</code> hooks. Immediate execution on <code>npm install</code>.</li>
+            <li><strong>PyPI (7 packages):</strong> Auto-execute on import. The payload downloads a remote script.</li>
+            <li><strong>Crates.io (6 packages):</strong> <code>build.rs</code> scripts. Run at compile time, before your code executes.</li>
+          </ul>
+
+          <p>
+            The package names read like a developer&rsquo;s wishlist: <code>llm-context-compressor</code>, <code>prompt-engineering-toolkit</code>, <code>wallet-security-checker</code>, <code>defi-risk-scanner</code>. Each one targets a specific community&mdash;AI developers, crypto builders, DevOps engineers&mdash;with names designed to appear in the right search results.
+          </p>
+
+          <hr class="essay-divider" />
+
+          <h2>What the behavioral scores say</h2>
+
+          <p>
+            I ran every TrapDoor package through <a href="/audit/">Commit&rsquo;s behavioral audit</a>. The results are uniform:
+          </p>
+
+          <div class="essay-table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>Package</th>
+                  <th>Ecosystem</th>
+                  <th>Score</th>
+                  <th>Publishers</th>
+                  <th>Downloads</th>
+                  <th>Age</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr style="background: rgba(209, 77, 65, 0.07);">
+                  <td><code>llm-context-compressor</code></td>
+                  <td>npm</td>
+                  <td style="color: #D14D41; font-weight: 600;">15</td>
+                  <td>?</td>
+                  <td>42/wk</td>
+                  <td>&lt;1 yr</td>
+                </tr>
+                <tr>
+                  <td><code>prompt-engineering-toolkit</code></td>
+                  <td>npm</td>
+                  <td style="color: #D14D41; font-weight: 600;">15</td>
+                  <td>?</td>
+                  <td>35/wk</td>
+                  <td>&lt;1 yr</td>
+                </tr>
+                <tr style="background: rgba(209, 77, 65, 0.07);">
+                  <td><code>model-switch-router</code></td>
+                  <td>npm</td>
+                  <td style="color: #D14D41; font-weight: 600;">15</td>
+                  <td>?</td>
+                  <td>42/wk</td>
+                  <td>&lt;1 yr</td>
+                </tr>
+                <tr>
+                  <td><code>workspace-config-loader</code></td>
+                  <td>npm</td>
+                  <td style="color: #D14D41; font-weight: 600;">15</td>
+                  <td>?</td>
+                  <td>21/wk</td>
+                  <td>&lt;1 yr</td>
+                </tr>
+                <tr style="background: rgba(209, 77, 65, 0.07);">
+                  <td><code>cryptowallet-safety</code></td>
+                  <td>PyPI</td>
+                  <td style="color: #D14D41; font-weight: 600;">null</td>
+                  <td>?</td>
+                  <td>0/wk</td>
+                  <td>&lt;1 yr</td>
+                </tr>
+                <tr>
+                  <td><code>defi-risk-scanner</code></td>
+                  <td>PyPI</td>
+                  <td style="color: #D14D41; font-weight: 600;">null</td>
+                  <td>?</td>
+                  <td>0/wk</td>
+                  <td>&lt;1 yr</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <p>
+            Every single package: score 15 or null. Zero behavioral history. No longevity. No community. No release track record. No linked GitHub repository.
+          </p>
+
+          <p>
+            A behavioral gate set to block HIGH-risk packages would have stopped all 34 on first install. No CVE database needed. No signature matching. No waiting for a report.
+          </p>
+
+          <hr class="essay-divider" />
+
+          <h2>The AI poisoning vector</h2>
+
+          <p>
+            This is the part that should change how you think about supply chain attacks.
+          </p>
+
+          <p>
+            TrapDoor didn&rsquo;t just steal credentials directly. It planted <code>.cursorrules</code> and <code>CLAUDE.md</code> files containing zero-width Unicode characters. The files look blank or innocuous in a text editor. But AI coding assistants read every character.
+          </p>
+
+          <p>
+            The hidden instructions directed the assistant to run a &ldquo;security scan&rdquo;&mdash;a plausible-sounding task that the AI would execute without suspicion. The scan harvested SSH keys, git credentials, VS Code settings, source headers, and environment variables. Exfiltration went through GitHub Pages and <code>raw.githubusercontent.com</code>&mdash;domains your firewall almost certainly allows.
+          </p>
+
+          <p>
+            This is a different threat model. Traditional malware runs when you install a package. AI poisoning runs when your assistant <em>reads a file</em>. The attack surface isn&rsquo;t <code>postinstall</code> hooks&mdash;it&rsquo;s the context window.
+          </p>
+
+          <hr class="essay-divider" />
+
+          <h2>Why this matters for AI-assisted development</h2>
+
+          <p>
+            When a human developer installs <code>llm-context-compressor</code>, they might check the README, scan the GitHub repo, read a few issues. When Cursor or Claude Code installs it, the decision is made in milliseconds based on the package name matching the prompt.
+          </p>
+
+          <p>
+            TrapDoor&rsquo;s package names were engineered for exactly this scenario. <code>prompt-engineering-toolkit</code> is what an AI assistant would suggest when you ask for prompt management. <code>workspace-config-loader</code> is what it would suggest when you need config loading. The names are the attack.
+          </p>
+
+          <p>
+            And once the package is installed, the <code>.cursorrules</code> or <code>CLAUDE.md</code> file provides a second payload delivery mechanism that doesn&rsquo;t require any code execution at all&mdash;just an AI assistant reading its own configuration.
+          </p>
+
+          <hr class="essay-divider" />
+
+          <h2>What to do about it</h2>
+
+          <p>
+            <strong>Gate your AI&rsquo;s installs.</strong> One command adds a behavioral gate to both Cursor and Claude Code:
+          </p>
+
+          <pre class="code-block"><code>npx proof-of-commitment hook</code></pre>
+
+          <p>
+            This intercepts every <code>npm install</code>, <code>pip install</code>, <code>cargo add</code>, and <code>go get</code> that your AI assistant runs. Packages with a score below the threshold get blocked before they touch your machine. Every TrapDoor package would have been caught.
+          </p>
+
+          <p>
+            For stricter protection (recommended if you work with crypto or AI infra):
+          </p>
+
+          <pre class="code-block"><code>COMMIT_HOOK_SEVERITY_BLOCK=HIGH npx proof-of-commitment hook</code></pre>
+
+          <p>
+            <strong>Audit what you already have:</strong>
+          </p>
+
+          <pre class="code-block"><code>npx proof-of-commitment --file package-lock.json</code></pre>
+
+          <p>
+            <strong>Check for poisoned config files.</strong> Search your project for zero-width characters in <code>.cursorrules</code>, <code>CLAUDE.md</code>, and any <code>.mdc</code> files:
+          </p>
+
+          <pre class="code-block"><code># Find zero-width Unicode in config files
+grep -rP '[\x200B\x200C\x200D\xFEFF\x2060]' .cursorrules CLAUDE.md **/*.mdc 2>/dev/null</code></pre>
+
+          <p>
+            If that grep returns matches, you have a problem.
+          </p>
+
+          <hr class="essay-divider" />
+
+          <h2>The pattern keeps repeating</h2>
+
+          <p>
+            LiteLLM in March. axios in late March. Shai-Hulud in May. Red Hat Miasma in June. Now TrapDoor.
+          </p>
+
+          <p>
+            Each attack escalates. LiteLLM was one package in one registry. Shai-Hulud was a self-propagating worm. Miasma forged provenance attestations. TrapDoor crossed three registries and weaponized AI assistants.
+          </p>
+
+          <p>
+            The entry point changes. The underlying pattern doesn&rsquo;t: packages with no behavioral history get published, and nothing gates the install.
+          </p>
+
+          <div class="essay-cta">
+            <a href="/audit/" class="btn-primary">Audit your dependencies &rarr;</a>
+            <a href="/get-started/" class="btn-ghost">Get free API key &rarr;</a>
+          </div>
+
+        </div>
+      </div>
+    </div>
+  </article>
+
+  <!-- Footer -->
+  <footer>
+    <div class="container">
+      <p><a href="/">Commit</a> &middot; Supply chain trust, measured behaviorally. <a href="/audit/">Audit</a> &middot; <a href="/rankings/">Rankings</a> &middot; <a href="/blog/">Writing</a> &middot; <a href="https://github.com/piiiico/proof-of-commitment">GitHub</a></p>
+    </div>
+  </footer>
+
+</Layout>

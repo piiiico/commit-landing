@@ -1,0 +1,593 @@
+---
+import Layout from '../../layouts/Layout.astro';
+---
+
+<Layout
+  title="Why npm audit Returns Zero Vulnerabilities for the Most Dangerous Packages — Commit"
+  description="npm audit, Snyk, Socket, and OpenSSF Scorecard all answer different questions. None of them measure structural supply chain risk — the conditions that make a package a high-value target before any malicious code exists. Here's the data."
+  canonical="https://getcommit.dev/blog/npm-audit-zero-vulnerabilities/"
+  publishDate="2026-04-21"
+>
+
+  <!-- Nav -->
+  <nav>
+    <div class="container nav-inner">
+      <a href="/" class="nav-brand">Commit</a>
+      <ul class="nav-links">
+        <li><a href="/extension">Extension</a></li>
+        <li><a href="/blog">Writing</a></li>
+        <li><a href="/pricing">Pricing</a></li><li><a href="/docs">Docs</a></li><li><a href="https://github.com/piiiico/proof-of-commitment" target="_blank" rel="noopener">GitHub</a></li>
+        <li><a href="mailto:pico@amdal.dev">Contact</a></li>
+      </ul>
+    </div>
+  </nav>
+
+  <!-- Essay -->
+  <article class="essay">
+    <div class="container">
+      <div class="editorial">
+
+        <!-- Header -->
+        <header class="essay-header">
+          <div class="essay-meta animate-in delay-1">
+            <time datetime="2026-04-21">April 21, 2026</time>
+          </div>
+          <h1 class="essay-title animate-in delay-2">Why npm audit Returns Zero Vulnerabilities for the Most Dangerous Packages</h1>
+          <p class="essay-subtitle animate-in delay-3">
+            The tools that protect npm all answer different questions. None of them
+            measure the thing that predicts supply chain attacks &mdash; structural
+            single points of failure. The data is public. The gap is enormous.
+          </p>
+          <p class="essay-byline animate-in delay-4">Pico</p>
+        </header>
+
+        <!-- Body -->
+        <div class="essay-body">
+
+          <p>
+            Before the ua-parser-js attack in October 2021, you could have run <code>npm audit</code> against any project that depended on it. It would have returned:
+          </p>
+
+          <pre><code>found 0 vulnerabilities</code></pre>
+
+          <p>
+            In October 2021, ua-parser-js &mdash; 7 million weekly downloads, used by Facebook, Microsoft, Amazon, and Google &mdash; was compromised. A malicious release deployed a cryptominer and a credential-stealing trojan to every CI pipeline and production server that ran <code>npm install</code>. The blast radius ran for four hours before the malicious versions were pulled.
+          </p>
+          <p>
+            Snyk returned the same result. Socket hadn&rsquo;t scanned the version yet. OpenSSF Scorecard gave the repository a respectable score. Every tool in the npm security ecosystem reported the same thing: nothing wrong here.
+          </p>
+          <p>
+            They were all telling the truth. And they were all missing the same thing.
+          </p>
+
+          <hr class="essay-divider" />
+
+          <h2>The measurement gap</h2>
+
+          <p>
+            The npm security ecosystem has four major tools. Each one answers a different question. None of them answers the question that would have caught the ua-parser-js attack in advance &mdash; because it&rsquo;s a question nobody is asking.
+          </p>
+
+          <h3>npm audit: &ldquo;Does this package have a reported CVE?&rdquo;</h3>
+
+          <p>
+            <code>npm audit</code> submits your dependency tree to GitHub&rsquo;s Advisory Database and returns known matches. It&rsquo;s free, built-in, and reactive. When someone discovers a vulnerability, documents it, and files a CVE, npm audit will eventually surface it.
+          </p>
+          <p>
+            The limitation is temporal. A CVE can only exist <em>after</em> an attack has been discovered, analyzed, and reported. For the ua-parser-js attack, the timeline was: malicious release on October 22 2021, community detection within hours, CVE filed days later. For that entire window, <code>npm audit</code> returned zero. For the years before the attack, while the structural conditions were visible, <code>npm audit</code> returned zero.
+          </p>
+          <p>
+            This isn&rsquo;t a bug. It&rsquo;s a design constraint. <code>npm audit</code> is a <em>known vulnerability scanner</em>. The industry treats it as a <em>supply chain security tool</em>. Those are different things.
+          </p>
+
+          <h3>Snyk: &ldquo;Does this package have a known vulnerability, and how do I fix it?&rdquo;</h3>
+
+          <p>
+            Snyk expands on npm audit with a proprietary vulnerability database, license compliance checking, SAST for your own code, and auto-fix PRs. It&rsquo;s excellent at what it does: once a vulnerability is known, Snyk helps you find it and fix it faster than npm audit alone.
+          </p>
+          <p>
+            But the detection model is the same. Snyk scans for known issues. It adds license risk (useful) and first-party code scanning (different problem). For unknown supply chain risk &mdash; the &ldquo;is this package a high-value attack target?&rdquo; question &mdash; Snyk has the same blind spot as npm audit. The database doesn&rsquo;t contain entries for attacks that haven&rsquo;t happened yet.
+          </p>
+
+          <h3>Socket: &ldquo;Is this package doing something dangerous right now?&rdquo;</h3>
+
+          <p>
+            Socket is genuinely different from the first two. Instead of looking up CVEs, it performs static analysis on the actual published package source. It looks for suspicious patterns: eval of dynamic strings, network calls to unusual endpoints, obfuscated code, environment variable access. For token-compromise attacks like ua-parser-js, Socket's approach catches malicious code within minutes of the bad version landing on the registry.
+          </p>
+          <p>
+            Minutes after publication is fast. It&rsquo;s also minutes after the malicious code was already available for installation. Socket catches attacks at the moment of publication, not before. It couldn&rsquo;t tell you in advance that a package is structurally risky &mdash; because the code is clean until the moment it isn&rsquo;t. The problem isn&rsquo;t in the code. The problem is in the structure.
+          </p>
+
+          <h3>OpenSSF Scorecard: &ldquo;Does this repository follow security best practices?&rdquo;</h3>
+
+          <p>
+            The OpenSSF Scorecard is the closest existing tool to measuring proactive risk. It evaluates GitHub repository hygiene: branch protection, CI/CD configuration, signed commits, dependency pinning, SAST integration. It answers whether the project <em>does security well</em>.
+          </p>
+          <p>
+            The gap is that Scorecard measures practices, not structural exposure. A repository can have perfect branch protection, signed releases, and comprehensive CI &mdash; and still have one person with the npm publish token. Scorecard evaluates the GitHub repository. The npm registry is a different system with different access controls and different attack surfaces. The axios repository followed reasonable practices. The vulnerability wasn&rsquo;t in the repo. It was in the registry credential.
+          </p>
+          <p>
+            Scorecard also doesn&rsquo;t weigh blast radius. A toy package with 100 downloads and a critical infrastructure package with 500 million downloads can get the same score. Structural risk requires both the vulnerability condition <em>and</em> the impact multiplier.
+          </p>
+
+          <hr class="essay-divider" />
+
+          <h2>The question nobody is asking</h2>
+
+          <p>
+            All four tools are reactive or practice-oriented. None asks the structural question:
+          </p>
+          <p style="font-style: italic; font-size: 1.1em; border-left: 3px solid var(--accent); padding-left: 1.25rem; margin: 2rem 0;">
+            Is this package a single point of failure at enormous scale &mdash; right now, before any attack has occurred?
+          </p>
+          <p>
+            That question is answerable from public data. The npm registry exposes maintainer count for every package. Download statistics are published weekly. You can compute the structural risk profile of any package in milliseconds without scanning a single line of code.
+          </p>
+          <p>
+            <a href="https://github.com/piiiico/proof-of-commitment">proof-of-commitment</a> asks this question. It scores packages across five behavioral dimensions &mdash; longevity, download momentum, release consistency, maintainer depth, and GitHub backing &mdash; and flags packages where the structural profile matches what supply chain attackers select for.
+          </p>
+          <p>
+            The critical flag condition is embarrassingly simple:
+          </p>
+
+          <pre><code>if (maintainerCount === 1 && weeklyDownloads > 10_000_000)
+  riskFlags.push("CRITICAL");</code></pre>
+
+          <p>
+            One maintainer. More than 10 million weekly downloads. That&rsquo;s it. If you&rsquo;re a skeptical engineer, you&rsquo;re thinking this is too simple. But simplicity is the point &mdash; the attack surface is structural, not behavioral. What matters is how many credentials an attacker needs to compromise and what they gain by doing so.
+          </p>
+
+          <hr class="essay-divider" />
+
+          <h2>The data</h2>
+
+          <p>
+            We ran 30 of the most-downloaded npm packages through the proof-of-commitment API on April 21, 2026. Here are the results, sorted by weekly downloads. Every number below is live from the npm registry.
+          </p>
+
+          <h3>CRITICAL: single maintainer, &gt;10M weekly downloads</h3>
+
+          <div style="overflow-x: auto; margin: 2rem 0;">
+            <table style="width: 100%; border-collapse: collapse; font-size: 0.875rem;">
+              <thead>
+                <tr style="border-bottom: 2px solid var(--border-light);">
+                  <th style="text-align: left; padding: 0.75rem 1rem 0.75rem 0; font-weight: 600;">Package</th>
+                  <th style="text-align: right; padding: 0.75rem 1rem; font-weight: 600;">Weekly DLs</th>
+                  <th style="text-align: center; padding: 0.75rem 1rem; font-weight: 600;">Maintainers</th>
+                  <th style="text-align: center; padding: 0.75rem 1rem; font-weight: 600;">Score</th>
+                  <th style="text-align: right; padding: 0.75rem 0 0.75rem 1rem; font-weight: 600;">Age</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr style="border-bottom: 1px solid var(--border-light);">
+                  <td style="padding: 0.75rem 1rem 0.75rem 0;"><code>minimatch</code></td>
+                  <td style="text-align: right; padding: 0.75rem 1rem;">569M</td>
+                  <td style="text-align: center; padding: 0.75rem 1rem;">1</td>
+                  <td style="text-align: center; padding: 0.75rem 1rem;">85</td>
+                  <td style="text-align: right; padding: 0.75rem 0 0.75rem 1rem;">14.8y</td>
+                </tr>
+                <tr style="border-bottom: 1px solid var(--border-light);">
+                  <td style="padding: 0.75rem 1rem 0.75rem 0;"><code>chalk</code></td>
+                  <td style="text-align: right; padding: 0.75rem 1rem;">412M</td>
+                  <td style="text-align: center; padding: 0.75rem 1rem;">1</td>
+                  <td style="text-align: center; padding: 0.75rem 1rem;">75</td>
+                  <td style="text-align: right; padding: 0.75rem 0 0.75rem 1rem;">12.7y</td>
+                </tr>
+                <tr style="border-bottom: 1px solid var(--border-light);">
+                  <td style="padding: 0.75rem 1rem 0.75rem 0;"><code>supports-color</code></td>
+                  <td style="text-align: right; padding: 0.75rem 1rem;">408M</td>
+                  <td style="text-align: center; padding: 0.75rem 1rem;">1</td>
+                  <td style="text-align: center; padding: 0.75rem 1rem;">75</td>
+                  <td style="text-align: right; padding: 0.75rem 0 0.75rem 1rem;">11.9y</td>
+                </tr>
+                <tr style="border-bottom: 1px solid var(--border-light);">
+                  <td style="padding: 0.75rem 1rem 0.75rem 0;"><code>glob</code></td>
+                  <td style="text-align: right; padding: 0.75rem 1rem;">335M</td>
+                  <td style="text-align: center; padding: 0.75rem 1rem;">1</td>
+                  <td style="text-align: center; padding: 0.75rem 1rem;">79</td>
+                  <td style="text-align: right; padding: 0.75rem 0 0.75rem 1rem;">15.3y</td>
+                </tr>
+                <tr style="border-bottom: 1px solid var(--border-light);">
+                  <td style="padding: 0.75rem 1rem 0.75rem 0;"><code>@types/node</code></td>
+                  <td style="text-align: right; padding: 0.75rem 1rem;">313M</td>
+                  <td style="text-align: center; padding: 0.75rem 1rem;">1</td>
+                  <td style="text-align: center; padding: 0.75rem 1rem;">88</td>
+                  <td style="text-align: right; padding: 0.75rem 0 0.75rem 1rem;">9.9y</td>
+                </tr>
+                <tr style="border-bottom: 1px solid var(--border-light);">
+                  <td style="padding: 0.75rem 1rem 0.75rem 0;"><code>has-flag</code></td>
+                  <td style="text-align: right; padding: 0.75rem 1rem;">267M</td>
+                  <td style="text-align: center; padding: 0.75rem 1rem;">1</td>
+                  <td style="text-align: center; padding: 0.75rem 1rem;">61</td>
+                  <td style="text-align: right; padding: 0.75rem 0 0.75rem 1rem;">10.8y</td>
+                </tr>
+                <tr style="border-bottom: 1px solid var(--border-light);">
+                  <td style="padding: 0.75rem 1rem 0.75rem 0;"><code>postcss</code></td>
+                  <td style="text-align: right; padding: 0.75rem 1rem;">210M</td>
+                  <td style="text-align: center; padding: 0.75rem 1rem;">1</td>
+                  <td style="text-align: center; padding: 0.75rem 1rem;">88</td>
+                  <td style="text-align: right; padding: 0.75rem 0 0.75rem 1rem;">12.5y</td>
+                </tr>
+                <tr style="border-bottom: 1px solid var(--border-light);">
+                  <td style="padding: 0.75rem 1rem 0.75rem 0;"><code>esbuild</code></td>
+                  <td style="text-align: right; padding: 0.75rem 1rem;">201M</td>
+                  <td style="text-align: center; padding: 0.75rem 1rem;">1</td>
+                  <td style="text-align: center; padding: 0.75rem 1rem;">88</td>
+                  <td style="text-align: right; padding: 0.75rem 0 0.75rem 1rem;">8.4y</td>
+                </tr>
+                <tr style="border-bottom: 1px solid var(--border-light);">
+                  <td style="padding: 0.75rem 1rem 0.75rem 0;"><code>chokidar</code></td>
+                  <td style="text-align: right; padding: 0.75rem 1rem;">161M</td>
+                  <td style="text-align: center; padding: 0.75rem 1rem;">1</td>
+                  <td style="text-align: center; padding: 0.75rem 1rem;">81</td>
+                  <td style="text-align: right; padding: 0.75rem 0 0.75rem 1rem;">14y</td>
+                </tr>
+                <tr style="border-bottom: 1px solid var(--border-light);">
+                  <td style="padding: 0.75rem 1rem 0.75rem 0;"><code>zod</code></td>
+                  <td style="text-align: right; padding: 0.75rem 1rem;">160M</td>
+                  <td style="text-align: center; padding: 0.75rem 1rem;">1</td>
+                  <td style="text-align: center; padding: 0.75rem 1rem;">83</td>
+                  <td style="text-align: right; padding: 0.75rem 0 0.75rem 1rem;">6.1y</td>
+                </tr>
+                <tr style="border-bottom: 1px solid var(--border-light);">
+                  <td style="padding: 0.75rem 1rem 0.75rem 0;"><code>lodash</code></td>
+                  <td style="text-align: right; padding: 0.75rem 1rem;">147M</td>
+                  <td style="text-align: center; padding: 0.75rem 1rem;">1</td>
+                  <td style="text-align: center; padding: 0.75rem 1rem;">87</td>
+                  <td style="text-align: right; padding: 0.75rem 0 0.75rem 1rem;">14y</td>
+                </tr>
+                <tr style="border-bottom: 1px solid var(--border-light);">
+                  <td style="padding: 0.75rem 1rem 0.75rem 0;"><code>rimraf</code></td>
+                  <td style="text-align: right; padding: 0.75rem 1rem;">130M</td>
+                  <td style="text-align: center; padding: 0.75rem 1rem;">1</td>
+                  <td style="text-align: center; padding: 0.75rem 1rem;">77</td>
+                  <td style="text-align: right; padding: 0.75rem 0 0.75rem 1rem;">15.2y</td>
+                </tr>
+                <tr style="border-bottom: 1px solid var(--border-light);">
+                  <td style="padding: 0.75rem 1rem 0.75rem 0;"><code>is-core-module</code></td>
+                  <td style="text-align: right; padding: 0.75rem 1rem;">127M</td>
+                  <td style="text-align: center; padding: 0.75rem 1rem;">1</td>
+                  <td style="text-align: center; padding: 0.75rem 1rem;">69</td>
+                  <td style="text-align: right; padding: 0.75rem 0 0.75rem 1rem;">11.6y</td>
+                </tr>
+                <tr style="border-bottom: 1px solid var(--border-light);">
+                  <td style="padding: 0.75rem 1rem 0.75rem 0;"><code>mkdirp</code></td>
+                  <td style="text-align: right; padding: 0.75rem 1rem;">116M</td>
+                  <td style="text-align: center; padding: 0.75rem 1rem;">1</td>
+                  <td style="text-align: center; padding: 0.75rem 1rem;">67</td>
+                  <td style="text-align: right; padding: 0.75rem 0 0.75rem 1rem;">15.3y</td>
+                </tr>
+                <tr style="border-bottom: 1px solid var(--border-light);">
+                  <td style="padding: 0.75rem 1rem 0.75rem 0;"><code>once</code></td>
+                  <td style="text-align: right; padding: 0.75rem 1rem;">111M</td>
+                  <td style="text-align: center; padding: 0.75rem 1rem;">1</td>
+                  <td style="text-align: center; padding: 0.75rem 1rem;">68</td>
+                  <td style="text-align: right; padding: 0.75rem 0 0.75rem 1rem;">13.7y</td>
+                </tr>
+                <tr style="border-bottom: 1px solid var(--border-light);">
+                  <td style="padding: 0.75rem 1rem 0.75rem 0;"><code>wrappy</code></td>
+                  <td style="text-align: right; padding: 0.75rem 1rem;">107M</td>
+                  <td style="text-align: center; padding: 0.75rem 1rem;">1</td>
+                  <td style="text-align: center; padding: 0.75rem 1rem;">61</td>
+                  <td style="text-align: right; padding: 0.75rem 0 0.75rem 1rem;">11.6y</td>
+                </tr>
+                <tr style="border-bottom: 1px solid var(--border-light); background: rgba(220, 38, 38, 0.04);">
+                  <td style="padding: 0.75rem 1rem 0.75rem 0;"><code>axios</code> &#x2020;</td>
+                  <td style="text-align: right; padding: 0.75rem 1rem;">100M</td>
+                  <td style="text-align: center; padding: 0.75rem 1rem;">1</td>
+                  <td style="text-align: center; padding: 0.75rem 1rem;">86</td>
+                  <td style="text-align: right; padding: 0.75rem 0 0.75rem 1rem;">11.6y</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <p style="font-size: 0.85rem; color: var(--ink-subtle);">
+            ua-parser-js (2021): 1 maintainer, token compromised, malicious code deployed. All other packages in this table share the same structural risk profile.
+          </p>
+
+          <p>
+            17 packages. Combined weekly downloads: <strong>3.8 billion</strong>. Every one of them has a single npm maintainer. Every one of them returns <code>found 0 vulnerabilities</code> from <code>npm audit</code>. Every one of them is structurally identical to ua-parser-js before it was compromised in 2021.
+          </p>
+
+          <h3>Not flagged: same download scale, distributed control</h3>
+
+          <div style="overflow-x: auto; margin: 2rem 0;">
+            <table style="width: 100%; border-collapse: collapse; font-size: 0.875rem;">
+              <thead>
+                <tr style="border-bottom: 2px solid var(--border-light);">
+                  <th style="text-align: left; padding: 0.75rem 1rem 0.75rem 0; font-weight: 600;">Package</th>
+                  <th style="text-align: right; padding: 0.75rem 1rem; font-weight: 600;">Weekly DLs</th>
+                  <th style="text-align: center; padding: 0.75rem 1rem; font-weight: 600;">Maintainers</th>
+                  <th style="text-align: center; padding: 0.75rem 1rem; font-weight: 600;">Score</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr style="border-bottom: 1px solid var(--border-light);">
+                  <td style="padding: 0.75rem 1rem 0.75rem 0;"><code>debug</code></td>
+                  <td style="text-align: right; padding: 0.75rem 1rem;">556M</td>
+                  <td style="text-align: center; padding: 0.75rem 1rem;">2</td>
+                  <td style="text-align: center; padding: 0.75rem 1rem;">79</td>
+                </tr>
+                <tr style="border-bottom: 1px solid var(--border-light);">
+                  <td style="padding: 0.75rem 1rem 0.75rem 0;"><code>commander</code></td>
+                  <td style="text-align: right; padding: 0.75rem 1rem;">370M</td>
+                  <td style="text-align: center; padding: 0.75rem 1rem;">2</td>
+                  <td style="text-align: center; padding: 0.75rem 1rem;">86</td>
+                </tr>
+                <tr style="border-bottom: 1px solid var(--border-light);">
+                  <td style="padding: 0.75rem 1rem 0.75rem 0;"><code>tslib</code></td>
+                  <td style="text-align: right; padding: 0.75rem 1rem;">360M</td>
+                  <td style="text-align: center; padding: 0.75rem 1rem;">6</td>
+                  <td style="text-align: center; padding: 0.75rem 1rem;">86</td>
+                </tr>
+                <tr style="border-bottom: 1px solid var(--border-light);">
+                  <td style="padding: 0.75rem 1rem 0.75rem 0;"><code>source-map</code></td>
+                  <td style="text-align: right; padding: 0.75rem 1rem;">280M</td>
+                  <td style="text-align: center; padding: 0.75rem 1rem;">23</td>
+                  <td style="text-align: center; padding: 0.75rem 1rem;">84</td>
+                </tr>
+                <tr style="border-bottom: 1px solid var(--border-light);">
+                  <td style="padding: 0.75rem 1rem 0.75rem 0;"><code>uuid</code></td>
+                  <td style="text-align: right; padding: 0.75rem 1rem;">242M</td>
+                  <td style="text-align: center; padding: 0.75rem 1rem;">2</td>
+                  <td style="text-align: center; padding: 0.75rem 1rem;">85</td>
+                </tr>
+                <tr style="border-bottom: 1px solid var(--border-light);">
+                  <td style="padding: 0.75rem 1rem 0.75rem 0;"><code>acorn</code></td>
+                  <td style="text-align: right; padding: 0.75rem 1rem;">198M</td>
+                  <td style="text-align: center; padding: 0.75rem 1rem;">3</td>
+                  <td style="text-align: center; padding: 0.75rem 1rem;">89</td>
+                </tr>
+                <tr style="border-bottom: 1px solid var(--border-light);">
+                  <td style="padding: 0.75rem 1rem 0.75rem 0;"><code>yargs</code></td>
+                  <td style="text-align: right; padding: 0.75rem 1rem;">174M</td>
+                  <td style="text-align: center; padding: 0.75rem 1rem;">2</td>
+                  <td style="text-align: center; padding: 0.75rem 1rem;">81</td>
+                </tr>
+                <tr style="border-bottom: 1px solid var(--border-light);">
+                  <td style="padding: 0.75rem 1rem 0.75rem 0;"><code>react</code></td>
+                  <td style="text-align: right; padding: 0.75rem 1rem;">127M</td>
+                  <td style="text-align: center; padding: 0.75rem 1rem;">2</td>
+                  <td style="text-align: center; padding: 0.75rem 1rem;">91</td>
+                </tr>
+                <tr style="border-bottom: 1px solid var(--border-light);">
+                  <td style="padding: 0.75rem 1rem 0.75rem 0;"><code>dotenv</code></td>
+                  <td style="text-align: right; padding: 0.75rem 1rem;">120M</td>
+                  <td style="text-align: center; padding: 0.75rem 1rem;">3</td>
+                  <td style="text-align: center; padding: 0.75rem 1rem;">94</td>
+                </tr>
+                <tr>
+                  <td style="padding: 0.75rem 1rem 0.75rem 0;"><code>webpack</code></td>
+                  <td style="text-align: right; padding: 0.75rem 1rem;">44M</td>
+                  <td style="text-align: center; padding: 0.75rem 1rem;">8</td>
+                  <td style="text-align: center; padding: 0.75rem 1rem;">97</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <p>
+            The difference is not download count, project maturity, or code quality. It&rsquo;s how many people have to be compromised before an attacker gets the <code>npm publish</code> token for a package that runs on millions of systems.
+          </p>
+
+          <hr class="essay-divider" />
+
+          <h2>Why behavioral signals matter</h2>
+
+          <p>
+            The analogy that works best is credit scoring versus fraud detection.
+          </p>
+          <p>
+            Fraud detection (CVE scanning, code analysis) catches bad transactions after they happen. It&rsquo;s reactive and essential. You absolutely need it. But credit scoring &mdash; the assessment of <em>structural conditions</em> that predict risk &mdash; operates on a different timescale. It asks: given the observable behavior of this entity, how likely is a future event?
+          </p>
+          <p>
+            In the npm ecosystem, the structural signals are:
+          </p>
+          <ul>
+            <li><strong>Maintainer count.</strong> How many people can push a release? One is a single point of failure. Two or more means an attacker needs multiple credentials or social engineering campaigns.</li>
+            <li><strong>Download volume.</strong> What&rsquo;s the blast radius of a compromise? 100 downloads/week is a test project. 500 million is critical infrastructure.</li>
+            <li><strong>Publish frequency.</strong> Is the maintainer actively present, or did they push a release three years ago and walk away? Abandoned packages are targets for maintainer takeover.</li>
+            <li><strong>Contributor concentration.</strong> Are commits coming from one person or a team? Bus factor matters even without malice &mdash; what happens when the one maintainer burns out, changes jobs, or loses their laptop?</li>
+          </ul>
+          <p>
+            These are <em>leading indicators</em>. They describe conditions that exist before an attack, and they describe the conditions that make an attack rational from the attacker&rsquo;s perspective. An attacker choosing between two targets will pick the one that requires fewer credentials to compromise and delivers more blast radius per effort.
+          </p>
+          <p>
+            That calculus is trivially computable from public data. Every number in the tables above comes from the npm registry API and the GitHub API. No scanning. No proprietary database. No machine learning. The data was always there.
+          </p>
+
+          <hr class="essay-divider" />
+
+          <h2>The 2&times;2 matrix</h2>
+
+          <p>
+            The clearest way to see the gap is as a two-dimensional space. Every security tool operates in one quadrant:
+          </p>
+
+          <div style="overflow-x: auto; margin: 2rem 0;">
+            <table style="width: 100%; border-collapse: collapse; font-size: 0.875rem;">
+              <thead>
+                <tr style="border-bottom: 2px solid var(--border-light);">
+                  <th style="padding: 0.75rem 1rem 0.75rem 0;"></th>
+                  <th style="text-align: center; padding: 0.75rem 1rem; font-weight: 600;">Code-level</th>
+                  <th style="text-align: center; padding: 0.75rem 1rem; font-weight: 600;">Structural</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr style="border-bottom: 1px solid var(--border-light);">
+                  <td style="padding: 0.75rem 1rem 0.75rem 0; font-weight: 600;">Reactive</td>
+                  <td style="text-align: center; padding: 0.75rem 1rem;">npm audit, Snyk<br /><span style="font-size: 0.8em; color: var(--ink-subtle);">&ldquo;Known bug in this version&rdquo;</span></td>
+                  <td style="text-align: center; padding: 0.75rem 1rem; color: var(--ink-subtle);">&mdash;</td>
+                </tr>
+                <tr style="border-bottom: 1px solid var(--border-light);">
+                  <td style="padding: 0.75rem 1rem 0.75rem 0; font-weight: 600;">Near-realtime</td>
+                  <td style="text-align: center; padding: 0.75rem 1rem;">Socket<br /><span style="font-size: 0.8em; color: var(--ink-subtle);">&ldquo;Suspicious code right now&rdquo;</span></td>
+                  <td style="text-align: center; padding: 0.75rem 1rem; color: var(--ink-subtle);">&mdash;</td>
+                </tr>
+                <tr>
+                  <td style="padding: 0.75rem 1rem 0.75rem 0; font-weight: 600;">Proactive</td>
+                  <td style="text-align: center; padding: 0.75rem 1rem;">OpenSSF Scorecard<br /><span style="font-size: 0.8em; color: var(--ink-subtle);">&ldquo;Good repo practices&rdquo;</span></td>
+                  <td style="text-align: center; padding: 0.75rem 1rem; color: var(--accent); font-weight: 600;">proof-of-commitment<br /><span style="font-size: 0.8em; color: var(--ink-subtle);">&ldquo;Structural risk profile&rdquo;</span></td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <p>
+            The bottom-right quadrant &mdash; proactive structural analysis &mdash; is the one that catches the conditions <em>before</em> the event. Every other quadrant is essential but responds to events rather than anticipating them.
+          </p>
+          <p>
+            This is not a replacement for npm audit, Snyk, or Socket. It&rsquo;s a dimension they don&rsquo;t cover. If you&rsquo;re only using CVE scanners, you&rsquo;re missing the structural layer. If you&rsquo;re only using structural scoring, you&rsquo;re missing known vulnerabilities. The responsible answer is both.
+          </p>
+
+          <hr class="essay-divider" />
+
+          <h2>What we don&rsquo;t do well</h2>
+
+          <p>
+            Honesty about limitations:
+          </p>
+          <ul>
+            <li><strong>We don&rsquo;t scan code.</strong> If a maintainer intentionally pushes a malicious release, we don&rsquo;t detect the payload. Socket does. We tell you the structural risk existed; Socket tells you the exploit happened. You need both.</li>
+            <li><strong>The CRITICAL threshold is a blunt instrument.</strong> &ldquo;One maintainer and 10M+ downloads&rdquo; catches the right packages, but the number 10M is a line we drew. We chose it because the two real-world attacks in 2026 (LiteLLM and axios) both met this condition. That&rsquo;s validated in the narrow sense and undertested in the broad sense.</li>
+            <li><strong>Maintainer count is a proxy.</strong> The npm registry reports the number of accounts with publish access. It doesn&rsquo;t tell us about 2FA enrollment, token scoping, or whether those accounts are active. Two maintainers where one is dormant isn&rsquo;t materially different from one maintainer.</li>
+            <li><strong>We generate false positives.</strong> 17 packages flag CRITICAL. Two were attacked. The other 15 are correctly identified as <em>structurally vulnerable</em> but may never be targeted. A false positive in this context means &ldquo;we flagged a real structural risk where the attack hasn&rsquo;t happened yet.&rdquo; Whether that&rsquo;s useful depends on whether you&rsquo;d rather be warned or surprised.</li>
+            <li><strong>No CVE database.</strong> We don&rsquo;t tell you about known bugs. If you replace <code>npm audit</code> with this, you&rsquo;re worse off. Use both.</li>
+          </ul>
+
+          <hr class="essay-divider" />
+
+          <h2>The complementary argument</h2>
+
+          <p>
+            The supply chain security stack should have three layers:
+          </p>
+          <ol>
+            <li><strong>Known vulnerability scanning</strong> (npm audit, Snyk). Catches documented bugs. The table stakes.</li>
+            <li><strong>Code-level anomaly detection</strong> (Socket). Catches malicious code at publish time. The early warning system.</li>
+            <li><strong>Structural risk assessment</strong> (proof-of-commitment). Identifies packages that <em>will be</em> high-value targets. The leading indicator.</li>
+          </ol>
+          <p>
+            Right now, most teams use layer 1 only. The sophisticated ones add layer 2. Almost nobody uses layer 3, because until two real-world attacks validated the signal, the &ldquo;bus factor&rdquo; argument was theoretical.
+          </p>
+          <p>
+            It&rsquo;s not theoretical. The ua-parser-js attack (2021), event-stream (2018), and colors.js (2022) all targeted the exact structural condition that proof-of-commitment flags: a single maintainer controlling a package with massive download volume. All three had clean code, no CVEs, good repo practices. The structural profile was the only anomaly.
+          </p>
+          <p>
+            14 packages in the top 100 still match that CRITICAL profile today. minimatch alone has 473 million weekly downloads.
+          </p>
+
+          <hr class="essay-divider" />
+
+          <h2>Try it</h2>
+
+          <p>
+            The entire tool is open source and zero-install:
+          </p>
+
+          <pre><code># Scan individual packages
+npx proof-of-commitment axios zod chalk lodash
+
+# Scan your project's dependencies
+npx proof-of-commitment --file package-lock.json
+
+# Yarn or pnpm
+npx proof-of-commitment --file yarn.lock
+npx proof-of-commitment --file pnpm-lock.yaml</code></pre>
+
+          <p>
+            Or use the web interface: <a href="/audit">getcommit.dev/audit</a>
+          </p>
+          <p>
+            Or add it to CI with one line:
+          </p>
+
+          <pre><code># .github/workflows/audit.yml
+- uses: piiiico/proof-of-commitment@main
+  with:
+    comment-on-pr: true</code></pre>
+
+          <p>
+            The API is public, the scoring is documented, and the methodology is in the README. If you think the threshold is wrong or the signals are incomplete, open an issue. This is a conversation about <em>what we should be measuring</em>, not a product pitch.
+          </p>
+
+          <hr class="essay-divider" />
+
+          <h2>The bottom line</h2>
+
+          <p>
+            <code>npm audit</code> returns zero vulnerabilities for minimatch, chalk, glob, @types/node, postcss, esbuild, zod, lodash, and 9 other packages that are structurally identical to ua-parser-js before the 2021 compromise. They have clean code, no CVEs, and active maintenance. They also have a single maintainer controlling publish access to hundreds of millions of weekly installations.
+          </p>
+          <p>
+            The tools that protect npm do good work. But they&rsquo;re measuring the wrong layer for the attacks that are actually happening. A supply chain attacker doesn&rsquo;t need to find a bug in your code. They need to compromise one credential. And for 17 of the most critical packages in the JavaScript ecosystem, one credential is all there is.
+          </p>
+          <p>
+            The data to identify these packages is public, computable, and free. The only question is whether you check before the CVE or after.
+          </p>
+
+          <hr class="essay-divider" />
+
+          <p class="essay-coda">
+            <em>All data in this essay was collected via the proof-of-commitment API on April 21, 2026. Numbers reflect live npm registry data at time of publication. Source: <a href="https://github.com/piiiico/proof-of-commitment">github.com/piiiico/proof-of-commitment</a></em>
+          </p>
+          <p class="essay-coda">
+            <em>Audit your dependencies: <a href="/audit">getcommit.dev/audit</a> | <a href="https://github.com/piiiico/proof-of-commitment">GitHub</a></em>
+          </p>
+          <p class="essay-coda">
+            <em>For a detailed comparison of all four tools: <a href="/blog/commit-vs-socket-snyk-npm-audit">Commit vs. Socket, Snyk, and npm audit</a></em>
+          </p>
+
+        </div>
+      </div>
+    </div>
+  </article>
+
+  <!-- Newsletter -->
+  <section class="newsletter-section">
+    <div class="container">
+      <div class="editorial reveal">
+        <h2 style="margin-bottom: 0.75rem;">Stay in the loop</h2>
+        <p style="margin-bottom: 2rem; font-size: 1rem;">
+          Early access, research updates, and the occasional strong opinion.
+        </p>
+
+        <form
+          action="https://buttondown.email/api/emails/embed-subscribe/commitgraph"
+          method="post"
+          target="popupwindow"
+          class="newsletter-form"
+        >
+          <input
+            type="email"
+            name="email"
+            placeholder="you@example.com"
+            required
+            class="newsletter-input"
+          />
+          <button type="submit" class="btn-primary" style="white-space: nowrap;">
+            Subscribe
+          </button>
+        </form>
+
+        <p class="newsletter-note">No spam. Unsubscribe anytime.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer>
+    <div class="container footer-inner">
+      <span class="footer-brand">Commit</span>
+      <ul class="footer-links">
+        <li><a href="/">Home</a></li>
+        <li><a href="/extension">Extension</a></li>
+        <li><a href="/blog">Writing</a></li>
+        <li><a href="/pricing">Pricing</a></li><li><a href="/docs">Docs</a></li><li><a href="https://github.com/piiiico/proof-of-commitment" target="_blank" rel="noopener">GitHub</a></li>
+        <li><a href="mailto:pico@amdal.dev">Contact</a></li>
+      </ul>
+      <span class="footer-locale">Stavanger, Norway</span>
+    </div>
+  </footer>
+
+</Layout>

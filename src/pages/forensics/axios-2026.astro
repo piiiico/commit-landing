@@ -1,0 +1,331 @@
+---
+import Layout from '../../layouts/Layout.astro';
+---
+
+<Layout
+  title="Axios Supply Chain Attack: March 2026 Post-Mortem — Commit"
+  description="Post-mortem analysis of the axios npm compromise (March 30–31, 2026). Stolen npm token, malicious versions 1.14.1 and 0.30.4, cross-platform RAT. npm audit showed 0 vulnerabilities before the attack."
+  canonical="https://getcommit.dev/forensics/axios-2026/"
+>
+
+  <!-- Nav -->
+  <nav>
+    <div class="container nav-inner">
+      <a href="/" class="nav-brand">Commit</a>
+      <ul class="nav-links">
+        <li><a href="/extension">Extension</a></li>
+        <li><a href="/blog">Writing</a></li>
+        <li><a href="/pricing">Pricing</a></li><li><a href="/docs">Docs</a></li><li><a href="https://github.com/piiiico/proof-of-commitment" target="_blank" rel="noopener">GitHub</a></li>
+        <li><a href="mailto:pico@amdal.dev">Contact</a></li>
+      </ul>
+    </div>
+  </nav>
+
+  <!-- Essay -->
+  <article class="essay">
+    <div class="container">
+      <div class="editorial">
+
+        <!-- Header -->
+        <header class="essay-header">
+          <div class="essay-meta animate-in delay-1">
+            <time datetime="2026-04-18">April 18, 2026</time>
+            <span style="margin-left: 1rem; font-size: 0.8rem; background: #fff0f0; color: #c00; padding: 0.2rem 0.5rem; border-radius: 3px; font-weight: 600; letter-spacing: 0.02em;">FORENSICS</span>
+          </div>
+          <h1 class="essay-title animate-in delay-2">Axios Supply Chain Attack: March 2026 Post-Mortem</h1>
+          <p class="essay-subtitle animate-in delay-3">
+            On March 30–31, 2026, axios was compromised. Stolen npm token. Malicious versions 1.14.1 and 0.30.4 published. Cross-platform RAT delivered to every project that updated.
+            npm audit showed 0 vulnerabilities before, during, and after. This is the post-mortem.
+          </p>
+          <p class="essay-byline animate-in delay-4">Pico</p>
+        </header>
+
+        <!-- Body -->
+        <div class="essay-body">
+
+          <!-- Attack confirmed notice -->
+          <div style="background: #fef2f2; border: 1px solid #fecaca; border-left: 4px solid #dc2626; border-radius: 4px; padding: 1.5rem; margin: 2rem 0;">
+            <h3 style="margin: 0 0 0.5rem 0; font-size: 1rem; text-transform: uppercase; letter-spacing: 0.08em; color: #dc2626;">Attack Confirmed: March 30–31, 2026</h3>
+            <p style="margin: 0; font-size: 0.9rem;">
+              axios was compromised. Malicious versions <code>axios@1.14.1</code> and <code>axios@0.30.4</code> were published via a stolen npm token for maintainer jasonsaayman. Both versions dropped a cross-platform Remote Access Trojan. npm audit returned zero vulnerabilities for both versions. This page was originally written as a structural threat model. The attack occurred before publication.
+            </p>
+          </div>
+
+          <!-- Attack summary -->
+          <div style="background: #fafafa; border: 1px solid #e0e0e0; border-left: 4px solid #c00; border-radius: 4px; padding: 1.5rem; margin: 2rem 0;">
+            <h3 style="margin: 0 0 1rem 0; font-size: 1rem; text-transform: uppercase; letter-spacing: 0.08em; color: #c00;">Confirmed Attack Profile</h3>
+            <div style="display: grid; grid-template-columns: auto 1fr; gap: 0.4rem 1rem; font-size: 0.9rem;">
+              <strong>Package:</strong><span>axios (99M weekly downloads)</span>
+              <strong>Date:</strong><span>March 30–31, 2026</span>
+              <strong>Attack vector:</strong><span>Stolen long-lived npm access token for maintainer <code>jasonsaayman</code></span>
+              <strong>Malicious versions:</strong><span><code>axios@1.14.1</code>, <code>axios@0.30.4</code></span>
+              <strong>Payload:</strong><span>Cross-platform Remote Access Trojan (RAT)</span>
+              <strong>Pre-stage:</strong><span>Attacker published <code>plain-crypto-js@4.2.0</code> 18 hours before the attack to avoid zero-history alarms</span>
+              <strong>npm audit warnings:</strong><span>Zero: before, during, and after</span>
+              <strong>Detection:</strong><span>StepSecurity's AI Package Analyst detected outbound C2 connection at 1.1 seconds into install</span>
+            </div>
+          </div>
+
+          <h2>What Actually Happened</h2>
+
+          <p>
+            The attacker obtained a long-lived npm access token for jasonsaayman, axios's sole maintainer. Not an OIDC token (those are ephemeral and scoped to GitHub Actions workflows), just a classic long-lived credential. The attacker changed the registered email on the account to <code>ifstap@proton.me</code>.
+          </p>
+
+          <p>
+            At 00:21 UTC on March 31, <code>axios@1.14.1</code> was published. An hour later, <code>axios@0.30.4</code> followed, poisoning both the stable and legacy release branches simultaneously. The forensic tell: legitimate axios releases include <code>"_npmUser": &#123;"email": "npm-oidc-no-reply@github.com", "trustedPublisher": &#123;...&#125;&#125;</code>. The malicious versions showed <code>"email": "ifstap@proton.me"</code> with no <code>gitHead</code> or OIDC binding. Neither version exists in the GitHub repo: no tags, no commits, no release branches.
+          </p>
+
+          <p>
+            The pre-staging was deliberate. The attack dependency, <code>plain-crypto-js@4.2.0</code>, designed to look like a legitimate crypto-js alternative, was published 18 hours before the axios releases specifically to avoid "zero-history package" detection heuristics.
+          </p>
+
+          <hr style="margin: 2rem 0; border: none; border-top: 1px solid var(--rule);" />
+
+          <h2>The Structural Gap: Not a Code Vulnerability</h2>
+
+          <p>
+            This is what makes axios a different class of risk. There is no vulnerable code in axios. No buffer overflow, no SQL injection, no dependency with a known CVE. The package is healthy by every quality metric:
+          </p>
+
+          <ul>
+            <li>11.6 years of consistent maintenance</li>
+            <li>Active release cadence (35+ major versions)</li>
+            <li>Growing download trend (101M weekly)</li>
+            <li>Healthy GitHub activity</li>
+          </ul>
+
+          <p>
+            The vulnerability was <strong>structural</strong>: one person controlled publish access for a package that 101 million weekly installs depended on. One token was the only barrier between clean software and backdoored software entering every JavaScript project that uses axios.
+          </p>
+
+          <h3>Why Existing Tools Would Miss It</h3>
+
+          <ul>
+            <li><strong>npm audit:</strong> Scans for known CVEs. There are none. A credential compromise attack uses no known vulnerability in axios itself.</li>
+            <li><strong>Snyk / Socket.dev:</strong> Dependency vulnerability scanners look for known malicious patterns or CVEs. A newly published version with fresh malicious code has no prior signature to match.</li>
+            <li><strong>SBOMs (Software Bill of Materials):</strong> Inventories what you have. Does not measure who controls what you have, or what happens if that person's token is stolen.</li>
+            <li><strong>Code audits:</strong> You cannot audit a package that hasn't been published yet. The malicious code doesn't exist until the attacker publishes it.</li>
+            <li><strong>OIDC/Provenance:</strong> Even packages with CI/CD provenance configured have human maintainers with long-lived personal tokens as bypass paths. A human maintainer's personal access token is always an exception path to OIDC controls.</li>
+          </ul>
+
+          <p>
+            None of these tools measure the structural fragility that made this attack possible: <strong>a single person's credential concentration relative to the blast radius of their package.</strong>
+          </p>
+
+          <hr style="margin: 2rem 0; border: none; border-top: 1px solid var(--rule);" />
+
+          <h2>The Structural Signals Right Now</h2>
+
+          <p>
+            Here is what <code>npx proof-of-commitment axios</code> returns today:
+          </p>
+
+          <div style="overflow-x: auto; margin: 2rem 0;">
+            <table style="width: 100%; border-collapse: collapse; font-size: 0.875rem;">
+              <thead>
+                <tr style="border-bottom: 2px solid var(--ink);">
+                  <th style="text-align: left; padding: 0.5rem 0.75rem;">Package</th>
+                  <th style="text-align: right; padding: 0.5rem 0.75rem;">Score</th>
+                  <th style="text-align: center; padding: 0.5rem 0.75rem;">Risk</th>
+                  <th style="text-align: right; padding: 0.5rem 0.75rem;">Maintainers</th>
+                  <th style="text-align: right; padding: 0.5rem 0.75rem;">Downloads/wk</th>
+                  <th style="text-align: right; padding: 0.5rem 0.75rem;">Age</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr style="border-bottom: 2px solid var(--ink); background: #fff5f5;">
+                  <td style="padding: 0.4rem 0.75rem; font-weight: bold;">axios</td>
+                  <td style="padding: 0.4rem 0.75rem; text-align: right;">86</td>
+                  <td style="padding: 0.4rem 0.75rem; text-align: center; color: #c00;">🔴 CRITICAL</td>
+                  <td style="padding: 0.4rem 0.75rem; text-align: right; font-weight: bold;">1</td>
+                  <td style="padding: 0.4rem 0.75rem; text-align: right;">82M</td>
+                  <td style="padding: 0.4rem 0.75rem; text-align: right;">11.6 yrs</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <p>
+            The score breakdown: <code>longevity=25 momentum=22 releases=20 maintainers=4 github=15</code>
+          </p>
+
+          <p>
+            Score 86 is nearly perfect. Axios is, by behavioral metrics, an exceptionally well-maintained package. The <strong>CRITICAL</strong> flag fires despite this, because the behavioral score measures quality and quality is orthogonal to structural risk. A well-maintained package with 82M weekly downloads and one maintainer is not safer than a poorly-maintained package with the same profile. It's a higher-value target.
+          </p>
+
+          <h3>Why the CRITICAL Flag Exists</h3>
+
+          <p>
+            The CRITICAL threshold is: <strong>sole maintainer + &gt;10M weekly downloads.</strong>
+          </p>
+
+          <p>
+            This threshold is deliberately aggressive. At 10 million weekly installs, compromising a single person's publish credential has enough blast radius to be worth a nation-state level attack. The ua-parser-js attack (2021) demonstrated exactly this: 7M weekly downloads, one token, nation-state level response required.
+          </p>
+
+          <p>
+            Axios has been in the CRITICAL zone throughout its history. Anyone running the audit today sees the same flag. Anyone who runs it tomorrow will see the same flag, unless the governance changes.
+          </p>
+
+          <hr style="margin: 2rem 0; border: none; border-top: 1px solid var(--rule);" />
+
+          <h2>The Specific Structural Gap: Long-Lived Tokens vs. OIDC</h2>
+
+          <p>
+            This attack vector doesn't require a zero-day. It requires a token management failure: specifically, the existence of a long-lived npm access token that is not rotated or expired.
+          </p>
+
+          <p>
+            The npm ecosystem has increasingly adopted OIDC-based provenance, where packages published through CI/CD pipelines can include cryptographic proof of origin. When this works, it creates a verifiable chain: code commit → CI pipeline → npm publish → provenance attestation.
+          </p>
+
+          <p>
+            Long-lived personal access tokens are the bypass. They exist outside OIDC. They don't expire by default. They aren't tied to a specific pipeline or commit. They represent a maintainer saying "I want to be able to publish from anywhere, at any time, without going through CI." That's a reasonable developer ergonomics preference. It's also, for a 101M-download package, a catastrophic governance gap.
+          </p>
+
+          <p>
+            The structural question proof-of-commitment surfaces is not "does this package have provenance?" It's: <strong>how many people can publish this package, and what's the blast radius if any one of those credentials is stolen?</strong> For axios: one person controls publish for 82 million weekly downloads.
+          </p>
+
+          <hr style="margin: 2rem 0; border: none; border-top: 1px solid var(--rule);" />
+
+          <h2>What Would Change the Structural Risk</h2>
+
+          <p>
+            The structural interventions that would materially reduce risk are not code audits, SBOMs, or Snyk scans:
+          </p>
+
+          <ol>
+            <li><strong>Requiring OIDC for all publishes:</strong> Disabling personal access token publishing for packages above a download threshold. npm has the mechanism; it's not enforced.</li>
+            <li><strong>Multi-maintainer governance:</strong> Any package with &gt;10M weekly downloads requiring at least two publishers to sign a release. Industry convention doesn't enforce this.</li>
+            <li><strong>Token rotation policy:</strong> Long-lived tokens expiring automatically after 90 days. npm supports this; most maintainers don't use it.</li>
+            <li><strong>Monitoring for single-maintainer critical packages:</strong> Your security team running <code>npx proof-of-commitment --file package.json</code> today will flag axios for review.</li>
+          </ol>
+
+          <p>
+            The last one is the one you can act on today.
+          </p>
+
+          <hr style="margin: 2rem 0; border: none; border-top: 1px solid var(--rule);" />
+
+          <h2>The Broader Pattern</h2>
+
+          <p>
+            axios is not unusual. It's the expected result of a structural condition that exists throughout the npm ecosystem. Packages with massive blast radius maintained by a single person, secured by a single credential.
+          </p>
+
+          <p>
+            We analyzed <a href="/blog/state-of-npm-trust-april-2026">the top 50 npm packages by downloads</a> and found that a significant fraction share the same structural profile as axios: sole maintainer, critical download volume, no secondary publish controls. The attack surface isn't one package. It's a category of packages that have organically grown far beyond what their governance model was designed to support.
+          </p>
+
+          <p>
+            npm audit will tell you when a CVE is filed against one of these packages. That's after the attack. The behavioral signal (sole maintainer, massive downloads, token concentration) exists before the attack, permanently, until the governance changes.
+          </p>
+
+          <hr style="margin: 2rem 0; border: none; border-top: 1px solid var(--rule);" />
+
+          <h2>Check Your Dependencies</h2>
+
+          <p>
+            Run your own <code>package.json</code> through proof-of-commitment in under 10 seconds:
+          </p>
+
+          <pre style="background: #f5f5f5; padding: 1rem; border-radius: 4px; overflow-x: auto; font-size: 0.85rem;"><code># Check a specific package
+npx proof-of-commitment axios
+
+# Check your whole project
+npx proof-of-commitment --file package.json</code></pre>
+
+          <p>
+            The output will flag packages in the same structural risk category as axios. CRITICAL means: if this maintainer's credential is compromised, your users receive the payload.
+          </p>
+
+          <p>
+            Web interface: <a href="https://getcommit.dev/audit">getcommit.dev/audit</a>
+          </p>
+
+          <p>
+            GitHub Action (runs on every PR, comments with risk scores):
+          </p>
+
+          <pre style="background: #f5f5f5; padding: 1rem; border-radius: 4px; overflow-x: auto; font-size: 0.85rem;"><code>- uses: piiiico/proof-of-commitment@main
+  with:
+    fail-on-critical: false
+    comment-on-pr: true</code></pre>
+
+          <p>
+            MCP server for Claude Desktop, Cursor, or Windsurf to check packages while you code:
+          </p>
+
+          <pre style="background: #f5f5f5; padding: 1rem; border-radius: 4px; overflow-x: auto; font-size: 0.85rem;"><code>&#123;
+  "mcpServers": &#123;
+    "proof-of-commitment": &#123;
+      "type": "streamable-http",
+      "url": "https://poc-backend.amdal-dev.workers.dev/mcp"
+    &#125;
+  &#125;
+&#125;</code></pre>
+
+          <hr class="essay-divider" />
+
+          <p class="essay-coda">
+            <em>We're building <a href="/">Commit</a>: trust infrastructure for the autonomous economy. Behavioral commitment data, not declarations.</em>
+          </p>
+          <p class="essay-coda">
+            <em>Related: <a href="/blog/three-npm-disasters-that-were-predictable">Three npm Disasters That Were Predictable</a> · <a href="/blog/state-of-npm-trust-april-2026">State of npm Trust: April 2026</a> · <a href="/thesis">The Thesis</a></em>
+          </p>
+
+        </div>
+      </div>
+    </div>
+  </article>
+
+  <!-- Newsletter -->
+  <section class="newsletter-section">
+    <div class="container">
+      <div class="editorial reveal">
+        <h2 style="margin-bottom: 0.75rem;">Stay in the loop</h2>
+        <p style="margin-bottom: 2rem; font-size: 1rem;">
+          Early access, research updates, and the occasional strong opinion.
+        </p>
+
+        <form
+          action="https://buttondown.email/api/emails/embed-subscribe/commitgraph"
+          method="post"
+          target="popupwindow"
+          class="newsletter-form"
+        >
+          <input
+            type="email"
+            name="email"
+            placeholder="you@example.com"
+            required
+            class="newsletter-input"
+          />
+          <button type="submit" class="btn-primary" style="white-space: nowrap;">
+            Subscribe
+          </button>
+        </form>
+
+        <p class="newsletter-note">No spam. Unsubscribe anytime.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer>
+    <div class="container footer-inner">
+      <span class="footer-brand">Commit</span>
+      <ul class="footer-links">
+        <li><a href="/">Home</a></li>
+        <li><a href="/extension">Extension</a></li>
+        <li><a href="/blog">Writing</a></li>
+        <li><a href="/pricing">Pricing</a></li><li><a href="/docs">Docs</a></li><li><a href="https://github.com/piiiico/proof-of-commitment" target="_blank" rel="noopener">GitHub</a></li>
+        <li><a href="mailto:pico@amdal.dev">Contact</a></li>
+      </ul>
+      <span class="footer-locale">Stavanger, Norway</span>
+    </div>
+  </footer>
+
+</Layout>

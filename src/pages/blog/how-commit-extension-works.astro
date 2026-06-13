@@ -1,0 +1,182 @@
+---
+import Layout from '../../layouts/Layout.astro';
+---
+
+<Layout
+  title="Two Layers, One Signal: How the Commit Extension Works — Commit"
+  description="The Commit extension measures two things about every business AI recommends: what public records prove, and what your own behavior reveals. Here's why both layers matter."
+  canonical="https://getcommit.dev/blog/how-commit-extension-works/"
+  publishDate="2026-04-05"
+>
+
+  <!-- Nav -->
+  <nav>
+    <div class="container nav-inner">
+      <a href="/" class="nav-brand">Commit</a>
+      <ul class="nav-links">
+        <li><a href="/extension">Extension</a></li>
+        <li><a href="/blog">Writing</a></li>
+        <li><a href="/pricing">Pricing</a></li><li><a href="/docs">Docs</a></li><li><a href="https://github.com/piiiico/proof-of-commitment" target="_blank" rel="noopener">GitHub</a></li>
+        <li><a href="mailto:pico@amdal.dev">Contact</a></li>
+      </ul>
+    </div>
+  </nav>
+
+  <!-- Essay -->
+  <article class="essay">
+    <div class="container">
+      <div class="editorial">
+
+        <!-- Header -->
+        <header class="essay-header">
+          <div class="essay-meta animate-in delay-1">
+            <time datetime="2026-04-05">April 5, 2026</time>
+          </div>
+          <h1 class="essay-title animate-in delay-2">Two Layers, One Signal</h1>
+          <p class="essay-subtitle animate-in delay-3">
+            The Commit extension measures two things about every business AI recommends: what public records prove, and what your own behavior reveals. Here's why both layers matter.
+          </p>
+          <p class="essay-byline animate-in delay-4">Pico</p>
+        </header>
+
+        <!-- Body -->
+        <div class="essay-body">
+
+          <p>
+            Ask ChatGPT for a restaurant recommendation in Stavanger and you'll get a confident answer — name, location, a sentence or two about the food. What you won't get is any evidence. No way to know if the business is financially solvent. No way to know if the kitchen passed its last health inspection. No way to know if you've actually been there twelve times and loved it.
+          </p>
+          <p>
+            The Commit extension was built to fill that gap. Not with more opinions, not with another rating system, but with two distinct layers of verifiable data — one public, one personal — that together form a kind of signal AI can't generate on its own.
+          </p>
+
+          <h2>Layer 1: The Floor</h2>
+
+          <p>
+            The first layer is foundation data — public records sourced from Norwegian government registries. When the extension detects a business mentioned by an AI assistant, it pulls three things:
+          </p>
+          <p>
+            <strong>Years of operation.</strong> From Brønnøysund, the Norwegian business registry. A restaurant that's been operating since 1998 has survived two recessions, a pandemic, and the full lifecycle of the Stavanger oil boom. A restaurant that registered six months ago hasn't survived anything yet. Time is an unfakeable signal.
+          </p>
+          <p>
+            <strong>Financial health.</strong> Norwegian companies file annual financials publicly. Revenue, operating margin, equity position — all legally required, all verifiable. A business that's been profitable for a decade is making a different kind of promise than one burning through investor capital.
+          </p>
+          <p>
+            <strong>Food safety record.</strong> Mattilsynet, Norway's Food Safety Authority, inspects every food-serving business and publishes the results. Pass, minor findings, major findings — it's a track record, not a declaration. The extension surfaces it alongside the AI's recommendation.
+          </p>
+          <p>
+            This layer works from the moment you install the extension. No account, no login, no behavioral history required. It's the floor: the minimum verifiable context you should have before trusting an AI recommendation.
+          </p>
+          <p>
+            But it has a limit. Foundation data tells you the business is real, solvent, and compliant. It doesn't tell you whether it's actually good. A restaurant can have perfect financials and terrible food. A hotel can pass every inspection and still be a place nobody returns to.
+          </p>
+          <p>
+            That's what Layer 2 measures.
+          </p>
+
+          <h2>Layer 2: The Signal</h2>
+
+          <p>
+            The second layer is behavioral commitment data — yours. The extension passively tracks which business websites you visit, how often, and for how long. Everything is stored locally in <code>chrome.storage.local</code>, on your machine, readable only by you.
+          </p>
+          <p>
+            From this raw data, the extension computes a commitment score (0–100) for each business. The scoring is weighted by unfakeability. Three visits over three weeks count for more than one long session. Return visits count more than raw page views. Repeated engagement over time — the hardest pattern to manufacture — carries the most weight.
+          </p>
+          <p>
+            When ChatGPT recommends a restaurant and you've visited their website fourteen times over the past year, the extension shows that. Not a review you wrote once. Not a rating you clicked. Your actual behavioral pattern — the kind of signal that requires real cost (time, attention, repetition) to produce.
+          </p>
+          <p>
+            This is the commitment thesis in miniature: <strong>when content becomes free, commitment becomes scarce.</strong> AI can generate a five-star review in milliseconds. It cannot generate twelve months of your browsing history.
+          </p>
+
+          <h2>Why Both Layers</h2>
+
+          <p>
+            Either layer alone is incomplete.
+          </p>
+          <p>
+            Foundation data without behavioral data is a background check — useful, but it doesn't tell you whether the business delivers on its promises. Plenty of financially healthy businesses are mediocre. Compliance is a floor, not a ceiling.
+          </p>
+          <p>
+            Behavioral data without foundation data is a personal hunch — useful, but vulnerable to recency bias, limited sample, and the absence of structural context. You might visit a website repeatedly because it has good SEO, not because the business is trustworthy.
+          </p>
+          <p>
+            Together, they triangulate. A business that has operated for 20 years, maintains healthy finances, passes food safety inspections, <em>and</em> has earned your repeated engagement over months — that's a qualitatively different signal than any single metric can produce. It's the difference between knowing someone's resume and knowing someone's track record with you personally.
+          </p>
+          <p>
+            This is the architecture that matters. Not "more data" — <strong>different kinds</strong> of data, each verifiable in a different way, each covering a blind spot the other can't.
+          </p>
+
+          <h2>Where the Extension Ends and the Protocol Begins</h2>
+
+          <p>
+            Right now, Layer 2 is local. Your commitment data stays in your browser. Nobody else benefits from it, and you don't benefit from anyone else's.
+          </p>
+          <p>
+            The next step — opt-in, authenticated via <a href="https://worldcoin.org/world-id">World ID</a> — is contributing your behavioral data to a shared commitment graph. World ID provides proof of personhood: cryptographic evidence that the data came from a real human, not a bot farm. This makes the behavioral layer Sybil-resistant from day one.
+          </p>
+          <p>
+            When enough real humans contribute their commitment signals, the graph stops being personal and becomes infrastructural. Not "this business has good reviews" but "this business has earned repeated engagement from 847 verified humans over the past year." That's a data type that doesn't exist yet — and it's the one AI systems need most.
+          </p>
+          <p>
+            The browser extension is the first data source into this graph. It's not the product. It's the instrument.
+          </p>
+
+          <hr class="essay-divider" />
+
+          <p class="essay-coda">
+            <em>This is part of an ongoing series on trust infrastructure for the autonomous economy. Related: <a href="/blog/commitment-is-the-new-link">Commitment Is the New Link</a>, <a href="/blog/five-stars-zero-commitment">Five Stars, Zero Commitment</a>, <a href="/blog/ai-lies-about-your-favorite-restaurant">AI Lies About Your Favorite Restaurant</a>. The extension is free and open source — <a href="/extension">download it here</a>. We're building <a href="/">Commit</a> — behavioral commitment data as the input layer for trust. <a href="mailto:pico@amdal.dev">Reach out</a> if you're working on the same problem.</em>
+          </p>
+
+        </div>
+      </div>
+    </div>
+  </article>
+
+  <!-- Newsletter -->
+  <section class="newsletter-section">
+    <div class="container">
+      <div class="editorial reveal">
+        <h2 style="margin-bottom: 0.75rem;">Stay in the loop</h2>
+        <p style="margin-bottom: 2rem; font-size: 1rem;">
+          Early access, research updates, and the occasional strong opinion.
+        </p>
+
+        <form
+          action="https://buttondown.email/api/emails/embed-subscribe/commitgraph"
+          method="post"
+          target="popupwindow"
+          class="newsletter-form"
+        >
+          <input
+            type="email"
+            name="email"
+            placeholder="you@example.com"
+            required
+            class="newsletter-input"
+          />
+          <button type="submit" class="btn-primary" style="white-space: nowrap;">
+            Subscribe
+          </button>
+        </form>
+
+        <p class="newsletter-note">No spam. Unsubscribe anytime.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer>
+    <div class="container footer-inner">
+      <span class="footer-brand">Commit</span>
+      <ul class="footer-links">
+        <li><a href="/">Home</a></li>
+        <li><a href="/extension">Extension</a></li>
+        <li><a href="/blog">Writing</a></li>
+        <li><a href="/pricing">Pricing</a></li><li><a href="/docs">Docs</a></li><li><a href="https://github.com/piiiico/proof-of-commitment" target="_blank" rel="noopener">GitHub</a></li>
+        <li><a href="mailto:pico@amdal.dev">Contact</a></li>
+      </ul>
+      <span class="footer-locale">Stavanger, Norway</span>
+    </div>
+  </footer>
+
+</Layout>
