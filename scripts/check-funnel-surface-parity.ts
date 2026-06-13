@@ -9,6 +9,20 @@
  *   3. pricing.astro CONTEXT_BY_CAMPAIGN
  *   4. proof-of-commitment worker.ts VALID_SOURCES
  *
+ * AND (added 2026-06-13 second pass): for every ref that has a CUSTOM
+ * HERO_BY_REF entry whose promise diverges from the generic web/REST
+ * default, there MUST be a matching source-aware branch in:
+ *   5. get-started.astro success-note (HOOK_SOURCES / MCP_SOURCES /
+ *      CLI_SOURCES / CI_SOURCES / README_SOURCES) — so the success state
+ *      after API-key creation echoes the hero promise instead of pivoting
+ *      to generic "Authorization: Bearer" REST snippets.
+ *   6. worker.ts welcome-email step 2 (HOOK_SOURCES_WELCOME /
+ *      MCP_SOURCES_WELCOME / CI_SOURCES_WELCOME / README_SOURCES_WELCOME)
+ *      — so the inbox follow-up keeps the same next-action frame the hero
+ *      and success-note already committed to.
+ * Refs whose HERO_BY_REF copy genuinely points at the REST/web flow (audit-
+ * web*, etc.) are allowlisted in DEFAULT_OK_REFS.
+ *
  * Exit 0 = full parity. Exit 1 = gap found (printed to stderr).
  *
  * Pattern history: funnel-surface-gap recurred 5× in 3 weeks
@@ -21,6 +35,12 @@
  * that fell through all 4 gates → source=web. The same funnel-surface-gap
  * pattern, just on a discovery surface the gate didn't watch. Adding the
  * READMEs to scanned sources catches the next variant before deploy.
+ *
+ * 2026-06-13 (second pass): the README refs reached source attribution but
+ * still hit the GENERIC default on success-note and welcome-email step 2,
+ * pivoting the chain mid-flow from "score your tree" to "Authorization:
+ * Bearer". Sites 5-6 added so the next custom-hero ref can't ship that
+ * inconsistency unnoticed.
  *
  * SCOPE: literal URL strings in npm-package/index.js + README.md +
  *        npm-package/README.md. No AST parsing, no generalising beyond 4 gates.
@@ -108,6 +128,49 @@ for (const ref of pricingRefs) {
 for (const ref of allRefs) {
   if (!inValidSources(workerSrc, ref))
     gaps.push(`MISSING: worker.ts VALID_SOURCES["${ref}"]`);
+}
+
+// ── Site 5+6: chain consistency for custom-hero refs ─────────────────────────
+// Refs that ARE custom-hero entries but legitimately map to the REST/web
+// default (the hero copy itself promises Authorization: Bearer / API usage).
+// All other custom-hero refs must appear in one of the downstream
+// source-aware branches in success-note (get-started.astro) AND welcome-
+// email step 2 (worker.ts) — else the chain pivots mid-flow.
+const DEFAULT_OK_REFS = new Set<string>([
+  "audit-web",
+  "audit-web-429",
+  "audit-web-critical",
+  "audit-web-compromised",
+  "audit-web-healthy",
+]);
+
+/** Branch-set names searched in success-note (get-started.astro) and welcome-email (worker.ts). */
+const SUCCESS_NOTE_BRANCH_SETS = ["HOOK_SOURCES", "MCP_SOURCES", "CLI_SOURCES", "CI_SOURCES", "README_SOURCES"];
+const WELCOME_BRANCH_SETS      = ["HOOK_SOURCES_WELCOME", "MCP_SOURCES_WELCOME", "CI_SOURCES_WELCOME", "README_SOURCES_WELCOME", "CLI_SOURCES_WELCOME"];
+
+/** Check whether a source key appears inside any of the named Set literals in source text. */
+function inAnySet(src: string, setNames: string[], key: string): boolean {
+  for (const name of setNames) {
+    // Each set is declared as `const NAME = new Set(['a', 'b', ...]);` — single line.
+    const decl = new RegExp(`const\\s+${name}\\s*=\\s*new\\s+Set\\(\\[([^\\]]*)\\]\\)`, "m");
+    const m = src.match(decl);
+    if (!m) continue;
+    const inner = m[1];
+    if (inner.includes(`'${key}'`) || inner.includes(`"${key}"`)) return true;
+  }
+  return false;
+}
+
+// All custom-hero refs that aren't on the REST/web default allowlist.
+for (const ref of getStartedRefs) {
+  if (!inBlock(gsSrc, "HERO_BY_REF", ref)) continue; // already flagged by site 1
+  if (DEFAULT_OK_REFS.has(ref)) continue;
+
+  if (!inAnySet(gsSrc, SUCCESS_NOTE_BRANCH_SETS, ref))
+    gaps.push(`MISSING: get-started.astro success-note branch for '${ref}' (add to one of ${SUCCESS_NOTE_BRANCH_SETS.join("/")}) — hero promises something other than REST/web; success-note will fall through to generic Authorization: Bearer.`);
+
+  if (!inAnySet(workerSrc, WELCOME_BRANCH_SETS, ref))
+    gaps.push(`MISSING: worker.ts welcome-email step 2 branch for '${ref}' (add to one of ${WELCOME_BRANCH_SETS.join("/")}) — hero promises something other than CI-gate onboarding; step 2 will fall through to generic "Add a CI gate" copy.`);
 }
 
 // ── Report ───────────────────────────────────────────────────────────────────
