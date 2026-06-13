@@ -1,0 +1,233 @@
+---
+import Layout from '../../layouts/Layout.astro';
+---
+
+<Layout
+  title="Your Agent Is Installing Dependencies Right Now — Commit"
+  description="88% of organizations have had agent security incidents. Thousands of MCP servers exposed, API keys stolen at scale. The identity problem is being solved. The supply chain problem hasn't started."
+  canonical="https://getcommit.dev/blog/agents-installing-dependencies/"
+  publishDate="2026-04-28"
+>
+
+  <!-- Nav -->
+  <nav>
+    <div class="container nav-inner">
+      <a href="/" class="nav-brand">Commit</a>
+      <ul class="nav-links">
+        <li><a href="/extension">Extension</a></li>
+        <li><a href="/blog">Writing</a></li>
+        <li><a href="/pricing">Pricing</a></li><li><a href="/docs">Docs</a></li><li><a href="https://github.com/piiiico/proof-of-commitment" target="_blank" rel="noopener">GitHub</a></li>
+        <li><a href="mailto:pico@amdal.dev">Contact</a></li>
+      </ul>
+    </div>
+  </nav>
+
+  <!-- Essay -->
+  <article class="essay">
+    <div class="container">
+      <div class="editorial">
+
+        <!-- Header -->
+        <header class="essay-header">
+          <div class="essay-meta animate-in delay-1">
+            <time datetime="2026-04-28">April 28, 2026</time>
+          </div>
+          <h1 class="essay-title animate-in delay-2">Your Agent Is Installing Dependencies Right Now</h1>
+          <p class="essay-subtitle animate-in delay-3">
+            88% of organizations have had agent security incidents. Thousands of MCP servers are exposed, with API keys stolen at scale. A supply chain attack on Bitwarden CLI specifically targeted AI coding tool credentials. The identity layer is being solved. The supply chain layer hasn&rsquo;t started.
+          </p>
+          <p class="essay-byline animate-in delay-4">Pico</p>
+        </header>
+
+        <!-- Body -->
+        <div class="essay-body">
+
+          <p>
+            Three things happened in the last two weeks that, taken together, signal a phase shift in how to think about AI agent security.
+          </p>
+          <p>
+            First: A Gravitee survey found that 88% of organizations have had confirmed or suspected agent security incidents. Not theoretical. Operational.
+          </p>
+          <p>
+            Second: A supply chain attack on Bitwarden CLI specifically targeted AI coding tool credentials &mdash; not developer laptops in general, but the tokens used by tools like Claude Code and Cursor.
+          </p>
+          <p>
+            Third: MCPwn &mdash; the first named exploit campaign targeting MCP servers &mdash; exposed thousands of MCP server instances across dozens of countries. One CVE in that campaign (<a href="https://nvd.nist.gov/vuln/detail/CVE-2026-25253" target="_blank" rel="noopener">CVE-2026-25253</a>, CVSS 8.8) provides unauthenticated access to stored Claude, OpenAI, and Google AI API keys.
+          </p>
+          <p>
+            The agent security wave is real. What I want to argue is that one part of it is being systematically underweighted: supply chain risk.
+          </p>
+
+          <hr class="essay-divider" />
+
+          <h2>The Identity Layer Is Being Solved</h2>
+
+          <p>
+            Okta launches Okta for AI Agents on April 30 &mdash; shadow agent detection, universal logout, agent gateway. Google Cloud Agent Identity and Microsoft Entra have shipped equivalent features. The 45% of organizations still using shared API keys for agents now have no excuse.
+          </p>
+          <p>
+            Identity is the question of whether an agent is authorized to act. L3 identity is now commoditized. Multiple vendors, GA, enterprise-grade.
+          </p>
+          <p>
+            But identity is not supply chain. Identity tells you <em>who</em> is acting. Supply chain tells you whether what the agent is running can be trusted. These are different questions. The ecosystem is answering the first. Nobody is answering the second.
+          </p>
+
+          <hr class="essay-divider" />
+
+          <h2>Why Agents Are Different From Developers</h2>
+
+          <p>
+            A human developer installs a dependency deliberately. They see the package name. They possibly scan the changelog. The act is bounded &mdash; one package, one decision, visible in a diff.
+          </p>
+          <p>
+            An agent installs packages at agent speed. Claude Code scaffolds a new project: 15 dependencies land before you&rsquo;ve opened the terminal. A coding agent adds a utility library: one <code>npm install</code>, no review gate, no diff shown. A DevOps agent sets up a deployment pipeline: dozens of packages, all selected by the agent&rsquo;s reasoning, none reviewed package-by-package by a human.
+          </p>
+          <p>
+            The Bitwarden CLI attack was an early data point. Attackers already know that agents install tools. They&rsquo;ve started designing attacks for the installation path specifically.
+          </p>
+          <p>
+            The threat model has changed. The old version: human installs package &rarr; package runs on their machine &rarr; credential stolen. The new version: agent is given a task &rarr; agent installs packages &rarr; agent runs code &rarr; agent&rsquo;s credentials stolen &rarr; agent acts on behalf of the human at agent speed, without human oversight of each step.
+          </p>
+          <p>
+            The surface area compounds. A compromised agent isn&rsquo;t one developer with a stolen key &mdash; it&rsquo;s every action that agent takes, autonomously, until someone notices.
+          </p>
+
+          <hr class="essay-divider" />
+
+          <h2>The MCP Ecosystem Is the Proof of Concept</h2>
+
+          <p>
+            MCP servers are the packages agents install. Agents connect to them, trust them, and execute their tools &mdash; often without any review of what those tools actually do.
+          </p>
+          <p>
+            When OX Security submitted a proof-of-concept server to 11 major MCP marketplaces to test their review processes, <strong>9 of 11 published it without detection.</strong> No automated scanning caught it. No human review flagged it. The server passed every gate between upload and installation.
+          </p>
+          <p>
+            MCPwn exposed thousands of MCP server instances. The broader ecosystem accumulated 138 CVEs in 2026. CVE-2026-25253 (CVSS 8.8) provides unauthenticated access to stored API tokens for Claude, OpenAI, and Google AI &mdash; plain text, no authentication required.
+          </p>
+          <p>
+            This is the npm crisis, compressed. npm took a decade to get serious about supply chain security, accumulating event-stream (2018), ua-parser-js (2021), colors.js (2022), and a long tail of smaller incidents along the way. MCP is compressing that same trajectory into months, with a larger attack surface &mdash; arbitrary code execution, not just package-time injection &mdash; and higher stakes, because the credentials at risk are the keys to the AI systems themselves.
+          </p>
+
+          <hr class="essay-divider" />
+
+          <h2>When Meta Gets It Wrong From the Inside</h2>
+
+          <p>
+            A recent Meta internal incident added a different angle. An employee implemented an AI agent&rsquo;s recommendation without adequate review, briefly exposing internal data to wrong parties. External attacker? No. Compromised package? No. An AI-assisted decision that outpaced the human review process around it.
+          </p>
+          <p>
+            The question the incident raises: it&rsquo;s not just &ldquo;what does this agent have permission to do?&rdquo; It&rsquo;s &ldquo;what does this agent <em>think</em> it has permission to do &mdash; and what does it depend on to make that judgment?&rdquo;
+          </p>
+          <p>
+            The packages agents depend on shape their behavior. A tool that lies about its scope. An MCP server that expands its own permissions. A dependency that alters the agent&rsquo;s output in ways designed to trigger downstream actions. These aren&rsquo;t hypothetical attack classes. They&rsquo;re the classes that the MCPwn campaign and the OX Security research proved work at scale.
+          </p>
+
+          <hr class="essay-divider" />
+
+          <h2>What Point-in-Time Scanning Misses</h2>
+
+          <p>
+            The response to every supply chain crisis follows the same playbook: add more review gates. More scanning at submission. More automated checks. More human oversight at intake.
+          </p>
+          <p>
+            Every time, the attack happens after the gate closes.
+          </p>
+          <p>
+            event-stream passed every npm check when it was first published. ua-parser-js had a clean audit record when its maintainer account was compromised. The MCPwn proof-of-concept passed 9 of 11 marketplace reviews. The pattern is consistent: <strong>review gates verify state at a point in time. The attack happens later.</strong>
+          </p>
+          <p>
+            We&rsquo;ve written about this as the <a href="/blog/toctou-of-trust">TOCTOU of trust</a>. When we applied behavioral trust scoring retrospectively to the worst npm supply chain incidents, the structural signals were present before every attack. event-stream&rsquo;s injected dependency scored 13 out of 100. ua-parser-js had single-maintainer concentration risk before its compromise. The signals were there. Nobody was reading them continuously.
+          </p>
+
+          <hr class="essay-divider" />
+
+          <h2>What Comes Next</h2>
+
+          <p>
+            The identity problem is getting solved. Okta, Google, Microsoft &mdash; all three major identity providers now treat agents as first-class principals. The authentication layer is shipping.
+          </p>
+          <p>
+            The supply chain problem is open. Nobody is continuously monitoring the packages agents depend on &mdash; not at agent speed, not with behavioral signals, not in a way that degrades trust in real time when a package&rsquo;s structural risk profile changes.
+          </p>
+          <p>
+            This is what <a href="/">Commit</a> was built for. Behavioral trust scoring &mdash; not point-in-time scans, not CVE matching, but continuous monitoring of the structural signals that predict supply chain incidents before they appear in a vulnerability database. Maintainer concentration. Dependency injection. Publish anomalies. The signals that were present before event-stream, before ua-parser-js, before every incident where &ldquo;npm audit returned zero vulnerabilities.&rdquo;
+          </p>
+          <p>
+            Run it against what your agents depend on:
+          </p>
+
+          <pre><code>npx proof-of-commitment npm &lt;package&gt;
+
+# Or for MCP servers:
+npx proof-of-commitment mcp-remote &lt;server&gt;
+
+# Web audit:
+# https://getcommit.dev/audit</code></pre>
+
+          <p>
+            The agent security wave is real. The identity layer is being solved. Supply chain is the layer that&rsquo;s still open &mdash; and agents are installing dependencies faster than the security model is moving.
+          </p>
+
+          <hr class="essay-divider" />
+
+          <p class="essay-coda">
+            <em>Sources: Gravitee (February 2026) &mdash; 88% agent security incidents; <a href="https://nvd.nist.gov/vuln/detail/CVE-2026-25253" target="_blank" rel="noopener">CVE-2026-25253</a> (CVSS 8.8); <a href="https://www.ox.security/blog/the-mother-of-all-ai-supply-chains-critical-systemic-vulnerability-at-the-core-of-the-mcp/" target="_blank" rel="noopener">OX Security</a> marketplace poisoning research (April 2026); MCPwn 135K+ instances (<a href="https://nvd.nist.gov/vuln/detail/CVE-2026-33032" target="_blank" rel="noopener">CVE-2026-33032</a>); Meta AI agent breach (April 2026); Okta for AI Agents GA announcement (April 2026).</em>
+          </p>
+          <p class="essay-coda">
+            <em>Audit your dependencies: <a href="/audit">getcommit.dev/audit</a> | <a href="/blog/ci-trust-scoring-tutorial">CI integration</a> | <a href="https://github.com/piiiico/proof-of-commitment" target="_blank" rel="noopener">GitHub</a></em>
+          </p>
+
+        </div>
+      </div>
+    </div>
+  </article>
+
+  <!-- Newsletter -->
+  <section class="newsletter-section">
+    <div class="container">
+      <div class="editorial reveal">
+        <h2 style="margin-bottom: 0.75rem;">Stay in the loop</h2>
+        <p style="margin-bottom: 2rem; font-size: 1rem;">
+          Early access, research updates, and the occasional strong opinion.
+        </p>
+
+        <form
+          action="https://buttondown.email/api/emails/embed-subscribe/commitgraph"
+          method="post"
+          target="popupwindow"
+          class="newsletter-form"
+        >
+          <input
+            type="email"
+            name="email"
+            placeholder="you@example.com"
+            required
+            class="newsletter-input"
+          />
+          <button type="submit" class="btn-primary" style="white-space: nowrap;">
+            Subscribe
+          </button>
+        </form>
+
+        <p class="newsletter-note">No spam. Unsubscribe anytime.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer>
+    <div class="container footer-inner">
+      <span class="footer-brand">Commit</span>
+      <ul class="footer-links">
+        <li><a href="/">Home</a></li>
+        <li><a href="/extension">Extension</a></li>
+        <li><a href="/blog">Writing</a></li>
+        <li><a href="/pricing">Pricing</a></li><li><a href="/docs">Docs</a></li><li><a href="https://github.com/piiiico/proof-of-commitment" target="_blank" rel="noopener">GitHub</a></li>
+        <li><a href="mailto:pico@amdal.dev">Contact</a></li>
+      </ul>
+      <span class="footer-locale">Stavanger, Norway</span>
+    </div>
+  </footer>
+
+</Layout>

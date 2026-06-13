@@ -1,0 +1,230 @@
+---
+import Layout from '../../layouts/Layout.astro';
+---
+
+<Layout
+  title="Your pnpm monorepo has 4 CRITICAL packages. Here's how to find them in 10 seconds. — Commit"
+  description="I scanned a pnpm workspace with 4 packages. 4 of the 10 unique dependencies flagged CRITICAL — single npm publisher, tens of millions of weekly downloads each. pnpm audit won't catch this."
+  canonical="https://getcommit.dev/blog/pnpm-monorepo-supply-chain-audit/"
+  publishDate="2026-05-09"
+>
+
+  <!-- Nav -->
+  <nav>
+    <div class="container nav-inner">
+      <a href="/" class="nav-brand">Commit</a>
+      <ul class="nav-links">
+        <li><a href="/extension">Extension</a></li>
+        <li><a href="/blog">Writing</a></li>
+        <li><a href="/pricing">Pricing</a></li><li><a href="/docs">Docs</a></li><li><a href="https://github.com/piiiico/proof-of-commitment" target="_blank" rel="noopener">GitHub</a></li>
+        <li><a href="mailto:pico@amdal.dev">Contact</a></li>
+      </ul>
+    </div>
+  </nav>
+
+  <!-- Essay -->
+  <article class="essay">
+    <div class="container">
+      <div class="editorial">
+
+        <!-- Header -->
+        <header class="essay-header">
+          <div class="essay-meta animate-in delay-1">
+            <time datetime="2026-05-09">May 9, 2026</time>
+          </div>
+          <h1 class="essay-title animate-in delay-2">Your pnpm monorepo has 4 CRITICAL packages. Here&rsquo;s how to find them in 10 seconds.</h1>
+          <p class="essay-subtitle animate-in delay-3">
+            I scanned a pnpm workspace with 4 packages. 4 out of 10 unique dependencies flagged CRITICAL &mdash; not CVEs, but single-publisher concentration risk.
+          </p>
+          <p class="essay-byline animate-in delay-4">Pico</p>
+        </header>
+
+        <!-- Body -->
+        <div class="essay-body">
+
+          <p>
+            Monorepos feel safer. Everything is in one place. Shared dependencies get deduped. The lockfile is one file.
+          </p>
+          <p>
+            The thing monorepos actually do is concentrate your attack surface and make it invisible. Each workspace has its own <code>package.json</code>, its own <code>dependencies</code>, its own exposure. And when you run <code>pnpm audit</code>, you get the same CVE scan you&rsquo;d get on a single project. It doesn&rsquo;t tell you what happens when you look at the aggregate.
+          </p>
+
+          <hr class="essay-divider" />
+
+          <h2>The scan</h2>
+
+          <p>
+            I ran <a href="https://github.com/piiiico/proof-of-commitment">Proof of Commitment</a> v1.5.0 against a pnpm workspace with 4 packages. The tool reads <code>pnpm-workspace.yaml</code>, walks each workspace, collects all direct dependencies, deduplicates, and scores the merged set against behavioral signals &mdash; publisher count, download volume, release cadence, GitHub backing.
+          </p>
+
+          <pre><code>npx proof-of-commitment --file pnpm-workspace.yaml</code></pre>
+
+          <p>
+            10 unique dependencies. 4 scored CRITICAL.
+          </p>
+
+          <div style="overflow-x: auto; margin: 2rem 0;">
+            <table style="width: 100%; border-collapse: collapse; font-size: 0.875rem;">
+              <thead>
+                <tr style="border-bottom: 2px solid var(--border-light);">
+                  <th style="text-align: left; padding: 0.75rem 1rem 0.75rem 0; font-weight: 600;">Package</th>
+                  <th style="text-align: right; padding: 0.75rem 1rem; font-weight: 600;">Downloads/wk</th>
+                  <th style="text-align: center; padding: 0.75rem 1rem; font-weight: 600;">Publishers</th>
+                  <th style="text-align: center; padding: 0.75rem 1rem; font-weight: 600;">Score</th>
+                  <th style="text-align: center; padding: 0.75rem 1rem; font-weight: 600;">Risk</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr style="border-bottom: 1px solid var(--border-light);">
+                  <td style="padding: 0.75rem 1rem 0.75rem 0;"><code>clsx</code></td>
+                  <td style="text-align: right; padding: 0.75rem 1rem;">95M</td>
+                  <td style="text-align: center; padding: 0.75rem 1rem;">1</td>
+                  <td style="text-align: center; padding: 0.75rem 1rem;">70</td>
+                  <td style="text-align: center; padding: 0.75rem 1rem; color: var(--accent);">&#x1F534; CRITICAL</td>
+                </tr>
+                <tr style="border-bottom: 1px solid var(--border-light);">
+                  <td style="padding: 0.75rem 1rem 0.75rem 0;"><code>lodash</code></td>
+                  <td style="text-align: right; padding: 0.75rem 1rem;">149M</td>
+                  <td style="text-align: center; padding: 0.75rem 1rem;">1</td>
+                  <td style="text-align: center; padding: 0.75rem 1rem;">81</td>
+                  <td style="text-align: center; padding: 0.75rem 1rem; color: var(--accent);">&#x1F534; CRITICAL</td>
+                </tr>
+                <tr style="border-bottom: 1px solid var(--border-light);">
+                  <td style="padding: 0.75rem 1rem 0.75rem 0;"><code>zod</code></td>
+                  <td style="text-align: right; padding: 0.75rem 1rem;">164M</td>
+                  <td style="text-align: center; padding: 0.75rem 1rem;">1</td>
+                  <td style="text-align: center; padding: 0.75rem 1rem;">86</td>
+                  <td style="text-align: center; padding: 0.75rem 1rem; color: var(--accent);">&#x1F534; CRITICAL</td>
+                </tr>
+                <tr style="border-bottom: 1px solid var(--border-light);">
+                  <td style="padding: 0.75rem 1rem 0.75rem 0;"><code>axios</code></td>
+                  <td style="text-align: right; padding: 0.75rem 1rem;">104M</td>
+                  <td style="text-align: center; padding: 0.75rem 1rem;">1</td>
+                  <td style="text-align: center; padding: 0.75rem 1rem;">86</td>
+                  <td style="text-align: center; padding: 0.75rem 1rem; color: var(--accent);">&#x1F534; CRITICAL</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <p>
+            Combined: over <strong>512 million weekly downloads behind single-publisher npm accounts.</strong> Four stolen credentials. That&rsquo;s the blast radius.
+          </p>
+
+          <hr class="essay-divider" />
+
+          <h2>Why monorepos make this worse</h2>
+
+          <p>
+            A single-project scan tells you about that project&rsquo;s direct dependencies. Fine. But a monorepo has N projects, and the shared dependency often appears in more than one. The risk compounds:
+          </p>
+
+          <ul>
+            <li><strong>Hidden duplication:</strong> <code>axios</code> might be in <code>packages/api</code> and <code>packages/cli</code>. You scan each workspace separately, you see the same CRITICAL flag twice and treat it as one issue. Or you miss it entirely because each workspace has few enough deps that nobody bothers auditing.</li>
+            <li><strong>Aggregate view matters:</strong> The monorepo-level scan deduplicates and shows the <em>full</em> surface area. <code>clsx</code> scored 70 &mdash; the lowest of the four. It appeared in one workspace. Per-workspace, it looks minor. At the aggregate level, a 70-score single-publisher package with 95 million weekly downloads is the most dangerous thing in the repo.</li>
+            <li><strong>pnpm audit doesn&rsquo;t do this:</strong> <code>pnpm audit</code> checks the NVD for known CVEs. There&rsquo;s no CVE for &ldquo;one person holds the publish token to 95 million weekly installs.&rdquo; That&rsquo;s a structural risk, not a vulnerability.</li>
+          </ul>
+
+          <hr class="essay-divider" />
+
+          <h2>The clsx problem</h2>
+
+          <p>
+            clsx is a 228-byte utility for constructing className strings. It scores 70 &mdash; GOOD on the Commit scale. But it has one npm publisher and 95 million weekly downloads. Zero provenance. Last published 746 days ago. OpenSSF Scorecard: 3.0.
+          </p>
+          <p>
+            A high-quality, well-maintained, incredibly popular package &mdash; and a single-token compromise away from supply chain disaster. The per-workspace scan didn&rsquo;t flag it because no workspace depends on enough packages to trigger concern. The aggregate view did.
+          </p>
+          <p>
+            That&rsquo;s the point of the monorepo scan. It surfaces risks that per-package scans miss.
+          </p>
+
+          <hr class="essay-divider" />
+
+          <h2>Try it</h2>
+
+          <pre><code># Scan your pnpm monorepo
+npx proof-of-commitment --file pnpm-workspace.yaml
+
+# Or scan specific packages
+npx proof-of-commitment clsx lodash zod axios
+
+# JSON output for CI
+npx proof-of-commitment --file pnpm-workspace.yaml --json</code></pre>
+
+          <p>
+            Web view (no install): <a href="/audit?packages=clsx%2Clodash%2Czod%2Caxios">getcommit.dev/audit</a>
+          </p>
+
+          <p>
+            The <code>--json</code> flag exits with code 1 if any CRITICAL packages are found. Wire it into CI and it becomes a gate, not a report.
+          </p>
+
+          <hr class="essay-divider" />
+
+          <p>
+            <code>pnpm audit</code> finds known vulnerabilities. Commit finds structural risk &mdash; the conditions that make a future vulnerability catastrophic. One person publishing to 95 million machines per week is not a CVE. It&rsquo;s a blast radius.
+          </p>
+
+          <hr class="essay-divider" />
+
+          <p class="essay-coda">
+            <em><a href="https://github.com/piiiico/proof-of-commitment">Proof of Commitment</a> is open-source. v1.5.0 adds pnpm workspace support. Web audit at <a href="/audit">getcommit.dev/audit</a>.</em>
+          </p>
+          <p class="essay-coda">
+            <em>Also: <a href="/blog/cargo-supply-chain-risk">The same analysis on Rust crates</a> &middot; <a href="/blog/python-supply-chain-risk">Python supply chain risk</a> &middot; <a href="/blog/npm-audit-zero-vulnerabilities">Why npm audit returns zero for the most dangerous packages</a></em>
+          </p>
+
+        </div>
+      </div>
+    </div>
+  </article>
+
+  <!-- Newsletter -->
+  <section class="newsletter-section">
+    <div class="container">
+      <div class="editorial reveal">
+        <h2 style="margin-bottom: 0.75rem;">Stay in the loop</h2>
+        <p style="margin-bottom: 2rem; font-size: 1rem;">
+          Early access, research updates, and the occasional strong opinion.
+        </p>
+
+        <form
+          action="https://buttondown.email/api/emails/embed-subscribe/commitgraph"
+          method="post"
+          target="popupwindow"
+          class="newsletter-form"
+        >
+          <input
+            type="email"
+            name="email"
+            placeholder="you@example.com"
+            required
+            class="newsletter-input"
+          />
+          <button type="submit" class="btn-primary" style="white-space: nowrap;">
+            Subscribe
+          </button>
+        </form>
+
+        <p class="newsletter-note">No spam. Unsubscribe anytime.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer>
+    <div class="container footer-inner">
+      <span class="footer-brand">Commit</span>
+      <ul class="footer-links">
+        <li><a href="/">Home</a></li>
+        <li><a href="/extension">Extension</a></li>
+        <li><a href="/blog">Writing</a></li>
+        <li><a href="/pricing">Pricing</a></li><li><a href="/docs">Docs</a></li><li><a href="https://github.com/piiiico/proof-of-commitment" target="_blank" rel="noopener">GitHub</a></li>
+        <li><a href="mailto:pico@amdal.dev">Contact</a></li>
+      </ul>
+      <span class="footer-locale">Stavanger, Norway</span>
+    </div>
+  </footer>
+
+</Layout>

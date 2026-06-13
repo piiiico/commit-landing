@@ -1,0 +1,37 @@
+/register /get-started 301
+/register/ /get-started 301
+
+/scan/repo /scan/repo/index.html 200
+/scan/repo/ /scan/repo/index.html 200
+/scan/:splat /scan/?pkg=:splat 302
+
+/blog/agents-can-pay https://agentlair.dev/blog/agents-can-pay 301
+/blog/agents-can-pay/ https://agentlair.dev/blog/agents-can-pay 301
+/blog/building-on-visa-tap https://agentlair.dev/blog/building-on-visa-tap 301
+/blog/building-on-visa-tap/ https://agentlair.dev/blog/building-on-visa-tap 301
+/blog/mastercard-vi-l4-gap https://agentlair.dev/blog/mastercard-vi-l4-gap 301
+/blog/mastercard-vi-l4-gap/ https://agentlair.dev/blog/mastercard-vi-l4-gap 301
+/blog/rsac-2026-confirmed-the-gap https://agentlair.dev/blog/rsac-2026-confirmed-the-gap 301
+/blog/rsac-2026-confirmed-the-gap/ https://agentlair.dev/blog/rsac-2026-confirmed-the-gap 301
+/blog/the-agent-passed-all-the-checks https://agentlair.dev/blog/the-agent-passed-all-the-checks 301
+/blog/the-agent-passed-all-the-checks/ https://agentlair.dev/blog/the-agent-passed-all-the-checks 301
+/blog/who-decides-what-agents-can-buy https://agentlair.dev/blog/who-decides-what-agents-can-buy 301
+/blog/who-decides-what-agents-can-buy/ https://agentlair.dev/blog/who-decides-what-agents-can-buy 301
+/blog/135000-frameworks-zero-governance https://agentlair.dev/blog/135000-frameworks-zero-governance 301
+/blog/135000-frameworks-zero-governance/ https://agentlair.dev/blog/135000-frameworks-zero-governance 301
+/blog/litellm-supply-chain-mcp https://agentlair.dev/blog/litellm-supply-chain-mcp 301
+/blog/litellm-supply-chain-mcp/ https://agentlair.dev/blog/litellm-supply-chain-mcp 301
+/blog/claude-code-source-leak-fake-repos https://agentlair.dev/blog/claude-code-source-leak-fake-repos 301
+/blog/claude-code-source-leak-fake-repos/ https://agentlair.dev/blog/claude-code-source-leak-fake-repos 301
+/blog/claude-code-behavioral-telemetry https://agentlair.dev/blog/claude-code-behavioral-telemetry 301
+/blog/claude-code-behavioral-telemetry/ https://agentlair.dev/blog/claude-code-behavioral-telemetry 301
+/blog/emdash-trust-guard https://agentlair.dev/blog/emdash-trust-guard 301
+/blog/emdash-trust-guard/ https://agentlair.dev/blog/emdash-trust-guard 301
+/blog/mythos-paradox https://agentlair.dev/blog/mythos-paradox 301
+/blog/mythos-paradox/ https://agentlair.dev/blog/mythos-paradox 301
+/blog/behavioral-trust-without-surveillance https://agentlair.dev/blog/behavioral-trust-without-surveillance 301
+/blog/behavioral-trust-without-surveillance/ https://agentlair.dev/blog/behavioral-trust-without-surveillance 301
+/blog/quantum-deadline-agent-credentials https://agentlair.dev/blog/quantum-deadline-agent-credentials 301
+/blog/quantum-deadline-agent-credentials/ https://agentlair.dev/blog/quantum-deadline-agent-credentials 301
+/blog/sixty-percent-want-approval-gates https://agentlair.dev/blog/sixty-percent-want-approval-gates 301
+/blog/sixty-percent-want-approval-gates/ https://agentlair.dev/blog/sixty-percent-want-approval-gates 301

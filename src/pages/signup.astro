@@ -1,0 +1,38 @@
+---
+// Legacy MCP soft-CTA URL — kept alive for clients whose conversation history
+// still cites https://getcommit.dev/signup?ref=mcp-cli (the URL emitted by
+// Commit MCP server v1.14.0 before 2026-05-20). The Astro redirects map in
+// astro.config.mjs would lose the ?ref= query string (meta-refresh hardcodes
+// the destination URL), so this page is an explicit JS redirect that
+// preserves the query string and lands users on /get-started?ref=… with
+// funnel attribution intact.
+//
+// New CTAs point at /get-started directly — when no traffic hits /signup for
+// a few weeks, this page can be deleted and replaced with a config redirect.
+---
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Get your API key — Commit</title>
+    <meta name="robots" content="noindex" />
+    <link rel="canonical" href="https://getcommit.dev/get-started" />
+    <meta http-equiv="refresh" content="0;url=/get-started" />
+    <style>
+      body { font-family: system-ui, sans-serif; max-width: 480px; margin: 80px auto; text-align: center; color: #333; }
+      a { color: #0066cc; }
+    </style>
+  </head>
+  <body>
+    <p>Redirecting to <a id="dest" href="/get-started">/get-started</a>…</p>
+    <script is:inline>
+      (function () {
+        var qs = window.location.search || '';
+        var dest = '/get-started' + qs;
+        var link = document.getElementById('dest');
+        if (link) link.setAttribute('href', dest);
+        window.location.replace(dest);
+      })();
+    </script>
+  </body>
+</html>

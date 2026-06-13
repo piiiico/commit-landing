@@ -1,0 +1,204 @@
+---
+import Layout from '../../layouts/Layout.astro';
+---
+
+<Layout
+  title="Your AI Coding Assistant Is Now a Supply Chain Attack Surface — Commit"
+  description="Cursor agents install npm, pip, cargo, and Go packages on your behalf. That's new attack surface. poc hook intercepts every install before it runs."
+  canonical="https://getcommit.dev/blog/cursor-hook-supply-chain-gate/"
+  publishDate="2026-05-29"
+>
+
+  <!-- Nav -->
+  <nav>
+    <div class="container nav-inner">
+      <a href="/" class="nav-brand">Commit</a>
+      <ul class="nav-links">
+        <li><a href="/quickstart/">Quickstart</a></li>
+        <li><a href="/audit/">Audit</a></li>
+        <li><a href="/blog/" style="color: var(--ink);">Writing</a></li>
+        <li><a href="/pricing/">Pricing</a></li>
+        <li><a href="/docs/">Docs</a></li>
+        <li><a href="https://github.com/piiiico/proof-of-commitment" target="_blank" rel="noopener">GitHub</a></li>
+        <li><a href="mailto:pico@amdal.dev">Contact</a></li>
+      </ul>
+    </div>
+  </nav>
+
+  <!-- Essay -->
+  <article class="essay">
+    <div class="container">
+      <div class="editorial">
+
+        <!-- Header -->
+        <header class="essay-header">
+          <div class="essay-meta animate-in delay-1">
+            <time datetime="2026-05-29">May 29, 2026</time>
+          </div>
+          <h1 class="essay-title animate-in delay-2">Your AI Coding Assistant Is Now a Supply Chain Attack Surface</h1>
+          <p class="essay-subtitle animate-in delay-3">
+            Cursor agents install npm, pip, cargo, and Go packages on your behalf. That&rsquo;s new attack surface. <code>poc hook</code> intercepts every install before it runs.
+          </p>
+          <p class="essay-byline animate-in delay-4">Pico</p>
+        </header>
+
+        <!-- Body -->
+        <div class="essay-body">
+
+          <p>
+            There used to be a human in the loop when a new dependency entered your project. You typed <code>npm install</code>. You chose the package. You (maybe) checked the publisher count. Then the Shai-Hulud worm happened.
+          </p>
+
+          <p>
+            On May 19, 2026, a compromised npm account published 637 malicious package versions in 39 minutes. The worm propagated autonomously, harvested credentials from 80+ environment variables, and installed persistence across three different hooks: <code>.claude/settings.json</code>, <code>.vscode/tasks.json</code>, and a background daemon polling GitHub every 60 seconds for signed commands.
+          </p>
+
+          <p>
+            It specifically targeted AI coding environments. Not as an afterthought&mdash;as the primary persistence vector.
+          </p>
+
+          <hr class="essay-divider" />
+
+          <h2>The new attack surface</h2>
+
+          <p>
+            When you type <code>npm install</code>, there&rsquo;s a decision point. Most people pause, check what they&rsquo;re installing, maybe look at weekly downloads or the GitHub repo. That pause is where human judgment used to live.
+          </p>
+
+          <p>
+            AI agents don&rsquo;t pause. When Cursor decides your project needs <code>axios</code>, it runs <code>npm install axios</code> and moves on. When it scaffolds a Python project, it runs <code>pip install litellm requests</code> in one shot. There&rsquo;s no friction, no second look.
+          </p>
+
+          <p>
+            That&rsquo;s not an argument against using AI coding assistants. It&rsquo;s an argument for putting the gate somewhere the agent can&rsquo;t bypass it.
+          </p>
+
+          <hr class="essay-divider" />
+
+          <h2>How <code>poc hook</code> works</h2>
+
+          <p>
+            Cursor exposes a <a href="https://docs.cursor.com/context/hooks" target="_blank" rel="noopener"><code>beforeShellExecution</code></a> hook: a JSON-configured script that intercepts shell commands before they run and returns <code>allow</code>, <code>ask</code>, or <code>deny</code> with a message.
+          </p>
+
+          <p>
+            <code>poc hook</code> installs a script into that hook. It parses the incoming command, identifies package install patterns across all four major ecosystems, calls the Commit API to score each package, and makes a decision&mdash;all in under 500ms so it doesn&rsquo;t interrupt normal flow.
+          </p>
+
+          <pre class="code-block"><code>poc hook            # project-local (.cursor/hooks.json)
+poc hook --global   # all Cursor projects (~/.cursor/hooks.json)</code></pre>
+
+          <p>
+            What it intercepts:
+          </p>
+
+          <div class="essay-table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>Package manager</th>
+                  <th>Example</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr><td>npm / npx</td><td><code>npm install axios</code></td></tr>
+                <tr><td>pnpm</td><td><code>pnpm add lodash</code></td></tr>
+                <tr><td>yarn</td><td><code>yarn add chalk</code></td></tr>
+                <tr><td>pip / uv</td><td><code>pip install litellm</code></td></tr>
+                <tr><td>cargo</td><td><code>cargo add serde</code></td></tr>
+                <tr><td>go</td><td><code>go get github.com/gin-gonic/gin</code></td></tr>
+              </tbody>
+            </table>
+          </div>
+
+          <p>
+            When a CRITICAL package is detected&mdash;sole publisher, >10M weekly downloads, the exact attack surface that got LiteLLM and axios compromised&mdash;the hook blocks the install and shows the agent why:
+          </p>
+
+          <pre class="code-block"><code>🔴 Commit blocked: axios is flagged CRITICAL by Commit supply chain scoring.
+
+  🔴 axios (score 86/100) — CRITICAL: sole npm publisher, 99M/week
+
+→ Review: https://getcommit.dev/audit?packages=axios&ecosystem=npm
+
+Package install blocked. The agent should use a safer alternative
+or get explicit user approval.</code></pre>
+
+          <p>
+            The agent gets the context it needs to explain to you what happened and why. You stay in control of the decision.
+          </p>
+
+          <hr class="essay-divider" />
+
+          <h2>The Shai-Hulud context</h2>
+
+          <p>
+            The May 2026 supply chain attack was unusual in its specificity toward AI tooling. Targeting <code>.claude/settings.json</code> wasn&rsquo;t random&mdash;it&rsquo;s where Claude Code loads its <code>SessionStart</code> hooks. The attacker understood that a Claude Code hook running at session start has the same access as the AI assistant itself: filesystem, shell, network.
+          </p>
+
+          <p>
+            The packages most at risk during that attack were the ones that scored worst behaviorally <em>before</em> it happened: sole publishers, stale release histories, high download volumes. Three of the five non-AntV packages were sole-publisher. Two had no release in over a year.
+          </p>
+
+          <p>
+            <code>npm audit</code> showed zero vulnerabilities on all of them the day before the attack.
+          </p>
+
+          <p>
+            Behavioral signals saw it coming. Process-based signals didn&rsquo;t.
+          </p>
+
+          <hr class="essay-divider" />
+
+          <h2>Why the hook belongs in the IDE, not just CI</h2>
+
+          <p>
+            CI gates catch packages after they&rsquo;re already in your lock file. The <code>poc hook</code> catches them before <code>npm install</code> completes&mdash;before anything hits disk, before the package is in your tree.
+          </p>
+
+          <p>
+            For human developers, that distinction is mostly philosophical: you can always delete a package. For AI agents operating at speed across multiple dependencies, the window between &ldquo;install command run&rdquo; and &ldquo;malicious code executed during postinstall&rdquo; can be milliseconds.
+          </p>
+
+          <p>
+            The hook is the first gate on the default path. CI is the second. Both run; the hook runs first.
+          </p>
+
+          <hr class="essay-divider" />
+
+          <h2>Setup in 30 seconds</h2>
+
+          <pre class="code-block"><code># Install the CLI if you haven't already:
+npm install -g proof-of-commitment
+
+# Install the Cursor hook (project-local):
+poc hook
+
+# Optional: save a free API key first for higher rate limits
+# poc login sk_commit_…   (get one at getcommit.dev/get-started)
+
+# To protect all Cursor projects:
+poc hook --global</code></pre>
+
+          <p>
+            The hook requires Node.js (already installed if you use Cursor). No separate dependency. No background process. It runs as a one-shot script each time Cursor&rsquo;s agent issues a shell command.
+          </p>
+
+          <div class="essay-cta">
+            <a href="/get-started/" class="btn-primary">Get free API key &rarr;</a>
+            <a href="/audit/" class="btn-ghost">Audit your dependencies &rarr;</a>
+          </div>
+
+        </div>
+      </div>
+    </div>
+  </article>
+
+  <!-- Footer -->
+  <footer>
+    <div class="container">
+      <p><a href="/">Commit</a> &middot; Supply chain trust, measured behaviorally. <a href="/audit/">Audit</a> &middot; <a href="/rankings/">Rankings</a> &middot; <a href="/blog/">Writing</a> &middot; <a href="https://github.com/piiiico/proof-of-commitment">GitHub</a></p>
+    </div>
+  </footer>
+
+</Layout>

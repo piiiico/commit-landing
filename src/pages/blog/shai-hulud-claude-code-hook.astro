@@ -1,0 +1,218 @@
+---
+import Layout from '../../layouts/Layout.astro';
+---
+
+<Layout
+  title="637 npm Packages Compromised in 39 Minutes. The Malware Installs a Claude Code SessionStart Hook. &mdash; Commit"
+  description="The Shai-Hulud worm stole npm tokens and republished packages autonomously. One of its persistence mechanisms: a Claude Code SessionStart hook in your .claude/settings.json."
+  canonical="https://getcommit.dev/blog/shai-hulud-claude-code-hook/"
+  publishDate="2026-05-25"
+>
+
+  <!-- Nav -->
+  <nav>
+    <div class="container nav-inner">
+      <a href="/" class="nav-brand">Commit</a>
+      <ul class="nav-links">
+        <li><a href="/quickstart/">Quickstart</a></li>
+        <li><a href="/audit/">Audit</a></li>
+        <li><a href="/blog/" style="color: var(--ink);">Writing</a></li>
+        <li><a href="/pricing/">Pricing</a></li>
+        <li><a href="/docs/">Docs</a></li>
+        <li><a href="https://github.com/piiiico/proof-of-commitment" target="_blank" rel="noopener">GitHub</a></li>
+        <li><a href="mailto:pico@amdal.dev">Contact</a></li>
+      </ul>
+    </div>
+  </nav>
+
+  <!-- Essay -->
+  <article class="essay">
+    <div class="container">
+      <div class="editorial">
+
+        <!-- Header -->
+        <header class="essay-header">
+          <div class="essay-meta animate-in delay-1">
+            <time datetime="2026-05-25">May 25, 2026</time>
+          </div>
+          <h1 class="essay-title animate-in delay-2">637 npm Packages Compromised in 39 Minutes. The Malware Installs a Claude Code <code>SessionStart</code> Hook.</h1>
+          <p class="essay-subtitle animate-in delay-3">
+            The Shai-Hulud worm stole npm tokens and republished packages autonomously. One of its persistence mechanisms: a Claude Code hook in your <code>.claude/settings.json</code>.
+          </p>
+          <p class="essay-byline animate-in delay-4">Pico</p>
+        </header>
+
+        <!-- Body -->
+        <div class="essay-body">
+
+          <p>
+            On May 19, 2026, between 01:39 and 02:18 UTC, a single compromised npm account published 637 malicious package versions across 323 packages. The entire attack took 39 minutes.
+          </p>
+
+          <p>
+            The packages included <code>jest-canvas-mock</code> (2.8M weekly downloads), <code>echarts-for-react</code> (1.1M), <code>size-sensor</code> (1.2M), <code>timeago.js</code> (295K), and most of the <code>@antv</code> visualization suite. Total blast radius: roughly 16 million weekly downloads.
+          </p>
+
+          <p>
+            This wasn&rsquo;t a human typing <code>npm publish</code> 637 times. This was a worm.
+          </p>
+
+          <hr class="essay-divider" />
+
+          <h2>How the self-propagation works</h2>
+
+          <p>
+            The <code>atool</code> npm account was compromised (how is still unknown). That account had publish access to 547 packages. The initial payload did what you&rsquo;d expect&mdash;harvested credentials from 80+ environment variables and 100+ file paths across AWS, GCP, Azure, GitHub, Kubernetes, and database systems.
+          </p>
+
+          <p>
+            Then it did something different: it searched for npm tokens with the <code>bypass_2fa</code> scope. In GitHub Actions environments, the malware exchanged OIDC tokens for per-package npm publish credentials. It then republished additional packages with itself embedded. An npm worm.
+          </p>
+
+          <p>
+            Two waves hit the registry. First: ~317 versions at 01:39. Second: ~314 versions 26 minutes later at 02:05. Detection started around 02:18.
+          </p>
+
+          <hr class="essay-divider" />
+
+          <h2>The persistence mechanisms</h2>
+
+          <p>
+            The exfiltrated credentials are serialized as JSON, gzip-compressed, encrypted with AES-256-GCM, and wrapped with RSA-OAEP. The exfiltration channel disguises itself as OpenTelemetry traces, posting to <code>t.m-kosche.com:443/api/public/otel/v1/traces</code>.
+          </p>
+
+          <p>
+            A backup channel creates public repos under the victim&rsquo;s GitHub account, commits encrypted credential dumps with Dune-themed naming patterns.
+          </p>
+
+          <p>
+            Here&rsquo;s where it gets personal for anyone reading this on a machine with Claude Code installed:
+          </p>
+
+          <p>
+            <strong>The malware installs a <code>SessionStart</code> hook in <code>.claude/settings.json</code>.</strong> It also drops VS Code task automation in <code>.vscode/tasks.json</code> and a background daemon at <code>~/.local/share/kitty/cat.py</code> that polls GitHub every 60 seconds for RSA-signed commands.
+          </p>
+
+          <p>
+            And there&rsquo;s a dead man&rsquo;s switch. If the stolen GitHub token gets revoked, the malware runs <code>rm -rf ~/</code>.
+          </p>
+
+          <hr class="essay-divider" />
+
+          <h2>What the packages looked like before the attack</h2>
+
+          <p>
+            I scored the compromised packages using <a href="/audit/">Commit&rsquo;s behavioral audit</a>. The non-AntV packages&mdash;the ones most projects wouldn&rsquo;t think to audit&mdash;tell the clearest story:
+          </p>
+
+          <div class="essay-table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>Package</th>
+                  <th>Score</th>
+                  <th>Publishers</th>
+                  <th>Downloads/wk</th>
+                  <th>Risk</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr style="background: rgba(209, 77, 65, 0.07);">
+                  <td><code>canvas-nest.js</code></td>
+                  <td>50</td>
+                  <td style="color: #D14D41; font-weight: 600;">1</td>
+                  <td>1K</td>
+                  <td style="color: #D14D41; font-weight: 600;">WARN: no release 12+ months</td>
+                </tr>
+                <tr>
+                  <td><code>timeago.js</code></td>
+                  <td>65</td>
+                  <td>2</td>
+                  <td>295K</td>
+                  <td style="color: #D14D41; font-weight: 600;">WARN: no release 12+ months</td>
+                </tr>
+                <tr style="background: rgba(209, 77, 65, 0.07);">
+                  <td><code>size-sensor</code></td>
+                  <td>66</td>
+                  <td style="color: #D14D41; font-weight: 600;">1</td>
+                  <td>1.2M</td>
+                  <td style="color: #D14D41; font-weight: 600;">HIGH: sole publisher + &gt;1M/wk</td>
+                </tr>
+                <tr>
+                  <td><code>echarts-for-react</code></td>
+                  <td>71</td>
+                  <td style="color: #D14D41; font-weight: 600;">1</td>
+                  <td>1.1M</td>
+                  <td style="color: #D14D41; font-weight: 600;">HIGH: sole publisher + &gt;1M/wk</td>
+                </tr>
+                <tr style="background: rgba(209, 77, 65, 0.07);">
+                  <td><code>jest-canvas-mock</code></td>
+                  <td>72</td>
+                  <td>2</td>
+                  <td>2.8M</td>
+                  <td style="color: #D14D41; font-weight: 600;">WARN: no release 12+ months</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <p>
+            Three of these five had a sole npm publisher. Two are stale&mdash;no release in over a year, still pulled by millions of projects weekly. That&rsquo;s exactly the profile that makes account takeover both easy and high-impact.
+          </p>
+
+          <p>
+            The <code>@antv</code> packages scored higher (84&ndash;89) because they have 17&ndash;18 maintainers. But that&rsquo;s exactly how the account worked: <code>atool</code> was one of those 18 maintainers. More publishers means more attack surface when any one of them can publish.
+          </p>
+
+          <hr class="essay-divider" />
+
+          <h2>What to check</h2>
+
+          <p>
+            If your <code>package-lock.json</code> or <code>yarn.lock</code> includes any of these packages, check which versions you installed between 01:39 and 02:18 UTC on May 19.
+          </p>
+
+          <p>
+            Then check the rest of your dependency tree:
+          </p>
+
+          <pre class="code-block"><code>npx proof-of-commitment --file package-lock.json</code></pre>
+
+          <p>
+            The packages that scored 50&ndash;72 before this attack&mdash;sole publishers, stale releases, high downloads&mdash;are the same profile that got compromised in the LiteLLM attack, the axios attack, and now this one.
+          </p>
+
+          <p>
+            The pattern doesn&rsquo;t change. The entry point is always the same: one compromised account with publish access to a widely-installed package.
+          </p>
+
+          <hr class="essay-divider" />
+
+          <h2>What&rsquo;s different about this one</h2>
+
+          <p>
+            Previous supply chain attacks hit one package at a time. This one propagated. It turned compromised npm tokens into more compromised packages. The 39-minute window between first publish and detection is getting shorter, but the blast radius is getting wider.
+          </p>
+
+          <p>
+            And the persistence mechanisms are evolving. Targeting <code>.claude/settings.json</code> and <code>.vscode/tasks.json</code> means the malware survives container restarts and embeds itself in developer tooling&mdash;the exact environment where you make decisions about which packages to trust.
+          </p>
+
+          <div class="essay-cta">
+            <a href="/audit/" class="btn-primary">Audit your dependencies &rarr;</a>
+            <a href="/get-started/" class="btn-ghost">Get free API key &rarr;</a>
+          </div>
+
+        </div>
+      </div>
+    </div>
+  </article>
+
+  <!-- Footer -->
+  <footer>
+    <div class="container">
+      <p><a href="/">Commit</a> &middot; Supply chain trust, measured behaviorally. <a href="/audit/">Audit</a> &middot; <a href="/rankings/">Rankings</a> &middot; <a href="/blog/">Writing</a> &middot; <a href="https://github.com/piiiico/proof-of-commitment">GitHub</a></p>
+    </div>
+  </footer>
+
+</Layout>

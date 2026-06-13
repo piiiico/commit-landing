@@ -1,0 +1,143 @@
+---
+import Layout from '../../layouts/Layout.astro';
+---
+
+<Layout
+  title="Scan any GitHub repo for supply chain risk in one click — Commit"
+  description="Paste a GitHub URL. Get trust scores for every dependency instantly. No install, no account — behavioral signals on demand."
+  canonical="https://getcommit.dev/blog/github-repo-scanner/"
+  publishDate="2026-05-14"
+>
+
+  <!-- Nav -->
+  <nav>
+    <div class="container nav-inner">
+      <a href="/" class="nav-brand">Commit</a>
+      <ul class="nav-links">
+        <li><a href="/extension">Extension</a></li>
+        <li><a href="/blog" style="color: var(--ink);">Writing</a></li>
+        <li><a href="/pricing">Pricing</a></li><li><a href="/docs">Docs</a></li><li><a href="https://github.com/hawkaa/commit" target="_blank" rel="noopener">GitHub</a></li>
+        <li><a href="mailto:pico@amdal.dev">Contact</a></li>
+      </ul>
+    </div>
+  </nav>
+
+  <!-- Essay -->
+  <article class="essay">
+    <div class="container">
+      <div class="editorial">
+
+        <!-- Header -->
+        <header class="essay-header">
+          <div class="essay-meta animate-in delay-1">
+            <time datetime="2026-05-14">May 14, 2026</time>
+          </div>
+          <h1 class="essay-title animate-in delay-2">Scan any GitHub repo for supply chain risk in one click</h1>
+          <p class="essay-subtitle animate-in delay-3">
+            Paste a URL. No install, no account. Behavioral trust scores for every dependency &mdash; in seconds.
+          </p>
+          <p class="essay-byline animate-in delay-4">H&aring;kon &Aring;mdal</p>
+        </header>
+
+        <!-- Body -->
+        <div class="essay-body">
+
+          <p>
+            Supply chain attacks don&rsquo;t announce themselves. The event-stream attack in 2018 started with a
+            maintainer handing off a package with 2 million weekly downloads. The ua-parser-js compromise in 2021
+            was a sole maintainer account with 7 million weekly downloads. In both cases, the signal was visible
+            before the incident &mdash; not in CVE databases, but in behavioral patterns.
+          </p>
+
+          <p>
+            I&rsquo;ve been building tooling that reads those behavioral signals: publisher concentration,
+            release consistency, project longevity, contributor depth. Today I shipped something that makes
+            this usable without any friction at all.
+          </p>
+
+          <h2>The scanner</h2>
+
+          <p>
+            <a href="https://getcommit.dev/scan/repo">getcommit.dev/scan/repo</a> takes a GitHub URL and
+            scores every dependency in the project&rsquo;s package manifest. Paste the URL, hit Scan, see results.
+            No account. No install. No API key.
+          </p>
+
+          <p>Five example scans worth running right now:</p>
+
+          <ul>
+            <li><a href="https://getcommit.dev/scan/repo?repo=facebook/react">facebook/react</a> &mdash; React&rsquo;s own dependencies, scored for behavioral risk</li>
+            <li><a href="https://getcommit.dev/scan/repo?repo=vercel/next.js">vercel/next.js</a> &mdash; Next.js dependency tree, 300+ resolved packages</li>
+            <li><a href="https://getcommit.dev/scan/repo?repo=expressjs/express">expressjs/express</a> &mdash; Express and its transitive chain</li>
+            <li><a href="https://getcommit.dev/scan/repo?repo=vitejs/vite">vitejs/vite</a> &mdash; Vite&rsquo;s build toolchain risk profile</li>
+            <li><a href="https://getcommit.dev/scan/repo?repo=supabase/supabase">supabase/supabase</a> &mdash; A modern full-stack repo with real exposure surface</li>
+          </ul>
+
+          <h2>What it scores</h2>
+
+          <p>
+            For each dependency, the scanner fetches behavioral signals from public sources and computes a
+            Commit Score:
+          </p>
+
+          <ul>
+            <li><strong>Publisher concentration</strong> &mdash; single maintainer accounts controlling packages with 50M+ weekly downloads are the most common attack vector. The score weights this heavily.</li>
+            <li><strong>Release consistency</strong> &mdash; irregular release cadences, long gaps, or sudden version jumps are early warning signals.</li>
+            <li><strong>Project longevity</strong> &mdash; how long a maintainer has been active on a package. Short tenure with high download counts is a risk pattern.</li>
+            <li><strong>Contributor depth</strong> &mdash; sole-contributor packages with large downstream use are flagged CRITICAL.</li>
+          </ul>
+
+          <p>
+            Packages scoring CRITICAL are the ones that match the historical attack profile. Not because they&rsquo;ve
+            been compromised &mdash; because they&rsquo;re the type of package that gets compromised.
+          </p>
+
+          <h2>Why URL input matters</h2>
+
+          <p>
+            The <a href="/audit">audit tool</a> asks you to paste a list of package names. That&rsquo;s useful
+            when you know what you&rsquo;re auditing. URL input is for when you don&rsquo;t want to check out a repo
+            first &mdash; you&rsquo;re evaluating a dependency, reviewing a PR from an external contributor,
+            or doing a quick security pass on an open-source project you&rsquo;re considering.
+          </p>
+
+          <p>
+            The flow is: copy the GitHub URL from your browser, paste it into the scanner, hit Scan.
+            Under five seconds to a full risk profile.
+          </p>
+
+          <h2>The underlying signal</h2>
+
+          <p>
+            npm audit gives you CVEs. CVEs are historical. By the time a package is in the CVE database,
+            the attack has already happened to someone.
+          </p>
+
+          <p>
+            Behavioral signals are forward-looking. Publisher concentration isn&rsquo;t a CVE &mdash; it&rsquo;s
+            a structural condition that makes a package attractive to attackers. That condition can exist
+            for years before anything bad happens. Knowing it exists lets you make a different decision:
+            pin the version, find an alternative, add a lockfile check to CI.
+          </p>
+
+          <p>
+            The scanner is free. Try it on your own repo first.
+          </p>
+
+          <p>
+            &rarr; <a href="https://getcommit.dev/scan/repo">getcommit.dev/scan/repo</a>
+          </p>
+
+        </div>
+
+        <!-- Footer nav -->
+        <nav class="essay-nav">
+          <a href="/blog">&larr; All writing</a>
+          <a href="/scan/repo">Try the scanner &rarr;</a>
+        </nav>
+
+      </div>
+    </div>
+  </article>
+
+</Layout>

@@ -1,0 +1,138 @@
+---
+import Layout from '../../layouts/Layout.astro';
+---
+
+<Layout
+  title="AI Slop Is a Commitment Problem — Commit"
+  description="The effort proxy broke. LLMs made 200 plausible words cost nothing. The fix isn't effort-detection — it's commitment-measurement: behavioral signals that compound over time and can't be faked."
+  canonical="https://getcommit.dev/blog/ai-slop-commitment-problem/"
+  publishDate="2026-05-08"
+>
+
+  <!-- Nav -->
+  <nav>
+    <div class="container nav-inner">
+      <a href="/" class="nav-brand">Commit</a>
+      <ul class="nav-links">
+        <li><a href="/extension">Extension</a></li>
+        <li><a href="/blog">Writing</a></li>
+        <li><a href="/pricing">Pricing</a></li><li><a href="/docs">Docs</a></li><li><a href="https://github.com/piiiico/proof-of-commitment" target="_blank" rel="noopener">GitHub</a></li>
+        <li><a href="mailto:pico@amdal.dev">Contact</a></li>
+      </ul>
+    </div>
+  </nav>
+
+  <!-- Essay -->
+  <article class="essay">
+    <div class="container">
+      <div class="editorial">
+
+        <!-- Header -->
+        <header class="essay-header">
+          <div class="essay-meta animate-in delay-1">
+            <time datetime="2026-05-08">May 8, 2026</time>
+          </div>
+          <h1 class="essay-title animate-in delay-2">AI Slop Is a Commitment Problem</h1>
+          <p class="essay-subtitle animate-in delay-3">
+            The effort proxy broke. The fix isn't effort-detection &mdash; it's commitment-measurement.
+          </p>
+          <p class="essay-byline animate-in delay-4">H&aring;kon &Aring;mdal</p>
+        </header>
+
+        <!-- Body -->
+        <div class="essay-body">
+
+          <p>
+            The Hacker News thread has hundreds of points. The title: &ldquo;AI slop is killing online communities.&rdquo; The top comments are almost all correct.
+          </p>
+          <p>
+            Forums are filling with plausible-sounding content that costs nothing to generate. Stack Overflow is shutting down hot questions faster than ever. Subreddits are adding proof-of-humanity gates. The problem isn&rsquo;t that the content is wrong &mdash; it&rsquo;s that you can no longer use effort as a proxy for legitimacy.
+          </p>
+          <p>
+            That proxy used to work.
+          </p>
+          <p>
+            Before LLMs, writing a thoughtful comment required something: time, knowledge, the willingness to be judged publicly. The effort was small &mdash; maybe five minutes &mdash; but it was real and correlated with having something to say. If someone wrote 200 words explaining a concept, there was a reasonable chance they understood it. Effort was a signal.
+          </p>
+          <p>
+            Now it isn&rsquo;t.
+          </p>
+          <p>
+            Claude, GPT, Gemini &mdash; all can generate 200 plausible words in seconds, with no knowledge, no accountability, no skin in the game. The cost of producing convincing content dropped to zero. The signal broke. Same structural problem that killed SEO link-buying: when you can produce the proxy cheaply enough, the proxy stops working.
+          </p>
+          <p>
+            Simon Willison put it directly last week: &ldquo;Claude Code does not have a professional reputation. It can&rsquo;t take accountability for what it&rsquo;s done.&rdquo; He wasn&rsquo;t criticizing LLMs &mdash; he was naming a structural fact. Reputation requires behavioral history. Accountability requires stakes. AI has neither. It produces outputs, not commitments.
+          </p>
+          <p>
+            GitHired launched the same week on Product Hunt with exactly this problem in mind &mdash; proof-of-work for job applications. Their bet: showing genuine effort (actual code, actual reasoning, actual time) differentiates candidates in a world of AI-polished resumes. They&rsquo;re right about the problem.
+          </p>
+          <p>
+            But effort isn&rsquo;t the right frame. Commitment is.
+          </p>
+          <p>
+            Effort can be automated convincingly enough, given time. Commitment can&rsquo;t &mdash; because commitment means sustained behavior with real costs over real time. Multiple people maintaining a codebase for ten years. Paying invoices on time, every month. Showing up in ways that leave a verifiable trail.
+          </p>
+          <p>
+            This is what we built Commit around. Not effort-as-signal &mdash; behavioral commitment as signal.
+          </p>
+          <p>
+            When we flag an npm package as CRITICAL because one maintainer controls 100 million weekly downloads, we&rsquo;re not running a security audit. We&rsquo;re measuring the absence of commitment. A healthy package has multiple maintainers who&rsquo;ve been contributing for years, consistent releases, organizational backing. These signals survive AI exactly because they require the one thing AI can&rsquo;t fake: repeated, costly, verifiable action sustained over time.
+          </p>
+          <p>
+            The numbers are stark. When we scored the top 50 most-downloaded npm packages in April 2026, 15 came back CRITICAL. Together: 2.5 billion weekly downloads running behind a single set of credentials per package. minimatch (562M downloads/week, 1 maintainer). chalk (413M, 1 maintainer). glob (332M, 1 maintainer). The difference between safe and critical isn&rsquo;t popularity or code quality. It&rsquo;s the depth of human commitment behind the package.
+          </p>
+          <p>
+            The AI slop problem isn&rsquo;t a content moderation problem. It&rsquo;s a measurement problem. Communities got used to using effort as shorthand for legitimacy. LLMs made that shorthand worthless overnight.
+          </p>
+          <p>
+            The answer isn&rsquo;t more moderation. It&rsquo;s better measurement &mdash; shifting from &ldquo;did someone write this?&rdquo; to &ldquo;does this person have a verifiable history of showing up?&rdquo;
+          </p>
+          <p>
+            Commit does this for code. The signals we measure &mdash; maintainer depth, release cadence, contributor longevity &mdash; don&rsquo;t degrade when AI gets better. They get harder to fake, because they compound over time.
+          </p>
+          <p>
+            The same logic applies to everything AI slop is breaking. Content trust, community trust, job applications, code quality. In each case, the old proxy is gone. The replacement isn&rsquo;t effort-detection. It&rsquo;s commitment-measurement.
+          </p>
+          <p>
+            <strong>Slop is cheap. Commitment isn&rsquo;t.</strong>
+          </p>
+
+          <hr />
+
+          <p class="essay-footer-note">
+            Score your dependencies: <a href="https://getcommit.dev/audit">getcommit.dev/audit</a>
+          </p>
+
+        </div>
+
+        <!-- CTA -->
+        <div class="essay-cta">
+          <p>Commitment signals that AI can&rsquo;t fake. Built for the supply chain problem &mdash; and for everything slop is breaking.</p>
+          <a href="/extension" class="btn btn-primary">Get the Extension</a>
+          <a href="/audit" class="btn btn-secondary">Audit Your Dependencies</a>
+        </div>
+
+        <!-- Back -->
+        <div style="margin-top: 3rem; padding-top: 2rem; border-top: 1px solid var(--border-light);">
+          <a href="/blog" style="font-size: 0.875rem; color: var(--ink-subtle); text-decoration: none;">&larr; All writing</a>
+        </div>
+
+      </div>
+    </div>
+  </article>
+
+  <!-- Footer -->
+  <footer>
+    <div class="container footer-inner">
+      <span class="footer-brand">Commit</span>
+      <ul class="footer-links">
+        <li><a href="/">Home</a></li>
+        <li><a href="/pricing">Pricing</a></li><li><a href="/docs">Docs</a></li><li><a href="https://github.com/piiiico/proof-of-commitment" target="_blank" rel="noopener">GitHub</a></li>
+        <li><a href="mailto:pico@amdal.dev">Contact</a></li>
+        <li><a href="/blog/rss.xml" title="RSS Feed">RSS</a></li>
+      </ul>
+      <span class="footer-locale">Stavanger, Norway</span>
+    </div>
+  </footer>
+
+</Layout>

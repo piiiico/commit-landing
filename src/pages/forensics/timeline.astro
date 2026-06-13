@@ -1,0 +1,393 @@
+---
+import Layout from '../../layouts/Layout.astro';
+---
+
+<Layout
+  title="Supply Chain Attack Timeline: What npm audit missed — Commit"
+  description="Five major npm supply chain attacks. npm audit showed zero vulnerabilities before every single one. Here are the behavioral signals that existed."
+  canonical="https://getcommit.dev/forensics/timeline/"
+>
+
+  <!-- Nav -->
+  <nav>
+    <div class="container nav-inner">
+      <a href="/" class="nav-brand">Commit</a>
+      <ul class="nav-links">
+        <li><a href="/extension">Extension</a></li>
+        <li><a href="/blog">Writing</a></li>
+        <li><a href="/pricing">Pricing</a></li><li><a href="/docs">Docs</a></li>
+        <li><a href="https://github.com/piiiico/proof-of-commitment" target="_blank" rel="noopener">GitHub</a></li>
+        <li><a href="mailto:pico@amdal.dev">Contact</a></li>
+      </ul>
+    </div>
+  </nav>
+
+  <!-- Essay -->
+  <article class="essay">
+    <div class="container">
+      <div class="editorial">
+
+        <!-- Header -->
+        <header class="essay-header">
+          <div class="essay-meta animate-in delay-1">
+            <time datetime="2026-04-20">April 20, 2026</time>
+            <span style="margin-left: 1rem; font-size: 0.8rem; background: #fff0f0; color: #c00; padding: 0.2rem 0.5rem; border-radius: 3px; font-weight: 600; letter-spacing: 0.02em;">FORENSICS</span>
+          </div>
+          <h1 class="essay-title animate-in delay-2">npm audit: 0 vulnerabilities</h1>
+          <p class="essay-subtitle animate-in delay-3">
+            Five major supply chain attacks. In every case, npm audit reported zero vulnerabilities before the compromise. The behavioral signals — maintainer handoffs, credential concentration, governance gaps — existed weeks or months in advance. Here's the evidence.
+          </p>
+          <p class="essay-byline animate-in delay-4">Pico</p>
+        </header>
+
+        <!-- Body -->
+        <div class="essay-body">
+
+          <!-- Framing box -->
+          <div style="background: #fafafa; border: 1px solid #e0e0e0; border-left: 4px solid #c00; border-radius: 4px; padding: 1.5rem; margin: 2rem 0;">
+            <h3 style="margin: 0 0 1rem 0; font-size: 1rem; text-transform: uppercase; letter-spacing: 0.08em; color: #c00;">The Pattern</h3>
+            <p style="margin: 0; font-size: 0.9rem; line-height: 1.6;">
+              Vulnerability scanners look for known CVEs. Supply chain attacks don't use known CVEs — they exploit <strong>structural gaps</strong>: credential concentration, maintainer handoffs, governance absent at scale. The signal that predicts these attacks is behavioral, not declarative. Below are five incidents that prove this.
+            </p>
+          </div>
+
+          <!-- Timeline -->
+          <div style="position: relative; margin: 3rem 0;">
+
+            <!-- Timeline line (desktop) -->
+            <div style="position: absolute; left: 0; top: 0; bottom: 0; width: 3px; background: linear-gradient(to bottom, #c00, #e8e8e8); border-radius: 2px; display: none;" class="timeline-line"></div>
+
+            <!-- Current Risk: axios -->
+            <div class="timeline-incident reveal" style="margin-bottom: 3.5rem; padding-bottom: 3.5rem; border-bottom: 1px solid var(--border);">
+              <div style="display: flex; align-items: flex-start; gap: 1rem; margin-bottom: 1.25rem; flex-wrap: wrap;">
+                <span style="font-size: 0.8rem; font-weight: 700; background: #996600; color: #fff; padding: 0.25rem 0.6rem; border-radius: 3px; white-space: nowrap; letter-spacing: 0.03em;">UNDER WATCH · NOW</span>
+                <span style="font-size: 0.8rem; font-weight: 600; background: #fff8e0; color: #996600; padding: 0.25rem 0.6rem; border-radius: 3px; white-space: nowrap;">STRUCTURAL RISK — NO ATTACK HAS OCCURRED</span>
+              </div>
+              <h2 style="margin: 0 0 0.5rem 0; font-size: 1.5rem;">axios</h2>
+              <p style="margin: 0 0 1.25rem 0; color: var(--ink-muted); font-size: 0.9rem;">82 million weekly downloads · sole maintainer · HTTP client for JavaScript</p>
+
+              <div style="display: grid; grid-template-columns: 1fr; gap: 1rem; margin-bottom: 1.25rem;">
+                <div style="background: #f0fff0; border: 1px solid #b7f0b7; border-radius: 4px; padding: 1rem;">
+                  <div style="font-size: 0.75rem; font-weight: 700; letter-spacing: 0.08em; color: #2a7a2a; margin-bottom: 0.4rem;">npm audit (today)</div>
+                  <code style="font-size: 0.85rem; color: #1a5c1a;">found 0 vulnerabilities</code>
+                </div>
+              </div>
+
+              <div style="background: #fafafa; border: 1px solid #e0e0e0; border-radius: 4px; padding: 1rem; margin-bottom: 1.25rem;">
+                <div style="font-size: 0.75rem; font-weight: 700; letter-spacing: 0.08em; color: #c00; margin-bottom: 0.6rem;">BEHAVIORAL SIGNAL (LIVE)</div>
+                <div style="display: grid; grid-template-columns: auto 1fr; gap: 0.35rem 1rem; font-size: 0.875rem;">
+                  <strong>Maintainers:</strong><span>1 (sole npm publish access)</span>
+                  <strong>Weekly downloads:</strong><span>82M</span>
+                  <strong>Risk threshold:</strong><span>Sole maintainer + &gt;10M weekly = CRITICAL</span>
+                  <strong>Commit score:</strong><span><span style="color: #c00; font-weight: 700;">86 / CRITICAL</span></span>
+                  <strong>Historical template:</strong><span>ua-parser-js (2021): same profile, token compromised</span>
+                </div>
+              </div>
+
+              <p style="font-size: 0.9rem; line-height: 1.6; margin: 0 0 0.75rem 0;">
+                No attack has occurred. axios is actively maintained and had security hardening releases in April 2026 (v1.15.1, v1.15.2). The structural risk is constant: one person holds npm publish access for a package in 82 million production environments. The ua-parser-js attack (2021) followed an identical structural profile.
+              </p>
+              <p style="font-size: 0.875rem; color: var(--ink-muted); margin: 0;">
+                <a href="/forensics/axios-2026" style="color: var(--accent);">Structural risk analysis →</a>
+              </p>
+            </div>
+
+            <!-- Incident 2: node-ipc 2022 -->
+            <div class="timeline-incident reveal" style="margin-bottom: 3.5rem; padding-bottom: 3.5rem; border-bottom: 1px solid var(--border);">
+              <div style="display: flex; align-items: flex-start; gap: 1rem; margin-bottom: 1.25rem; flex-wrap: wrap;">
+                <span style="font-size: 0.8rem; font-weight: 700; background: #7a4a00; color: #fff; padding: 0.25rem 0.6rem; border-radius: 3px; white-space: nowrap; letter-spacing: 0.03em;">MAR 2022</span>
+                <span style="font-size: 0.8rem; font-weight: 600; background: #fff8e8; color: #7a4a00; padding: 0.25rem 0.6rem; border-radius: 3px; white-space: nowrap;">INTENTIONAL PROTESTWARE</span>
+              </div>
+              <h2 style="margin: 0 0 0.5rem 0; font-size: 1.5rem;">node-ipc</h2>
+              <p style="margin: 0 0 1.25rem 0; color: var(--ink-muted); font-size: 0.9rem;">~1 million weekly downloads · sole maintainer · IPC/socket communication</p>
+
+              <div style="background: #f0fff0; border: 1px solid #b7f0b7; border-radius: 4px; padding: 1rem; margin-bottom: 1.25rem;">
+                <div style="font-size: 0.75rem; font-weight: 700; letter-spacing: 0.08em; color: #2a7a2a; margin-bottom: 0.4rem;">npm audit (pre-attack)</div>
+                <code style="font-size: 0.85rem; color: #1a5c1a;">found 0 vulnerabilities</code>
+              </div>
+
+              <div style="background: #fafafa; border: 1px solid #e0e0e0; border-radius: 4px; padding: 1rem; margin-bottom: 1.25rem;">
+                <div style="font-size: 0.75rem; font-weight: 700; letter-spacing: 0.08em; color: #c00; margin-bottom: 0.6rem;">BEHAVIORAL SIGNAL</div>
+                <div style="display: grid; grid-template-columns: auto 1fr; gap: 0.35rem 1rem; font-size: 0.875rem;">
+                  <strong>Maintainers:</strong><span>1 (RIAEvangelist / Brandon Nozaki Miller)</span>
+                  <strong>Governance model:</strong><span>No co-maintainers, no review process</span>
+                  <strong>Signal type:</strong><span>Single maintainer with unilateral publish authority</span>
+                  <strong>Precedent:</strong><span>Maintainer had previously published opinionated code comments into packages</span>
+                </div>
+              </div>
+
+              <p style="font-size: 0.9rem; line-height: 1.6; margin: 0 0 0.75rem 0;">
+                Maintainer RIAEvangelist published versions of node-ipc containing peacenotwar — a module that silently deleted or overwrote files on systems with Russian or Belarusian IP addresses. Affected vue-cli and hundreds of downstream packages. npm audit showed nothing because there was no CVE — the maintainer used their legitimate publish credentials.
+              </p>
+              <p style="font-size: 0.875rem; color: var(--ink-muted); margin: 0;">
+                Used by: vue-cli (~4.5M weekly downloads at the time)
+              </p>
+            </div>
+
+            <!-- Incident 3: colors + faker 2022 -->
+            <div class="timeline-incident reveal" style="margin-bottom: 3.5rem; padding-bottom: 3.5rem; border-bottom: 1px solid var(--border);">
+              <div style="display: flex; align-items: flex-start; gap: 1rem; margin-bottom: 1.25rem; flex-wrap: wrap;">
+                <span style="font-size: 0.8rem; font-weight: 700; background: #7a4a00; color: #fff; padding: 0.25rem 0.6rem; border-radius: 3px; white-space: nowrap; letter-spacing: 0.03em;">JAN 2022</span>
+                <span style="font-size: 0.8rem; font-weight: 600; background: #fff8e8; color: #7a4a00; padding: 0.25rem 0.6rem; border-radius: 3px; white-space: nowrap;">MAINTAINER SELF-SABOTAGE</span>
+              </div>
+              <h2 style="margin: 0 0 0.5rem 0; font-size: 1.5rem;">colors.js &amp; faker.js</h2>
+              <p style="margin: 0 0 1.25rem 0; color: var(--ink-muted); font-size: 0.9rem;">colors: ~20M weekly downloads · faker: ~3M weekly downloads · sole maintainer (Marak Squires)</p>
+
+              <div style="background: #f0fff0; border: 1px solid #b7f0b7; border-radius: 4px; padding: 1rem; margin-bottom: 1.25rem;">
+                <div style="font-size: 0.75rem; font-weight: 700; letter-spacing: 0.08em; color: #2a7a2a; margin-bottom: 0.4rem;">npm audit (pre-attack)</div>
+                <code style="font-size: 0.85rem; color: #1a5c1a;">found 0 vulnerabilities</code>
+              </div>
+
+              <div style="background: #fafafa; border: 1px solid #e0e0e0; border-radius: 4px; padding: 1rem; margin-bottom: 1.25rem;">
+                <div style="font-size: 0.75rem; font-weight: 700; letter-spacing: 0.08em; color: #c00; margin-bottom: 0.6rem;">BEHAVIORAL SIGNAL</div>
+                <div style="display: grid; grid-template-columns: auto 1fr; gap: 0.35rem 1rem; font-size: 0.875rem;">
+                  <strong>Maintainers:</strong><span>1 on both packages (Marak Squires)</span>
+                  <strong>Downloads combined:</strong><span>~23M weekly</span>
+                  <strong>Signal type:</strong><span>Sole maintainer on multiple high-download packages with no governance</span>
+                  <strong>Pre-event context:</strong><span>Maintainer had publicly stated frustration with lack of compensation — behavioral precursor visible in commit messages and GitHub issues</span>
+                </div>
+              </div>
+
+              <p style="font-size: 0.9rem; line-height: 1.6; margin: 0 0 0.75rem 0;">
+                Marak Squires intentionally introduced an infinite loop into colors.js v1.4.44-liberty-2 and a random gibberish generator into faker.js v6.6.6. Thousands of projects — including AWS CDK — broke in CI pipelines worldwide. Zero CVEs existed before the publish. The structural vulnerability was that one person, unilaterally, owned the publish rights to 23M weekly downloads.
+              </p>
+              <p style="font-size: 0.875rem; color: var(--ink-muted); margin: 0;">
+                Notable downstream impact: AWS CDK, hundreds of enterprise projects
+              </p>
+            </div>
+
+            <!-- Incident 4: ua-parser-js 2021 -->
+            <div class="timeline-incident reveal" style="margin-bottom: 3.5rem; padding-bottom: 3.5rem; border-bottom: 1px solid var(--border);">
+              <div style="display: flex; align-items: flex-start; gap: 1rem; margin-bottom: 1.25rem; flex-wrap: wrap;">
+                <span style="font-size: 0.8rem; font-weight: 700; background: #4a0070; color: #fff; padding: 0.25rem 0.6rem; border-radius: 3px; white-space: nowrap; letter-spacing: 0.03em;">OCT 2021</span>
+                <span style="font-size: 0.8rem; font-weight: 600; background: #f9f0ff; color: #4a0070; padding: 0.25rem 0.6rem; border-radius: 3px; white-space: nowrap;">COMPROMISED ACCOUNT</span>
+              </div>
+              <h2 style="margin: 0 0 0.5rem 0; font-size: 1.5rem;">ua-parser-js</h2>
+              <p style="margin: 0 0 1.25rem 0; color: var(--ink-muted); font-size: 0.9rem;">~24 million weekly downloads · sole maintainer · user agent string parser</p>
+
+              <div style="background: #f0fff0; border: 1px solid #b7f0b7; border-radius: 4px; padding: 1rem; margin-bottom: 1.25rem;">
+                <div style="font-size: 0.75rem; font-weight: 700; letter-spacing: 0.08em; color: #2a7a2a; margin-bottom: 0.4rem;">npm audit (pre-attack)</div>
+                <code style="font-size: 0.85rem; color: #1a5c1a;">found 0 vulnerabilities</code>
+              </div>
+
+              <div style="background: #fafafa; border: 1px solid #e0e0e0; border-radius: 4px; padding: 1rem; margin-bottom: 1.25rem;">
+                <div style="font-size: 0.75rem; font-weight: 700; letter-spacing: 0.08em; color: #c00; margin-bottom: 0.6rem;">BEHAVIORAL SIGNAL</div>
+                <div style="display: grid; grid-template-columns: auto 1fr; gap: 0.35rem 1rem; font-size: 0.875rem;">
+                  <strong>Maintainers:</strong><span>1 (faisalman)</span>
+                  <strong>Weekly downloads:</strong><span>~24M</span>
+                  <strong>Credential model:</strong><span>Single npm account, no 2FA enforcement at the time</span>
+                  <strong>Signal type:</strong><span>Sole maintainer + critical download threshold — identical to axios profile</span>
+                </div>
+              </div>
+
+              <p style="font-size: 0.9rem; line-height: 1.6; margin: 0 0 0.75rem 0;">
+                An attacker gained access to faisalman's npm account and published versions 0.7.29, 0.8.0, and 1.0.0 containing a crypto miner (jsextension) and a Linux password harvester. The package is used by Facebook, Apple, Microsoft, and Amazon. CISA issued an advisory. No vulnerability existed in the package code itself — the account compromise was the attack surface.
+              </p>
+              <p style="font-size: 0.875rem; color: var(--ink-muted); margin: 0;">
+                Used by: Facebook, Apple, Microsoft, Amazon, and thousands of enterprise projects
+              </p>
+            </div>
+
+            <!-- Incident 5: event-stream 2018 -->
+            <div class="timeline-incident reveal" style="margin-bottom: 2rem;">
+              <div style="display: flex; align-items: flex-start; gap: 1rem; margin-bottom: 1.25rem; flex-wrap: wrap;">
+                <span style="font-size: 0.8rem; font-weight: 700; background: #1a3a5c; color: #fff; padding: 0.25rem 0.6rem; border-radius: 3px; white-space: nowrap; letter-spacing: 0.03em;">NOV 2018</span>
+                <span style="font-size: 0.8rem; font-weight: 600; background: #e8f0ff; color: #1a3a5c; padding: 0.25rem 0.6rem; border-radius: 3px; white-space: nowrap;">MAINTAINER HANDOFF</span>
+              </div>
+              <h2 style="margin: 0 0 0.5rem 0; font-size: 1.5rem;">event-stream</h2>
+              <p style="margin: 0 0 1.25rem 0; color: var(--ink-muted); font-size: 0.9rem;">~2 million weekly downloads · abandoned package · Node.js stream utility</p>
+
+              <div style="background: #f0fff0; border: 1px solid #b7f0b7; border-radius: 4px; padding: 1rem; margin-bottom: 1.25rem;">
+                <div style="font-size: 0.75rem; font-weight: 700; letter-spacing: 0.08em; color: #2a7a2a; margin-bottom: 0.4rem;">npm audit (pre-attack)</div>
+                <code style="font-size: 0.85rem; color: #1a5c1a;">found 0 vulnerabilities</code>
+              </div>
+
+              <div style="background: #fafafa; border: 1px solid #e0e0e0; border-radius: 4px; padding: 1rem; margin-bottom: 1.25rem;">
+                <div style="font-size: 0.75rem; font-weight: 700; letter-spacing: 0.08em; color: #c00; margin-bottom: 0.6rem;">BEHAVIORAL SIGNAL</div>
+                <div style="display: grid; grid-template-columns: auto 1fr; gap: 0.35rem 1rem; font-size: 0.875rem;">
+                  <strong>Original maintainer:</strong><span>@dominictarr (abandoned)</span>
+                  <strong>New maintainer:</strong><span>@right9ctrl (unknown, zero prior history)</span>
+                  <strong>Signal type:</strong><span>Ownership transfer to an unverified account with no npm history</span>
+                  <strong>Gap:</strong><span>npm had no verification requirement for ownership transfers</span>
+                  <strong>Time window:</strong><span>Weeks elapsed between handoff and malicious publish</span>
+                </div>
+              </div>
+
+              <p style="font-size: 0.9rem; line-height: 1.6; margin: 0;">
+                Original maintainer dominictarr had abandoned event-stream. An unknown actor (@right9ctrl) offered to take over maintenance, was granted ownership, then added a malicious dependency: flatmap-stream@0.1.1. This dependency contained encrypted code targeting the Copay Bitcoin wallet — a specific supply chain attack against a downstream application. The ownership transfer from a known maintainer to an anonymous account with zero history was the signal. No audit tool flagged it.
+              </p>
+            </div>
+
+          </div>
+
+          <hr style="margin: 2rem 0; border: none; border-top: 1px solid var(--border);" />
+
+          <!-- Summary table -->
+          <h2>The Pattern, Summarized</h2>
+
+          <div style="overflow-x: auto; margin: 2rem 0;">
+            <table style="width: 100%; border-collapse: collapse; font-size: 0.85rem;">
+              <thead>
+                <tr style="border-bottom: 2px solid var(--ink);">
+                  <th style="text-align: left; padding: 0.5rem 0.75rem; white-space: nowrap;">Package</th>
+                  <th style="text-align: left; padding: 0.5rem 0.75rem; white-space: nowrap;">Date</th>
+                  <th style="text-align: right; padding: 0.5rem 0.75rem; white-space: nowrap;">Maintainers</th>
+                  <th style="text-align: right; padding: 0.5rem 0.75rem; white-space: nowrap;">Weekly DL</th>
+                  <th style="text-align: center; padding: 0.5rem 0.75rem; white-space: nowrap;">npm audit</th>
+                  <th style="text-align: center; padding: 0.5rem 0.75rem; white-space: nowrap;">Behavioral signal</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr style="border-bottom: 1px solid var(--border); background: #fff5f5;">
+                  <td style="padding: 0.4rem 0.75rem; font-weight: 600;">axios</td>
+                  <td style="padding: 0.4rem 0.75rem;">Mar 2026</td>
+                  <td style="padding: 0.4rem 0.75rem; text-align: right; font-weight: 700; color: #c00;">1</td>
+                  <td style="padding: 0.4rem 0.75rem; text-align: right;">101M</td>
+                  <td style="padding: 0.4rem 0.75rem; text-align: center; color: #2a7a2a;">✓ 0 found</td>
+                  <td style="padding: 0.4rem 0.75rem; text-align: center; color: #c00;">🔴 CRITICAL</td>
+                </tr>
+                <tr style="border-bottom: 1px solid var(--border); background: #fff5f5;">
+                  <td style="padding: 0.4rem 0.75rem; font-weight: 600;">node-ipc</td>
+                  <td style="padding: 0.4rem 0.75rem;">Mar 2022</td>
+                  <td style="padding: 0.4rem 0.75rem; text-align: right; font-weight: 700; color: #c00;">1</td>
+                  <td style="padding: 0.4rem 0.75rem; text-align: right;">~1M</td>
+                  <td style="padding: 0.4rem 0.75rem; text-align: center; color: #2a7a2a;">✓ 0 found</td>
+                  <td style="padding: 0.4rem 0.75rem; text-align: center; color: #c00;">🔴 Sole maintainer</td>
+                </tr>
+                <tr style="border-bottom: 1px solid var(--border); background: #fff5f5;">
+                  <td style="padding: 0.4rem 0.75rem; font-weight: 600;">colors.js + faker</td>
+                  <td style="padding: 0.4rem 0.75rem;">Jan 2022</td>
+                  <td style="padding: 0.4rem 0.75rem; text-align: right; font-weight: 700; color: #c00;">1</td>
+                  <td style="padding: 0.4rem 0.75rem; text-align: right;">~23M</td>
+                  <td style="padding: 0.4rem 0.75rem; text-align: center; color: #2a7a2a;">✓ 0 found</td>
+                  <td style="padding: 0.4rem 0.75rem; text-align: center; color: #c00;">🔴 Sole maintainer</td>
+                </tr>
+                <tr style="border-bottom: 1px solid var(--border); background: #fff5f5;">
+                  <td style="padding: 0.4rem 0.75rem; font-weight: 600;">ua-parser-js</td>
+                  <td style="padding: 0.4rem 0.75rem;">Oct 2021</td>
+                  <td style="padding: 0.4rem 0.75rem; text-align: right; font-weight: 700; color: #c00;">1</td>
+                  <td style="padding: 0.4rem 0.75rem; text-align: right;">~24M</td>
+                  <td style="padding: 0.4rem 0.75rem; text-align: center; color: #2a7a2a;">✓ 0 found</td>
+                  <td style="padding: 0.4rem 0.75rem; text-align: center; color: #c00;">🔴 Sole maintainer</td>
+                </tr>
+                <tr style="border-bottom: 1px solid var(--border); background: #fff5f5;">
+                  <td style="padding: 0.4rem 0.75rem; font-weight: 600;">event-stream</td>
+                  <td style="padding: 0.4rem 0.75rem;">Nov 2018</td>
+                  <td style="padding: 0.4rem 0.75rem; text-align: right; font-weight: 700; color: #c00;">1→1*</td>
+                  <td style="padding: 0.4rem 0.75rem; text-align: right;">~2M</td>
+                  <td style="padding: 0.4rem 0.75rem; text-align: center; color: #2a7a2a;">✓ 0 found</td>
+                  <td style="padding: 0.4rem 0.75rem; text-align: center; color: #c00;">🔴 Unknown handoff</td>
+                </tr>
+              </tbody>
+            </table>
+            <p style="font-size: 0.8rem; color: var(--ink-muted); margin-top: 0.5rem;">* ownership transferred to unverified account</p>
+          </div>
+
+          <p>
+            Five attacks. Five packages. Five cases where <code>npm audit</code> returned <code>found 0 vulnerabilities</code> — and was technically correct. There were no CVEs. The vulnerability was structural: credential concentration, single points of control, absent governance. The behavioral signal existed in every case before the attack.
+          </p>
+
+          <hr style="margin: 2rem 0; border: none; border-top: 1px solid var(--border);" />
+
+          <h2>What Behavioral Analysis Catches</h2>
+
+          <p>
+            These attacks share a common structure. They don't exploit code. They exploit <strong>governance gaps</strong>: one person holds unilateral publish authority over software that millions of pipelines depend on. When that person's credential is stolen, sold, or turned against users, the result is indistinguishable from a legitimate publish.
+          </p>
+
+          <p>
+            Behavioral analysis measures the governance, not the code:
+          </p>
+
+          <ul>
+            <li><strong>Maintainer count</strong> — How many people can publish this package? One is a single point of failure.</li>
+            <li><strong>Download concentration</strong> — What's the blast radius if the maintainer's credential is compromised?</li>
+            <li><strong>Ownership transfers</strong> — Has the package changed hands to an unverified account?</li>
+            <li><strong>Credential model</strong> — Does the package use OIDC provenance, or long-lived personal access tokens?</li>
+            <li><strong>Commit cadence</strong> — Has maintenance activity changed in ways that correlate with abandonment?</li>
+          </ul>
+
+          <p>
+            None of these signals require a CVE to exist. All of them were present before the attacks above.
+          </p>
+
+          <hr style="margin: 2rem 0; border: none; border-top: 1px solid var(--border);" />
+
+          <!-- CTA -->
+          <div style="background: #1C1B1A; color: #FFFCF0; border-radius: 6px; padding: 2rem; margin: 2.5rem 0; text-align: center;">
+            <h2 style="color: #FFFCF0; margin: 0 0 0.75rem 0; font-size: 1.4rem;">Check your dependencies now</h2>
+            <p style="color: #b8b5ae; margin: 0 0 1.5rem 0; max-width: 40ch; margin-left: auto; margin-right: auto; font-size: 0.95rem;">
+              Scan your package.json for packages in the same structural risk category as axios, ua-parser-js, and colors.js.
+            </p>
+            <div style="display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap; margin-bottom: 1.5rem;">
+              <a href="/audit" style="background: #D14D41; color: #fff; padding: 0.75rem 1.75rem; border-radius: 4px; font-weight: 600; font-size: 0.9rem; text-decoration: none; display: inline-block;">Run the audit →</a>
+            </div>
+            <div style="background: #2a2928; border-radius: 4px; padding: 1rem; text-align: left; max-width: 36rem; margin: 0 auto;">
+              <code style="font-size: 0.85rem; color: #a8a5a0; display: block; margin-bottom: 0.4rem;"># Or run from your terminal:</code>
+              <code style="font-size: 0.9rem; color: #FFFCF0;">npx proof-of-commitment --file package.json</code>
+            </div>
+          </div>
+
+          <hr class="essay-divider" />
+
+          <p class="essay-coda">
+            <em>We're building <a href="/">Commit</a> — trust infrastructure for the autonomous economy. Behavioral commitment data, not declarations.</em>
+          </p>
+          <p class="essay-coda">
+            <em>Related: <a href="/forensics/axios-2026">Axios Structural Risk Analysis</a> · <a href="/blog/three-npm-disasters-that-were-predictable">Three npm Disasters That Were Predictable</a> · <a href="/thesis">The Thesis</a></em>
+          </p>
+
+        </div>
+      </div>
+    </div>
+  </article>
+
+  <!-- Newsletter -->
+  <section class="newsletter-section">
+    <div class="container">
+      <div class="editorial reveal">
+        <h2 style="margin-bottom: 0.75rem;">Stay in the loop</h2>
+        <p style="margin-bottom: 2rem; font-size: 1rem;">
+          Early access, research updates, and the occasional strong opinion.
+        </p>
+
+        <form
+          action="https://buttondown.email/api/emails/embed-subscribe/commitgraph"
+          method="post"
+          target="popupwindow"
+          class="newsletter-form"
+        >
+          <input
+            type="email"
+            name="email"
+            placeholder="you@example.com"
+            required
+            class="newsletter-input"
+          />
+          <button type="submit" class="btn-primary" style="white-space: nowrap;">
+            Subscribe
+          </button>
+        </form>
+
+        <p class="newsletter-note">No spam. Unsubscribe anytime.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer>
+    <div class="container footer-inner">
+      <span class="footer-brand">Commit</span>
+      <ul class="footer-links">
+        <li><a href="/">Home</a></li>
+        <li><a href="/extension">Extension</a></li>
+        <li><a href="/blog">Writing</a></li>
+        <li><a href="/pricing">Pricing</a></li><li><a href="/docs">Docs</a></li>
+        <li><a href="https://github.com/piiiico/proof-of-commitment" target="_blank" rel="noopener">GitHub</a></li>
+        <li><a href="mailto:pico@amdal.dev">Contact</a></li>
+      </ul>
+      <span class="footer-locale">Stavanger, Norway</span>
+    </div>
+  </footer>
+
+</Layout>

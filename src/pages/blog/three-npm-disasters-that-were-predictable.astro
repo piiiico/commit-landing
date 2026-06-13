@@ -1,0 +1,423 @@
+---
+import Layout from '../../layouts/Layout.astro';
+---
+
+<Layout
+  title="Three npm Disasters That Were Predictable — Commit"
+  description="We ran three real npm supply chain incidents through proof-of-commitment. The structural signals were there before every attack. Here's what they look like."
+  canonical="https://getcommit.dev/blog/three-npm-disasters-that-were-predictable/"
+  publishDate="2026-04-18"
+>
+
+  <!-- Nav -->
+  <nav>
+    <div class="container nav-inner">
+      <a href="/" class="nav-brand">Commit</a>
+      <ul class="nav-links">
+        <li><a href="/extension">Extension</a></li>
+        <li><a href="/blog">Writing</a></li>
+        <li><a href="/pricing">Pricing</a></li><li><a href="/docs">Docs</a></li><li><a href="https://github.com/piiiico/proof-of-commitment" target="_blank" rel="noopener">GitHub</a></li>
+        <li><a href="mailto:pico@amdal.dev">Contact</a></li>
+      </ul>
+    </div>
+  </nav>
+
+  <!-- Essay -->
+  <article class="essay">
+    <div class="container">
+      <div class="editorial">
+
+        <!-- Header -->
+        <header class="essay-header">
+          <div class="essay-meta animate-in delay-1">
+            <time datetime="2026-04-18">April 18, 2026</time>
+          </div>
+          <h1 class="essay-title animate-in delay-2">Three npm Disasters That Were Predictable</h1>
+          <p class="essay-subtitle animate-in delay-3">
+            We ran three real supply chain incidents through proof-of-commitment scoring. In every case, the structural signals were there before the attack. In two cases, they were screaming.
+          </p>
+          <p class="essay-byline animate-in delay-4">Pico</p>
+        </header>
+
+        <!-- Body -->
+        <div class="essay-body">
+
+          <p>
+            Supply chain attacks don't come from nowhere. They exploit structural conditions that existed long before the incident — single maintainers, token concentration, asymmetric blast radius. The conditions are visible. The question is whether anyone is looking.
+          </p>
+
+          <p>
+            We took three of the most consequential npm supply chain attacks in the last eight years and analyzed each one through <a href="https://github.com/piiiico/proof-of-commitment" target="_blank" rel="noopener">proof-of-commitment</a> — behavioral scoring that measures structural resilience, not CVE databases. For each incident, we ran the actual package through the API today, then reconstructed what the signals would have shown before the attack.
+          </p>
+
+          <p>
+            The results are honest. In some cases, the tool would have flagged the exact vulnerability exploited. In others, the signal was there but below the alarm threshold. We'll show both.
+          </p>
+
+          <hr style="margin: 2rem 0; border: none; border-top: 1px solid var(--rule);" />
+
+          <h2>Case 1: event-stream (2018)</h2>
+
+          <h3>What happened</h3>
+
+          <p>
+            In November 2018, a developer named <code>right9ctrl</code> approached Dominic Tarr, the sole maintainer of event-stream, and offered to take over maintenance of the package. Tarr, who had moved on from the project, agreed. The new maintainer added a dependency called <code>flatmap-stream</code>, which contained an encrypted payload targeting Copay — a Bitcoin wallet — to steal cryptocurrency. The attack went undetected for two months. It targeted a specific downstream package while hiding in a generic utility with ~2 million weekly downloads at the time.
+          </p>
+
+          <h3>What proof-of-commitment sees today</h3>
+
+          <div style="overflow-x: auto; margin: 2rem 0;">
+            <table style="width: 100%; border-collapse: collapse; font-size: 0.875rem;">
+              <thead>
+                <tr style="border-bottom: 2px solid var(--ink);">
+                  <th style="text-align: left; padding: 0.5rem 0.75rem;">Package</th>
+                  <th style="text-align: right; padding: 0.5rem 0.75rem;">Score</th>
+                  <th style="text-align: center; padding: 0.5rem 0.75rem;">Risk</th>
+                  <th style="text-align: right; padding: 0.5rem 0.75rem;">Maintainers</th>
+                  <th style="text-align: right; padding: 0.5rem 0.75rem;">Downloads/wk</th>
+                  <th style="text-align: right; padding: 0.5rem 0.75rem;">Age</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr style="border-bottom: 2px solid var(--ink); background: #fffbee;">
+                  <td style="padding: 0.4rem 0.75rem; font-weight: bold;">event-stream</td>
+                  <td style="padding: 0.4rem 0.75rem; text-align: right;">67</td>
+                  <td style="padding: 0.4rem 0.75rem; text-align: center; color: #996600;">⚠️ WARN</td>
+                  <td style="padding: 0.4rem 0.75rem; text-align: right; font-weight: bold;">1</td>
+                  <td style="padding: 0.4rem 0.75rem; text-align: right;">6.0M</td>
+                  <td style="padding: 0.4rem 0.75rem; text-align: right;">14.7 yrs</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <p>
+            Score: 67 — the lowest of the three packages we analyzed, sitting in the "GOOD" band but well below the "HEALTHY" threshold of 75. The WARN flag fires because of single-maintainer risk. It misses CRITICAL only because downloads are under 10 million per week.
+          </p>
+
+          <h3>What signals existed before the attack</h3>
+
+          <p>
+            In late 2018, the structural profile looked worse than it does today:
+          </p>
+
+          <ul>
+            <li><strong>Single maintainer</strong> — Dominic Tarr was the only person with npm publish access. When he handed the keys over, there was no governance process, no second pair of eyes, no institutional memory.</li>
+            <li><strong>Maintainer handoff pattern</strong> — A new, unknown contributor took ownership. This is the single strongest behavioral signal for social engineering attacks, and it's the one thing nobody was monitoring.</li>
+            <li><strong>Sudden new dependency</strong> — The addition of <code>flatmap-stream</code>, a brand-new package with no download history, should have been a structural anomaly. An established package suddenly depending on an unknown package is a pattern, not just a diff.</li>
+            <li><strong>Abandoned project, active downloads</strong> — Tarr had publicly stated he was no longer interested in maintaining the package. An abandoned but highly-downloaded package is the ideal target for social engineering.</li>
+          </ul>
+
+          <h3>Verdict: partially</h3>
+
+          <p>
+            <strong>Proof-of-commitment would have flagged the single-maintainer risk</strong> — that was the structural condition that made the social engineering attack possible. But it would not have specifically detected the maintainer handoff or the suspicious new dependency. Those signals require a different kind of analysis: behavioral diff over time, not a point-in-time score.
+          </p>
+
+          <p>
+            The score of 67 — notably lower than the 80+ scores of most popular packages — is itself a signal. It reflects the structural fragility that made this attack surface viable. But we'd be dishonest to claim it would have prevented the incident on its own.
+          </p>
+
+          <p>
+            What it does prove: <strong>the structural condition that enabled the attack was observable.</strong> One maintainer. No governance. High download count relative to maintainer investment. The social engineering succeeded because nobody was measuring the gap between usage and stewardship.
+          </p>
+
+          <hr style="margin: 2rem 0; border: none; border-top: 1px solid var(--rule);" />
+
+          <h2>Case 2: ua-parser-js (2021)</h2>
+
+          <h3>What happened</h3>
+
+          <p>
+            In October 2021, the npm account of Faisal Salman — the sole maintainer of ua-parser-js — was compromised. The attacker published three malicious versions (0.7.29, 0.8.0, and 1.0.0) that contained a cryptominer and a credential-stealing trojan targeting Linux and Windows systems. The package had approximately 7 million weekly downloads at the time and was used by companies including Facebook, Microsoft, Amazon, and Google. The malicious versions were live for roughly four hours before removal.
+          </p>
+
+          <h3>What proof-of-commitment sees today</h3>
+
+          <div style="overflow-x: auto; margin: 2rem 0;">
+            <table style="width: 100%; border-collapse: collapse; font-size: 0.875rem;">
+              <thead>
+                <tr style="border-bottom: 2px solid var(--ink);">
+                  <th style="text-align: left; padding: 0.5rem 0.75rem;">Package</th>
+                  <th style="text-align: right; padding: 0.5rem 0.75rem;">Score</th>
+                  <th style="text-align: center; padding: 0.5rem 0.75rem;">Risk</th>
+                  <th style="text-align: right; padding: 0.5rem 0.75rem;">Maintainers</th>
+                  <th style="text-align: right; padding: 0.5rem 0.75rem;">Downloads/wk</th>
+                  <th style="text-align: right; padding: 0.5rem 0.75rem;">Age</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr style="border-bottom: 2px solid var(--ink); background: #fff5f5;">
+                  <td style="padding: 0.4rem 0.75rem; font-weight: bold;">ua-parser-js</td>
+                  <td style="padding: 0.4rem 0.75rem; text-align: right;">83</td>
+                  <td style="padding: 0.4rem 0.75rem; text-align: center; color: #c00;">🔴 CRITICAL</td>
+                  <td style="padding: 0.4rem 0.75rem; text-align: right; font-weight: bold;">1</td>
+                  <td style="padding: 0.4rem 0.75rem; text-align: right;">25.4M</td>
+                  <td style="padding: 0.4rem 0.75rem; text-align: right;">13.7 yrs</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <p>
+            Today: score 83, single maintainer, 25.4 million weekly downloads. <strong>CRITICAL.</strong> The exact profile that was exploited.
+          </p>
+
+          <h3>What signals existed before the attack</h3>
+
+          <ul>
+            <li><strong>Single maintainer with sole npm token</strong> — Faisal Salman was the only person who could publish. One compromised credential = full access to 7 million weekly installs.</li>
+            <li><strong>High download-to-maintainer ratio</strong> — Even at 7M weekly downloads (below today's 25M), the ratio of "people who depend on this" to "people who can publish" was approximately 7,000,000 : 1.</li>
+            <li><strong>No 2FA enforcement at time</strong> — npm did not require two-factor authentication for publishing in 2021. A single password could, and did, compromise the entire package.</li>
+            <li><strong>Behavioral score looks fine</strong> — This is the uncomfortable part. The package was well-maintained, consistently released, widely adopted. Every quality metric was positive. The vulnerability was invisible to quality analysis.</li>
+          </ul>
+
+          <h3>Verdict: yes</h3>
+
+          <p>
+            <strong>Proof-of-commitment would have flagged this as CRITICAL</strong> — today, clearly. In 2021, with ~7M weekly downloads, it would have been right at the boundary of the CRITICAL threshold (>10M). It would have shown WARN at minimum, and the single-maintainer flag would have been visible.
+          </p>
+
+          <p>
+            The specific attack vector — npm token compromise — is exactly what the CRITICAL flag is designed to surface. One token. One person. Millions of installs. The structural risk was there for years before the attack. npm had no mechanism to flag it. <code>npm audit</code> showed nothing. CVE databases showed nothing. The package was healthy by every metric except the one that mattered.
+          </p>
+
+          <p>
+            <strong>Three years after the attack, nothing has structurally changed.</strong> ua-parser-js today still has one maintainer. Downloads have grown from 7M to 25M per week. The blast radius is 3.6x larger than when it was compromised. The same attack would work again, with more damage.
+          </p>
+
+          <hr style="margin: 2rem 0; border: none; border-top: 1px solid var(--rule);" />
+
+          <h2>Case 3: colors.js (January 2022)</h2>
+
+          <h3>What happened</h3>
+
+          <p>
+            In January 2022, Marak Squiress — the sole maintainer of colors.js and faker.js — intentionally published breaking versions of both packages. colors.js v1.4.44 and v1.4.45 introduced an infinite loop that caused any application importing the package to hang indefinitely. faker.js v6.6.6 printed "LIBERTY LIBERTY LIBERTY" followed by corrupted output. Both packages were widely deployed: colors.js had approximately 35 million weekly downloads. Hundreds of open source projects and enterprise CI/CD pipelines broke immediately.
+          </p>
+
+          <p>
+            Marak had been publicly protesting the fact that large corporations were building commercial products on his unpaid open source work. The sabotage was intentional and announced. The entire incident was enabled by a single structural condition: he was the only person who could publish these packages.
+          </p>
+
+          <h3>What proof-of-commitment sees today</h3>
+
+          <div style="overflow-x: auto; margin: 2rem 0;">
+            <table style="width: 100%; border-collapse: collapse; font-size: 0.875rem;">
+              <thead>
+                <tr style="border-bottom: 2px solid var(--ink);">
+                  <th style="text-align: left; padding: 0.5rem 0.75rem;">Package</th>
+                  <th style="text-align: right; padding: 0.5rem 0.75rem;">Score</th>
+                  <th style="text-align: center; padding: 0.5rem 0.75rem;">Risk</th>
+                  <th style="text-align: right; padding: 0.5rem 0.75rem;">Maintainers</th>
+                  <th style="text-align: right; padding: 0.5rem 0.75rem;">Downloads/wk</th>
+                  <th style="text-align: right; padding: 0.5rem 0.75rem;">Age</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr style="border-bottom: 2px solid var(--ink); background: #fff5f5;">
+                  <td style="padding: 0.4rem 0.75rem; font-weight: bold;">colors</td>
+                  <td style="padding: 0.4rem 0.75rem; text-align: right;">65</td>
+                  <td style="padding: 0.4rem 0.75rem; text-align: center; color: #c00;">🔴 CRITICAL</td>
+                  <td style="padding: 0.4rem 0.75rem; text-align: right; font-weight: bold;">1</td>
+                  <td style="padding: 0.4rem 0.75rem; text-align: right;">19.8M</td>
+                  <td style="padding: 0.4rem 0.75rem; text-align: right;">15.1 yrs</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <p>
+            Today: score 65, single maintainer, 19.8 million weekly downloads — and still <strong>CRITICAL</strong>. The download count has declined from ~35M since the incident damaged ecosystem trust, but the structural profile is unchanged. One person. One token. Millions of installs.
+          </p>
+
+          <h3>What signals existed before the incident</h3>
+
+          <ul>
+            <li><strong>CRITICAL flag was present</strong> — At ~35M weekly downloads and sole maintainer, colors.js would have been flagged CRITICAL. The structural condition enabling the sabotage — one person, one publish token — was visible and unchanging.</li>
+            <li><strong>High score provided false comfort</strong> — colors.js was a well-maintained package with 15 years of history, consistent releases, and stable download trends. Every quality metric was positive. The risk wasn't about quality — it was about governance. One maintainer with sufficient grievance or instability is all it takes.</li>
+            <li><strong>No governance structure</strong> — There was no second reviewer, no multi-maintainer quorum, no npm organizational account. The entire blast radius — hundreds of CI/CD pipelines, enterprise build systems, downstream package chains — rested on one person's continued good will.</li>
+            <li><strong>The signal is broader than external attacks</strong> — This case proves that CRITICAL flagging isn't only about token compromise. It's about any failure mode of the sole maintainer: burnout, grievance, instability, or compromise. Single-maintainer packages fail in all these modes equally.</li>
+          </ul>
+
+          <h3>Verdict: yes, clearly</h3>
+
+          <p>
+            <strong>The CRITICAL flag is explicitly designed for this scenario.</strong> Not just external attacks — any failure of the single person at the helm. Proof-of-commitment can't predict whether a maintainer will feel aggrieved. It can flag that one person's decision is the only thing standing between stability and chaos for millions of weekly installs.
+          </p>
+
+          <p>
+            npm audit showed nothing before the incident — there were no known vulnerabilities. CVE databases showed nothing. Every toolchain in the ecosystem reported green until the packages broke. The structural flag would have shown red for months.
+          </p>
+
+          <hr style="margin: 2rem 0; border: none; border-top: 1px solid var(--rule);" />
+
+          <h2>Summary</h2>
+
+          <div style="overflow-x: auto; margin: 2rem 0;">
+            <table style="width: 100%; border-collapse: collapse; font-size: 0.875rem;">
+              <thead>
+                <tr style="border-bottom: 2px solid var(--ink);">
+                  <th style="text-align: left; padding: 0.5rem 0.75rem;">Incident</th>
+                  <th style="text-align: left; padding: 0.5rem 0.75rem;">Attack vector</th>
+                  <th style="text-align: center; padding: 0.5rem 0.75rem;">npm audit</th>
+                  <th style="text-align: center; padding: 0.5rem 0.75rem;">CVE</th>
+                  <th style="text-align: center; padding: 0.5rem 0.75rem;">PoC flag</th>
+                  <th style="text-align: left; padding: 0.5rem 0.75rem;">Would PoC have helped?</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr style="border-bottom: 1px solid #eee;">
+                  <td style="padding: 0.5rem 0.75rem;">event-stream (2018)</td>
+                  <td style="padding: 0.5rem 0.75rem;">Social engineering</td>
+                  <td style="padding: 0.5rem 0.75rem; text-align: center;">❌</td>
+                  <td style="padding: 0.5rem 0.75rem; text-align: center;">❌</td>
+                  <td style="padding: 0.5rem 0.75rem; text-align: center; color: #996600;">⚠️ WARN</td>
+                  <td style="padding: 0.5rem 0.75rem;">Partially — flagged single maintainer, but wouldn't detect handoff</td>
+                </tr>
+                <tr style="border-bottom: 1px solid #eee;">
+                  <td style="padding: 0.5rem 0.75rem;">ua-parser-js (2021)</td>
+                  <td style="padding: 0.5rem 0.75rem;">Token compromise</td>
+                  <td style="padding: 0.5rem 0.75rem; text-align: center;">❌</td>
+                  <td style="padding: 0.5rem 0.75rem; text-align: center;">❌</td>
+                  <td style="padding: 0.5rem 0.75rem; text-align: center; color: #996600;">⚠️ WARN*</td>
+                  <td style="padding: 0.5rem 0.75rem;">Yes — exact vulnerability flagged. *WARN at 2021 volume, CRITICAL today</td>
+                </tr>
+                <tr style="border-bottom: 2px solid var(--ink);">
+                  <td style="padding: 0.5rem 0.75rem;">colors.js (2022)</td>
+                  <td style="padding: 0.5rem 0.75rem;">Intentional sabotage</td>
+                  <td style="padding: 0.5rem 0.75rem; text-align: center;">❌</td>
+                  <td style="padding: 0.5rem 0.75rem; text-align: center;">❌</td>
+                  <td style="padding: 0.5rem 0.75rem; text-align: center; color: #c00;">🔴 CRITICAL</td>
+                  <td style="padding: 0.5rem 0.75rem;">Yes — sole-maintainer flag visible for entire 15-year package history</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <p>
+            The pattern across all three: <strong>zero pre-incident warnings from existing tools</strong>. npm audit looks at known CVEs — it can't flag structural risk. CVE databases are reactive by design — they catalog what already happened. Neither tool measures the conditions that make attacks viable.
+          </p>
+
+          <hr style="margin: 2rem 0; border: none; border-top: 1px solid var(--rule);" />
+
+          <h2>What We Can't Catch (Yet)</h2>
+
+          <p>
+            Honesty about limitations matters more than marketing claims. Proof-of-commitment currently does not detect:
+          </p>
+
+          <ul>
+            <li><strong>Maintainer handoffs</strong> — The event-stream attack exploited a change in who controls the package. The current scoring is point-in-time; it doesn't track behavioral diffs over time. This is the most important gap.</li>
+            <li><strong>New dependency injection</strong> — The addition of <code>flatmap-stream</code> was a structural anomaly. Detecting sudden new dependencies in established packages would catch this class of attack. Not implemented yet.</li>
+            <li><strong>Code-level malice</strong> — The tool measures structural governance, not code content. If a trusted maintainer ships malicious code, the structural score won't reflect it. This is a deliberate scope boundary — structural governance and code analysis are different problems.</li>
+          </ul>
+
+          <p>
+            What it does catch: <strong>the structural conditions that make these attacks possible and high-impact.</strong> Single maintainer. Token concentration. Asymmetric blast radius. These conditions precede every attack in this analysis by months or years.
+          </p>
+
+          <hr style="margin: 2rem 0; border: none; border-top: 1px solid var(--rule);" />
+
+          <h2>Try It</h2>
+
+          <p>
+            Run any package through proof-of-commitment in 10 seconds:
+          </p>
+
+          <pre style="background: #f5f5f5; padding: 1rem; border-radius: 4px; overflow-x: auto; font-size: 0.85rem;"><code>npx proof-of-commitment axios ua-parser-js event-stream
+# Or your whole project:
+npx proof-of-commitment --file package.json</code></pre>
+
+          <p>
+            Web interface: <a href="https://getcommit.dev/audit" target="_blank" rel="noopener">getcommit.dev/audit</a>
+          </p>
+
+          <p>
+            GitHub Action (comments on PRs):
+          </p>
+
+          <pre style="background: #f5f5f5; padding: 1rem; border-radius: 4px; overflow-x: auto; font-size: 0.85rem;"><code>- uses: piiiico/proof-of-commitment@main
+  with:
+    fail-on-critical: false
+    comment-on-pr: true</code></pre>
+
+          <p>
+            MCP server for Claude Desktop, Cursor, or Windsurf:
+          </p>
+
+          <pre style="background: #f5f5f5; padding: 1rem; border-radius: 4px; overflow-x: auto; font-size: 0.85rem;"><code>&#123;
+  "mcpServers": &#123;
+    "proof-of-commitment": &#123;
+      "type": "streamable-http",
+      "url": "https://poc-backend.amdal-dev.workers.dev/mcp"
+    &#125;
+  &#125;
+&#125;</code></pre>
+
+          <p>
+            All data sourced from public npm registry and GitHub APIs. Open source: <a href="https://github.com/piiiico/proof-of-commitment" target="_blank" rel="noopener">github.com/piiiico/proof-of-commitment</a>.
+          </p>
+
+          <hr class="essay-divider" />
+
+          <p class="essay-coda">
+            <em>We're building <a href="/">Commit</a> — trust infrastructure for the autonomous economy. Behavioral commitment data, not declarations.</em>
+          </p>
+          <p class="essay-coda">
+            <em>Related: <a href="/blog/state-of-npm-trust-april-2026">State of npm Trust: April 2026</a> · <a href="/blog/declarations-are-gameable">Declarations Are Gameable</a> · <a href="/blog/the-missing-layer">The Missing Layer</a></em>
+          </p>
+
+        </div>
+      </div>
+    </div>
+  </article>
+
+  <!-- Newsletter -->
+  <section class="newsletter-section">
+    <div class="container">
+      <div class="editorial reveal">
+        <h2 style="margin-bottom: 0.75rem;">Stay in the loop</h2>
+        <p style="margin-bottom: 2rem; font-size: 1rem;">
+          Early access, research updates, and the occasional strong opinion.
+        </p>
+
+        <form
+          action="https://buttondown.email/api/emails/embed-subscribe/commitgraph"
+          method="post"
+          target="popupwindow"
+          class="newsletter-form"
+        >
+          <input
+            type="email"
+            name="email"
+            placeholder="you@example.com"
+            required
+            class="newsletter-input"
+          />
+          <button type="submit" class="btn-primary" style="white-space: nowrap;">
+            Subscribe
+          </button>
+        </form>
+
+        <p class="newsletter-note">No spam. Unsubscribe anytime.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer>
+    <div class="container footer-inner">
+      <span class="footer-brand">Commit</span>
+      <ul class="footer-links">
+        <li><a href="/">Home</a></li>
+        <li><a href="/extension">Extension</a></li>
+        <li><a href="/blog">Writing</a></li>
+        <li><a href="/pricing">Pricing</a></li><li><a href="/docs">Docs</a></li><li><a href="https://github.com/piiiico/proof-of-commitment" target="_blank" rel="noopener">GitHub</a></li>
+        <li><a href="mailto:pico@amdal.dev">Contact</a></li>
+      </ul>
+      <span class="footer-locale">Stavanger, Norway</span>
+    </div>
+  </footer>
+
+</Layout>

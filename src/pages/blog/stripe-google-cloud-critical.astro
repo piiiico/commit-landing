@@ -1,0 +1,183 @@
+---
+import Layout from '../../layouts/Layout.astro';
+---
+
+<Layout
+  title="Stripe and Google Cloud Storage Are Both CRITICAL on npm &mdash; Commit"
+  description="stripe has 12M downloads/week and 1 npm publisher. @google-cloud/storage has 12M/week and 1 publisher. AWS S3 SDK has 29M/week and 2 publishers. Company reputation doesn't fix credential concentration."
+  canonical="https://getcommit.dev/blog/stripe-google-cloud-critical/"
+  publishDate="2026-05-24"
+>
+
+  <!-- Nav -->
+  <nav>
+    <div class="container nav-inner">
+      <a href="/" class="nav-brand">Commit</a>
+      <ul class="nav-links">
+        <li><a href="/quickstart/">Quickstart</a></li>
+        <li><a href="/audit/">Audit</a></li>
+        <li><a href="/blog/" style="color: var(--ink);">Writing</a></li>
+        <li><a href="/pricing/">Pricing</a></li>
+        <li><a href="/docs/">Docs</a></li>
+        <li><a href="https://github.com/piiiico/proof-of-commitment" target="_blank" rel="noopener">GitHub</a></li>
+        <li><a href="mailto:pico@amdal.dev">Contact</a></li>
+      </ul>
+    </div>
+  </nav>
+
+  <!-- Essay -->
+  <article class="essay">
+    <div class="container">
+      <div class="editorial">
+
+        <!-- Header -->
+        <header class="essay-header">
+          <div class="essay-meta animate-in delay-1">
+            <time datetime="2026-05-24">May 24, 2026</time>
+          </div>
+          <h1 class="essay-title animate-in delay-2">Stripe and Google Cloud Storage Are Both CRITICAL on npm</h1>
+          <p class="essay-subtitle animate-in delay-3">
+            Company reputation doesn&rsquo;t fix credential concentration.
+          </p>
+          <p class="essay-byline animate-in delay-4">H&aring;kon &Aring;mdal</p>
+        </header>
+
+        <!-- Body -->
+        <div class="essay-body">
+
+          <p>
+            The <code>stripe</code> npm package processes payments for millions of businesses. It has 12 million downloads per week and one npm publisher: a service account called <code>stripe-bindings</code>.
+          </p>
+
+          <p>
+            If someone compromises that account&rsquo;s credentials, they publish a malicious version to every <code>npm install</code> in every CI pipeline that depends on <code>stripe</code>. This is not a theoretical risk. The <a href="/blog/axios-attack-prediction/">axios attack in March 2026</a> followed the same pattern: one publisher, stolen credentials, 97 million machines exposed.
+          </p>
+
+          <hr class="essay-divider" />
+
+          <h2>The audit</h2>
+
+          <p>I ran five infrastructure packages through <a href="/audit/">Commit&rsquo;s behavioral audit</a>:</p>
+
+          <div class="essay-table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>Package</th>
+                  <th>Score</th>
+                  <th>Publishers</th>
+                  <th>Downloads/wk</th>
+                  <th>Risk</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td><a href="/npm/next/"><code>next</code></a></td>
+                  <td>95</td>
+                  <td>4</td>
+                  <td>37.7M</td>
+                  <td>&mdash;</td>
+                </tr>
+                <tr>
+                  <td><a href="/npm/@aws-sdk%2Fclient-s3/"><code>@aws-sdk/client-s3</code></a></td>
+                  <td>92</td>
+                  <td>2</td>
+                  <td>29.1M</td>
+                  <td>&mdash;</td>
+                </tr>
+                <tr style="background: rgba(209, 77, 65, 0.07);">
+                  <td><a href="/npm/stripe/"><code>stripe</code></a></td>
+                  <td>86</td>
+                  <td style="color: #D14D41; font-weight: 600;">1</td>
+                  <td>12.2M</td>
+                  <td style="color: #D14D41; font-weight: 600;">CRITICAL</td>
+                </tr>
+                <tr style="background: rgba(209, 77, 65, 0.07);">
+                  <td><a href="/npm/@google-cloud%2Fstorage/"><code>@google-cloud/storage</code></a></td>
+                  <td>75</td>
+                  <td style="color: #D14D41; font-weight: 600;">1</td>
+                  <td>12.4M</td>
+                  <td style="color: #D14D41; font-weight: 600;">CRITICAL</td>
+                </tr>
+                <tr>
+                  <td><a href="/npm/prisma/"><code>prisma</code></a></td>
+                  <td>88</td>
+                  <td>2</td>
+                  <td>12.4M</td>
+                  <td>&mdash;</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <p>
+            Two of the five are CRITICAL. Not because Stripe or Google have bad security practices&mdash;they don&rsquo;t. But because npm&rsquo;s publish model concentrates access in a single credential.
+          </p>
+
+          <hr class="essay-divider" />
+
+          <h2>What CRITICAL means here</h2>
+
+          <p>
+            Commit flags a package as CRITICAL when it has a single npm publisher <em>and</em> more than 10 million weekly downloads. This is the attack surface that the <a href="/blog/the-axios-signal/">axios</a>, LiteLLM, and <a href="/blog/event-stream-autopsy/">event-stream</a> attacks exploited. The attacker doesn&rsquo;t need to find a vulnerability in the code. They need one credential.
+          </p>
+
+          <p>
+            <code>stripe</code> also has <code>hasDangerousWorkflow: true</code> from the <a href="https://securityscorecards.dev/" target="_blank" rel="noopener">OpenSSF Scorecard</a>, meaning its GitHub Actions configuration has patterns that could be exploited&mdash;e.g., a <code>pull_request_target</code> trigger with write permissions. Combined with a single publisher, this creates two independent attack paths.
+          </p>
+
+          <h2>What&rsquo;s not at risk</h2>
+
+          <p>
+            To be clear: Stripe the company has strong security infrastructure. Their API, their dashboard, their card processing&mdash;those run on systems they control. The risk here is specifically the npm distribution channel. The <code>stripe</code> npm package is the SDK that 12 million weekly installs pull into their own applications. If a malicious version gets published, it runs in <em>your</em> CI pipeline and <em>your</em> production servers&mdash;not Stripe&rsquo;s.
+          </p>
+
+          <hr class="essay-divider" />
+
+          <h2>The structural fix</h2>
+
+          <p>There are two paths out:</p>
+
+          <ol>
+            <li>
+              <strong>Add a second npm publisher.</strong> <code>next</code> has 4 publishers. <code>@aws-sdk/client-s3</code> has 2. A second publisher means no single credential compromise gives full publish access. This costs nothing.
+            </li>
+            <li>
+              <strong>Enable npm Trusted Publishing.</strong> OIDC-based provenance ties every published version to a specific GitHub Actions run. No long-lived tokens to steal. <code>stripe</code> already publishes with provenance (<code>hasProvenance: true</code>), which is good&mdash;but Trusted Publishing with mandatory 2FA on the publisher account is the full solution.
+            </li>
+          </ol>
+
+          <p>
+            Compare: <code>prisma</code> has 12.4 million downloads/week and 2 publishers. It&rsquo;s not CRITICAL. The difference is one line in <code>npm owner add</code>.
+          </p>
+
+          <hr class="essay-divider" />
+
+          <h2>Check your own dependencies</h2>
+
+          <p>Run this in any project:</p>
+
+          <pre class="code-block"><code>npx proof-of-commitment --file package.json</code></pre>
+
+          <p>
+            Or paste packages into the <a href="/audit/">web audit</a>. The CRITICAL flag shows which of your dependencies have this concentration risk right now.
+          </p>
+
+          <div class="essay-cta">
+            <a href="/audit/" class="btn-primary">Audit your dependencies &rarr;</a>
+            <a href="/get-started/" class="btn-ghost">Get free API key &rarr;</a>
+          </div>
+
+        </div>
+      </div>
+    </div>
+  </article>
+
+  <!-- Footer -->
+  <footer>
+    <div class="container">
+      <p><a href="/">Commit</a> &middot; Supply chain trust, measured behaviorally. <a href="/audit/">Audit</a> &middot; <a href="/rankings/">Rankings</a> &middot; <a href="/blog/">Writing</a> &middot; <a href="https://github.com/piiiico/proof-of-commitment">GitHub</a></p>
+    </div>
+  </footer>
+
+</Layout>

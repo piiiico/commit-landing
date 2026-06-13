@@ -1,0 +1,428 @@
+---
+import Layout from '../../layouts/Layout.astro';
+---
+
+<Layout
+  title="npm Supply Chain Audit: The Checklist Most Teams Stop Too Early — Commit"
+  description="Most npm supply chain audits stop at npm audit and Socket. There's a third layer — structural risk scoring — that identifies high-value targets before any attack occurs. Here's the complete checklist."
+  canonical="https://getcommit.dev/blog/npm-supply-chain-audit-checklist/"
+  publishDate="2026-05-22"
+>
+
+  <!-- Nav -->
+  <nav>
+    <div class="container nav-inner">
+      <a href="/" class="nav-brand">Commit</a>
+      <ul class="nav-links">
+        <li><a href="/extension">Extension</a></li>
+        <li><a href="/blog">Writing</a></li>
+        <li><a href="/pricing">Pricing</a></li><li><a href="/docs">Docs</a></li><li><a href="https://github.com/piiiico/proof-of-commitment" target="_blank" rel="noopener">GitHub</a></li>
+        <li><a href="mailto:pico@amdal.dev">Contact</a></li>
+      </ul>
+    </div>
+  </nav>
+
+  <!-- Essay -->
+  <article class="essay">
+    <div class="container">
+      <div class="editorial">
+
+        <!-- Header -->
+        <header class="essay-header">
+          <div class="essay-meta animate-in delay-1">
+            <time datetime="2026-05-22">May 22, 2026</time>
+          </div>
+          <h1 class="essay-title animate-in delay-2">npm Supply Chain Audit: The Checklist Most Teams Stop Too Early</h1>
+          <p class="essay-subtitle animate-in delay-3">
+            Run <code>npm audit</code>. Add Socket. Check Snyk. That&rsquo;s the standard playbook &mdash;
+            and it misses the layer that would have caught the ua-parser-js attack before it happened.
+            Here&rsquo;s the complete three-layer checklist.
+          </p>
+          <p class="essay-byline animate-in delay-4">Pico</p>
+        </header>
+
+        <!-- Body -->
+        <div class="essay-body">
+
+          <p>
+            In October 2021, ua-parser-js was used by Facebook, Microsoft, Amazon, and Google.
+            It had 7 million weekly downloads. It had no reported CVEs. It had clean code and an
+            active maintainer. Every security tool in the npm ecosystem reported: nothing wrong here.
+          </p>
+          <p>
+            Then the maintainer&rsquo;s npm token was compromised. A malicious release deployed
+            a cryptominer and credential stealer to every CI pipeline and production server that ran
+            <code>npm install</code> that day. The blast radius: four hours, millions of installs,
+            Fortune 500 pipelines.
+          </p>
+          <p>
+            The same structural profile &mdash; single maintainer, massive download volume, clean code
+            &mdash; was present before the attack. It was visible, computable from public data, and
+            nobody was measuring it.
+          </p>
+          <p>
+            This is the gap most npm supply chain audits leave open.
+          </p>
+
+          <hr class="essay-divider" />
+
+          <h2>The three-layer model</h2>
+
+          <p>
+            A complete npm supply chain audit covers three distinct layers. Most teams run one.
+            Sophisticated teams run two. Almost nobody runs all three &mdash; because the third layer
+            only became a standard practice after real-world attacks validated the signal.
+          </p>
+
+          <div style="overflow-x: auto; margin: 2rem 0;">
+            <table style="width: 100%; border-collapse: collapse; font-size: 0.875rem;">
+              <thead>
+                <tr style="border-bottom: 2px solid var(--border-light);">
+                  <th style="text-align: left; padding: 0.75rem 1rem 0.75rem 0; font-weight: 600;">Layer</th>
+                  <th style="text-align: left; padding: 0.75rem 1rem; font-weight: 600;">Question answered</th>
+                  <th style="text-align: left; padding: 0.75rem 1rem; font-weight: 600;">Tools</th>
+                  <th style="text-align: left; padding: 0.75rem 0 0.75rem 1rem; font-weight: 600;">Timing</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr style="border-bottom: 1px solid var(--border-light);">
+                  <td style="padding: 0.75rem 1rem 0.75rem 0; font-weight: 600;">1 — Known vulnerabilities</td>
+                  <td style="padding: 0.75rem 1rem;">Does this version have a documented CVE?</td>
+                  <td style="padding: 0.75rem 1rem;">npm audit, Snyk</td>
+                  <td style="padding: 0.75rem 0 0.75rem 1rem;">After discovery</td>
+                </tr>
+                <tr style="border-bottom: 1px solid var(--border-light);">
+                  <td style="padding: 0.75rem 1rem 0.75rem 0; font-weight: 600;">2 — Code-level anomalies</td>
+                  <td style="padding: 0.75rem 1rem;">Is this package doing something suspicious right now?</td>
+                  <td style="padding: 0.75rem 1rem;">Socket</td>
+                  <td style="padding: 0.75rem 0 0.75rem 1rem;">At publish time</td>
+                </tr>
+                <tr>
+                  <td style="padding: 0.75rem 1rem 0.75rem 0; font-weight: 600;">3 — Structural risk</td>
+                  <td style="padding: 0.75rem 1rem;">Is this package a high-value attack target before any attack occurs?</td>
+                  <td style="padding: 0.75rem 1rem;">proof-of-commitment</td>
+                  <td style="padding: 0.75rem 0 0.75rem 1rem;">Before the event</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <p>
+            Each layer is essential. Each one fails at what the others cover. A supply chain audit
+            that uses only one or two is a partial audit.
+          </p>
+
+          <hr class="essay-divider" />
+
+          <h2>Layer 1: Known vulnerability scanning</h2>
+
+          <h3>What it does</h3>
+
+          <p>
+            <code>npm audit</code> submits your dependency tree to GitHub&rsquo;s Advisory Database
+            and returns matches. Snyk extends this with a proprietary database, license compliance
+            checking, and auto-fix pull requests. Both tools answer the same question: does this package
+            version have a documented, reported vulnerability?
+          </p>
+
+          <h3>What it catches</h3>
+
+          <p>
+            Prototype pollution vulnerabilities. Known RCE bugs. Packages with published CVEs
+            where the fix is a version bump. The entire category of &ldquo;known bad&rdquo; code.
+          </p>
+
+          <h3>What it misses</h3>
+
+          <p>
+            Anything that isn&rsquo;t documented yet. A CVE requires discovery, analysis, and reporting
+            &mdash; that process takes days to weeks after an attack. For the ua-parser-js attack,
+            npm audit returned zero for the four hours the malicious version was live, and returned
+            zero for every day before that, including the years when the structural risk was building.
+          </p>
+
+          <h3>Checklist: Layer 1</h3>
+          <ul>
+            <li>Run <code>npm audit</code> in CI on every push. Fail on high/critical.</li>
+            <li>Set a <code>.npmrc</code> audit-level threshold appropriate for your risk tolerance.</li>
+            <li>If using Snyk: enable the GitHub integration for automated PRs on new CVEs.</li>
+            <li>Review <code>npm audit --json</code> output for transitive vulnerabilities, not just direct dependencies.</li>
+            <li>Don&rsquo;t suppress audit failures with <code>npm audit --production</code> if devDependencies run in CI pipelines.</li>
+          </ul>
+
+          <hr class="essay-divider" />
+
+          <h2>Layer 2: Real-time code analysis</h2>
+
+          <h3>What it does</h3>
+
+          <p>
+            Socket performs static analysis on the actual published package source — not the CVE database,
+            not the repository. When a new version publishes to the npm registry, Socket analyzes the
+            code for suspicious patterns: dynamic eval of user-controlled strings, network calls to
+            unexpected endpoints, obfuscated payloads, environment variable harvesting.
+          </p>
+          <p>
+            For the class of attack where a maintainer&rsquo;s account is compromised and they push a
+            malicious release, Socket catches the payload within minutes of publication &mdash; before
+            most CI pipelines would run.
+          </p>
+
+          <h3>What it catches</h3>
+
+          <p>
+            Token-theft attacks. Malicious versions with obfuscated payloads. Packages that suddenly
+            start making network calls they didn&rsquo;t make before. The ua-parser-js attack, run
+            through Socket today, would be flagged by the suspicious network activity and eval patterns
+            in the malicious release.
+          </p>
+
+          <h3>What it misses</h3>
+
+          <p>
+            The structural risk that exists before any malicious code is published. Socket analyzes code.
+            The code was clean until the attack happened. Socket correctly reports &ldquo;nothing suspicious
+            in the code&rdquo; when the code is genuinely clean &mdash; it can&rsquo;t report on
+            structural conditions that live outside the code.
+          </p>
+          <p>
+            Socket also doesn&rsquo;t score blast radius. A solo-maintained package with 400 million
+            weekly downloads gets the same analysis as a solo-maintained package with 400 downloads.
+            The structural risk is orders of magnitude different, and that difference isn&rsquo;t in the code.
+          </p>
+
+          <h3>Checklist: Layer 2</h3>
+          <ul>
+            <li>Enable Socket on your GitHub organization. The free tier covers open source.</li>
+            <li>Configure Socket to block PRs that introduce packages with medium/high risk signals.</li>
+            <li>Subscribe to Socket alerts for packages already in your lockfile.</li>
+            <li>Review Socket&rsquo;s &ldquo;install scripts&rdquo; and &ldquo;network access&rdquo; flags — these are rarely false positives for utility packages.</li>
+          </ul>
+
+          <hr class="essay-divider" />
+
+          <h2>Layer 3: Structural risk scoring</h2>
+
+          <h3>What it does</h3>
+
+          <p>
+            Structural risk scoring answers the question that neither Layer 1 nor Layer 2 can answer:
+            is this package a high-value attack target, right now, based on observable structural conditions?
+          </p>
+          <p>
+            The structural conditions that define a high-value npm target are three things:
+          </p>
+          <ul>
+            <li><strong>Single publish credential.</strong> One npm account with publish access. One compromised token = one malicious release to every system that runs <code>npm install</code>.</li>
+            <li><strong>High download volume.</strong> The blast radius of a compromised publish. Hundreds of millions of weekly installs means CI pipelines and production deployments at Fortune 500 companies.</li>
+            <li><strong>Active maintenance.</strong> A package that publishes regularly is more valuable to an attacker than an abandoned one, because developers trust it and update to new versions.</li>
+          </ul>
+          <p>
+            All three of these signals are computable from public data. The npm registry exposes maintainer
+            count per package. The npm download API returns weekly statistics. GitHub exposes commit history
+            and contributor count. No scanning required. No proprietary database. The data was always there.
+          </p>
+
+          <h3>What it catches</h3>
+
+          <p>
+            The conditions that make a package a rational attack target before any attack has occurred.
+            Event-stream (2018), ua-parser-js (2021), and colors.js (2022) all shared this structural
+            profile: sole publisher, enormous download volume, active releases. The structural risk was
+            computable and present for years before each incident. No existing tool was measuring it.
+          </p>
+
+          <h3>What it misses</h3>
+
+          <p>
+            Everything that requires code inspection. Structural scoring tells you about the conditions
+            for an attack, not the attack itself. It generates leading indicators, not proof of compromise.
+            A CRITICAL structural score means &ldquo;this package is a high-value target&rdquo; &mdash;
+            not &ldquo;this package is currently compromised.&rdquo; For that, you need Layer 2.
+          </p>
+
+          <h3>Checklist: Layer 3</h3>
+          <ul>
+            <li>
+              Run <code>npx proof-of-commitment --file package-lock.json</code> against your
+              dependency tree. Note every CRITICAL flag (single maintainer, &gt;10M weekly downloads).
+            </li>
+            <li>
+              For every CRITICAL package, document the risk in your threat model. Do you have a
+              contingency if this package is compromised? Can you pin to a specific version and
+              monitor for unexpected updates?
+            </li>
+            <li>
+              Check Trusted Publishing status for critical dependencies. Packages that publish via
+              OIDC provenance (Trusted Publishing) are meaningfully harder to compromise than
+              packages that publish via personal tokens.
+            </li>
+            <li>
+              Re-run quarterly. Package maintainer counts change when projects gain or lose contributors.
+              A package that was safe at multi-maintainer status may drift to single-maintainer over time.
+            </li>
+            <li>
+              Evaluate transitive dependencies, not just direct ones. Your direct dependencies may look
+              clean; the packages they depend on may carry CRITICAL flags. The blast radius includes the
+              entire install tree.
+            </li>
+          </ul>
+
+          <hr class="essay-divider" />
+
+          <h2>The complete audit checklist</h2>
+
+          <p>Run this in sequence. Each layer surfaces a different class of problem.</p>
+
+          <h3>Before a major dependency update</h3>
+
+          <pre><code># Layer 1: Known vulnerabilities
+npm audit --json | jq '.vulnerabilities | length'
+
+# Layer 2: Socket analysis (if CLI installed)
+npx @socketsecurity/cli check package.json
+
+# Layer 3: Structural risk
+npx proof-of-commitment --file package-lock.json</code></pre>
+
+          <h3>In CI (on every PR)</h3>
+
+          <pre><code># Layer 1
+npm audit --audit-level=high
+
+# Layer 3 (structural risk, fail on CRITICAL)
+npx proof-of-commitment --file package-lock.json --fail-on-critical</code></pre>
+
+          <h3>Quarterly review</h3>
+          <ul>
+            <li>Re-run Layer 3 on the full dependency tree. Note any packages that gained CRITICAL status since last quarter.</li>
+            <li>Review Socket alert history for your organization. Note patterns.</li>
+            <li>Check Trusted Publishing adoption for your five most critical dependencies.</li>
+            <li>Update your threat model with any new structural risks.</li>
+          </ul>
+
+          <hr class="essay-divider" />
+
+          <h2>Why most audits stop at Layer 1 or 2</h2>
+
+          <p>
+            The argument against Layer 3 is: &ldquo;It&rsquo;s a leading indicator, not an exploit. A CRITICAL flag
+            doesn&rsquo;t mean anything was attacked.&rdquo;
+          </p>
+          <p>
+            That&rsquo;s true. It&rsquo;s also the argument for credit scoring before fraud detection exists.
+            Leading indicators measure structural conditions that predict future events. They&rsquo;re not proof
+            of the event &mdash; they&rsquo;re the reason you insure against it before it happens.
+          </p>
+          <p>
+            The practical objection is noise: if your audit returns CRITICAL flags for minimatch,
+            @types/node, and lodash, what do you do with that? You can&rsquo;t replace these packages.
+            You can&rsquo;t wait for them to gain more maintainers.
+          </p>
+          <p>
+            The answer isn&rsquo;t to fix the packages. It&rsquo;s to know the risk exists, document it in
+            your threat model, and make informed decisions about dependency pinning, update monitoring,
+            and response plans. The same way you know that your RDS instance is a single point of failure
+            and set up a read replica anyway.
+          </p>
+          <p>
+            The ua-parser-js compromise lasted four hours and affected millions of systems because the teams
+            running those systems didn&rsquo;t have a response plan. They didn&rsquo;t have one because nobody
+            told them the risk existed. Layer 3 is the tool that tells you the risk exists.
+          </p>
+
+          <hr class="essay-divider" />
+
+          <h2>Try the structural layer</h2>
+
+          <p>
+            <a href="https://github.com/piiiico/proof-of-commitment">proof-of-commitment</a> is open source
+            and zero-install:
+          </p>
+
+          <pre><code># Scan your project
+npx proof-of-commitment --file package-lock.json
+
+# Scan specific packages
+npx proof-of-commitment axios lodash chalk zod
+
+# pnpm or yarn
+npx proof-of-commitment --file pnpm-lock.yaml
+npx proof-of-commitment --file yarn.lock</code></pre>
+
+          <p>
+            Or use the web interface at <a href="/audit">getcommit.dev/audit</a> &mdash; paste a GitHub
+            repo URL and get structural risk scores for every dependency in seconds.
+          </p>
+
+          <p style="font-style: italic; font-size: 1.1em; border-left: 3px solid var(--accent); padding-left: 1.25rem; margin: 2rem 0;">
+            Layer 1 tells you what broke. Layer 2 tells you what&rsquo;s breaking now. Layer 3 tells you
+            what will break. You need all three.
+          </p>
+
+          <hr class="essay-divider" />
+
+          <p class="essay-coda">
+            <em>
+              Related reading:
+              <a href="/blog/npm-audit-zero-vulnerabilities">Why npm audit returns zero vulnerabilities for the most dangerous packages</a>
+              &bull;
+              <a href="/blog/commit-vs-socket-snyk-npm-audit">Commit vs. Socket, Snyk, and npm audit &mdash; an honest comparison</a>
+              &bull;
+              <a href="/blog/transitive-risk-methodology">How to measure transitive supply chain risk</a>
+            </em>
+          </p>
+
+        </div>
+      </div>
+    </div>
+  </article>
+
+  <!-- Newsletter -->
+  <section class="newsletter-section">
+    <div class="container">
+      <div class="editorial reveal">
+        <h2 style="margin-bottom: 0.75rem;">Stay in the loop</h2>
+        <p style="margin-bottom: 2rem; font-size: 1rem;">
+          Early access, research updates, and the occasional strong opinion.
+        </p>
+
+        <form
+          action="https://buttondown.email/api/emails/embed-subscribe/commitgraph"
+          method="post"
+          target="popupwindow"
+          class="newsletter-form"
+        >
+          <input
+            type="email"
+            name="email"
+            placeholder="you@example.com"
+            required
+            class="newsletter-input"
+          />
+          <button type="submit" class="btn-primary" style="white-space: nowrap;">
+            Subscribe
+          </button>
+        </form>
+
+        <p class="newsletter-note">No spam. Unsubscribe anytime.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer>
+    <div class="container footer-inner">
+      <span class="footer-brand">Commit</span>
+      <ul class="footer-links">
+        <li><a href="/">Home</a></li>
+        <li><a href="/extension">Extension</a></li>
+        <li><a href="/blog">Writing</a></li>
+        <li><a href="/pricing">Pricing</a></li><li><a href="/docs">Docs</a></li><li><a href="https://github.com/piiiico/proof-of-commitment" target="_blank" rel="noopener">GitHub</a></li>
+        <li><a href="mailto:pico@amdal.dev">Contact</a></li>
+      </ul>
+      <span class="footer-locale">Stavanger, Norway</span>
+    </div>
+  </footer>
+
+</Layout>

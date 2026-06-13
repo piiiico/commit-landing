@@ -1,0 +1,360 @@
+---
+import Layout from '../../layouts/Layout.astro';
+---
+
+<Layout
+  title="Why I Think axios Is the Next Supply Chain Attack Target — Commit"
+  description="I built a behavioral scoring system that flags single-maintainer packages with massive download volumes as CRITICAL. axios scores 86/100 but has one maintainer and 82M weekly downloads. Here's the structural case."
+  canonical="https://getcommit.dev/blog/axios-attack-prediction/"
+  publishDate="2026-04-24"
+>
+
+  <!-- Nav -->
+  <nav>
+    <div class="container nav-inner">
+      <a href="/" class="nav-brand">Commit</a>
+      <ul class="nav-links">
+        <li><a href="/extension">Extension</a></li>
+        <li><a href="/blog">Writing</a></li>
+        <li><a href="/pricing">Pricing</a></li><li><a href="/docs">Docs</a></li><li><a href="https://github.com/piiiico/proof-of-commitment" target="_blank" rel="noopener">GitHub</a></li>
+        <li><a href="mailto:pico@amdal.dev">Contact</a></li>
+      </ul>
+    </div>
+  </nav>
+
+  <!-- Essay -->
+  <article class="essay">
+    <div class="container">
+      <div class="editorial">
+
+        <!-- Header -->
+        <header class="essay-header">
+          <div class="essay-meta animate-in delay-1">
+            <time datetime="2026-04-24">April 24, 2026</time>
+          </div>
+          <h1 class="essay-title animate-in delay-2">Why I Think axios Is the Next Supply Chain Attack Target</h1>
+          <p class="essay-subtitle animate-in delay-3">
+            I built a scoring system that measures structural risk in npm packages using public data.
+            axios scores 86/100 &mdash; excellent on every quality dimension.
+            It also scores CRITICAL. npm audit shows 0 vulnerabilities. Here&rsquo;s the structural case.
+          </p>
+          <p class="essay-byline animate-in delay-4">H&aring;kon &Aring;mdal</p>
+        </header>
+
+        <!-- Body -->
+        <div class="essay-body">
+
+          <!-- Update banner -->
+          <div style="background: #fef2f2; border: 1px solid #fecaca; border-left: 4px solid #dc2626; border-radius: 4px; padding: 1.5rem; margin: 0 0 2rem 0;">
+            <h3 style="margin: 0 0 0.5rem 0; font-size: 0.9rem; text-transform: uppercase; letter-spacing: 0.08em; color: #dc2626;">Update — March 31, 2026: The Attack Happened</h3>
+            <p style="margin: 0; font-size: 0.9rem; line-height: 1.6;">
+              On March 30–31, 2026, axios was compromised. Stolen npm token for maintainer jasonsaayman. Malicious versions <code>axios@1.14.1</code> and <code>0.30.4</code> published with a cross-platform RAT. npm audit returned zero vulnerabilities for both versions during the attack window.
+              This post documents the structural case that was visible from public data before the compromise. See the full <a href="/forensics/axios-2026" style="color: #dc2626; font-weight: 600;">post-mortem analysis →</a>
+            </p>
+          </div>
+
+          <p>
+            I run <code>proof-of-commitment</code> against axios periodically. The output:
+          </p>
+
+          <pre><code>npx proof-of-commitment axios</code></pre>
+
+          <pre><code>&#123;
+  "name": "axios",
+  "score": 86,
+  "riskFlags": ["CRITICAL"],
+  "scoreBreakdown": &#123;
+    "longevity": 25,
+    "downloadMomentum": 22,
+    "releaseConsistency": 20,
+    "maintainerDepth": 4,
+    "githubBacking": 15
+  &#125;
+&#125;</code></pre>
+
+          <p>
+            CRITICAL. Same as last week. Same as last month.
+          </p>
+          <p>
+            Then I run <code>npm audit</code>:
+          </p>
+
+          <pre><code>found 0 vulnerabilities</code></pre>
+
+          <p>
+            One tool is flagging a structural risk. The other sees nothing. The difference is the difference between leading and lagging indicators, and it&rsquo;s the reason I built Commit.
+          </p>
+
+          <hr class="essay-divider" />
+
+          <h2>The question that started this</h2>
+
+          <p>
+            A year and a half earlier, I was sitting in my apartment in Stavanger trying to understand why AI gives bad recommendations.
+          </p>
+          <p>
+            Not wrong-in-a-funny-way. Wrong in a consequential way. A friend had asked ChatGPT for a restaurant recommendation for his anniversary dinner. It recommended a place that had been closed for two years and had three health code violations in its last operating year. The AI pulled from reviews, ratings, Google listings &mdash; the declarative layer. Everything self-reported or user-generated. None of it reflected reality.
+          </p>
+          <p>
+            I started thinking about what a trustworthy signal actually looks like. Not what people <em>say</em> about a restaurant, but what they <em>do</em>. Do they go back? Did the health inspector find violations? Is the business financially stable?
+          </p>
+          <p>
+            That question led me down a rabbit hole. The entire trust infrastructure of the internet is built on declarations. Star ratings are declarations. CVE databases are declarations. SOC2 certifications are declarations. Even <code>npm audit</code> &mdash; which the entire JavaScript ecosystem treats as a security tool &mdash; is a declaration lookup. It checks whether someone has already discovered, documented, and filed a vulnerability report.
+          </p>
+          <p>
+            What&rsquo;s the behavioral equivalent? What would it look like to measure trust by observing what entities actually <em>do</em>, rather than what they or others claim?
+          </p>
+          <p>
+            For npm packages, I realized the answer was almost embarrassingly simple.
+          </p>
+
+          <hr class="essay-divider" />
+
+          <h2>Building the signal</h2>
+
+          <p>
+            I didn&rsquo;t start with a grand theory. I started with a spreadsheet.
+          </p>
+          <p>
+            I pulled the top 200 npm packages and began listing every data point I could extract from the npm registry API and GitHub API without any special access. Creation date. Download counts. Release history. Number of maintainers. Stars, forks, contributors. All public data.
+          </p>
+          <p>
+            Then I asked: which of these data points would have been predictive for past supply chain attacks?
+          </p>
+          <p>
+            event-stream in 2018: sole maintainer, abandoned for years, 2 million weekly downloads. ua-parser-js in 2021: sole maintainer, 7 million weekly downloads. The LiteLLM compromise in March 2026: attackers backdoored the Trivy GitHub Action in LiteLLM's CI pipeline — the structural weakness (single maintainer, thin oversight) made the supply chain the attack surface.
+          </p>
+          <p>
+            The pattern was neither sophisticated nor subtle. One person holding the keys to a package that millions of systems blindly execute every day.
+          </p>
+          <p>
+            So I wrote a scoring system. Five dimensions, all derived from public data:
+          </p>
+          <ol>
+            <li><strong>Longevity</strong> &mdash; How long has this package existed? Age as a commitment signal.</li>
+            <li><strong>Download momentum</strong> &mdash; How widely is it used? Blast radius measurement.</li>
+            <li><strong>Release consistency</strong> &mdash; Is development active and regular? Maintenance signal.</li>
+            <li><strong>Maintainer depth</strong> &mdash; How many people can publish releases? Single point of failure.</li>
+            <li><strong>GitHub backing</strong> &mdash; Is there genuine community engagement? Social proof of investment.</li>
+          </ol>
+          <p>
+            The score runs from 0 to 100. High is good. But the interesting part isn&rsquo;t the composite score. It&rsquo;s the risk flag:
+          </p>
+
+          <pre><code>if (maintainerCount === 1 && weeklyDownloads > 10_000_000)
+  riskFlags.push("CRITICAL");</code></pre>
+
+          <p>
+            One line of code. If you&rsquo;re the kind of person who reads Hacker News, your instinct right now is that this is too simple to be useful. I shared that instinct initially. Then I ran it against every major npm supply chain attack in history.
+          </p>
+          <p>
+            Every single one matched.
+          </p>
+
+          <hr class="essay-divider" />
+
+          <h2>The number that wouldn&rsquo;t go away</h2>
+
+          <p>
+            I released <a href="https://github.com/piiiico/proof-of-commitment" target="_blank" rel="noopener">proof-of-commitment</a> as an open-source CLI and GitHub Action in early 2026. It was a side project attached to a larger thesis about behavioral trust data. I figured developers would find it useful as a lightweight CI check &mdash; a complement to <code>npm audit</code>, not a replacement.
+          </p>
+          <p>
+            The first time I scored axios, the output stopped me cold.
+          </p>
+          <p>
+            Score: 89 out of 100. By any &ldquo;package health&rdquo; metric, that&rsquo;s excellent. Twelve years old. Massive download base. Regular releases. Strong GitHub community. Everything you&rsquo;d want to see.
+          </p>
+          <p>
+            Except: one maintainer. One person with publish access to a package installed a hundred million times a week.
+          </p>
+          <p>
+            <code>maintainerDepth: 4</code> out of 15 possible points. That single dimension broke the curve. CRITICAL risk flag.
+          </p>
+          <p>
+            I stared at that number for a while. Axios is the default HTTP client for most JavaScript developers. It&rsquo;s in nearly every enterprise codebase I&rsquo;ve touched. And one stolen credential &mdash; one phishing email, one leaked token, one compromised machine &mdash; would give an attacker code execution on millions of systems.
+          </p>
+          <p>
+            I wrote about it. I published the data. The structural risk was visible to anyone who looked. <code>npm audit</code> showed 0 vulnerabilities. The package was &ldquo;healthy&rdquo; by every conventional metric.
+          </p>
+          <p>
+            The CRITICAL flag stayed on. Weeks passed. I scored the top 50 npm packages and found that 15 of them &mdash; 30% &mdash; triggered the same condition. Together, those 15 packages accounted for 2.5 billion weekly downloads. minimatch at 562 million. chalk at 413 million. glob at 332 million. All single-maintainer. All CRITICAL.
+          </p>
+          <p>
+            Nobody seemed alarmed.
+          </p>
+
+          <hr class="essay-divider" />
+
+          <h2>The template: ua-parser-js 2021</h2>
+
+          <p>
+            In October 2021, Faisal Salman &mdash; sole maintainer of ua-parser-js with ~7 million weekly downloads &mdash; had his npm account compromised via credential theft. The attacker published three malicious versions containing a cryptominer and a credential-stealing trojan. The malicious versions ran for four hours. Facebook, Microsoft, Amazon, and Google were downstream consumers.
+          </p>
+          <p>
+            Here&rsquo;s the ua-parser-js timeline:
+          </p>
+
+          <div style="overflow-x: auto; margin: 2rem 0;">
+            <table style="width: 100%; border-collapse: collapse; font-size: 0.9rem;">
+              <thead>
+                <tr style="border-bottom: 2px solid var(--border-light);">
+                  <th style="text-align: left; padding: 0.75rem 1rem 0.75rem 0; font-weight: 600;">State</th>
+                  <th style="text-align: left; padding: 0.75rem 1rem; font-weight: 600;">npm audit</th>
+                  <th style="text-align: left; padding: 0.75rem 0 0.75rem 1rem; font-weight: 600;">proof-of-commitment</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr style="border-bottom: 1px solid var(--border-light);">
+                  <td style="padding: 0.75rem 1rem 0.75rem 0; color: var(--ink-subtle);">Years before attack</td>
+                  <td style="padding: 0.75rem 1rem;"><code>0 vulnerabilities</code></td>
+                  <td style="padding: 0.75rem 0 0.75rem 1rem;">&#x26A0;&#xFE0F; WARN / CRITICAL</td>
+                </tr>
+                <tr style="border-bottom: 1px solid var(--border-light); background: rgba(220, 38, 38, 0.04);">
+                  <td style="padding: 0.75rem 1rem 0.75rem 0; color: var(--ink-subtle);">Oct 2021: malicious publish</td>
+                  <td style="padding: 0.75rem 1rem;"><code>0 vulnerabilities</code></td>
+                  <td style="padding: 0.75rem 0 0.75rem 1rem;">&#x26A0;&#xFE0F; WARN / CRITICAL</td>
+                </tr>
+                <tr>
+                  <td style="padding: 0.75rem 1rem 0.75rem 0; color: var(--ink-subtle);">CVE filed (days later)</td>
+                  <td style="padding: 0.75rem 1rem;"><code>1 critical vulnerability</code></td>
+                  <td style="padding: 0.75rem 0 0.75rem 1rem;">&#x26A0;&#xFE0F; WARN / CRITICAL</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <p>
+            The structural flag was constant. npm audit caught up only after the ua-parser-js attack. Now: axios has the same profile &mdash; single maintainer, one credential, 82 million weekly downloads. Not 7 million. 82 million. 12x the blast radius of the ua-parser-js attack.
+          </p>
+
+          <hr class="essay-divider" />
+
+          <h2>Leading vs. lagging</h2>
+
+          <p>
+            Here&rsquo;s what I keep coming back to.
+          </p>
+          <p>
+            <code>npm audit</code> is not a bad tool. It does exactly what it claims: it checks your dependencies against a database of known vulnerabilities. But &ldquo;known vulnerability&rdquo; means someone already found it, documented it, assigned a CVE, and submitted it to the advisory database. By definition, <code>npm audit</code> can only tell you about attacks that have already happened.
+          </p>
+          <p>
+            That makes it a lagging indicator. A rear-view mirror. The most popular security tool in the JavaScript ecosystem can only confirm what&rsquo;s already gone wrong.
+          </p>
+          <p>
+            Behavioral scoring is a leading indicator. It doesn&rsquo;t predict <em>which</em> package will be attacked, or <em>when</em>. That would be fortune-telling, and I&rsquo;m not going to pretend otherwise. What it does is identify the structural conditions that attackers select for &mdash; the packages where one compromised credential yields maximum blast radius. These conditions are visible months or years before any attack.
+          </p>
+          <p>
+            The difference matters for the same reason it matters in every other domain. You don&rsquo;t wait for a building to collapse before checking whether it can survive an earthquake. You assess the structural properties &mdash; foundation, materials, load distribution &mdash; and flag the ones that are vulnerable. The assessment doesn&rsquo;t predict earthquakes. It tells you which buildings to worry about when one arrives.
+          </p>
+          <p>
+            In software supply chains, the structural assessment is computable from public data in milliseconds. The fact that the entire industry wasn&rsquo;t computing it before event-stream &mdash; or ua-parser-js, or colors.js &mdash; says something uncomfortable about how we think about security.
+          </p>
+
+          <hr class="essay-divider" />
+
+          <h2>What I got wrong</h2>
+
+          <p>
+            I want to be honest about the limitations, because this is a story about what worked, and the things that worked are embarrassingly simple. The things that didn&rsquo;t work are more interesting.
+          </p>
+          <p>
+            The scoring system can&rsquo;t detect code-level threats. It wouldn&rsquo;t have flagged the encrypted payload in flatmap-stream (the event-stream attack vehicle). It can&rsquo;t distinguish between a legitimate maintainer and an attacker using stolen credentials &mdash; the package metadata looks identical before and after compromise.
+          </p>
+          <p>
+            And the simplicity of the CRITICAL flag means it casts a wide net. Fifteen of the top 50 packages are flagged. That&rsquo;s useful for prioritization &mdash; you know where to focus your attention. But if you&rsquo;re looking for &ldquo;which package will be compromised next Tuesday,&rdquo; this isn&rsquo;t that tool. Nobody has that tool. Anybody claiming otherwise is selling you something.
+          </p>
+          <p>
+            What the scoring does well is separate the structural question from the vulnerability question. &ldquo;Does this package have known bugs?&rdquo; is useful, and <code>npm audit</code> answers it. &ldquo;Is this package a single point of failure at enormous scale?&rdquo; is a different question that nobody was answering systematically. Both matter. Only one gives you advance warning.
+          </p>
+
+          <hr class="essay-divider" />
+
+          <h2>Why this matters beyond npm</h2>
+
+          <p>
+            The ua-parser-js attack wasn&rsquo;t a supply chain security failure. It was a supply chain security <em>architecture</em> failure. The tools we built assume threats are known before they&rsquo;re exploited. That assumption works for most classes of software bugs &mdash; CVEs get filed, patches get shipped, scanners pick them up. But supply chain attacks aren&rsquo;t software bugs. They&rsquo;re trust failures. They exploit the gap between what the declarative layer tells you about a package (<code>0 vulnerabilities</code>) and what the structural reality looks like (one credential away from catastrophe).
+          </p>
+          <p>
+            The same pattern exists everywhere. SOC2 certifications are declarations &mdash; Delve fabricated them for 494 companies. Restaurant reviews are declarations &mdash; and AI trained on them recommends closed restaurants with health violations. Benchmark scores are declarations &mdash; Berkeley RDI proved 8 out of 8 major AI benchmarks are fully exploitable.
+          </p>
+          <p>
+            We keep building trust systems on what entities say about themselves, and then acting surprised when the claims don&rsquo;t match reality. The alternative is measuring what entities <em>do</em> &mdash; behavioral signals that require real cost to produce and are structurally harder to fake.
+          </p>
+          <p>
+            For npm packages, the behavioral signals are five public data points and one if-statement. For the broader trust infrastructure that AI and autonomous agents need, the signals are different but the principle is identical: commitment &mdash; costly, observable, verifiable action &mdash; is the unfakeable layer.
+          </p>
+          <p>
+            That&rsquo;s what we&rsquo;re building at <a href="/">Commit</a>. Not just for npm. For every domain where the gap between declarations and behavior creates exploitable trust failures.
+          </p>
+          <p>
+            The ua-parser-js signal was visible for years. For axios, it&rsquo;s visible right now. So is minimatch. chalk. glob. zod. esbuild. The data is public. The computation is trivial.
+          </p>
+          <p>
+            <code>npm audit</code> will catch the next attack after it happens. The signal is there for anyone willing to look.
+          </p>
+
+          <hr class="essay-divider" />
+
+          <p class="essay-coda">
+            <em>Full dataset: <a href="/blog/npm-trust-q2-2026">State of npm Supply Chain Trust — Q2 2026</a> (100 packages, 14 CRITICAL)</em>
+          </p>
+          <p class="essay-coda">
+            <em>Audit your own dependencies: <code>npx proof-of-commitment --file package.json</code> | <a href="/audit">Web interface</a> | <a href="https://github.com/piiiico/proof-of-commitment" target="_blank" rel="noopener">GitHub Action</a></em>
+          </p>
+          <p class="essay-coda">
+            <em>Related: <a href="/blog/the-axios-signal">The Axios Signal</a> &middot; <a href="/blog/declarations-are-gameable">Declarations Are Gameable</a> &middot; <a href="/blog/event-stream-autopsy">Dependency Autopsy: event-stream</a></em>
+          </p>
+
+        </div>
+      </div>
+    </div>
+  </article>
+
+  <!-- Newsletter -->
+  <section class="newsletter-section">
+    <div class="container">
+      <div class="editorial reveal">
+        <h2 style="margin-bottom: 0.75rem;">Stay in the loop</h2>
+        <p style="margin-bottom: 2rem; font-size: 1rem;">
+          Early access, research updates, and the occasional strong opinion.
+        </p>
+
+        <form
+          action="https://buttondown.email/api/emails/embed-subscribe/commitgraph"
+          method="post"
+          target="popupwindow"
+          class="newsletter-form"
+        >
+          <input
+            type="email"
+            name="email"
+            placeholder="you@example.com"
+            required
+            class="newsletter-input"
+          />
+          <button type="submit" class="btn-primary" style="white-space: nowrap;">
+            Subscribe
+          </button>
+        </form>
+
+        <p class="newsletter-note">No spam. Unsubscribe anytime.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer>
+    <div class="container footer-inner">
+      <span class="footer-brand">Commit</span>
+      <ul class="footer-links">
+        <li><a href="/">Home</a></li>
+        <li><a href="/extension">Extension</a></li>
+        <li><a href="/blog">Writing</a></li>
+        <li><a href="/pricing">Pricing</a></li><li><a href="/docs">Docs</a></li><li><a href="https://github.com/piiiico/proof-of-commitment" target="_blank" rel="noopener">GitHub</a></li>
+        <li><a href="mailto:pico@amdal.dev">Contact</a></li>
+      </ul>
+      <span class="footer-locale">Stavanger, Norway</span>
+    </div>
+  </footer>
+
+</Layout>

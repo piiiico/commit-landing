@@ -1,0 +1,77 @@
+---
+import Layout from '../layouts/Layout.astro';
+---
+
+<Layout
+  title="Privacy Policy — Commit"
+  description="Privacy policy for the Commit Chrome extension."
+  canonical="https://getcommit.dev/privacy/"
+>
+
+  <!-- Nav -->
+  <nav>
+    <div class="container nav-inner">
+      <a href="/" class="nav-brand">Commit</a>
+      <ul class="nav-links">
+        <li><a href="/extension">Extension</a></li>
+        <li><a href="/blog">Writing</a></li>
+        <li><a href="/pricing">Pricing</a></li><li><a href="/docs">Docs</a></li><li><a href="https://github.com/piiiico/proof-of-commitment" target="_blank" rel="noopener">GitHub</a></li>
+      </ul>
+    </div>
+  </nav>
+
+  <!-- Privacy Content -->
+  <section class="hero" style="padding-top: 6rem; padding-bottom: 6rem;">
+    <div class="container">
+      <div class="editorial" style="max-width: 720px;">
+        <h1 class="hero-title animate-in delay-1" style="font-size: clamp(1.8rem, 4vw, 2.8rem);">
+          Privacy Policy
+        </h1>
+        <p class="hero-sub animate-in delay-2" style="color: var(--ink-light); margin-bottom: 3rem;">
+          Commit Extension &mdash; Last updated: April 2026
+        </p>
+
+        <div style="font-size: 1rem; line-height: 1.8; color: var(--ink);">
+
+          <h2 style="font-size: 1.25rem; font-weight: 700; margin-top: 2.5rem; margin-bottom: 0.75rem;">Data Collected</h2>
+          <ul style="padding-left: 1.5rem; margin-bottom: 1.5rem;">
+            <li><strong>Website visit data:</strong> domain, time spent, visit count — stored locally in your browser only, never transmitted.</li>
+            <li><strong>AI response text:</strong> scanned locally to extract Norwegian business names — the raw text is never transmitted.</li>
+          </ul>
+
+          <h2 style="font-size: 1.25rem; font-weight: 700; margin-top: 2.5rem; margin-bottom: 0.75rem;">Data Transmitted</h2>
+          <ul style="padding-left: 1.5rem; margin-bottom: 1.5rem;">
+            <li>Business names extracted from AI responses are sent to <code>api.getcommit.dev</code> to look up public registry data.</li>
+            <li>No personal identifiers, no conversation content, and no URLs are transmitted.</li>
+          </ul>
+
+          <h2 style="font-size: 1.25rem; font-weight: 700; margin-top: 2.5rem; margin-bottom: 0.75rem;">Third-Party Data Sources</h2>
+          <ul style="padding-left: 1.5rem; margin-bottom: 1.5rem;">
+            <li><strong>Norwegian Business Registry (Brønnøysund):</strong> public registration data.</li>
+            <li><strong>Mattilsynet:</strong> public food safety inspection data.</li>
+          </ul>
+
+          <h2 style="font-size: 1.25rem; font-weight: 700; margin-top: 2.5rem; margin-bottom: 0.75rem;">Optional (not in v0.1.0)</h2>
+          <p style="margin-bottom: 1.5rem;">
+            Future versions may offer opt-in behavioral data sharing using a ZK-nullifier (fully anonymous). This will always be explicitly opt-in.
+          </p>
+
+          <h2 style="font-size: 1.25rem; font-weight: 700; margin-top: 2.5rem; margin-bottom: 0.75rem;">Contact</h2>
+          <p>
+            Questions about this privacy policy? Email <a href="mailto:privacy@getcommit.dev" style="color: var(--ink); text-decoration: underline;">privacy@getcommit.dev</a>.
+          </p>
+
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer style="border-top: 1px solid var(--border); padding: 2rem 0; margin-top: 4rem;">
+    <div class="container" style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem;">
+      <span style="color: var(--ink-light); font-size: 0.875rem;">&copy; 2026 Commit</span>
+      <a href="/privacy" style="color: var(--ink-light); font-size: 0.875rem; text-decoration: none;">Privacy</a>
+    </div>
+  </footer>
+
+</Layout>

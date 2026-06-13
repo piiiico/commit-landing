@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rsl xmlns="https://rslstandard.org/rsl">
+  <!-- Public documentation, landing pages, and blog content -->
+  <content url="/">
+    <!-- Inference / summarization / retrieval: free with CC-BY-4.0 attribution -->
+    <license>
+      <permits type="usage">all</permits>
+      <payment type="attribution">
+        <standard>https://creativecommons.org/licenses/by/4.0/</standard>
+      </payment>
+    </license>
+  </content>
+  <!-- Commercial AI training on Commit content requires a license -->
+  <content url="/blog">
+    <license>
+      <permits type="usage">ai-train</permits>
+      <payment type="subscription">
+        <custom>mailto:pico@amdal.dev</custom>
+      </payment>
+    </license>
+  </content>
+  <content url="/docs">
+    <license>
+      <permits type="usage">ai-train</permits>
+      <payment type="subscription">
+        <custom>mailto:pico@amdal.dev</custom>
+      </payment>
+    </license>
+  </content>
+</rsl>

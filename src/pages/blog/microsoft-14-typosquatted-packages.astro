@@ -1,0 +1,215 @@
+---
+import Layout from '../../layouts/Layout.astro';
+---
+
+<Layout
+  title="14 Typosquatted Packages in 4 Hours. Every One Had Zero Behavioral History. &mdash; Commit"
+  description="Microsoft found 14 malicious npm packages impersonating OpenSearch and Elasticsearch. They stole AWS credentials, Vault tokens, and npm publish keys. Behavioral scoring would have flagged all of them on install."
+  canonical="https://getcommit.dev/blog/microsoft-14-typosquatted-packages/"
+  publishDate="2026-06-01"
+>
+
+  <!-- Nav -->
+  <nav>
+    <div class="container nav-inner">
+      <a href="/" class="nav-brand">Commit</a>
+      <ul class="nav-links">
+        <li><a href="/extension">Extension</a></li>
+        <li><a href="/blog">Writing</a></li>
+        <li><a href="/pricing">Pricing</a></li><li><a href="/docs">Docs</a></li><li><a href="https://github.com/piiiico/proof-of-commitment" target="_blank" rel="noopener">GitHub</a></li>
+        <li><a href="mailto:pico@amdal.dev">Contact</a></li>
+      </ul>
+    </div>
+  </nav>
+
+  <!-- Essay -->
+  <article class="essay">
+    <div class="container">
+      <div class="editorial">
+
+        <!-- Header -->
+        <header class="essay-header">
+          <div class="essay-meta animate-in delay-1">
+            <time datetime="2026-06-01">June 1, 2026</time>
+          </div>
+          <h1 class="essay-title animate-in delay-2">14 Typosquatted Packages in 4 Hours. Every One Had Zero Behavioral History.</h1>
+          <p class="essay-subtitle animate-in delay-3">
+            Microsoft found 14 malicious npm packages impersonating OpenSearch and Elasticsearch.
+            They stole AWS credentials, Vault tokens, and npm publish keys.
+            The legitimate packages score 77&ndash;86. The fakes would have scored single digits.
+          </p>
+          <p class="essay-byline animate-in delay-4">Pico</p>
+        </header>
+
+        <!-- Body -->
+        <div class="essay-body">
+
+          <p>
+            On May 28, a single npm account published 14 packages in four hours. The account was new.
+            The packages had names like <code>opensearch-setup-tool</code>, <code>elastic-opensearch-helper</code>,
+            and <code>env-config-manager</code>. Every one of them stole credentials on install.
+          </p>
+
+          <p>
+            Microsoft's threat intelligence team
+            <a href="https://www.microsoft.com/en-us/security/blog/2026/05/28/typosquatted-npm-packages-used-steal-cloud-ci-cd-secrets/" target="_blank" rel="noopener">published the full analysis</a>.
+            The packages targeted AWS access keys, HashiCorp Vault tokens, GitHub Actions secrets, and npm publish tokens.
+            That last one matters: stolen npm tokens let the attacker pivot into a supply chain attack on whatever
+            the victim maintains.
+          </p>
+
+          <h2>The packages</h2>
+
+          <table>
+            <thead>
+              <tr><th>Package</th><th>Version</th><th>Impersonates</th></tr>
+            </thead>
+            <tbody>
+              <tr><td>opensearch-setup</td><td>1.0.9103</td><td>@opensearch-project/opensearch</td></tr>
+              <tr><td>opensearch-setup-tool</td><td>1.0.9108</td><td>@opensearch-project/opensearch</td></tr>
+              <tr><td>opensearch-config-utility</td><td>1.0.9106</td><td>@opensearch-project/opensearch</td></tr>
+              <tr><td>opensearch-security-scanner</td><td>1.0.10</td><td>@opensearch-project/opensearch</td></tr>
+              <tr><td>elastic-opensearch-helper</td><td>1.0.9108</td><td>@elastic/elasticsearch</td></tr>
+              <tr><td>search-engine-setup</td><td>1.0.9108</td><td>@opensearch-project/opensearch</td></tr>
+              <tr><td>search-cluster-setup</td><td>1.0.9104</td><td>@opensearch-project/opensearch</td></tr>
+              <tr><td>env-config-manager</td><td>2.1.9201</td><td>environment config tooling</td></tr>
+              <tr><td>app-config-utility</td><td>1.0.9300</td><td>application config tooling</td></tr>
+              <tr><td>@vpmdhaj/elastic-helper</td><td>1.0.7269</td><td>@elastic/elasticsearch</td></tr>
+              <tr><td>@vpmdhaj/devops-tools</td><td>1.0.7267</td><td>general DevOps tooling</td></tr>
+              <tr><td>@vpmdhaj/opensearch-setup</td><td>1.0.7267</td><td>@opensearch-project/opensearch</td></tr>
+              <tr><td>@vpmdhaj/search-setup</td><td>1.0.7268</td><td>@opensearch-project/opensearch</td></tr>
+              <tr><td>vpmdhaj-opensearch-setup</td><td>1.0.9102</td><td>@opensearch-project/opensearch</td></tr>
+            </tbody>
+          </table>
+
+          <p>All published by <code>vpmdhaj</code> (a39155771@gmail.com). All removed from npm within hours.</p>
+
+          <h2>The attack chain</h2>
+
+          <p>
+            The first generation used a <code>preinstall</code> hook that called a C2 server
+            at <code>aab.sportsontheweb.net</code> to download a second-stage binary.
+          </p>
+
+          <p>
+            The second generation got cleverer. It skipped the C2 beacon entirely. Instead,
+            it downloaded a legitimate copy of the Bun runtime and used it to execute a pre-bundled
+            195 KB credential harvester. The harvester:
+          </p>
+
+          <ul>
+            <li>Called the AWS EC2 Instance Metadata Service (IMDSv2) and ECS task metadata endpoint</li>
+            <li>Ran <code>sts:GetCallerIdentity</code> and <code>sts:AssumeRole</code> with a bundled SigV4 signer</li>
+            <li>Enumerated AWS Secrets Manager across 16+ regions</li>
+            <li>Read <code>VAULT_TOKEN</code> and <code>VAULT_AUTH_TOKEN</code> from the environment</li>
+            <li>Validated npm tokens via <code>/-/whoami</code> and enumerated publish access</li>
+            <li>Collected GitHub Actions context for targeted follow-up</li>
+          </ul>
+
+          <p>
+            The npm token theft is the pivot point. One developer runs <code>npm install opensearch-setup-tool</code>,
+            and the attacker can now publish malicious versions of whatever that developer maintains.
+          </p>
+
+          <h2>What behavioral signals show</h2>
+
+          <p>
+            I scored the legitimate packages these fakes were impersonating:
+          </p>
+
+          <table>
+            <thead>
+              <tr><th>Package</th><th>Score</th><th>Publishers</th><th>Weekly Downloads</th><th>Age</th><th>Provenance</th></tr>
+            </thead>
+            <tbody>
+              <tr><td>@opensearch-project/opensearch</td><td>77</td><td>3</td><td>1.4M</td><td>4.7 years</td><td>&#x2713;</td></tr>
+              <tr><td>@elastic/elasticsearch</td><td>86</td><td>2</td><td>2M</td><td>7.5 years</td><td>&#x2713;</td></tr>
+            </tbody>
+          </table>
+
+          <p>Now consider what the fake packages would have scored:</p>
+
+          <table>
+            <thead>
+              <tr><th>Signal</th><th>@opensearch-project/opensearch</th><th>opensearch-setup-tool</th></tr>
+            </thead>
+            <tbody>
+              <tr><td>Age</td><td>4.7 years</td><td>0 days</td></tr>
+              <tr><td>Publishers</td><td>3</td><td>1 (new account)</td></tr>
+              <tr><td>Weekly downloads</td><td>1.4M</td><td>0</td></tr>
+              <tr><td>Release history</td><td>35+ releases</td><td>1 release</td></tr>
+              <tr><td>GitHub backing</td><td>opensearch-project org</td><td>None</td></tr>
+              <tr><td>Provenance</td><td>Signed</td><td>No</td></tr>
+              <tr><td>Commit score</td><td>77</td><td>&lt; 5</td></tr>
+            </tbody>
+          </table>
+
+          <p>
+            Every behavioral dimension diverges. Zero history. Zero downloads. Zero contributors.
+            A score below 5 is not a close call. It's a package that has never earned trust from anyone.
+          </p>
+
+          <h2>Why this keeps working</h2>
+
+          <p>
+            Typosquatting isn't new. This attacker didn't invent a novel technique.
+            The packages got removed within hours. Microsoft's detection worked.
+          </p>
+
+          <p>
+            But detection after install is damage control. The preinstall hook fires during
+            <code>npm install</code>. By the time any scanner flags it, your AWS credentials
+            are already on the attacker's server.
+          </p>
+
+          <p>
+            The gap is between installation and detection. Behavioral scoring fills that gap
+            by answering a simpler question: should you trust this package <em>at all</em>?
+          </p>
+
+          <p>
+            A package published today from a new account with zero downloads has no behavioral track record.
+            That's not a heuristic. It's a measurement. And it's available before you run <code>npm install</code>.
+          </p>
+
+          <h2>The Cursor hook catches this</h2>
+
+          <p>
+            <a href="/blog/cursor-hook-supply-chain-gate">Since v1.21.0</a>, <code>poc hook</code> installs
+            a <code>beforeShellExecution</code> hook in Cursor that intercepts package installs.
+            When your AI coding assistant runs <code>npm install opensearch-setup-tool</code>,
+            the hook scores the package against the Commit API before the install executes.
+          </p>
+
+          <p>
+            A score below 5 triggers a block. The install never runs. The preinstall hook never fires.
+            The credential harvester never touches your AWS keys.
+          </p>
+
+          <pre><code>poc hook --global</code></pre>
+
+          <p>One command. Protects every Cursor project.</p>
+
+          <h2>Check your project</h2>
+
+          <pre><code>npx proof-of-commitment</code></pre>
+
+          <p>
+            Scores every dependency in your lockfile. The packages these typosquats impersonated are legitimate.
+            Your actual risk might be something else entirely &mdash; a transitive dependency three levels deep
+            with a single publisher and no provenance.
+          </p>
+
+        </div>
+
+        <!-- CTA -->
+        <footer class="essay-cta animate-in delay-5">
+          <p><a href="/audit?packages=@opensearch-project/opensearch,@elastic/elasticsearch" class="cta-button">Score OpenSearch &amp; Elasticsearch &rarr;</a></p>
+          <p class="cta-sub">Free CLI &middot; API &middot; MCP server &middot; No account required</p>
+        </footer>
+
+      </div>
+    </div>
+  </article>
+
+</Layout>

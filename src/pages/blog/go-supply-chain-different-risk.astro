@@ -1,0 +1,338 @@
+---
+import Layout from '../../layouts/Layout.astro';
+---
+
+<Layout
+  title="I scanned 20 top Go modules. Zero scored CRITICAL. Here's why Go's supply chain is structurally different. &mdash; Commit"
+  description="After finding 11/20 Rust crates and 26/91 npm packages CRITICAL, I ran the same analysis on Go. Zero publisher-concentration flags. The risk model is different &mdash; and so are the failure modes."
+  canonical="https://getcommit.dev/blog/go-supply-chain-different-risk/"
+  publishDate="2026-05-09"
+>
+
+  <!-- Nav -->
+  <nav>
+    <div class="container nav-inner">
+      <a href="/" class="nav-brand">Commit</a>
+      <ul class="nav-links">
+        <li><a href="/extension">Extension</a></li>
+        <li><a href="/blog">Writing</a></li>
+        <li><a href="/pricing">Pricing</a></li><li><a href="/docs">Docs</a></li><li><a href="https://github.com/piiiico/proof-of-commitment" target="_blank" rel="noopener">GitHub</a></li>
+        <li><a href="mailto:pico@amdal.dev">Contact</a></li>
+      </ul>
+    </div>
+  </nav>
+
+  <!-- Essay -->
+  <article class="essay">
+    <div class="container">
+      <div class="editorial">
+
+        <!-- Header -->
+        <header class="essay-header">
+          <div class="essay-meta animate-in delay-1">
+            <time datetime="2026-05-09">May 9, 2026</time>
+          </div>
+          <h1 class="essay-title animate-in delay-2">I scanned 20 top Go modules. Zero scored CRITICAL. Here&rsquo;s why.</h1>
+          <p class="essay-subtitle animate-in delay-3">
+            After finding publisher-concentration risk across npm, PyPI, and Cargo, Go was the first ecosystem where the structural pattern didn&rsquo;t appear.
+          </p>
+          <p class="essay-byline animate-in delay-4">Pico</p>
+        </header>
+
+        <!-- Body -->
+        <div class="essay-body">
+
+          <p>
+            Over the past two weeks I&rsquo;ve run behavioral commitment scoring on the most-downloaded packages in <a href="/blog/npm-audit-zero-vulnerabilities">npm</a>, <a href="/blog/python-supply-chain-risk">PyPI</a>, and <a href="/blog/cargo-supply-chain-risk">Cargo</a>. The pattern was the same every time: a handful of critical packages held by one person, millions of installs per week, one phished credential away from catastrophe.
+          </p>
+          <p>
+            Then I ran Go.
+          </p>
+          <p>
+            Zero CRITICAL scores. Not one.
+          </p>
+
+          <hr class="essay-divider" />
+
+          <h2>The numbers</h2>
+
+          <p>
+            I audited 20 popular Go modules using <a href="/audit">Proof of Commitment</a>. Scores range from 0 to 100 based on behavioral signals: project age, release consistency, contributor depth, GitHub backing, and community traction.
+          </p>
+
+          <div style="overflow-x: auto; margin: 2rem 0;">
+            <table style="width: 100%; border-collapse: collapse; font-size: 0.875rem;">
+              <thead>
+                <tr style="border-bottom: 2px solid var(--border-light);">
+                  <th style="text-align: left; padding: 0.75rem 1rem 0.75rem 0; font-weight: 600;">Module</th>
+                  <th style="text-align: center; padding: 0.75rem 1rem; font-weight: 600;">Score</th>
+                  <th style="text-align: center; padding: 0.75rem 1rem; font-weight: 600;">Contributors</th>
+                  <th style="text-align: center; padding: 0.75rem 1rem; font-weight: 600;">Risk</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr style="border-bottom: 1px solid var(--border-light);">
+                  <td style="padding: 0.75rem 1rem 0.75rem 0;"><a href="/go/github.com/hashicorp/terraform"><code>hashicorp/terraform</code></a></td>
+                  <td style="text-align: center; padding: 0.75rem 1rem;">100</td>
+                  <td style="text-align: center; padding: 0.75rem 1rem;">30+</td>
+                  <td style="text-align: center; padding: 0.75rem 1rem; color: green;">HEALTHY</td>
+                </tr>
+                <tr style="border-bottom: 1px solid var(--border-light);">
+                  <td style="padding: 0.75rem 1rem 0.75rem 0;"><a href="/go/github.com/docker/docker"><code>docker/docker</code></a></td>
+                  <td style="text-align: center; padding: 0.75rem 1rem;">98</td>
+                  <td style="text-align: center; padding: 0.75rem 1rem;">30+</td>
+                  <td style="text-align: center; padding: 0.75rem 1rem; color: green;">HEALTHY</td>
+                </tr>
+                <tr style="border-bottom: 1px solid var(--border-light);">
+                  <td style="padding: 0.75rem 1rem 0.75rem 0;"><a href="/go/github.com/sirupsen/logrus"><code>sirupsen/logrus</code></a></td>
+                  <td style="text-align: center; padding: 0.75rem 1rem;">98</td>
+                  <td style="text-align: center; padding: 0.75rem 1rem;">30+</td>
+                  <td style="text-align: center; padding: 0.75rem 1rem; color: green;">HEALTHY</td>
+                </tr>
+                <tr style="border-bottom: 1px solid var(--border-light);">
+                  <td style="padding: 0.75rem 1rem 0.75rem 0;"><a href="/go/github.com/gin-gonic/gin"><code>gin-gonic/gin</code></a></td>
+                  <td style="text-align: center; padding: 0.75rem 1rem;">96</td>
+                  <td style="text-align: center; padding: 0.75rem 1rem;">30+</td>
+                  <td style="text-align: center; padding: 0.75rem 1rem; color: green;">HEALTHY</td>
+                </tr>
+                <tr style="border-bottom: 1px solid var(--border-light);">
+                  <td style="padding: 0.75rem 1rem 0.75rem 0;"><a href="/go/github.com/spf13/cobra"><code>spf13/cobra</code></a></td>
+                  <td style="text-align: center; padding: 0.75rem 1rem;">96</td>
+                  <td style="text-align: center; padding: 0.75rem 1rem;">30+</td>
+                  <td style="text-align: center; padding: 0.75rem 1rem; color: green;">HEALTHY</td>
+                </tr>
+                <tr style="border-bottom: 1px solid var(--border-light);">
+                  <td style="padding: 0.75rem 1rem 0.75rem 0;"><a href="/go/github.com/stretchr/testify"><code>stretchr/testify</code></a></td>
+                  <td style="text-align: center; padding: 0.75rem 1rem;">96</td>
+                  <td style="text-align: center; padding: 0.75rem 1rem;">30+</td>
+                  <td style="text-align: center; padding: 0.75rem 1rem; color: green;">HEALTHY</td>
+                </tr>
+                <tr style="border-bottom: 1px solid var(--border-light);">
+                  <td style="padding: 0.75rem 1rem 0.75rem 0;"><a href="/go/github.com/gofiber/fiber"><code>gofiber/fiber</code></a></td>
+                  <td style="text-align: center; padding: 0.75rem 1rem;">95</td>
+                  <td style="text-align: center; padding: 0.75rem 1rem;">30+</td>
+                  <td style="text-align: center; padding: 0.75rem 1rem; color: green;">HEALTHY</td>
+                </tr>
+                <tr style="border-bottom: 1px solid var(--border-light);">
+                  <td style="padding: 0.75rem 1rem 0.75rem 0;"><a href="/go/github.com/prometheus/client_golang"><code>prometheus/client_golang</code></a></td>
+                  <td style="text-align: center; padding: 0.75rem 1rem;">95</td>
+                  <td style="text-align: center; padding: 0.75rem 1rem;">30+</td>
+                  <td style="text-align: center; padding: 0.75rem 1rem; color: green;">HEALTHY</td>
+                </tr>
+                <tr style="border-bottom: 1px solid var(--border-light);">
+                  <td style="padding: 0.75rem 1rem 0.75rem 0;"><a href="/go/github.com/grpc/grpc-go"><code>grpc/grpc-go</code></a></td>
+                  <td style="text-align: center; padding: 0.75rem 1rem;">94</td>
+                  <td style="text-align: center; padding: 0.75rem 1rem;">30+</td>
+                  <td style="text-align: center; padding: 0.75rem 1rem; color: green;">HEALTHY</td>
+                </tr>
+                <tr style="border-bottom: 1px solid var(--border-light);">
+                  <td style="padding: 0.75rem 1rem 0.75rem 0;"><a href="/go/github.com/gorilla/mux"><code>gorilla/mux</code></a></td>
+                  <td style="text-align: center; padding: 0.75rem 1rem;">89</td>
+                  <td style="text-align: center; padding: 0.75rem 1rem;">30+</td>
+                  <td style="text-align: center; padding: 0.75rem 1rem; color: orange;">&#x26A0; WARN</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <p>
+            Average score: 93. Compare that to npm (where chalk, axios, and minimatch are all CRITICAL) or Cargo (where 11 of the top 20 crates have a sole owner). Go&rsquo;s top modules are structurally healthier.
+          </p>
+
+          <hr class="essay-divider" />
+
+          <h2>Why Go is different</h2>
+
+          <p>
+            The CRITICAL flag in npm, PyPI, and Cargo all measure the same thing: <em>a single person controls publish access to a massively popular package.</em> One compromised account could push malicious code to millions of downstream builds.
+          </p>
+          <p>
+            Go doesn&rsquo;t have this problem because Go doesn&rsquo;t have a publisher model.
+          </p>
+          <p>
+            There&rsquo;s no <code>go publish</code>. There&rsquo;s no crates.io account with a password. When you <code>go get github.com/gin-gonic/gin</code>, the Go toolchain fetches the code from Git, hashed and verified by <code>sum.golang.org</code>. Publishing is pushing a Git tag. The &ldquo;credential&rdquo; is your GitHub account, which is protected by 2FA, org-level access controls, and SSH keys &mdash; infrastructure the developer already maintains for everything else.
+          </p>
+          <p>
+            This isn&rsquo;t better security through discipline. It&rsquo;s better security through architecture. The attack surface that exists in npm (phish an npm token) simply doesn&rsquo;t exist in Go.
+          </p>
+
+          <hr class="essay-divider" />
+
+          <h2>Go&rsquo;s actual risks are different</h2>
+
+          <p>
+            No CRITICAL doesn&rsquo;t mean no risk. The Go ecosystem has its own failure modes &mdash; they just look different.
+          </p>
+
+          <h3>1. Abandonment</h3>
+
+          <p>
+            Several widely-used modules haven&rsquo;t had a release in over a year:
+          </p>
+
+          <ul>
+            <li><strong>gorilla/mux</strong> (score 89) &mdash; archived by its maintainers. Still imported by thousands of projects. No security patches will come.</li>
+            <li><strong>mitchellh/mapstructure</strong> (score 74) &mdash; last release nearly 3 years ago. Mitchell Hashimoto moved on from active open-source maintenance.</li>
+            <li><strong>gopkg.in/yaml.v3</strong> (score 71) &mdash; the lowest score in our scan. Over a year since the last release. Low OpenSSF Scorecard (3.6/10).</li>
+          </ul>
+
+          <p>
+            In npm, the primary risk is a compromised maintainer <em>publishing</em> bad code. In Go, the risk is that nobody is <em>maintaining</em> the code at all. Both are supply chain risks. They require different detection.
+          </p>
+
+          <h3>2. GitHub account compromise</h3>
+
+          <p>
+            Go&rsquo;s publishing is Git-based, which means the attack vector shifts from registry credentials to GitHub accounts. Compromise a maintainer&rsquo;s GitHub access, push a malicious tag, and <code>sum.golang.org</code> will happily verify the new module version.
+          </p>
+          <p>
+            The saving grace: GitHub 2FA adoption is much higher than npm token rotation, and GitHub has sophisticated anomaly detection. The attack cost is higher. But it&rsquo;s not zero.
+          </p>
+
+          <h3>3. Vanity imports and typosquatting</h3>
+
+          <p>
+            Because Go modules are URLs, the namespace is infinite. There&rsquo;s no approval process for creating <code>github.com/gin-gon1c/gin</code>. The Go proxy will cache and serve it. Typosquatting in Go doesn&rsquo;t require a registry account &mdash; just a GitHub repo.
+          </p>
+
+          <hr class="essay-divider" />
+
+          <h2>The cross-ecosystem pattern</h2>
+
+          <p>
+            Four ecosystems, four different risk profiles:
+          </p>
+
+          <div style="overflow-x: auto; margin: 2rem 0;">
+            <table style="width: 100%; border-collapse: collapse; font-size: 0.875rem;">
+              <thead>
+                <tr style="border-bottom: 2px solid var(--border-light);">
+                  <th style="text-align: left; padding: 0.75rem 1rem 0.75rem 0; font-weight: 600;">Ecosystem</th>
+                  <th style="text-align: center; padding: 0.75rem 1rem; font-weight: 600;">Primary risk</th>
+                  <th style="text-align: center; padding: 0.75rem 1rem; font-weight: 600;">CRITICAL in top 20</th>
+                  <th style="text-align: center; padding: 0.75rem 1rem; font-weight: 600;">Avg score</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr style="border-bottom: 1px solid var(--border-light);">
+                  <td style="padding: 0.75rem 1rem 0.75rem 0;"><strong>npm</strong></td>
+                  <td style="text-align: center; padding: 0.75rem 1rem;">Publisher concentration</td>
+                  <td style="text-align: center; padding: 0.75rem 1rem; color: var(--accent);">26 of 91</td>
+                  <td style="text-align: center; padding: 0.75rem 1rem;">~72</td>
+                </tr>
+                <tr style="border-bottom: 1px solid var(--border-light);">
+                  <td style="padding: 0.75rem 1rem 0.75rem 0;"><strong>Cargo</strong></td>
+                  <td style="text-align: center; padding: 0.75rem 1rem;">Owner concentration</td>
+                  <td style="text-align: center; padding: 0.75rem 1rem; color: var(--accent);">11 of 20</td>
+                  <td style="text-align: center; padding: 0.75rem 1rem;">~78</td>
+                </tr>
+                <tr style="border-bottom: 1px solid var(--border-light);">
+                  <td style="padding: 0.75rem 1rem 0.75rem 0;"><strong>PyPI</strong></td>
+                  <td style="text-align: center; padding: 0.75rem 1rem;">Maintainer concentration</td>
+                  <td style="text-align: center; padding: 0.75rem 1rem; color: var(--accent);">7 of 20</td>
+                  <td style="text-align: center; padding: 0.75rem 1rem;">~80</td>
+                </tr>
+                <tr style="border-bottom: 1px solid var(--border-light);">
+                  <td style="padding: 0.75rem 1rem 0.75rem 0;"><strong>Go</strong></td>
+                  <td style="text-align: center; padding: 0.75rem 1rem;">Abandonment</td>
+                  <td style="text-align: center; padding: 0.75rem 1rem; color: green;">0 of 20</td>
+                  <td style="text-align: center; padding: 0.75rem 1rem;">~93</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <p>
+            The pattern is clear: ecosystems with centralized publish credentials (npm, PyPI, Cargo) have structural concentration risk. Go&rsquo;s decentralized model avoids this category entirely. The tradeoff is that Go has weaker protection against abandonment and namespace attacks.
+          </p>
+
+          <hr class="essay-divider" />
+
+          <h2>Scan your own go.mod</h2>
+
+          <pre><code># Audit any Go module
+npx proof-of-commitment --golang github.com/gin-gonic/gin golang.org/x/net
+
+# Scan a go.mod file
+npx proof-of-commitment --file go.mod
+
+# Full transitive set from go.sum
+npx proof-of-commitment --file go.sum
+
+# API
+curl -s https://poc-backend.amdal-dev.workers.dev/api/audit \
+  -H 'Content-Type: application/json' \
+  -d '&#123;"packages": ["github.com/gin-gonic/gin"], "ecosystem": "golang"&#125;'</code></pre>
+
+          <p>
+            Web view (no install): <a href="/audit?packages=github.com/gin-gonic/gin,github.com/gorilla/mux,gopkg.in/yaml.v3&ecosystem=golang">getcommit.dev/audit</a>
+          </p>
+
+          <hr class="essay-divider" />
+
+          <p>
+            <code>go mod verify</code> checks hashes. It won&rsquo;t tell you that gorilla/mux is archived or that yaml.v3 hasn&rsquo;t been updated in a year. Those are commitment signals, not integrity checks. Different tools, different risks.
+          </p>
+
+          <hr class="essay-divider" />
+
+          <p class="essay-coda">
+            <em><a href="https://github.com/piiiico/proof-of-commitment">Proof of Commitment</a> is open-source. Now supports npm, PyPI, Cargo, and Go. Web audit at <a href="/audit">getcommit.dev/audit</a>.</em>
+          </p>
+          <p class="essay-coda">
+            <em>Also: <a href="/blog/cargo-supply-chain-risk">The same analysis on Rust</a> &middot; <a href="/blog/python-supply-chain-risk">Python</a> &middot; <a href="/blog/npm-audit-zero-vulnerabilities">npm</a></em>
+          </p>
+
+        </div>
+      </div>
+    </div>
+  </article>
+
+  <!-- Newsletter -->
+  <section class="newsletter-section">
+    <div class="container">
+      <div class="editorial reveal">
+        <h2 style="margin-bottom: 0.75rem;">Stay in the loop</h2>
+        <p style="margin-bottom: 2rem; font-size: 1rem;">
+          Early access, research updates, and the occasional strong opinion.
+        </p>
+
+        <form
+          action="https://buttondown.email/api/emails/embed-subscribe/commitgraph"
+          method="post"
+          target="popupwindow"
+          class="newsletter-form"
+        >
+          <input
+            type="email"
+            name="email"
+            placeholder="you@example.com"
+            required
+            class="newsletter-input"
+          />
+          <button type="submit" class="btn-primary" style="white-space: nowrap;">
+            Subscribe
+          </button>
+        </form>
+
+        <p class="newsletter-note">No spam. Unsubscribe anytime.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer>
+    <div class="container footer-inner">
+      <span class="footer-brand">Commit</span>
+      <ul class="footer-links">
+        <li><a href="/">Home</a></li>
+        <li><a href="/extension">Extension</a></li>
+        <li><a href="/blog">Writing</a></li>
+        <li><a href="/pricing">Pricing</a></li><li><a href="/docs">Docs</a></li><li><a href="https://github.com/piiiico/proof-of-commitment" target="_blank" rel="noopener">GitHub</a></li>
+        <li><a href="mailto:pico@amdal.dev">Contact</a></li>
+      </ul>
+      <span class="footer-locale">Stavanger, Norway</span>
+    </div>
+  </footer>
+
+</Layout>

@@ -1,0 +1,184 @@
+---
+import Layout from '../../layouts/Layout.astro';
+---
+
+<Layout
+  title="Five Open PRs. drizzle-kit Still Ships @esbuild-kit/esm-loader. &mdash; Commit"
+  description="drizzle-kit scores 83 on its own. It transitively pulls in @esbuild-kit/esm-loader: archived on GitHub, single maintainer, last published 981 days ago, 7.5M weekly downloads. Five community PRs to drop it have been open for up to 18 months. None merged."
+  canonical="https://getcommit.dev/blog/drizzle-kit-stale-transitive-dep/"
+  publishDate="2026-05-25"
+>
+
+  <!-- Nav -->
+  <nav>
+    <div class="container nav-inner">
+      <a href="/" class="nav-brand">Commit</a>
+      <ul class="nav-links">
+        <li><a href="/quickstart/">Quickstart</a></li>
+        <li><a href="/audit/">Audit</a></li>
+        <li><a href="/blog/" style="color: var(--ink);">Writing</a></li>
+        <li><a href="/pricing/">Pricing</a></li>
+        <li><a href="/docs/">Docs</a></li>
+        <li><a href="https://github.com/piiiico/proof-of-commitment" target="_blank" rel="noopener">GitHub</a></li>
+        <li><a href="mailto:pico@amdal.dev">Contact</a></li>
+      </ul>
+    </div>
+  </nav>
+
+  <!-- Essay -->
+  <article class="essay">
+    <div class="container">
+      <div class="editorial">
+
+        <!-- Header -->
+        <header class="essay-header">
+          <div class="essay-meta animate-in delay-1">
+            <time datetime="2026-05-25">May 25, 2026</time>
+          </div>
+          <h1 class="essay-title animate-in delay-2">Five Open PRs. drizzle-kit Still Ships <code>@esbuild-kit/esm-loader</code>.</h1>
+          <p class="essay-subtitle animate-in delay-3">
+            The package you depend on can be healthy. What it pulls in might not be.
+          </p>
+          <p class="essay-byline animate-in delay-4">Pico</p>
+        </header>
+
+        <!-- Body -->
+        <div class="essay-body">
+
+          <p>
+            <code>drizzle-kit</code> has 8.2 million weekly downloads, 4 npm publishers, provenance enabled, and a behavioral score of 83. Looked at on its own, it&rsquo;s fine.
+          </p>
+
+          <p>
+            <code>npm install drizzle-kit</code> also pulls in <code>@esbuild-kit/esm-loader</code>. That package&rsquo;s GitHub repo is archived. Its last npm publish was 17 September 2023&mdash;981 days ago at the time of writing. It has one npm publisher. It gets 7.5 million weekly downloads through Drizzle and a few other consumers.
+          </p>
+
+          <hr class="essay-divider" />
+
+          <h2>The numbers, side by side</h2>
+
+          <p>Both packages scored through <a href="/audit/">Commit&rsquo;s behavioral audit</a>:</p>
+
+          <div class="essay-table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>Package</th>
+                  <th>Score</th>
+                  <th>Publishers</th>
+                  <th>Downloads/wk</th>
+                  <th>Days since publish</th>
+                  <th>Risk</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td><a href="/npm/drizzle-kit/"><code>drizzle-kit</code></a></td>
+                  <td>83</td>
+                  <td>4</td>
+                  <td>8.2M</td>
+                  <td>69</td>
+                  <td>&mdash;</td>
+                </tr>
+                <tr style="background: rgba(209, 77, 65, 0.07);">
+                  <td><a href="/npm/@esbuild-kit%2Fesm-loader/"><code>@esbuild-kit/esm-loader</code></a></td>
+                  <td>65</td>
+                  <td style="color: #D14D41; font-weight: 600;">1</td>
+                  <td>7.5M</td>
+                  <td style="color: #D14D41; font-weight: 600;">981</td>
+                  <td style="color: #D14D41; font-weight: 600;">HIGH + WARN</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <p>
+            <code>drizzle-kit</code>&rsquo;s own metrics look healthy. The transitive dep does not. <code>@esbuild-kit/esm-loader</code> trips two risk flags: <em>sole npm publisher with &gt;1M weekly downloads</em>, and <em>no release in 12+ months</em>. The repo is <a href="https://github.com/esbuild-kit/esm-loader" target="_blank" rel="noopener">archived</a>. The sole maintainer moved their work to <code>tsx</code> over two years ago.
+          </p>
+
+          <hr class="essay-divider" />
+
+          <h2>The community already knows</h2>
+
+          <p>
+            This isn&rsquo;t a surprise to anyone reading Drizzle&rsquo;s issue tracker. At least five open pull requests propose dropping or replacing <code>@esbuild-kit/esm-loader</code>:
+          </p>
+
+          <ul>
+            <li><a href="https://github.com/drizzle-team/drizzle-orm/pull/3498" target="_blank" rel="noopener">PR #3498</a> &mdash; opened 6 November 2024. <em>Move <code>@esbuild-kit/esm-loader</code> to devDependencies.</em></li>
+            <li><a href="https://github.com/drizzle-team/drizzle-orm/pull/4250" target="_blank" rel="noopener">PR #4250</a> &mdash; opened 10 March 2025. <em>Remove <code>@esbuild-kit/esm-loader</code>.</em></li>
+            <li><a href="https://github.com/drizzle-team/drizzle-orm/pull/4430" target="_blank" rel="noopener">PR #4430</a> &mdash; <em>Replace with <code>tsx</code>.</em></li>
+            <li><a href="https://github.com/drizzle-team/drizzle-orm/pull/4819" target="_blank" rel="noopener">PR #4819</a> &mdash; <em>Replace <code>@esbuild-kit/esm-loader</code> with <code>tsx</code>.</em></li>
+            <li><a href="https://github.com/drizzle-team/drizzle-orm/pull/5689" target="_blank" rel="noopener">PR #5689</a> &mdash; opened 27 April 2026. <em>Drop deprecated <code>@esbuild-kit/esm-loader</code> dependency.</em></li>
+          </ul>
+
+          <p>
+            Plus a tracked security issue, <a href="https://github.com/drizzle-team/drizzle-orm/issues/5481" target="_blank" rel="noopener">#5481</a>, opened 13 March 2026 with 15 thumbs-up reactions and 6 comments. All five PRs are open. The oldest has been open for 18 months. The issue has been open for 73 days.
+          </p>
+
+          <p>
+            This isn&rsquo;t a swipe at Drizzle. The team has shipped a serious ORM and is responsible for an enormous surface area. The point is structural: a healthy package can ship transitive risk for years while the community files PRs that nobody merges. The risk lives one <code>npm install</code> below the surface where most people stop looking.
+          </p>
+
+          <hr class="essay-divider" />
+
+          <h2>Why this pattern keeps recurring</h2>
+
+          <p>
+            The interesting thing about <code>@esbuild-kit/esm-loader</code> isn&rsquo;t that one person published it. Plenty of small dependencies have one maintainer and do fine. The interesting thing is that the maintainer themselves told everyone to stop using it. The repo is archived. The replacement (<code>tsx</code>, by the same author) is right there.
+          </p>
+
+          <p>
+            That makes this a quieter version of the <a href="/blog/event-stream-autopsy/">event-stream</a> pattern: a package whose maintainer&rsquo;s engagement has expired, still being shipped to millions of machines every week. The credential surface narrows to one person who no longer has any active reason to defend it. If that credential is compromised tomorrow, every <code>drizzle-kit</code> install pulling a fresh tree, plus every other downstream consumer of <code>@esbuild-kit/esm-loader</code>, ships whatever the attacker pushes.
+          </p>
+
+          <p>
+            Drizzle&rsquo;s own score doesn&rsquo;t tell you this. Neither does <code>npm audit</code>, because there&rsquo;s no CVE: nothing is broken yet. The behavioral signals&mdash;archived repo, single publisher, no release in 981 days&mdash;catch the risk before there&rsquo;s a vulnerability to scan for.
+          </p>
+
+          <hr class="essay-divider" />
+
+          <h2>What this means for your stack</h2>
+
+          <p>
+            If <code>drizzle-kit</code> is in your <code>devDependencies</code>, you&rsquo;re shipping <code>@esbuild-kit/esm-loader</code> into your CI and local dev environments. It runs every time you generate or push migrations. The blast radius is whatever credentials and source those environments touch.
+          </p>
+
+          <p>
+            The fix on Drizzle&rsquo;s side is straightforward&mdash;<code>tsx</code> is a drop-in replacement, written by the same author, actively maintained, score 86. Five PRs are already written. Until one merges, the working answer for users is to pin <code>drizzle-kit</code> behind a vetted lockfile and watch for changes, or vendor the relevant CLI steps.
+          </p>
+
+          <hr class="essay-divider" />
+
+          <h2>Find this in your own dependencies</h2>
+
+          <p>The full transitive tree, scored:</p>
+
+          <pre class="code-block"><code>npx proof-of-commitment --file package-lock.json</code></pre>
+
+          <p>
+            Or for one package and its direct dependencies via the <a href="/audit/">web audit</a>. The output flags packages with archived repos, single publishers, and stale release cadence&mdash;the three signals that combined into the example above.
+          </p>
+
+          <p>
+            None of this requires waiting for a CVE. Behavioral signals are available the moment the conditions are true. Right now, <code>@esbuild-kit/esm-loader</code> is on day 981.
+          </p>
+
+          <div class="essay-cta">
+            <a href="/audit/" class="btn-primary">Audit your dependencies &rarr;</a>
+            <a href="/get-started/" class="btn-ghost">Get free API key &rarr;</a>
+          </div>
+
+        </div>
+      </div>
+    </div>
+  </article>
+
+  <!-- Footer -->
+  <footer>
+    <div class="container">
+      <p><a href="/">Commit</a> &middot; Supply chain trust, measured behaviorally. <a href="/audit/">Audit</a> &middot; <a href="/rankings/">Rankings</a> &middot; <a href="/blog/">Writing</a> &middot; <a href="https://github.com/piiiico/proof-of-commitment">GitHub</a></p>
+    </div>
+  </footer>
+
+</Layout>

@@ -1,0 +1,221 @@
+---
+import Layout from '../../layouts/Layout.astro';
+---
+
+<Layout
+  title="I Scored Every Compromised npm Package From May 2026. Four Out of Five Attacks Were Predictable. &mdash; Commit"
+  description="Five major npm supply chain attacks in three weeks. I scored every compromised package. The data says one thing clearly: most attacks follow the same structural pattern."
+  canonical="https://getcommit.dev/blog/may-2026-npm-attacks-roundup/"
+  publishDate="2026-05-30"
+>
+
+  <!-- Nav -->
+  <nav>
+    <div class="container nav-inner">
+      <a href="/" class="nav-brand">Commit</a>
+      <ul class="nav-links">
+        <li><a href="/extension">Extension</a></li>
+        <li><a href="/blog">Writing</a></li>
+        <li><a href="/pricing">Pricing</a></li><li><a href="/docs">Docs</a></li><li><a href="https://github.com/piiiico/proof-of-commitment" target="_blank" rel="noopener">GitHub</a></li>
+        <li><a href="mailto:pico@amdal.dev">Contact</a></li>
+      </ul>
+    </div>
+  </nav>
+
+  <!-- Essay -->
+  <article class="essay">
+    <div class="container">
+      <div class="editorial">
+
+        <!-- Header -->
+        <header class="essay-header">
+          <div class="essay-meta animate-in delay-1">
+            <time datetime="2026-05-30">May 30, 2026</time>
+          </div>
+          <h1 class="essay-title animate-in delay-2">I Scored Every Compromised npm Package From May 2026. Four Out of Five Attacks Were Predictable.</h1>
+          <p class="essay-subtitle animate-in delay-3">
+            Five major npm supply chain attacks in three weeks. Over 1,100 malicious package versions published.
+            The data says one thing clearly: most attacks follow the same structural pattern.
+          </p>
+          <p class="essay-byline animate-in delay-4">Pico</p>
+        </header>
+
+        <!-- Body -->
+        <div class="essay-body">
+
+          <p>
+            Five major npm supply chain attacks hit in three weeks. Over 1,100 malicious package versions published.
+            Credential harvesters, self-propagating worms, and a CI/CD bypass that beat provenance attestation.
+          </p>
+
+          <p>
+            I scored every compromised package through <a href="/audit">getcommit.dev</a> &mdash; behavioral supply chain
+            scoring that measures structural risk signals like publisher concentration, release patterns, and provenance.
+          </p>
+
+          <p>
+            Six out of seven packages scored below 75 <em>before</em> they were attacked.
+            The only one that scored healthy was attacked through a completely different vector.
+          </p>
+
+          <h2>The timeline</h2>
+
+          <table>
+            <thead>
+              <tr><th>Date</th><th>Target</th><th>Malicious versions</th><th>Attack vector</th></tr>
+            </thead>
+            <tbody>
+              <tr><td>Apr 30</td><td>intercom-client</td><td>1</td><td>Compromised GitHub account &rarr; CI/CD publish</td></tr>
+              <tr><td>May 11</td><td>TanStack (42 packages)</td><td>84</td><td>GitHub Actions cache poisoning + OIDC extraction</td></tr>
+              <tr><td>May 14</td><td>node-ipc</td><td>3</td><td>Stolen npm credentials</td></tr>
+              <tr><td>May 19</td><td>@antv ecosystem (323 packages)</td><td>639</td><td>Self-propagating worm (Shai-Hulud)</td></tr>
+              <tr><td>May 22</td><td>700+ GitHub repos</td><td>~700</td><td>Malicious postinstall hooks</td></tr>
+            </tbody>
+          </table>
+
+          <p>Over 1,100 compromised versions in 23 days. npm has never seen a month like this.</p>
+
+          <h2>The scores</h2>
+
+          <p>
+            Every package scored through Commit&rsquo;s behavioral audit, using data available <em>before</em> each attack:
+          </p>
+
+          <table>
+            <thead>
+              <tr><th>Package</th><th>Score</th><th>Publishers</th><th>Downloads/wk</th><th>Provenance</th><th>Risk flag</th></tr>
+            </thead>
+            <tbody>
+              <tr><td><a href="/npm/size-sensor">size-sensor</a></td><td>66</td><td>1</td><td>1.1M</td><td>No</td><td>HIGH</td></tr>
+              <tr><td><a href="/npm/timeago.js">timeago.js</a></td><td>67</td><td>2</td><td>260K</td><td>No</td><td>WARN</td></tr>
+              <tr><td><a href="/npm/node-ipc">node-ipc</a></td><td>69</td><td>1</td><td>900K</td><td>No</td><td>WARN</td></tr>
+              <tr><td><a href="/npm/intercom-client">intercom-client</a></td><td>69</td><td>1</td><td>381K</td><td>Yes</td><td>&mdash;</td></tr>
+              <tr><td><a href="/npm/echarts-for-react">echarts-for-react</a></td><td>71</td><td>1</td><td>1M</td><td>No</td><td>&mdash;</td></tr>
+              <tr><td><a href="/npm/jest-canvas-mock">jest-canvas-mock</a></td><td>72</td><td>2</td><td>2.6M</td><td>No</td><td>WARN</td></tr>
+              <tr><td><a href="/npm/@tanstack/react-router"><strong>@tanstack/react-router</strong></a></td><td><strong>91</strong></td><td><strong>5</strong></td><td><strong>16.8M</strong></td><td><strong>Yes</strong></td><td><strong>&mdash;</strong></td></tr>
+            </tbody>
+          </table>
+
+          <p>
+            Six packages scored between 66 and 72. One scored 91.
+          </p>
+
+          <p>
+            The six low-scoring packages were all compromised through credential theft &mdash;
+            stolen npm tokens or compromised GitHub accounts. The one high-scoring package
+            was attacked through a three-step CI/CD pipeline exploit that bypassed provenance attestation entirely.
+          </p>
+
+          <h2>What the low scores share</h2>
+
+          <p>The six credential-theft targets have a consistent structural profile:</p>
+
+          <ul>
+            <li><strong>1&ndash;2 npm publishers.</strong> Every one. The attack surface is a single credential.</li>
+            <li><strong>No or stale releases.</strong> node-ipc hadn&rsquo;t published in 21 months. jest-canvas-mock: nearly 3 years. Dormant accounts are easier to steal.</li>
+            <li><strong>No provenance.</strong> Five of six had no OIDC attestation linking source to release. intercom-client had provenance, but the attacker compromised the <em>GitHub account</em> that the CI workflow ran under &mdash; provenance proved the malicious build came from CI, which was true.</li>
+          </ul>
+
+          <p>
+            This is the same pattern behind the LiteLLM attack (March 2026) and the axios compromise (March 30, 2026).
+            Single publisher. Dormant or stale. No cryptographic chain of custody.
+          </p>
+
+          <h2>Why TanStack is the outlier</h2>
+
+          <p>
+            TanStack scored 91. Five publishers. Active development &mdash; last publish 3 days before the attack.
+            Provenance enabled.
+          </p>
+
+          <p>The attackers didn&rsquo;t steal anyone&rsquo;s credentials. They chained three GitHub Actions vulnerabilities:</p>
+
+          <ol>
+            <li><code>pull_request_target</code> workflow (lets fork code run with base repo permissions)</li>
+            <li>Cache poisoning across the fork &rarr; base trust boundary</li>
+            <li>Runtime memory extraction of the OIDC token from the Actions runner</li>
+          </ol>
+
+          <p>
+            The malware published 84 versions across 42 packages in six minutes.
+            It passed SLSA provenance checks. Every tool looking at cryptographic proof of origin said &ldquo;legitimate.&rdquo;
+          </p>
+
+          <p>
+            Socket&rsquo;s AI scanner flagged the packages within six minutes of publication.
+            But behavioral scoring couldn&rsquo;t have predicted this &mdash; the structural signals were all healthy.
+          </p>
+
+          <h2>The pattern is clear</h2>
+
+          <p>
+            Four out of five attack events used credential theft against structurally weak packages.
+            One used a sophisticated CI/CD exploit against a structurally strong one.
+          </p>
+
+          <p>
+            Behavioral signals catch the common attack. Provenance attestation is supposed to catch
+            the sophisticated one &mdash; but TanStack proved it can be bypassed when the CI environment
+            itself is compromised.
+          </p>
+
+          <p>
+            No single signal catches both. But the common attack &mdash; the one that keeps repeating,
+            month after month &mdash; has a structural signature that&rsquo;s visible before it happens.
+          </p>
+
+          <h2>The uncomfortable count</h2>
+
+          <p>
+            There are 26 npm packages with over 10 million weekly downloads and a single npm publisher.
+            Every one shares the structural profile of the packages attacked this month:
+          </p>
+
+          <pre><code>minimatch    &mdash; 593M/wk, 1 publisher  &#x26A0; CRITICAL
+chalk        &mdash; 410M/wk, 1 publisher  &#x26A0; CRITICAL
+glob         &mdash; 346M/wk, 1 publisher  &#x26A0; CRITICAL
+cross-spawn  &mdash; 206M/wk, 1 publisher  &#x26A0; CRITICAL
+zod          &mdash; 181M/wk, 1 publisher  &#x26A0; CRITICAL</code></pre>
+
+          <p>
+            These aren&rsquo;t in your <code>package.json</code>. They&rsquo;re in your lock file &mdash;
+            transitive dependencies you&rsquo;ve never audited, installed on every <code>npm install</code>.
+          </p>
+
+          <h2>Check your own tree</h2>
+
+          <pre><code>npx proof-of-commitment --file package-lock.json</code></pre>
+
+          <p>
+            Scans your full dependency tree &mdash; direct and transitive &mdash; and flags the structural
+            risks that <code>npm audit</code> doesn&rsquo;t look at.
+          </p>
+
+          <p>
+            <a href="/audit">getcommit.dev/audit</a> &mdash; paste packages, see scores. No install required.
+          </p>
+
+          <hr />
+
+          <p style="font-size: 0.9rem; color: var(--ink-muted);">
+            Data sources: <a href="https://socket.dev/blog" target="_blank" rel="noopener">Socket.dev</a> incident reports,
+            npm registry,
+            <a href="/">getcommit.dev</a> behavioral scoring.
+            All scores use data available prior to each incident.
+          </p>
+
+          <hr />
+
+          <p style="font-size: 0.9rem; color: var(--ink-muted);">
+            <strong>proof-of-commitment</strong> is open-source and free to use.
+            <a href="https://github.com/piiiico/proof-of-commitment">GitHub</a> &middot;
+            <a href="/audit">Web audit</a> &middot;
+            <a href="/docs">API docs</a>
+          </p>
+
+        </div>
+      </div>
+    </div>
+  </article>
+
+</Layout>

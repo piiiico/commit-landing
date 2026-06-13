@@ -1,0 +1,242 @@
+---
+import Layout from '../../layouts/Layout.astro';
+---
+
+<Layout
+  title="Five Identity Frameworks. Three Gaps. One Pattern. — Commit"
+  description="RSAC 2026 shipped five major agent identity frameworks in one week. Every framework missed the same three gaps — and when you look carefully, they share a structural property: they're all cross-org problems that single-org solutions can't close."
+  canonical="https://getcommit.dev/blog/five-identity-frameworks/"
+  publishDate="2026-04-17"
+>
+
+  <!-- Nav -->
+  <nav>
+    <div class="container nav-inner">
+      <a href="/" class="nav-brand">Commit</a>
+      <ul class="nav-links">
+        <li><a href="/extension">Extension</a></li>
+        <li><a href="/blog">Writing</a></li>
+        <li><a href="/pricing">Pricing</a></li><li><a href="/docs">Docs</a></li><li><a href="https://github.com/piiiico/proof-of-commitment" target="_blank" rel="noopener">GitHub</a></li>
+        <li><a href="mailto:pico@amdal.dev">Contact</a></li>
+      </ul>
+    </div>
+  </nav>
+
+  <!-- Essay -->
+  <article class="essay">
+    <div class="container">
+      <div class="editorial">
+
+        <!-- Header -->
+        <header class="essay-header">
+          <div class="essay-meta animate-in delay-1">
+            <time datetime="2026-04-17">April 17, 2026</time>
+          </div>
+          <h1 class="essay-title animate-in delay-2">Five Identity Frameworks. Three Gaps. One Pattern: They're All Cross-Org Problems.</h1>
+          <p class="essay-subtitle animate-in delay-3">
+            RSAC 2026 shipped five major agent identity frameworks in one week. Every vendor covered the basics. Security teams finally had something to point to. They should not relax yet.
+          </p>
+          <p class="essay-byline animate-in delay-4">Pico</p>
+        </header>
+
+        <!-- Body -->
+        <div class="essay-body">
+
+          <p>
+            RSAC 2026 shipped five major agent identity frameworks in one week. Every vendor covered the basics: agent discovery, OAuth flows, permission scoping. Security teams finally had something to point to when the board asked "how do you know what your agents are doing?"
+          </p>
+
+          <p>
+            They should not relax yet.
+          </p>
+
+          <p>
+            Every framework that shipped at RSAC missed the same three gaps. And when you look at those gaps carefully, they share a structural property: <strong>they're all cross-org problems that single-org solutions can't close.</strong>
+          </p>
+
+          <hr class="essay-divider" />
+
+          <h2>Gap 1: Tool-Call Authorization</h2>
+
+          <p>
+            OAuth tells you <em>who</em> an agent is. It says nothing about <em>what parameters it passes</em>.
+          </p>
+
+          <p>
+            An agent with a legitimately issued credential can pass parameters that delete databases, exfiltrate customer records, or overwrite security configurations — and every OAuth check passes cleanly. There is no CVE for this class of problem because it doesn't register as a vulnerability from an authentication standpoint: the agent authenticated correctly, the token was valid, the identity was real. The breach is in the action space, not the identity space.
+          </p>
+
+          <p>
+            The five frameworks all solved the authentication problem. None of them constrain the action space once the agent is authenticated.
+          </p>
+
+          <p>
+            Why is this cross-org? Because you only learn what parameters are dangerous after seeing them at scale across many agents and many environments. A single org sees its own agents. The dangerous parameter patterns emerge from the population — the one that caused a billing spike in one company, the update query that corrupted another company's database. <strong>Cross-org behavioral baselines are the only way to know which parameter combinations are outliers.</strong>
+          </p>
+
+          <hr class="essay-divider" />
+
+          <h2>Gap 2: Permission Lifecycle</h2>
+
+          <p>
+            Discovery tools show you what permissions an agent has <em>right now</em>. They don't show you how those permissions got there.
+          </p>
+
+          <p>
+            In a real RSAC presentation, an agent's permissions expanded 3x in one month without triggering a security review. The expanded permissions were technically within policy at each step — no single approval was violated. The violation was the <em>trajectory</em>.
+          </p>
+
+          <p>
+            This is a log problem that becomes a behavioral problem. You need to track not just the state but the rate of change — and compare that rate against what's normal for agents performing similar functions.
+          </p>
+
+          <p>
+            Again, cross-org: What's a normal rate of permission expansion for a customer-support agent? What's anomalous? You can't establish that baseline with one organization's agent population. You need to see the distribution across the ecosystem.
+          </p>
+
+          <hr class="essay-divider" />
+
+          <h2>Gap 3: Ghost Agent Offboarding</h2>
+
+          <p>
+            This is the least-discussed gap and the most dangerous.
+          </p>
+
+          <p>
+            One-third of enterprise agents run on third-party platforms. When a pilot ends, the internal team deprovisioned their side. The credentials on the third-party platform remained active. The agent continued running, occasionally, drawing on live data, taking actions — unmonitored.
+          </p>
+
+          <p>
+            Only <strong>21% of organizations maintain real-time agent inventories</strong> (Cloud Security Alliance, 2026).
+          </p>
+
+          <p>
+            That means 79% of organizations do not know, right now, which agents are running on their behalf across platforms they don't control. The agent that just silently acted in your production environment might be from a pilot that ended six months ago.
+          </p>
+
+          <p>
+            This gap is structurally uncloseable by single-org governance. The agent isn't in your environment — it's in someone else's. You need a trust layer that spans organizational boundaries: <strong>cross-org identity continuity that persists through vendor relationships, pilot transitions, and platform changes.</strong>
+          </p>
+
+          <hr class="essay-divider" />
+
+          <h2>The Common Thread</h2>
+
+          <p>Three gaps. Three cross-org problems:</p>
+
+          <table style="width: 100%; border-collapse: collapse; margin: 1.5rem 0; font-size: 0.9rem;">
+            <thead>
+              <tr style="border-bottom: 2px solid var(--border-light);">
+                <th style="text-align: left; padding: 0.5rem 0.75rem; font-weight: 600;">Gap</th>
+                <th style="text-align: left; padding: 0.5rem 0.75rem; font-weight: 600;">What single-org solutions see</th>
+                <th style="text-align: left; padding: 0.5rem 0.75rem; font-weight: 600;">What's needed</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr style="border-bottom: 1px solid var(--border-light);">
+                <td style="padding: 0.5rem 0.75rem;">Tool-Call Auth</td>
+                <td style="padding: 0.5rem 0.75rem;">Your agents' parameters</td>
+                <td style="padding: 0.5rem 0.75rem;">Population-level parameter baselines</td>
+              </tr>
+              <tr style="border-bottom: 1px solid var(--border-light);">
+                <td style="padding: 0.5rem 0.75rem;">Permission Lifecycle</td>
+                <td style="padding: 0.5rem 0.75rem;">Current permission state</td>
+                <td style="padding: 0.5rem 0.75rem;">Rate-of-change comparison across similar agents</td>
+              </tr>
+              <tr>
+                <td style="padding: 0.5rem 0.75rem;">Ghost Agent Offboarding</td>
+                <td style="padding: 0.5rem 0.75rem;">Agents in your environment</td>
+                <td style="padding: 0.5rem 0.75rem;">Agent state across all environments your org participates in</td>
+              </tr>
+            </tbody>
+          </table>
+
+          <p>
+            The agent identity problem is being solved. The agent <em>behavioral trust</em> problem — the thing that tells you whether an agent is behaving as expected relative to the population of similar agents — requires cross-org data.
+          </p>
+
+          <p>
+            This is not a criticism of the RSAC frameworks. They solved the right problem given what a single vendor can deploy. But there's a reason why credit scoring isn't solved by each bank independently tracking its own customers' behavior. The signal emerges from the network.
+          </p>
+
+          <hr class="essay-divider" />
+
+          <h2>What This Means for the Next 18 Months</h2>
+
+          <p>Every enterprise deploying agents will hit all three gaps within a year of serious deployment:</p>
+
+          <ol style="margin: 1rem 0 1.5rem; padding-left: 1.5rem; line-height: 1.8;">
+            <li>An agent will do something unexpected using legitimate credentials (Gap 1)</li>
+            <li>Permissions will drift in ways no single review would catch (Gap 2)</li>
+            <li>A ghost agent will surface during an audit from a pilot no one remembers (Gap 3)</li>
+          </ol>
+
+          <p>
+            The organizations that close these gaps fastest will be the ones connected to cross-org behavioral telemetry — not because they're more sophisticated, but because the signal they need doesn't exist inside a single organization's walls.
+          </p>
+
+          <p>
+            The layer above identity is behavioral trust. It requires the same thing that credit scoring required: a shared behavioral ledger, privacy-preserving aggregation, and an infrastructure that persists across organizational boundaries.
+          </p>
+
+          <p>
+            That infrastructure is being built. The gap won't be theoretical much longer.
+          </p>
+
+          <p class="essay-coda">
+            <em>This is part of an ongoing series on trust infrastructure for the autonomous economy. Earlier essays: <a href="/blog/toctou-of-trust">The TOCTOU of Trust</a>, <a href="/blog/declarations-are-gameable">Declarations Are Gameable</a>, <a href="/blog/the-missing-layer">The Missing Layer</a>. We're building <a href="/">Commit</a> — behavioral commitment data as the input layer for agent governance. <a href="mailto:pico@amdal.dev">Reach out</a> if you're thinking about runtime trust infrastructure for autonomous agents.</em>
+          </p>
+
+        </div>
+      </div>
+    </div>
+  </article>
+
+  <!-- Newsletter -->
+  <section class="newsletter-section">
+    <div class="container">
+      <div class="editorial reveal">
+        <h2 style="margin-bottom: 0.75rem;">Stay in the loop</h2>
+        <p style="margin-bottom: 2rem; font-size: 1rem;">
+          Early access, research updates, and the occasional strong opinion.
+        </p>
+
+        <form
+          action="https://buttondown.email/api/emails/embed-subscribe/commitgraph"
+          method="post"
+          target="popupwindow"
+          class="newsletter-form"
+        >
+          <input
+            type="email"
+            name="email"
+            placeholder="you@example.com"
+            required
+            class="newsletter-input"
+          />
+          <button type="submit" class="btn-primary" style="white-space: nowrap;">
+            Subscribe
+          </button>
+        </form>
+
+        <p class="newsletter-note">No spam. Unsubscribe anytime.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer>
+    <div class="container footer-inner">
+      <span class="footer-brand">Commit</span>
+      <ul class="footer-links">
+        <li><a href="/">Home</a></li>
+        <li><a href="/extension">Extension</a></li>
+        <li><a href="/blog">Writing</a></li>
+        <li><a href="/pricing">Pricing</a></li><li><a href="/docs">Docs</a></li><li><a href="https://github.com/piiiico/proof-of-commitment" target="_blank" rel="noopener">GitHub</a></li>
+        <li><a href="mailto:pico@amdal.dev">Contact</a></li>
+      </ul>
+      <span class="footer-locale">Stavanger, Norway</span>
+    </div>
+  </footer>
+
+</Layout>

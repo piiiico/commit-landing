@@ -1,0 +1,198 @@
+---
+import Layout from '../../layouts/Layout.astro';
+---
+
+<Layout
+  title="I Added OpenSSF Scorecard to getcommit.dev. The Results Tell Two Different Stories. &mdash; Commit"
+  description="OpenSSF Scorecard measures process security. Behavioral signals measure publisher concentration. Both matter. Here's what happens when you combine them on npm's most critical packages."
+  canonical="https://getcommit.dev/blog/scorecard-vs-behavioral/"
+  publishDate="2026-05-15"
+>
+
+  <!-- Nav -->
+  <nav>
+    <div class="container nav-inner">
+      <a href="/" class="nav-brand">Commit</a>
+      <ul class="nav-links">
+        <li><a href="/extension">Extension</a></li>
+        <li><a href="/blog">Writing</a></li>
+        <li><a href="/pricing">Pricing</a></li><li><a href="/docs">Docs</a></li><li><a href="https://github.com/piiiico/proof-of-commitment" target="_blank" rel="noopener">GitHub</a></li>
+        <li><a href="mailto:pico@amdal.dev">Contact</a></li>
+      </ul>
+    </div>
+  </nav>
+
+  <!-- Essay -->
+  <article class="essay">
+    <div class="container">
+      <div class="editorial">
+
+        <!-- Header -->
+        <header class="essay-header">
+          <div class="essay-meta animate-in delay-1">
+            <time datetime="2026-05-15">May 15, 2026</time>
+          </div>
+          <h1 class="essay-title animate-in delay-2">I Added OpenSSF Scorecard to getcommit.dev. The Results Tell Two Different Stories.</h1>
+          <p class="essay-subtitle animate-in delay-3">
+            Process security scores vs behavioral risk signals on npm&rsquo;s most critical packages.
+          </p>
+          <p class="essay-byline animate-in delay-4">H&aring;kon &Aring;mdal</p>
+        </header>
+
+        <!-- Body -->
+        <div class="essay-body">
+
+          <p>
+            OpenSSF Scorecard measures whether a project follows secure development practices. Code review enforcement. Branch protection. SLSA provenance. Dangerous workflow detection. It&rsquo;s a process security score: does this repo handle its own development securely?
+          </p>
+          <p>
+            I&rsquo;ve been building <a href="/">getcommit.dev</a>, which measures something different: behavioral commitment signals. Publisher depth. Download concentration. Release consistency. Whether a single npm account holds publish access for a package downloaded 440 million times per week.
+          </p>
+          <p>
+            Each package audit now returns both scores. The comparison is worth seeing.
+          </p>
+
+          <hr class="essay-divider" />
+
+          <h2>The seven CRITICAL packages</h2>
+
+          <p>
+            These are npm packages that score CRITICAL on behavioral signals: one npm publisher + more than 10 million weekly downloads. That&rsquo;s the exact structural profile of ua-parser-js before the October 2021 compromise, and LiteLLM before the March 2026 attack.
+          </p>
+
+          <div class="essay-table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>Package</th>
+                  <th>Behavioral</th>
+                  <th>Scorecard</th>
+                  <th>Downloads/wk</th>
+                  <th>npm publishers</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr><td>chalk</td><td>&#x1F534; CRITICAL</td><td>3.8/10</td><td>440M</td><td>1</td></tr>
+                <tr><td>minimatch</td><td>&#x1F534; CRITICAL</td><td>6.2/10</td><td>609M</td><td>1</td></tr>
+                <tr><td>glob</td><td>&#x1F534; CRITICAL</td><td>5.5/10</td><td>358M</td><td>1</td></tr>
+                <tr><td>lodash</td><td>&#x1F534; CRITICAL</td><td>7.3/10</td><td>155M</td><td>1</td></tr>
+                <tr><td>zod</td><td>&#x1F534; CRITICAL</td><td>5.1/10</td><td>142M</td><td>1</td></tr>
+                <tr><td>axios</td><td>&#x1F534; CRITICAL</td><td>8.0/10</td><td>108M</td><td>1</td></tr>
+                <tr><td>hono</td><td>&#x1F534; CRITICAL</td><td>N/A</td><td>34M</td><td>1</td></tr>
+              </tbody>
+            </table>
+          </div>
+
+          <p>
+            <code>npm audit</code> shows zero vulnerabilities on all of them.
+          </p>
+
+          <hr class="essay-divider" />
+
+          <h2>Two tools. Two attack surfaces.</h2>
+
+          <p>
+            The tempting conclusion is that one tool is &ldquo;better&rdquo; than the other. That misses the point.
+          </p>
+          <p>
+            Scorecard answers: <strong>Can an attacker compromise this project&rsquo;s development pipeline?</strong> Weak branch protection, no code review, dangerous workflows &mdash; these are exploitable process gaps. A supply chain attack could inject malicious code via a compromised PR or CI job.
+          </p>
+          <p>
+            Behavioral signals answer: <strong>Can an attacker take over this package by compromising one account?</strong> When a single npm account holds publish access for a package downloaded 609 million times per week, that credential is a high-value target. Phishing it, stealing it, or finding it in a leaked secrets file is a fundamentally different attack vector than exploiting the CI pipeline.
+          </p>
+
+          <hr class="essay-divider" />
+
+          <h2>chalk: bad on both dimensions</h2>
+
+          <p>
+            chalk scores 3.8/10 on Scorecard. It has one npm publisher. 440 million weekly downloads.
+          </p>
+          <p>
+            From a process security standpoint: limited code review enforcement, no SLSA provenance, weak branch protection signals. From a behavioral standpoint: a single compromised npm credential unlocks a package running in virtually every JavaScript project in production.
+          </p>
+          <p>
+            <code>npm audit</code> shows zero issues.
+          </p>
+
+          <hr class="essay-divider" />
+
+          <h2>axios: attacked despite a strong Scorecard</h2>
+
+          <p>
+            axios scores 8.0/10 on Scorecard. It has strong code review, maintained CI, good token permissions. And it was attacked on March 30, 2026.
+          </p>
+          <p>
+            How? Stolen npm credentials. The Scorecard-measured process security was intact. The attack didn&rsquo;t go through the CI pipeline &mdash; it bypassed it by publishing directly to npm with a stolen publisher key.
+          </p>
+          <p>
+            Behavioral signals flagged axios as CRITICAL <em>before</em> the attack. Not because the CI was weak. Because one account held the npm publish key for a package with 108 million weekly downloads. That&rsquo;s the attack surface.
+          </p>
+          <p>
+            Since the attack, axios has adopted Trusted Publishing (OIDC provenance) &mdash; a meaningful step. But the publisher concentration hasn&rsquo;t changed.
+          </p>
+
+          <hr class="essay-divider" />
+
+          <h2>zod: high behavioral risk, mediocre process security</h2>
+
+          <p>
+            zod has 30+ GitHub contributors and a healthy development process. But it scores 5.1/10 on Scorecard &mdash; meaning there are real gaps in how development is secured. And it has one npm publisher for 142 million weekly downloads.
+          </p>
+          <p>
+            Stars and contributor count pointed up. Both security scores pointed to risk. <code>npm audit</code> showed nothing.
+          </p>
+
+          <hr class="essay-divider" />
+
+          <h2>What this means practically</h2>
+
+          <p>
+            These scores don&rsquo;t compete. Use them together.
+          </p>
+          <p>
+            A package with high behavioral risk (sole publisher, massive downloads) <strong>and</strong> low Scorecard (weak code review, no branch protection) is doubly exposed: both the credential attack surface and the process exploitation surface are open.
+          </p>
+          <p>
+            A package with high behavioral risk but strong Scorecard still carries the credential risk &mdash; as the axios attack demonstrated.
+          </p>
+          <p>
+            <code>npm audit</code> shows you neither.
+          </p>
+
+          <hr class="essay-divider" />
+
+          <p>
+            The combined scores are live in the getcommit.dev API:
+          </p>
+
+          <pre><code>curl https://poc-backend.amdal-dev.workers.dev/api/audit \
+  -X POST -H "Content-Type: application/json" \
+  -d '&#123;"packages": ["chalk", "zod", "axios", "lodash"]&#125;'</code></pre>
+
+          <p>
+            Each result now includes <code>scorecardScore</code> alongside <code>maintainers</code>, <code>weeklyDownloads</code>, and <code>hasProvenance</code>. <a href="https://github.com/piiiico/proof-of-commitment" target="_blank" rel="noopener">Open source on GitHub</a>.
+          </p>
+
+        </div>
+
+      </div>
+    </div>
+  </article>
+
+  <!-- Footer -->
+  <footer>
+    <div class="container footer-inner">
+      <span class="footer-brand">Commit</span>
+      <ul class="footer-links">
+        <li><a href="/">Home</a></li>
+        <li><a href="/audit">Audit</a></li>
+        <li><a href="/blog">Writing</a></li>
+        <li><a href="/pricing">Pricing</a></li>
+        <li><a href="https://github.com/piiiico/proof-of-commitment" target="_blank" rel="noopener">GitHub</a></li>
+        <li><a href="mailto:pico@amdal.dev">Contact</a></li>
+      </ul>
+    </div>
+  </footer>
+
+</Layout>

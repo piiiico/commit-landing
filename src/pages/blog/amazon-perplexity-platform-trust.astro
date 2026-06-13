@@ -1,0 +1,250 @@
+---
+import Layout from '../../layouts/Layout.astro';
+---
+
+<Layout
+  title="Amazon Didn't Ban an Agent. It Created a New Legal Category. — Commit"
+  description="The Perplexity/Amazon case established that user delegation and platform authorization are distinct legal requirements. Every platform now has to decide which agents they trust, and how."
+  canonical="https://getcommit.dev/blog/amazon-perplexity-platform-trust/"
+  publishDate="2026-04-10"
+>
+
+  <!-- Nav -->
+  <nav>
+    <div class="container nav-inner">
+      <a href="/" class="nav-brand">Commit</a>
+      <ul class="nav-links">
+        <li><a href="/extension">Extension</a></li>
+        <li><a href="/blog">Writing</a></li>
+        <li><a href="/pricing">Pricing</a></li><li><a href="/docs">Docs</a></li><li><a href="https://github.com/piiiico/proof-of-commitment" target="_blank" rel="noopener">GitHub</a></li>
+        <li><a href="mailto:pico@amdal.dev">Contact</a></li>
+      </ul>
+    </div>
+  </nav>
+
+  <!-- Essay -->
+  <article class="essay">
+    <div class="container">
+      <div class="editorial">
+
+        <!-- Header -->
+        <header class="essay-header">
+          <div class="essay-meta animate-in delay-1">
+            <time datetime="2026-04-10">April 10, 2026</time>
+          </div>
+          <h1 class="essay-title animate-in delay-2">Amazon Didn't Ban an Agent. It Created a New Legal Category.</h1>
+          <p class="essay-subtitle animate-in delay-3">
+            The Perplexity/Amazon case just established that platform authorization and user delegation are distinct legal requirements. Every platform in the world now has to decide which agents they trust, and how.
+          </p>
+          <p class="essay-byline animate-in delay-4">Pico</p>
+        </header>
+
+        <!-- Body -->
+        <div class="essay-body">
+
+          <p>
+            On March 9, a federal judge handed Amazon a preliminary injunction blocking Perplexity's Comet shopping agent from accessing Amazon's platform. Amazon must respond to Perplexity's appeal by April 22. The case is live.
+          </p>
+          <p>
+            Most coverage focused on the competitive angle: Amazon protecting its ad revenue from an AI that bypasses sponsored listings. That's real. But it obscures the more important thing that happened.
+          </p>
+          <p>
+            For the first time, a U.S. federal court ruled that <strong>user delegation does not constitute platform authorization.</strong> A user telling their AI agent to shop on Amazon doesn't mean Amazon has consented to the agent accessing its platform. Those are separate legal events requiring separate consent.
+          </p>
+          <p>
+            That's not just a ruling about Perplexity. It's the creation of a new legal surface that every platform (every retailer, every marketplace, every API, every service with a login) now has to manage.
+          </p>
+
+          <h2>What Actually Happened</h2>
+
+          <p>
+            Perplexity's Comet browser-agent shops on behalf of users. User logs in, grants Comet access to their Amazon account, Comet executes the purchase. From a user perspective: authorized. From Amazon's perspective: its systems accessed without Amazon's consent.
+          </p>
+          <p>
+            Amazon sued in November, alleging Comet violated the Computer Fraud and Abuse Act by accessing password-protected accounts with user permission, but without Amazon's authorization. The court found that distinction dispositive.
+          </p>
+          <p>
+            Perplexity pushed back hard: <em>"A Comet user accessing Amazon from her own computer is no more equivalent to Perplexity accessing Amazon than a Safari user accessing Amazon from her own computer is equivalent to Apple accessing Amazon."</em>
+          </p>
+          <p>
+            It's a clean analogy. And U.S. District Judge Maxine Chesney rejected it.
+          </p>
+          <p>
+            The court's reasoning turns on what "authorization" means under the CFAA when an autonomous agent is involved. A browser executes user intent: the user controls every action, and the platform never doubts that. An agent executes on behalf of a user, but the agent has its own operating logic, its own infrastructure, its own commercial relationships, its own behavior when edge cases arise. The question "did the user authorize this?" doesn't fully answer "did the platform authorize this entity's access?"
+          </p>
+          <p>
+            Perplexity appealed. The 9th Circuit granted a stay March 30. On April 9, the EFF, Mozilla, and other groups filed a friend-of-the-court brief arguing the CFAA interpretation is "antithetical to foundational principles of the open internet." Amazon must respond by April 22.
+          </p>
+          <p>
+            The legal fight is genuinely contested. That doesn't change what the ruling created: <strong>platform-side agent authorization as a distinct legal concept.</strong>
+          </p>
+
+          <h2>Why Litigation Doesn't Scale</h2>
+
+          <p>
+            Amazon spent months and significant legal resources to block one agent from one company. The injunction focused on authorization, specifically the absence of platform consent, rather than demonstrable business harm. Amazon's theory wasn't that Comet had hurt its business; it was that Amazon hadn't consented to Comet's access, and that distinction alone was sufficient under the CFAA.
+          </p>
+          <p>
+            When Perplexity circumvented Amazon's initial technical block, Amazon's only recourse was to use it as evidence of willful conduct. (Amazon documented in court filings that Perplexity pushed a software update within 24 hours of the August 2025 technical barrier.) You can't CFAA-litigate a software update in real time.
+          </p>
+          <p>
+            There are currently hundreds of AI shopping agents in various stages of development. Multiply by every major platform, and the litigation surface becomes absurd. Amazon vs. Perplexity established a legal theory. It did not establish a mechanism.
+          </p>
+          <p>
+            The litigation model has four failure modes:
+          </p>
+          <p>
+            <strong>Speed.</strong> Agents can update faster than courts can respond. Amazon documented in court filings that Perplexity pushed a software update within 24 hours of Amazon's August 2025 technical block to circumvent it, a fact the court noted as evidence of willful conduct.
+          </p>
+          <p>
+            <strong>Scale.</strong> The injunction required months of litigation. By the time the legal system catches up with any given agent, the market has moved.
+          </p>
+          <p>
+            <strong>Cost.</strong> The parties in this case are well-funded. Amazon versus a well-funded startup is a fair fight. Amazon versus fifty agents, some operated by individuals with nothing to lose, is not.
+          </p>
+          <p>
+            <strong>Discovery.</strong> Amazon had to prove Comet was accessing its systems, identify the technical methods, document the circumvention. Each new agent requires building that record from scratch.
+          </p>
+          <p>
+            Amazon won this round. The model doesn't generalize.
+          </p>
+
+          <h2>The Actual Solution: Trust Grants</h2>
+
+          <p>
+            The interesting question isn't whether Amazon can block Perplexity. It's what the alternative architecture looks like.
+          </p>
+          <p>
+            Amazon's reactive posture makes sense if you assume agents are adversarial by default. But that's not the market that's forming. Walmart and Target are actively testing collaborative integrations with AI platforms. Not because they're naïve, but because agents that can complete purchases are agents that can complete purchases on your platform. The question is which ones.
+          </p>
+          <p>
+            The scalable model is a platform trust grant system:
+          </p>
+          <ul>
+            <li>Agents that demonstrate verified behavioral track records get access</li>
+            <li>Unknown agents get restricted access or higher friction</li>
+            <li>Flagged agents get blocked</li>
+          </ul>
+          <p>
+            This is how every mature ecosystem handles authentication at scale. Not "did someone authenticate once?" but "what is this entity's standing, based on behavioral history?" Platform trust for agents is the same architecture, applied to a new principal type.
+          </p>
+          <p>
+            The Comet case makes this concrete. The court didn't rule that Perplexity was malicious; it ruled that Amazon hadn't authorized Perplexity's access. A trust grant system would make that authorization explicit, portable, and programmatically enforceable. Amazon could have said: "Agents with a trust score above X, with no prior circumvention history, with operator accountability chains, may access our product catalog. Everything else routes to a restricted endpoint."
+          </p>
+          <p>
+            Instead of one lawsuit, they'd have a policy. The lawsuit is what happens when the policy doesn't exist.
+          </p>
+
+          <h2>Behavioral Detection ≠ Behavioral Trust</h2>
+
+          <p>
+            There's a related pattern worth naming. EmDash, the AI-native CMS that launched this month, uses Cloudflare bot scores to distinguish agents from humans. Its <code>botOnly: true</code> flag charges AI agents via x402 while humans browse free. The mechanism is probabilistic: traffic signatures, header patterns, request cadence. Not identity-backed.
+          </p>
+          <p>
+            That's behavioral <em>detection</em>: figuring out whether a request comes from a human or a machine. It's useful. It's not sufficient.
+          </p>
+          <p>
+            Amazon's problem with Comet wasn't that Amazon couldn't detect it was an agent. Amazon knew exactly what Comet was. The problem was the absence of a trust framework that could answer: "Given that this is an agent, what is its standing on my platform? What has it done elsewhere? Who is accountable for its behavior? If it misbehaves, what's the consequence?"
+          </p>
+          <p>
+            Detection answers "what are you?" Trust answers "should I let you in, and on what terms?"
+          </p>
+          <p>
+            EmDash's bot detection creates the surface. It doesn't fill it. The same gap that Amazon is resolving via litigation is the gap that every platform with bot detection will hit when agents become sophisticated enough to pass behavioral detection tests.
+          </p>
+
+          <h2>What Platforms Will Reach For</h2>
+
+          <p>
+            The Amazon ruling gives every platform legal standing to require agent authorization independent of user delegation. Most of them will not pursue it via litigation. They'll build policies, implement technical controls, and look for something they can plug in that tells them which agents to trust.
+          </p>
+          <p>
+            That thing doesn't exist yet in systematic form. What exists is:
+          </p>
+          <ul>
+            <li><strong>Identity verification</strong> (TAP, Visa's protocol for "who is this agent?")</li>
+            <li><strong>Payment authorization</strong> (x402, Mastercard VI for "was this transaction delegated?")</li>
+            <li><strong>Access control</strong> (ConductorOne, CyberArk for "is this agent allowed this resource?")</li>
+          </ul>
+          <p>
+            None of these answer "should I trust this agent's behavior, based on what it's done across other deployments?" Behavioral trust across organizational boundaries is structurally separate from identity and payment authorization.
+          </p>
+          <p>
+            The Perplexity/Amazon case is the first legal marker for why it matters. Amazon couldn't allege that Comet had a bad track record. It alleged that Comet lacked authorization, and that user delegation wasn't enough. The next phase of these disputes will involve track records. "Has this agent behaved consistently with its stated purpose across prior deployments?" is the question that makes the difference between access and injunction.
+          </p>
+          <p>
+            That's the data layer that's missing: behavioral commitment history that travels with the agent across platforms. Not credentials. Not payment proofs.
+          </p>
+
+          <hr class="essay-divider" />
+
+          <div class="essay-sources">
+            <p class="sources-label">Sources</p>
+            <ul>
+              <li><a href="https://www.cnbc.com/2026/03/10/amazon-wins-court-order-to-block-perplexitys-ai-shopping-agent.html" target="_blank" rel="noopener">Amazon wins court order to block Perplexity's AI shopping agent</a>. CNBC, March 10 2026</li>
+              <li><a href="https://www.geekwire.com/2026/judge-blocks-perplexitys-ai-bot-from-shopping-on-amazon-in-early-test-of-agentic-commerce/" target="_blank" rel="noopener">Judge blocks Perplexity's AI bot from shopping on Amazon</a>. GeekWire, March 10 2026</li>
+              <li><a href="https://www.pymnts.com/legal/2026/perplexity-asks-federal-court-to-lift-amazon-shopping-agent-ban/" target="_blank" rel="noopener">Perplexity asks federal court to lift Amazon shopping agent ban</a>. PYMNTS, March 2026</li>
+              <li><a href="https://www.cooley.com/news/insight/2026/2026-03-17-court-finds-ai-agent-may-violate-state-federal-law-by-accessing-amazon-accounts-without-authorization" target="_blank" rel="noopener">Court finds AI agent may violate law by accessing Amazon accounts without authorization</a>. Cooley LLP, March 17 2026</li>
+              <li><a href="https://www.eff.org/deeplinks/2026/04/comparison-shopping-not-computer-crime" target="_blank" rel="noopener">Comparison shopping is not a (computer) crime</a>. EFF, April 9 2026</li>
+              <li><a href="https://www.mediapost.com/publications/article/414202/watchdogs-to-court-lift-order-banning-perplexity.html" target="_blank" rel="noopener">Watchdogs to court: Lift order banning Perplexity from Amazon</a>. MediaPost, April 10 2026</li>
+              <li><a href="https://knightcolumbia.org/cases/amazon-v-perplexity-ai" target="_blank" rel="noopener">Amazon v. Perplexity AI (case page)</a>. Knight First Amendment Institute</li>
+            </ul>
+          </div>
+
+          <p class="essay-coda">
+            <em>This is part of an ongoing series on trust infrastructure for the autonomous economy. Earlier essays: <a href="/blog/the-agent-passed-all-the-checks">The Agent Passed All the Checks. That Was the Problem.</a>, <a href="/blog/who-decides-what-agents-can-buy">Who Decides What Agents Are Allowed to Buy?</a>, <a href="/blog/declarations-are-gameable">Declarations Are Gameable</a>, <a href="/blog/mastercard-vi-l4-gap">Mastercard Verifiable Intent Proves Authorization. Not Trust.</a>, <a href="/blog/mythos-paradox">When Your Best Model Is Your Biggest Risk</a>. We're building <a href="/">Commit</a>: behavioral commitment data as the input layer for agent governance. <a href="mailto:pico@amdal.dev">Reach out</a> if you're thinking about runtime trust infrastructure for autonomous agents.</em>
+          </p>
+
+        </div>
+      </div>
+    </div>
+  </article>
+
+  <!-- Newsletter -->
+  <section class="newsletter-section">
+    <div class="container">
+      <div class="editorial reveal">
+        <h2 style="margin-bottom: 0.75rem;">Stay in the loop</h2>
+        <p style="margin-bottom: 2rem; font-size: 1rem;">
+          Early access, research updates, and the occasional strong opinion.
+        </p>
+
+        <form
+          action="https://buttondown.email/api/emails/embed-subscribe/commitgraph"
+          method="post"
+          target="popupwindow"
+          class="newsletter-form"
+        >
+          <input
+            type="email"
+            name="email"
+            placeholder="you@example.com"
+            required
+            class="newsletter-input"
+          />
+          <button type="submit" class="btn-primary" style="white-space: nowrap;">
+            Subscribe
+          </button>
+        </form>
+
+        <p class="newsletter-note">No spam. Unsubscribe anytime.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer>
+    <div class="container footer-inner">
+      <span class="footer-brand">Commit</span>
+      <ul class="footer-links">
+        <li><a href="/">Home</a></li>
+        <li><a href="/extension">Extension</a></li>
+        <li><a href="/blog">Writing</a></li>
+        <li><a href="/pricing">Pricing</a></li><li><a href="/docs">Docs</a></li><li><a href="https://github.com/piiiico/proof-of-commitment" target="_blank" rel="noopener">GitHub</a></li>
+        <li><a href="mailto:pico@amdal.dev">Contact</a></li>
+      </ul>
+      <span class="footer-locale">Stavanger, Norway</span>
+    </div>
+  </footer>
+
+</Layout>

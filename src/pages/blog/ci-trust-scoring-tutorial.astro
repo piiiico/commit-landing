@@ -1,0 +1,358 @@
+---
+import Layout from '../../layouts/Layout.astro';
+---
+
+<Layout
+  title="Add Trust Scoring to Your CI Pipeline in 5 Minutes — Commit"
+  description="A practical guide to adding behavioral supply chain auditing to GitHub Actions, GitLab CI, or any CI system. Copy-paste YAML included."
+  canonical="https://getcommit.dev/blog/ci-trust-scoring-tutorial/"
+  publishDate="2026-04-19"
+>
+
+  <!-- Nav -->
+  <nav>
+    <div class="container nav-inner">
+      <a href="/" class="nav-brand">Commit</a>
+      <ul class="nav-links">
+        <li><a href="/extension">Extension</a></li>
+        <li><a href="/blog">Writing</a></li>
+        <li><a href="/pricing">Pricing</a></li><li><a href="/docs">Docs</a></li><li><a href="https://github.com/piiiico/proof-of-commitment" target="_blank" rel="noopener">GitHub</a></li>
+        <li><a href="mailto:pico@amdal.dev">Contact</a></li>
+      </ul>
+    </div>
+  </nav>
+
+  <!-- Article -->
+  <article class="essay">
+    <div class="container">
+      <div class="editorial">
+
+        <!-- Header -->
+        <header class="essay-header">
+          <div class="essay-meta animate-in delay-1">
+            <time datetime="2026-04-19">April 19, 2026</time>
+          </div>
+          <h1 class="essay-title animate-in delay-2">Add Trust Scoring to Your CI Pipeline in 5 Minutes</h1>
+          <p class="essay-subtitle animate-in delay-3">
+            npm audit tells you about known CVEs. This tells you about structural risk — solo maintainers, download anomalies, behavioral signals — before the CVE exists.
+          </p>
+          <p class="essay-byline animate-in delay-4">Pico</p>
+        </header>
+
+        <!-- Body -->
+        <div class="essay-body">
+
+          <p>
+            Most supply chain attacks are not zero-days. They are predictable failures: a package with a single maintainer, stagnant activity, and 50 million weekly downloads changes hands. <code>npm audit</code> shows zero issues — because there is no CVE yet.
+          </p>
+          <p>
+            <a href="https://github.com/piiiico/proof-of-commitment" target="_blank" rel="noopener">proof-of-commitment</a> scores dependencies on behavioral signals: maintainer count, download trends, maintenance activity, historical incidents. Two ways to add it to CI. Pick one.
+          </p>
+
+          <h2>Option 1: GitHub Action (Recommended)</h2>
+
+          <p>Add a new workflow file to your repo:</p>
+
+          <pre><code># .github/workflows/supply-chain-audit.yml
+name: Supply Chain Audit
+
+on:
+  pull_request:
+    paths:
+      - 'package.json'
+      - 'package-lock.json'
+      - 'bun.lock'
+      - 'requirements.txt'
+      - 'pyproject.toml'
+  push:
+    branches: [main]
+  workflow_dispatch: {}
+
+jobs:
+  audit:
+    name: Dependency Audit
+    runs-on: ubuntu-latest
+    permissions:
+      pull-requests: write   # needed for PR comments
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Commit Supply Chain Audit
+        uses: piiiico/proof-of-commitment@main
+        with:
+          fail-on-critical: false   # set true to block merges on CRITICAL packages
+          max-packages: '20'
+          comment-on-pr: true       # posts results as a PR comment</code></pre>
+
+          <p>That is the minimal config. Auto-detects packages from your lock file, posts a comment on every PR touching dependencies.</p>
+
+          <h2>Inputs</h2>
+
+          <table>
+            <thead>
+              <tr><th>Input</th><th>Default</th><th>What it does</th></tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><code>packages</code></td>
+                <td><em>auto</em></td>
+                <td>Comma-separated package names. Skip this — auto-detection reads your lock file.</td>
+              </tr>
+              <tr>
+                <td><code>ecosystem</code></td>
+                <td><code>auto</code></td>
+                <td><code>npm</code> or <code>pypi</code>. Auto-detected from your package files.</td>
+              </tr>
+              <tr>
+                <td><code>fail-on-critical</code></td>
+                <td><code>true</code></td>
+                <td>Exit non-zero if any CRITICAL packages found. Set <code>false</code> to audit-only without blocking.</td>
+              </tr>
+              <tr>
+                <td><code>max-packages</code></td>
+                <td><code>20</code></td>
+                <td>How many packages to audit from the lock file. Focus on your top dependencies.</td>
+              </tr>
+              <tr>
+                <td><code>comment-on-pr</code></td>
+                <td><code>true</code></td>
+                <td>Post results as a PR comment, auto-updated on re-runs.</td>
+              </tr>
+            </tbody>
+          </table>
+
+          <h2>Example Output</h2>
+
+          <p>The action posts a comment to every dependency PR:</p>
+
+          <pre><code>## Commit Supply Chain Audit
+
+| Package | Score | Risk | Weekly Downloads | Maintainers |
+|---------|-------|------|-----------------|-------------|
+| axios   |  42   | CRITICAL | 101M | 2 |
+| lodash  |  71   | MODERATE | 54M  | 4 |
+| chalk   |  58   | HIGH     | 413M | 1 |
+| zod     |  89   | LOW      | 18M  | 2 |
+| react   |  94   | LOW      | 70M  | 8 |
+
+⚠️ 1 CRITICAL package found. Review before merging.
+
+Scores reflect behavioral commitment signals — maintainer bus factor, download trend, maintenance activity, incident history. Not CVE databases.
+→ Full methodology: getcommit.dev/thesis</code></pre>
+
+          <p>
+            The comment updates automatically on each push. No separate workflow run required.
+          </p>
+
+          <h2>Outputs</h2>
+
+          <p>Use these in downstream steps:</p>
+
+          <pre><code>      - name: Commit Supply Chain Audit
+        id: audit
+        uses: piiiico/proof-of-commitment@main
+
+      - name: Post to Slack if critical
+        if: steps.audit.outputs.has-critical == 'true'
+        run: echo "Found CRITICAL packages — check audit summary"</code></pre>
+
+          <table>
+            <thead>
+              <tr><th>Output</th><th>Value</th></tr>
+            </thead>
+            <tbody>
+              <tr><td><code>has-critical</code></td><td><code>true</code> if any CRITICAL packages found</td></tr>
+              <tr><td><code>critical-count</code></td><td>Number of CRITICAL packages</td></tr>
+              <tr><td><code>audit-summary</code></td><td>Full results as a markdown table</td></tr>
+            </tbody>
+          </table>
+
+          <h2>Option 2: CLI in Any CI</h2>
+
+          <p>Works in GitHub Actions, GitLab CI, CircleCI, Buildkite — anywhere with Node.js.</p>
+
+          <p><strong>GitHub Actions (manual step):</strong></p>
+
+          <pre><code>      - name: Audit dependencies
+        run: npx proof-of-commitment --file package.json</code></pre>
+
+          <p><strong>GitLab CI:</strong></p>
+
+          <pre><code>supply-chain-audit:
+  stage: test
+  script:
+    - npx proof-of-commitment --file package.json
+  only:
+    changes:
+      - package.json
+      - package-lock.json</code></pre>
+
+          <p><strong>CircleCI:</strong></p>
+
+          <pre><code>jobs:
+  supply-chain-audit:
+    docker:
+      - image: cimg/node:lts
+    steps:
+      - checkout
+      - run:
+          name: Audit dependencies
+          command: npx proof-of-commitment --file package.json</code></pre>
+
+          <p><strong>Any shell script:</strong></p>
+
+          <pre><code>npx proof-of-commitment --file package.json
+npx proof-of-commitment --file requirements.txt   # Python projects</code></pre>
+
+          <p>
+            The CLI exits non-zero if CRITICAL packages are found, so it integrates naturally with any CI that checks exit codes.
+          </p>
+
+          <h2>Bonus: Add a Badge to Your README</h2>
+
+          <p>Show live trust scores directly in your README. Badges pull from the same scoring API:</p>
+
+          <pre><code>![Commit Trust Score](https://getcommit.dev/badge/npm/your-package-name)</code></pre>
+
+          <p>Replace <code>your-package-name</code> with any npm package. The badge updates live.</p>
+
+          <p>
+            For PyPI packages: <code>https://getcommit.dev/badge/pypi/your-package</code>
+          </p>
+
+          <p>
+            More badge options — shields.io compatible, custom thresholds — at <a href="/badges">/badges</a>.
+          </p>
+
+          <h2>What the Scores Mean</h2>
+
+          <p>Scores run 0–100. Four risk tiers:</p>
+
+          <table>
+            <thead>
+              <tr><th>Score</th><th>Tier</th><th>Interpretation</th></tr>
+            </thead>
+            <tbody>
+              <tr><td>80–100</td><td>LOW</td><td>Strong behavioral signals across all dimensions</td></tr>
+              <tr><td>60–79</td><td>MODERATE</td><td>Some risk signals — review before major version bumps</td></tr>
+              <tr><td>40–59</td><td>HIGH</td><td>Multiple risk signals — consider alternatives or pin the version</td></tr>
+              <tr><td>0–39</td><td>CRITICAL</td><td>Severe structural risk — solo maintainer, high downloads, weak activity</td></tr>
+            </tbody>
+          </table>
+
+          <p>
+            Signals include: maintainer count, download volume vs. maintainer ratio, maintenance activity over 90 days, historical incident flags, and download trend anomalies.
+          </p>
+          <p>
+            These are structural signals, not CVE lookups. A package can score CRITICAL with zero known vulnerabilities — that is exactly the point. <a href="/thesis">Full methodology →</a>
+          </p>
+
+          <h2>Source</h2>
+
+          <p>
+            GitHub Action: <a href="https://github.com/piiiico/proof-of-commitment" target="_blank" rel="noopener">github.com/piiiico/proof-of-commitment</a><br />
+            CLI: <code>npx proof-of-commitment</code><br />
+            API: <code>https://poc-backend.amdal-dev.workers.dev</code>
+          </p>
+
+          <hr />
+
+          <p style="color: var(--ink-muted); font-size: 0.9rem;">
+            Running into issues? Found a package that should score differently? <a href="mailto:pico@amdal.dev">pico@amdal.dev</a>
+          </p>
+
+        </div>
+      </div>
+    </div>
+  </article>
+
+  <!-- Newsletter -->
+  <section class="newsletter-section">
+    <div class="container">
+      <div class="editorial reveal">
+        <h2 style="margin-bottom: 0.75rem;">Stay in the loop</h2>
+        <p style="margin-bottom: 2rem; font-size: 1rem;">
+          Early access, research updates, and the occasional strong opinion.
+        </p>
+        <form
+          action="https://buttondown.email/api/emails/embed-subscribe/commitgraph"
+          method="post"
+          target="popupwindow"
+          class="newsletter-form"
+        >
+          <input type="email" name="email" placeholder="you@example.com" required class="newsletter-input" />
+          <button type="submit" class="btn-primary" style="white-space: nowrap;">Subscribe</button>
+        </form>
+        <p class="newsletter-note">No spam. Unsubscribe anytime.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer>
+    <div class="container footer-inner">
+      <span class="footer-brand">Commit</span>
+      <ul class="footer-links">
+        <li><a href="/">Home</a></li>
+        <li><a href="/extension">Extension</a></li>
+        <li><a href="/blog">Writing</a></li>
+        <li><a href="/pricing">Pricing</a></li><li><a href="/docs">Docs</a></li><li><a href="https://github.com/piiiico/proof-of-commitment" target="_blank" rel="noopener">GitHub</a></li>
+        <li><a href="mailto:pico@amdal.dev">Contact</a></li>
+      </ul>
+      <span class="footer-locale">Stavanger, Norway</span>
+    </div>
+  </footer>
+
+</Layout>
+
+<style>
+  pre {
+    background: var(--paper-dim);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 1.25rem;
+    overflow-x: auto;
+    margin: 1.5rem 0;
+    font-size: 0.85rem;
+    line-height: 1.5;
+  }
+  code {
+    font-family: 'Fira Code', 'Cascadia Code', 'JetBrains Mono', monospace;
+  }
+  pre code {
+    background: none;
+    padding: 0;
+    font-size: inherit;
+  }
+  p code {
+    background: var(--paper-dim);
+    border: 1px solid var(--border);
+    border-radius: 3px;
+    padding: 0.1em 0.35em;
+    font-size: 0.88em;
+  }
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 1.5rem 0;
+    font-size: 0.9rem;
+  }
+  th, td {
+    text-align: left;
+    padding: 0.6rem 1rem;
+    border-bottom: 1px solid var(--border);
+  }
+  th {
+    color: var(--ink-muted);
+    font-weight: 500;
+  }
+  ul {
+    margin: 1rem 0 1rem 1.5rem;
+    line-height: 1.8;
+  }
+  hr {
+    border: none;
+    border-top: 1px solid var(--border);
+    margin: 2.5rem 0;
+  }
+</style>

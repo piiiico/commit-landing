@@ -1,0 +1,875 @@
+---
+import Layout from '../../layouts/Layout.astro';
+---
+
+<Layout
+  title="State of npm Supply Chain Trust: April 2026 — Commit"
+  description="We audited the 50 most downloaded npm packages with proof-of-commitment. 30% are CRITICAL. 2.5 billion weekly downloads depend on a single maintainer each."
+  canonical="https://getcommit.dev/blog/state-of-npm-trust-april-2026/"
+  publishDate="2026-04-18"
+>
+
+  <!-- Nav -->
+  <nav>
+    <div class="container nav-inner">
+      <a href="/" class="nav-brand">Commit</a>
+      <ul class="nav-links">
+        <li><a href="/extension">Extension</a></li>
+        <li><a href="/blog">Writing</a></li>
+        <li><a href="/pricing">Pricing</a></li><li><a href="/docs">Docs</a></li><li><a href="https://github.com/piiiico/proof-of-commitment" target="_blank" rel="noopener">GitHub</a></li>
+        <li><a href="mailto:pico@amdal.dev">Contact</a></li>
+      </ul>
+    </div>
+  </nav>
+
+  <!-- Essay -->
+  <article class="essay">
+    <div class="container">
+      <div class="editorial">
+
+        <!-- Header -->
+        <header class="essay-header">
+          <div class="essay-meta animate-in delay-1">
+            <time datetime="2026-04-18">April 18, 2026</time>
+          </div>
+          <h1 class="essay-title animate-in delay-2">State of npm Supply Chain Trust: April 2026</h1>
+          <p class="essay-subtitle animate-in delay-3">
+            We audited the 50 most downloaded npm packages with behavioral commitment scoring. 30% are CRITICAL. 2.54 billion weekly downloads depend on a single maintainer each.
+          </p>
+          <p class="essay-byline animate-in delay-4">Pico</p>
+        </header>
+
+        <!-- Body -->
+        <div class="essay-body">
+
+          <h2>Executive Summary</h2>
+
+          <p>
+            <strong>15 of the top 50 npm packages by weekly downloads are CRITICAL</strong> — meaning a single person's npm token is the only barrier between those packages and a supply chain compromise. Combined, those 15 packages receive <strong>2.54 billion weekly downloads</strong>, representing 34% of all downloads across the top 50.
+          </p>
+
+          <p>
+            The packages that passed include webpack (score=100, 8 maintainers), prettier (score=100, 11 maintainers), and TypeScript (score=98, 6 maintainers). The packages that are CRITICAL include minimatch (562M downloads/week, 1 maintainer), chalk (413M downloads/week, 1 maintainer), and glob (332M downloads/week, 1 maintainer).
+          </p>
+
+          <p>
+            Here's the uncomfortable part: <strong>every single package scores above 70 on structural metrics</strong>. The behavioral signals look fine. Release cadence looks fine. Download momentum looks fine. The risk is invisible to any metric that doesn't explicitly flag single-maintainer concentration at scale — which is exactly what <code>npm audit</code> doesn't do.
+          </p>
+
+          <p>
+            This is the same structural profile that the ua-parser-js attack exploited in October 2021. A single token. A window. A malicious publish. Cryptominer and credential stealer deployed to 7 million weekly downloads before anyone noticed. axios carries the same profile at 82 million weekly downloads.
+          </p>
+
+          <hr style="margin: 2rem 0; border: none; border-top: 1px solid var(--rule);" />
+
+          <h2>The Full Dataset</h2>
+
+          <p>
+            Audited April 18, 2026 via <a href="https://github.com/piiiico/proof-of-commitment" target="_blank" rel="noopener">proof-of-commitment</a>. CRITICAL = 1 maintainer + &gt;10M weekly downloads.
+          </p>
+
+          <div style="overflow-x: auto; margin: 2rem 0;">
+            <table style="width: 100%; border-collapse: collapse; font-size: 0.875rem;">
+              <thead>
+                <tr style="border-bottom: 2px solid var(--ink);">
+                  <th style="text-align: left; padding: 0.5rem 0.75rem;">#</th>
+                  <th style="text-align: left; padding: 0.5rem 0.75rem;">Package</th>
+                  <th style="text-align: right; padding: 0.5rem 0.75rem;">Score</th>
+                  <th style="text-align: center; padding: 0.5rem 0.75rem;">Risk</th>
+                  <th style="text-align: right; padding: 0.5rem 0.75rem;">Maintainers</th>
+                  <th style="text-align: right; padding: 0.5rem 0.75rem;">Downloads/wk</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr style="border-bottom: 1px solid #eee;">
+                  <td style="padding: 0.4rem 0.75rem; color: #888;">1</td>
+                  <td style="padding: 0.4rem 0.75rem;">semver</td>
+                  <td style="padding: 0.4rem 0.75rem; text-align: right;">95</td>
+                  <td style="padding: 0.4rem 0.75rem; text-align: center;">✅ SAFE</td>
+                  <td style="padding: 0.4rem 0.75rem; text-align: right;">5</td>
+                  <td style="padding: 0.4rem 0.75rem; text-align: right;">633M</td>
+                </tr>
+                <tr style="border-bottom: 1px solid #eee; background: #fff5f5;">
+                  <td style="padding: 0.4rem 0.75rem; color: #888;">2</td>
+                  <td style="padding: 0.4rem 0.75rem; font-weight: bold;">minimatch</td>
+                  <td style="padding: 0.4rem 0.75rem; text-align: right;">85</td>
+                  <td style="padding: 0.4rem 0.75rem; text-align: center; color: #c00;">🔴 CRITICAL</td>
+                  <td style="padding: 0.4rem 0.75rem; text-align: right; font-weight: bold;">1</td>
+                  <td style="padding: 0.4rem 0.75rem; text-align: right; font-weight: bold;">562M</td>
+                </tr>
+                <tr style="border-bottom: 1px solid #eee;">
+                  <td style="padding: 0.4rem 0.75rem; color: #888;">3</td>
+                  <td style="padding: 0.4rem 0.75rem;">debug</td>
+                  <td style="padding: 0.4rem 0.75rem; text-align: right;">82</td>
+                  <td style="padding: 0.4rem 0.75rem; text-align: center;">✅ SAFE</td>
+                  <td style="padding: 0.4rem 0.75rem; text-align: right;">2</td>
+                  <td style="padding: 0.4rem 0.75rem; text-align: right;">553M</td>
+                </tr>
+                <tr style="border-bottom: 1px solid #eee; background: #fff5f5;">
+                  <td style="padding: 0.4rem 0.75rem; color: #888;">4</td>
+                  <td style="padding: 0.4rem 0.75rem; font-weight: bold;">chalk</td>
+                  <td style="padding: 0.4rem 0.75rem; text-align: right;">75</td>
+                  <td style="padding: 0.4rem 0.75rem; text-align: center; color: #c00;">🔴 CRITICAL</td>
+                  <td style="padding: 0.4rem 0.75rem; text-align: right; font-weight: bold;">1</td>
+                  <td style="padding: 0.4rem 0.75rem; text-align: right; font-weight: bold;">413M</td>
+                </tr>
+                <tr style="border-bottom: 1px solid #eee;">
+                  <td style="padding: 0.4rem 0.75rem; color: #888;">5</td>
+                  <td style="padding: 0.4rem 0.75rem;">commander</td>
+                  <td style="padding: 0.4rem 0.75rem; text-align: right;">86</td>
+                  <td style="padding: 0.4rem 0.75rem; text-align: center;">✅ SAFE</td>
+                  <td style="padding: 0.4rem 0.75rem; text-align: right;">2</td>
+                  <td style="padding: 0.4rem 0.75rem; text-align: right;">366M</td>
+                </tr>
+                <tr style="border-bottom: 1px solid #eee;">
+                  <td style="padding: 0.4rem 0.75rem; color: #888;">6</td>
+                  <td style="padding: 0.4rem 0.75rem;">tslib</td>
+                  <td style="padding: 0.4rem 0.75rem; text-align: right;">89</td>
+                  <td style="padding: 0.4rem 0.75rem; text-align: center;">✅ SAFE</td>
+                  <td style="padding: 0.4rem 0.75rem; text-align: right;">6</td>
+                  <td style="padding: 0.4rem 0.75rem; text-align: right;">357M</td>
+                </tr>
+                <tr style="border-bottom: 1px solid #eee;">
+                  <td style="padding: 0.4rem 0.75rem; color: #888;">7</td>
+                  <td style="padding: 0.4rem 0.75rem;">picomatch</td>
+                  <td style="padding: 0.4rem 0.75rem; text-align: right;">90</td>
+                  <td style="padding: 0.4rem 0.75rem; text-align: center;">✅ SAFE</td>
+                  <td style="padding: 0.4rem 0.75rem; text-align: right;">4</td>
+                  <td style="padding: 0.4rem 0.75rem; text-align: right;">342M</td>
+                </tr>
+                <tr style="border-bottom: 1px solid #eee; background: #fff5f5;">
+                  <td style="padding: 0.4rem 0.75rem; color: #888;">8</td>
+                  <td style="padding: 0.4rem 0.75rem; font-weight: bold;">glob</td>
+                  <td style="padding: 0.4rem 0.75rem; text-align: right;">82</td>
+                  <td style="padding: 0.4rem 0.75rem; text-align: center; color: #c00;">🔴 CRITICAL</td>
+                  <td style="padding: 0.4rem 0.75rem; text-align: right; font-weight: bold;">1</td>
+                  <td style="padding: 0.4rem 0.75rem; text-align: right; font-weight: bold;">332M</td>
+                </tr>
+                <tr style="border-bottom: 1px solid #eee; background: #fff5f5;">
+                  <td style="padding: 0.4rem 0.75rem; color: #888;">9</td>
+                  <td style="padding: 0.4rem 0.75rem; font-weight: bold;">@types/node</td>
+                  <td style="padding: 0.4rem 0.75rem; text-align: right;">88</td>
+                  <td style="padding: 0.4rem 0.75rem; text-align: center; color: #c00;">🔴 CRITICAL</td>
+                  <td style="padding: 0.4rem 0.75rem; text-align: right; font-weight: bold;">1</td>
+                  <td style="padding: 0.4rem 0.75rem; text-align: right; font-weight: bold;">310M</td>
+                </tr>
+                <tr style="border-bottom: 1px solid #eee;">
+                  <td style="padding: 0.4rem 0.75rem; color: #888;">10</td>
+                  <td style="padding: 0.4rem 0.75rem;">uuid</td>
+                  <td style="padding: 0.4rem 0.75rem; text-align: right;">82</td>
+                  <td style="padding: 0.4rem 0.75rem; text-align: center;">✅ SAFE</td>
+                  <td style="padding: 0.4rem 0.75rem; text-align: right;">2</td>
+                  <td style="padding: 0.4rem 0.75rem; text-align: right;">239M</td>
+                </tr>
+                <tr style="border-bottom: 1px solid #eee; background: #fff5f5;">
+                  <td style="padding: 0.4rem 0.75rem; color: #888;">11</td>
+                  <td style="padding: 0.4rem 0.75rem; font-weight: bold;">esbuild</td>
+                  <td style="padding: 0.4rem 0.75rem; text-align: right;">88</td>
+                  <td style="padding: 0.4rem 0.75rem; text-align: center; color: #c00;">🔴 CRITICAL</td>
+                  <td style="padding: 0.4rem 0.75rem; text-align: right; font-weight: bold;">1</td>
+                  <td style="padding: 0.4rem 0.75rem; text-align: right; font-weight: bold;">190M</td>
+                </tr>
+                <tr style="border-bottom: 1px solid #eee;">
+                  <td style="padding: 0.4rem 0.75rem; color: #888;">12</td>
+                  <td style="padding: 0.4rem 0.75rem;">ws</td>
+                  <td style="padding: 0.4rem 0.75rem; text-align: right;">93</td>
+                  <td style="padding: 0.4rem 0.75rem; text-align: center;">✅ SAFE</td>
+                  <td style="padding: 0.4rem 0.75rem; text-align: right;">4</td>
+                  <td style="padding: 0.4rem 0.75rem; text-align: right;">188M</td>
+                </tr>
+                <tr style="border-bottom: 1px solid #eee;">
+                  <td style="padding: 0.4rem 0.75rem; color: #888;">13</td>
+                  <td style="padding: 0.4rem 0.75rem;">typescript</td>
+                  <td style="padding: 0.4rem 0.75rem; text-align: right;">98</td>
+                  <td style="padding: 0.4rem 0.75rem; text-align: center;">✅ SAFE</td>
+                  <td style="padding: 0.4rem 0.75rem; text-align: right;">6</td>
+                  <td style="padding: 0.4rem 0.75rem; text-align: right;">178M</td>
+                </tr>
+                <tr style="border-bottom: 1px solid #eee;">
+                  <td style="padding: 0.4rem 0.75rem; color: #888;">14</td>
+                  <td style="padding: 0.4rem 0.75rem;">yargs</td>
+                  <td style="padding: 0.4rem 0.75rem; text-align: right;">84</td>
+                  <td style="padding: 0.4rem 0.75rem; text-align: center;">✅ SAFE</td>
+                  <td style="padding: 0.4rem 0.75rem; text-align: right;">2</td>
+                  <td style="padding: 0.4rem 0.75rem; text-align: right;">173M</td>
+                </tr>
+                <tr style="border-bottom: 1px solid #eee; background: #fff5f5;">
+                  <td style="padding: 0.4rem 0.75rem; color: #888;">15</td>
+                  <td style="padding: 0.4rem 0.75rem; font-weight: bold;">zod</td>
+                  <td style="padding: 0.4rem 0.75rem; text-align: right;">83</td>
+                  <td style="padding: 0.4rem 0.75rem; text-align: center; color: #c00;">🔴 CRITICAL</td>
+                  <td style="padding: 0.4rem 0.75rem; text-align: right; font-weight: bold;">1</td>
+                  <td style="padding: 0.4rem 0.75rem; text-align: right; font-weight: bold;">158M</td>
+                </tr>
+                <tr style="border-bottom: 1px solid #eee; background: #fff5f5;">
+                  <td style="padding: 0.4rem 0.75rem; color: #888;">16</td>
+                  <td style="padding: 0.4rem 0.75rem; font-weight: bold;">chokidar</td>
+                  <td style="padding: 0.4rem 0.75rem; text-align: right;">81</td>
+                  <td style="padding: 0.4rem 0.75rem; text-align: center; color: #c00;">🔴 CRITICAL</td>
+                  <td style="padding: 0.4rem 0.75rem; text-align: right; font-weight: bold;">1</td>
+                  <td style="padding: 0.4rem 0.75rem; text-align: right; font-weight: bold;">158M</td>
+                </tr>
+                <tr style="border-bottom: 1px solid #eee;">
+                  <td style="padding: 0.4rem 0.75rem; color: #888;">17</td>
+                  <td style="padding: 0.4rem 0.75rem;">caniuse-lite</td>
+                  <td style="padding: 0.4rem 0.75rem; text-align: right;">87</td>
+                  <td style="padding: 0.4rem 0.75rem; text-align: center;">✅ SAFE</td>
+                  <td style="padding: 0.4rem 0.75rem; text-align: right;">2</td>
+                  <td style="padding: 0.4rem 0.75rem; text-align: right;">155M</td>
+                </tr>
+                <tr style="border-bottom: 1px solid #eee; background: #fff5f5;">
+                  <td style="padding: 0.4rem 0.75rem; color: #888;">18</td>
+                  <td style="padding: 0.4rem 0.75rem; font-weight: bold;">lodash</td>
+                  <td style="padding: 0.4rem 0.75rem; text-align: right;">87</td>
+                  <td style="padding: 0.4rem 0.75rem; text-align: center; color: #c00;">🔴 CRITICAL</td>
+                  <td style="padding: 0.4rem 0.75rem; text-align: right; font-weight: bold;">1</td>
+                  <td style="padding: 0.4rem 0.75rem; text-align: right; font-weight: bold;">145M</td>
+                </tr>
+                <tr style="border-bottom: 1px solid #eee;">
+                  <td style="padding: 0.4rem 0.75rem; color: #888;">19</td>
+                  <td style="padding: 0.4rem 0.75rem;">micromatch</td>
+                  <td style="padding: 0.4rem 0.75rem; text-align: right;">84</td>
+                  <td style="padding: 0.4rem 0.75rem; text-align: center; color: #996600;">⚠️ WARN</td>
+                  <td style="padding: 0.4rem 0.75rem; text-align: right;">3</td>
+                  <td style="padding: 0.4rem 0.75rem; text-align: right;">141M</td>
+                </tr>
+                <tr style="border-bottom: 1px solid #eee;">
+                  <td style="padding: 0.4rem 0.75rem; color: #888;">20</td>
+                  <td style="padding: 0.4rem 0.75rem;">@babel/core</td>
+                  <td style="padding: 0.4rem 0.75rem; text-align: right;">93</td>
+                  <td style="padding: 0.4rem 0.75rem; text-align: center;">✅ SAFE</td>
+                  <td style="padding: 0.4rem 0.75rem; text-align: right;">4</td>
+                  <td style="padding: 0.4rem 0.75rem; text-align: right;">128M</td>
+                </tr>
+                <tr style="border-bottom: 1px solid #eee;">
+                  <td style="padding: 0.4rem 0.75rem; color: #888;">21</td>
+                  <td style="padding: 0.4rem 0.75rem;">eslint</td>
+                  <td style="padding: 0.4rem 0.75rem; text-align: right;">91</td>
+                  <td style="padding: 0.4rem 0.75rem; text-align: center;">✅ SAFE</td>
+                  <td style="padding: 0.4rem 0.75rem; text-align: right;">2</td>
+                  <td style="padding: 0.4rem 0.75rem; text-align: right;">125M</td>
+                </tr>
+                <tr style="border-bottom: 1px solid #eee;">
+                  <td style="padding: 0.4rem 0.75rem; color: #888;">22</td>
+                  <td style="padding: 0.4rem 0.75rem;">react</td>
+                  <td style="padding: 0.4rem 0.75rem; text-align: right;">91</td>
+                  <td style="padding: 0.4rem 0.75rem; text-align: center;">✅ SAFE</td>
+                  <td style="padding: 0.4rem 0.75rem; text-align: right;">2</td>
+                  <td style="padding: 0.4rem 0.75rem; text-align: right;">122M</td>
+                </tr>
+                <tr style="border-bottom: 1px solid #eee;">
+                  <td style="padding: 0.4rem 0.75rem; color: #888;">23</td>
+                  <td style="padding: 0.4rem 0.75rem;">dotenv</td>
+                  <td style="padding: 0.4rem 0.75rem; text-align: right;">93</td>
+                  <td style="padding: 0.4rem 0.75rem; text-align: center;">✅ SAFE</td>
+                  <td style="padding: 0.4rem 0.75rem; text-align: right;">3</td>
+                  <td style="padding: 0.4rem 0.75rem; text-align: right;">120M</td>
+                </tr>
+                <tr style="border-bottom: 1px solid #eee;">
+                  <td style="padding: 0.4rem 0.75rem; color: #888;">24</td>
+                  <td style="padding: 0.4rem 0.75rem;">react-dom</td>
+                  <td style="padding: 0.4rem 0.75rem; text-align: right;">91</td>
+                  <td style="padding: 0.4rem 0.75rem; text-align: center;">✅ SAFE</td>
+                  <td style="padding: 0.4rem 0.75rem; text-align: right;">2</td>
+                  <td style="padding: 0.4rem 0.75rem; text-align: right;">116M</td>
+                </tr>
+                <tr style="border-bottom: 1px solid #eee;">
+                  <td style="padding: 0.4rem 0.75rem; color: #888;">25</td>
+                  <td style="padding: 0.4rem 0.75rem;">vite</td>
+                  <td style="padding: 0.4rem 0.75rem; text-align: right;">91</td>
+                  <td style="padding: 0.4rem 0.75rem; text-align: center;">✅ SAFE</td>
+                  <td style="padding: 0.4rem 0.75rem; text-align: right;">4</td>
+                  <td style="padding: 0.4rem 0.75rem; text-align: right;">105M</td>
+                </tr>
+                <tr style="border-bottom: 1px solid #eee;">
+                  <td style="padding: 0.4rem 0.75rem; color: #888;">26</td>
+                  <td style="padding: 0.4rem 0.75rem;">rollup</td>
+                  <td style="padding: 0.4rem 0.75rem; text-align: right;">99</td>
+                  <td style="padding: 0.4rem 0.75rem; text-align: center;">✅ SAFE</td>
+                  <td style="padding: 0.4rem 0.75rem; text-align: right;">5</td>
+                  <td style="padding: 0.4rem 0.75rem; text-align: right;">102M</td>
+                </tr>
+                <tr style="border-bottom: 1px solid #eee; background: #fff5f5;">
+                  <td style="padding: 0.4rem 0.75rem; color: #888;">27</td>
+                  <td style="padding: 0.4rem 0.75rem; font-weight: bold;">axios</td>
+                  <td style="padding: 0.4rem 0.75rem; text-align: right;">89</td>
+                  <td style="padding: 0.4rem 0.75rem; text-align: center; color: #c00;">🔴 CRITICAL</td>
+                  <td style="padding: 0.4rem 0.75rem; text-align: right; font-weight: bold;">1</td>
+                  <td style="padding: 0.4rem 0.75rem; text-align: right; font-weight: bold;">101M</td>
+                </tr>
+                <tr style="border-bottom: 1px solid #eee;">
+                  <td style="padding: 0.4rem 0.75rem; color: #888;">28</td>
+                  <td style="padding: 0.4rem 0.75rem;">express</td>
+                  <td style="padding: 0.4rem 0.75rem; text-align: right;">97</td>
+                  <td style="padding: 0.4rem 0.75rem; text-align: center;">✅ SAFE</td>
+                  <td style="padding: 0.4rem 0.75rem; text-align: right;">5</td>
+                  <td style="padding: 0.4rem 0.75rem; text-align: right;">93M</td>
+                </tr>
+                <tr style="border-bottom: 1px solid #eee;">
+                  <td style="padding: 0.4rem 0.75rem; color: #888;">29</td>
+                  <td style="padding: 0.4rem 0.75rem;">tailwindcss</td>
+                  <td style="padding: 0.4rem 0.75rem; text-align: right;">95</td>
+                  <td style="padding: 0.4rem 0.75rem; text-align: center;">✅ SAFE</td>
+                  <td style="padding: 0.4rem 0.75rem; text-align: right;">3</td>
+                  <td style="padding: 0.4rem 0.75rem; text-align: right;">89M</td>
+                </tr>
+                <tr style="border-bottom: 1px solid #eee;">
+                  <td style="padding: 0.4rem 0.75rem; color: #888;">30</td>
+                  <td style="padding: 0.4rem 0.75rem;">prettier</td>
+                  <td style="padding: 0.4rem 0.75rem; text-align: right;">100</td>
+                  <td style="padding: 0.4rem 0.75rem; text-align: center;">✅ SAFE</td>
+                  <td style="padding: 0.4rem 0.75rem; text-align: right;">11</td>
+                  <td style="padding: 0.4rem 0.75rem; text-align: right;">87M</td>
+                </tr>
+                <tr style="border-bottom: 1px solid #eee;">
+                  <td style="padding: 0.4rem 0.75rem; color: #888;">31</td>
+                  <td style="padding: 0.4rem 0.75rem;">undici</td>
+                  <td style="padding: 0.4rem 0.75rem; text-align: right;">96</td>
+                  <td style="padding: 0.4rem 0.75rem; text-align: center;">✅ SAFE</td>
+                  <td style="padding: 0.4rem 0.75rem; text-align: right;">3</td>
+                  <td style="padding: 0.4rem 0.75rem; text-align: right;">82M</td>
+                </tr>
+                <tr style="border-bottom: 1px solid #eee; background: #fff5f5;">
+                  <td style="padding: 0.4rem 0.75rem; color: #888;">32</td>
+                  <td style="padding: 0.4rem 0.75rem; font-weight: bold;">sharp</td>
+                  <td style="padding: 0.4rem 0.75rem; text-align: right;">84</td>
+                  <td style="padding: 0.4rem 0.75rem; text-align: center; color: #c00;">🔴 CRITICAL</td>
+                  <td style="padding: 0.4rem 0.75rem; text-align: right; font-weight: bold;">1</td>
+                  <td style="padding: 0.4rem 0.75rem; text-align: right; font-weight: bold;">51M</td>
+                </tr>
+                <tr style="border-bottom: 1px solid #eee;">
+                  <td style="padding: 0.4rem 0.75rem; color: #888;">33</td>
+                  <td style="padding: 0.4rem 0.75rem;">cors</td>
+                  <td style="padding: 0.4rem 0.75rem; text-align: right;">87</td>
+                  <td style="padding: 0.4rem 0.75rem; text-align: center;">✅ SAFE</td>
+                  <td style="padding: 0.4rem 0.75rem; text-align: right;">3</td>
+                  <td style="padding: 0.4rem 0.75rem; text-align: right;">50M</td>
+                </tr>
+                <tr style="border-bottom: 1px solid #eee;">
+                  <td style="padding: 0.4rem 0.75rem; color: #888;">34</td>
+                  <td style="padding: 0.4rem 0.75rem;">webpack</td>
+                  <td style="padding: 0.4rem 0.75rem; text-align: right;">100</td>
+                  <td style="padding: 0.4rem 0.75rem; text-align: center;">✅ SAFE</td>
+                  <td style="padding: 0.4rem 0.75rem; text-align: right;">8</td>
+                  <td style="padding: 0.4rem 0.75rem; text-align: right;">44M</td>
+                </tr>
+                <tr style="border-bottom: 1px solid #eee;">
+                  <td style="padding: 0.4rem 0.75rem; color: #888;">35</td>
+                  <td style="padding: 0.4rem 0.75rem;">jest</td>
+                  <td style="padding: 0.4rem 0.75rem; text-align: right;">95</td>
+                  <td style="padding: 0.4rem 0.75rem; text-align: center;">✅ SAFE</td>
+                  <td style="padding: 0.4rem 0.75rem; text-align: right;">5</td>
+                  <td style="padding: 0.4rem 0.75rem; text-align: right;">44M</td>
+                </tr>
+                <tr style="border-bottom: 1px solid #eee;">
+                  <td style="padding: 0.4rem 0.75rem; color: #888;">36</td>
+                  <td style="padding: 0.4rem 0.75rem;">ts-node</td>
+                  <td style="padding: 0.4rem 0.75rem; text-align: right;">81</td>
+                  <td style="padding: 0.4rem 0.75rem; text-align: center;">✅ SAFE</td>
+                  <td style="padding: 0.4rem 0.75rem; text-align: right;">2</td>
+                  <td style="padding: 0.4rem 0.75rem; text-align: right;">43M</td>
+                </tr>
+                <tr style="border-bottom: 1px solid #eee;">
+                  <td style="padding: 0.4rem 0.75rem; color: #888;">37</td>
+                  <td style="padding: 0.4rem 0.75rem;">jsonwebtoken</td>
+                  <td style="padding: 0.4rem 0.75rem; text-align: right;">87</td>
+                  <td style="padding: 0.4rem 0.75rem; text-align: center;">✅ SAFE</td>
+                  <td style="padding: 0.4rem 0.75rem; text-align: right;">3</td>
+                  <td style="padding: 0.4rem 0.75rem; text-align: right;">40M</td>
+                </tr>
+                <tr style="border-bottom: 1px solid #eee;">
+                  <td style="padding: 0.4rem 0.75rem; color: #888;">38</td>
+                  <td style="padding: 0.4rem 0.75rem;">@babel/preset-env</td>
+                  <td style="padding: 0.4rem 0.75rem; text-align: right;">93</td>
+                  <td style="padding: 0.4rem 0.75rem; text-align: center;">✅ SAFE</td>
+                  <td style="padding: 0.4rem 0.75rem; text-align: right;">4</td>
+                  <td style="padding: 0.4rem 0.75rem; text-align: right;">38M</td>
+                </tr>
+                <tr style="border-bottom: 1px solid #eee; background: #fff5f5;">
+                  <td style="padding: 0.4rem 0.75rem; color: #888;">39</td>
+                  <td style="padding: 0.4rem 0.75rem; font-weight: bold;">@types/jest</td>
+                  <td style="padding: 0.4rem 0.75rem; text-align: right;">81</td>
+                  <td style="padding: 0.4rem 0.75rem; text-align: center; color: #c00;">🔴 CRITICAL</td>
+                  <td style="padding: 0.4rem 0.75rem; text-align: right; font-weight: bold;">1</td>
+                  <td style="padding: 0.4rem 0.75rem; text-align: right; font-weight: bold;">37M</td>
+                </tr>
+                <tr style="border-bottom: 1px solid #eee;">
+                  <td style="padding: 0.4rem 0.75rem; color: #888;">40</td>
+                  <td style="padding: 0.4rem 0.75rem;">next</td>
+                  <td style="padding: 0.4rem 0.75rem; text-align: right;">91</td>
+                  <td style="padding: 0.4rem 0.75rem; text-align: center;">✅ SAFE</td>
+                  <td style="padding: 0.4rem 0.75rem; text-align: right;">2</td>
+                  <td style="padding: 0.4rem 0.75rem; text-align: right;">36M</td>
+                </tr>
+                <tr style="border-bottom: 1px solid #eee; background: #fff5f5;">
+                  <td style="padding: 0.4rem 0.75rem; color: #888;">41</td>
+                  <td style="padding: 0.4rem 0.75rem; font-weight: bold;">hono</td>
+                  <td style="padding: 0.4rem 0.75rem; text-align: right;">82</td>
+                  <td style="padding: 0.4rem 0.75rem; text-align: center; color: #c00;">🔴 CRITICAL</td>
+                  <td style="padding: 0.4rem 0.75rem; text-align: right; font-weight: bold;">1</td>
+                  <td style="padding: 0.4rem 0.75rem; text-align: right; font-weight: bold;">34M</td>
+                </tr>
+                <tr style="border-bottom: 1px solid #eee;">
+                  <td style="padding: 0.4rem 0.75rem; color: #888;">42</td>
+                  <td style="padding: 0.4rem 0.75rem;">pino</td>
+                  <td style="padding: 0.4rem 0.75rem; text-align: right;">93</td>
+                  <td style="padding: 0.4rem 0.75rem; text-align: center;">✅ SAFE</td>
+                  <td style="padding: 0.4rem 0.75rem; text-align: right;">4</td>
+                  <td style="padding: 0.4rem 0.75rem; text-align: right;">28M</td>
+                </tr>
+                <tr style="border-bottom: 1px solid #eee; background: #fff5f5;">
+                  <td style="padding: 0.4rem 0.75rem; color: #888;">43</td>
+                  <td style="padding: 0.4rem 0.75rem; font-weight: bold;">pg</td>
+                  <td style="padding: 0.4rem 0.75rem; text-align: right;">81</td>
+                  <td style="padding: 0.4rem 0.75rem; text-align: center; color: #c00;">🔴 CRITICAL</td>
+                  <td style="padding: 0.4rem 0.75rem; text-align: right; font-weight: bold;">1</td>
+                  <td style="padding: 0.4rem 0.75rem; text-align: right; font-weight: bold;">24M</td>
+                </tr>
+                <tr style="border-bottom: 1px solid #eee;">
+                  <td style="padding: 0.4rem 0.75rem; color: #888;">44</td>
+                  <td style="padding: 0.4rem 0.75rem;">winston</td>
+                  <td style="padding: 0.4rem 0.75rem; text-align: right;">89</td>
+                  <td style="padding: 0.4rem 0.75rem; text-align: center;">✅ SAFE</td>
+                  <td style="padding: 0.4rem 0.75rem; text-align: right;">8</td>
+                  <td style="padding: 0.4rem 0.75rem; text-align: right;">22M</td>
+                </tr>
+                <tr style="border-bottom: 1px solid #eee; background: #fff5f5;">
+                  <td style="padding: 0.4rem 0.75rem; color: #888;">45</td>
+                  <td style="padding: 0.4rem 0.75rem; font-weight: bold;">cross-env</td>
+                  <td style="padding: 0.4rem 0.75rem; text-align: right;">73</td>
+                  <td style="padding: 0.4rem 0.75rem; text-align: center; color: #c00;">🔴 CRITICAL</td>
+                  <td style="padding: 0.4rem 0.75rem; text-align: right; font-weight: bold;">1</td>
+                  <td style="padding: 0.4rem 0.75rem; text-align: right; font-weight: bold;">17M</td>
+                </tr>
+                <tr style="border-bottom: 1px solid #eee;">
+                  <td style="padding: 0.4rem 0.75rem; color: #888;">46</td>
+                  <td style="padding: 0.4rem 0.75rem;">ioredis</td>
+                  <td style="padding: 0.4rem 0.75rem; text-align: right;">88</td>
+                  <td style="padding: 0.4rem 0.75rem; text-align: center;">✅ SAFE</td>
+                  <td style="padding: 0.4rem 0.75rem; text-align: right;">2</td>
+                  <td style="padding: 0.4rem 0.75rem; text-align: right;">17M</td>
+                </tr>
+                <tr style="border-bottom: 1px solid #eee;">
+                  <td style="padding: 0.4rem 0.75rem; color: #888;">47</td>
+                  <td style="padding: 0.4rem 0.75rem;">socket.io</td>
+                  <td style="padding: 0.4rem 0.75rem; text-align: right;">87</td>
+                  <td style="padding: 0.4rem 0.75rem; text-align: center;">✅ SAFE</td>
+                  <td style="padding: 0.4rem 0.75rem; text-align: right;">2</td>
+                  <td style="padding: 0.4rem 0.75rem; text-align: right;">13M</td>
+                </tr>
+                <tr style="border-bottom: 1px solid #eee; background: #fff5f5;">
+                  <td style="padding: 0.4rem 0.75rem; color: #888;">48</td>
+                  <td style="padding: 0.4rem 0.75rem; font-weight: bold;">nodemon</td>
+                  <td style="padding: 0.4rem 0.75rem; text-align: right;">86</td>
+                  <td style="padding: 0.4rem 0.75rem; text-align: center; color: #c00;">🔴 CRITICAL</td>
+                  <td style="padding: 0.4rem 0.75rem; text-align: right; font-weight: bold;">1</td>
+                  <td style="padding: 0.4rem 0.75rem; text-align: right; font-weight: bold;">12M</td>
+                </tr>
+                <tr style="border-bottom: 1px solid #eee;">
+                  <td style="padding: 0.4rem 0.75rem; color: #888;">49</td>
+                  <td style="padding: 0.4rem 0.75rem;">prisma</td>
+                  <td style="padding: 0.4rem 0.75rem; text-align: right;">91</td>
+                  <td style="padding: 0.4rem 0.75rem; text-align: center;">✅ SAFE</td>
+                  <td style="padding: 0.4rem 0.75rem; text-align: right;">2</td>
+                  <td style="padding: 0.4rem 0.75rem; text-align: right;">10M</td>
+                </tr>
+                <tr style="border-bottom: 2px solid var(--ink);">
+                  <td style="padding: 0.4rem 0.75rem; color: #888;">50</td>
+                  <td style="padding: 0.4rem 0.75rem;">redis</td>
+                  <td style="padding: 0.4rem 0.75rem; text-align: right;">96</td>
+                  <td style="padding: 0.4rem 0.75rem; text-align: center;">✅ SAFE</td>
+                  <td style="padding: 0.4rem 0.75rem; text-align: right;">5</td>
+                  <td style="padding: 0.4rem 0.75rem; text-align: right;">9M</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <p style="font-size: 0.8rem; color: #888; margin-top: -1rem;">
+            Data: <a href="/blog/state-of-npm-trust-april-2026/data.json">JSON dataset</a> — proof-of-commitment API, April 18 2026.
+            Try it: <code>npx proof-of-commitment &lt;package-name&gt;</code>
+          </p>
+
+          <hr style="margin: 2rem 0; border: none; border-top: 1px solid var(--rule);" />
+
+          <h2>Score Distribution</h2>
+
+          <p>
+            Here's what the structural scores look like across the 50 packages — and why the score alone is insufficient:
+          </p>
+
+          <div style="overflow-x: auto; margin: 2rem 0;">
+            <table style="width: 100%; border-collapse: collapse; font-size: 0.9rem;">
+              <thead>
+                <tr style="border-bottom: 2px solid var(--ink);">
+                  <th style="text-align: left; padding: 0.5rem 0.75rem;">Band</th>
+                  <th style="text-align: right; padding: 0.5rem 0.75rem;">Count</th>
+                  <th style="text-align: right; padding: 0.5rem 0.75rem;">% of packages</th>
+                  <th style="text-align: left; padding: 0.5rem 0.75rem;">What it means</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr style="border-bottom: 1px solid #eee;">
+                  <td style="padding: 0.5rem 0.75rem;">🟢 90–100 (Green)</td>
+                  <td style="padding: 0.5rem 0.75rem; text-align: right;">22</td>
+                  <td style="padding: 0.5rem 0.75rem; text-align: right;">44%</td>
+                  <td style="padding: 0.5rem 0.75rem;">Strong behavioral signals: consistent releases, active maintainers, growing adoption</td>
+                </tr>
+                <tr style="border-bottom: 1px solid #eee;">
+                  <td style="padding: 0.5rem 0.75rem;">🟡 70–89 (Yellow)</td>
+                  <td style="padding: 0.5rem 0.75rem; text-align: right;">28</td>
+                  <td style="padding: 0.5rem 0.75rem; text-align: right;">56%</td>
+                  <td style="padding: 0.5rem 0.75rem;">Some gaps — lower maintainer depth, release cadence variance, or age signals</td>
+                </tr>
+                <tr style="border-bottom: 1px solid #eee;">
+                  <td style="padding: 0.5rem 0.75rem;">🔴 40–69 (Red)</td>
+                  <td style="padding: 0.5rem 0.75rem; text-align: right;">0</td>
+                  <td style="padding: 0.5rem 0.75rem; text-align: right;">0%</td>
+                  <td style="padding: 0.5rem 0.75rem;">Structural decay — stale, abandoned, or fragile</td>
+                </tr>
+                <tr style="border-bottom: 2px solid var(--ink); background: #fff5f5;">
+                  <td style="padding: 0.5rem 0.75rem; font-weight: bold;">🔴 CRITICAL flag</td>
+                  <td style="padding: 0.5rem 0.75rem; text-align: right; font-weight: bold;">15</td>
+                  <td style="padding: 0.5rem 0.75rem; text-align: right; font-weight: bold;">30%</td>
+                  <td style="padding: 0.5rem 0.75rem;">1 maintainer + &gt;10M weekly downloads — score doesn't save you here</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <p>
+            <strong>The uncomfortable finding: scores look fine. The risk is hiding in the CRITICAL flag.</strong> Every package in the top 50 scores 70 or above — solidly in the "healthy" zone by behavioral metrics. Release cadence, longevity, and download momentum all look reasonable. The danger isn't in the scores.
+          </p>
+
+          <p>
+            It's in the 15 packages where a single npm token is the only barrier between those downloads and a supply chain compromise.
+          </p>
+
+          <hr style="margin: 2rem 0; border: none; border-top: 1px solid var(--rule);" />
+
+          <h2>The CRITICAL List</h2>
+
+          <p>
+            These are the 15 packages where one person's credentials control access for millions of developers. Sorted by blast radius (weekly downloads).
+          </p>
+
+          <div style="overflow-x: auto; margin: 2rem 0;">
+            <table style="width: 100%; border-collapse: collapse; font-size: 0.9rem;">
+              <thead>
+                <tr style="border-bottom: 2px solid var(--ink);">
+                  <th style="text-align: left; padding: 0.5rem 0.75rem;">Package</th>
+                  <th style="text-align: right; padding: 0.5rem 0.75rem;">Downloads/wk</th>
+                  <th style="text-align: right; padding: 0.5rem 0.75rem;">Score</th>
+                  <th style="text-align: left; padding: 0.5rem 0.75rem;">Why it matters</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr style="border-bottom: 1px solid #eee; background: #fff5f5;">
+                  <td style="padding: 0.5rem 0.75rem; font-weight: bold;">minimatch</td>
+                  <td style="padding: 0.5rem 0.75rem; text-align: right; font-weight: bold;">562M</td>
+                  <td style="padding: 0.5rem 0.75rem; text-align: right;">85</td>
+                  <td style="padding: 0.5rem 0.75rem;">Used by npm itself, ESLint, Mocha, Jest — it's in almost everything</td>
+                </tr>
+                <tr style="border-bottom: 1px solid #eee; background: #fff5f5;">
+                  <td style="padding: 0.5rem 0.75rem; font-weight: bold;">chalk</td>
+                  <td style="padding: 0.5rem 0.75rem; text-align: right; font-weight: bold;">413M</td>
+                  <td style="padding: 0.5rem 0.75rem; text-align: right;">75</td>
+                  <td style="padding: 0.5rem 0.75rem;">Terminal colors for every CLI tool, build script, and logging framework</td>
+                </tr>
+                <tr style="border-bottom: 1px solid #eee; background: #fff5f5;">
+                  <td style="padding: 0.5rem 0.75rem; font-weight: bold;">glob</td>
+                  <td style="padding: 0.5rem 0.75rem; text-align: right; font-weight: bold;">332M</td>
+                  <td style="padding: 0.5rem 0.75rem; text-align: right;">82</td>
+                  <td style="padding: 0.5rem 0.75rem;">File matching used in test runners, bundlers, and build tools everywhere</td>
+                </tr>
+                <tr style="border-bottom: 1px solid #eee; background: #fff5f5;">
+                  <td style="padding: 0.5rem 0.75rem; font-weight: bold;">@types/node</td>
+                  <td style="padding: 0.5rem 0.75rem; text-align: right; font-weight: bold;">310M</td>
+                  <td style="padding: 0.5rem 0.75rem; text-align: right;">88</td>
+                  <td style="padding: 0.5rem 0.75rem;">TypeScript type definitions for Node.js — in every TS project</td>
+                </tr>
+                <tr style="border-bottom: 1px solid #eee; background: #fff5f5;">
+                  <td style="padding: 0.5rem 0.75rem; font-weight: bold;">esbuild</td>
+                  <td style="padding: 0.5rem 0.75rem; text-align: right; font-weight: bold;">190M</td>
+                  <td style="padding: 0.5rem 0.75rem; text-align: right;">88</td>
+                  <td style="padding: 0.5rem 0.75rem;">Bundler powering Vite, Next.js, and half the JS build toolchain</td>
+                </tr>
+                <tr style="border-bottom: 1px solid #eee; background: #fff5f5;">
+                  <td style="padding: 0.5rem 0.75rem; font-weight: bold;">zod</td>
+                  <td style="padding: 0.5rem 0.75rem; text-align: right; font-weight: bold;">158M</td>
+                  <td style="padding: 0.5rem 0.75rem; text-align: right;">83</td>
+                  <td style="padding: 0.5rem 0.75rem;">De facto validation for TypeScript APIs; runtime boundary for AI outputs</td>
+                </tr>
+                <tr style="border-bottom: 1px solid #eee; background: #fff5f5;">
+                  <td style="padding: 0.5rem 0.75rem; font-weight: bold;">chokidar</td>
+                  <td style="padding: 0.5rem 0.75rem; text-align: right; font-weight: bold;">158M</td>
+                  <td style="padding: 0.5rem 0.75rem; text-align: right;">81</td>
+                  <td style="padding: 0.5rem 0.75rem;">File watcher in Webpack, Vite, Jest; active in every dev environment</td>
+                </tr>
+                <tr style="border-bottom: 1px solid #eee; background: #fff5f5;">
+                  <td style="padding: 0.5rem 0.75rem; font-weight: bold;">lodash</td>
+                  <td style="padding: 0.5rem 0.75rem; text-align: right; font-weight: bold;">145M</td>
+                  <td style="padding: 0.5rem 0.75rem; text-align: right;">87</td>
+                  <td style="padding: 0.5rem 0.75rem;">Utility belt in production codebases worldwide; often 3–5 levels deep</td>
+                </tr>
+                <tr style="border-bottom: 1px solid #eee; background: #fff5f5;">
+                  <td style="padding: 0.5rem 0.75rem; font-weight: bold;">axios</td>
+                  <td style="padding: 0.5rem 0.75rem; text-align: right; font-weight: bold;">101M</td>
+                  <td style="padding: 0.5rem 0.75rem; text-align: right;">89</td>
+                  <td style="padding: 0.5rem 0.75rem;">Compromised April 1st, 2026. Token stolen, malicious publish. Zero CVE warning.</td>
+                </tr>
+                <tr style="border-bottom: 1px solid #eee; background: #fff5f5;">
+                  <td style="padding: 0.5rem 0.75rem; font-weight: bold;">sharp</td>
+                  <td style="padding: 0.5rem 0.75rem; text-align: right; font-weight: bold;">51M</td>
+                  <td style="padding: 0.5rem 0.75rem; text-align: right;">84</td>
+                  <td style="padding: 0.5rem 0.75rem;">Native image processing with C++ bindings — malicious version is hard to detect</td>
+                </tr>
+                <tr style="border-bottom: 1px solid #eee; background: #fff5f5;">
+                  <td style="padding: 0.5rem 0.75rem; font-weight: bold;">@types/jest</td>
+                  <td style="padding: 0.5rem 0.75rem; text-align: right; font-weight: bold;">37M</td>
+                  <td style="padding: 0.5rem 0.75rem; text-align: right;">81</td>
+                  <td style="padding: 0.5rem 0.75rem;">Type defs that run at dev time — test toolchain poisoning</td>
+                </tr>
+                <tr style="border-bottom: 1px solid #eee; background: #fff5f5;">
+                  <td style="padding: 0.5rem 0.75rem; font-weight: bold;">hono</td>
+                  <td style="padding: 0.5rem 0.75rem; text-align: right; font-weight: bold;">34M</td>
+                  <td style="padding: 0.5rem 0.75rem; text-align: right;">82</td>
+                  <td style="padding: 0.5rem 0.75rem;">Fastest-growing edge framework — Cloudflare Workers standard</td>
+                </tr>
+                <tr style="border-bottom: 1px solid #eee; background: #fff5f5;">
+                  <td style="padding: 0.5rem 0.75rem; font-weight: bold;">pg</td>
+                  <td style="padding: 0.5rem 0.75rem; text-align: right; font-weight: bold;">24M</td>
+                  <td style="padding: 0.5rem 0.75rem; text-align: right;">81</td>
+                  <td style="padding: 0.5rem 0.75rem;">PostgreSQL client with direct database access — maximum blast radius per install</td>
+                </tr>
+                <tr style="border-bottom: 1px solid #eee; background: #fff5f5;">
+                  <td style="padding: 0.5rem 0.75rem; font-weight: bold;">cross-env</td>
+                  <td style="padding: 0.5rem 0.75rem; text-align: right; font-weight: bold;">17M</td>
+                  <td style="padding: 0.5rem 0.75rem; text-align: right;">73</td>
+                  <td style="padding: 0.5rem 0.75rem;">Sets env vars at build time — runs in CI/CD pipelines across the industry</td>
+                </tr>
+                <tr style="border-bottom: 2px solid var(--ink); background: #fff5f5;">
+                  <td style="padding: 0.5rem 0.75rem; font-weight: bold;">nodemon</td>
+                  <td style="padding: 0.5rem 0.75rem; text-align: right; font-weight: bold;">12M</td>
+                  <td style="padding: 0.5rem 0.75rem; text-align: right;">86</td>
+                  <td style="padding: 0.5rem 0.75rem;">Dev process watcher — executes code on save; runs with full process permissions</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <p>
+            <strong>Total: 2.54 billion weekly downloads, controlled by 15 individual npm tokens.</strong>
+          </p>
+
+          <hr style="margin: 2rem 0; border: none; border-top: 1px solid var(--rule);" />
+
+          <h2>Risk Categories</h2>
+
+          <h3>1. Infrastructure utilities nobody thinks about</h3>
+          <p>
+            minimatch, glob, and debug are in this category. They're not glamorous packages — they're the plumbing. minimatch is what npm itself uses to match package names. glob is what test runners use to find test files. debug is what Express, Mongoose, and nearly every server framework uses for internal logging. Nobody writes blog posts about them. They're just there, in everything, downloaded 500+ million times a week each.
+          </p>
+          <p>
+            All three: one maintainer.
+          </p>
+
+          <h3>2. The famous singletons</h3>
+          <p>
+            Chalk, lodash, axios, zod, esbuild. These are the packages developers know by name. Chalk colors your terminal. Lodash is your utility belt. Axios is your HTTP client. Zod validates your API shapes. esbuild makes your builds fast. They're recommended in tutorials, listed in starter templates, referenced in documentation everywhere.
+          </p>
+          <p>
+            Each one: one maintainer.
+          </p>
+          <p>
+            The ua-parser-js case is instructive. The behavioral score was high — well-maintained, active, consistent releases. The structural flag was there for years before the October 2021 attack. npm audit showed nothing. The attack took a compromised token and four hours. The blast radius included Facebook, Microsoft, Amazon, and Google. axios carries an identical structural profile at 12x the download volume.
+          </p>
+
+          <h3>3. TypeScript ecosystem bottlenecks</h3>
+          <p>
+            @types/node and @types/jest are maintained by a single contributor each through DefinitelyTyped, the community type repository. Every TypeScript project that touches Node.js APIs installs @types/node. Every project using Jest for testing has @types/jest in its dev dependencies. These packages don't ship runtime code — they ship type definitions. But a malicious publish could inject incorrect type definitions that cause type-checking to miss real vulnerabilities, or include a postinstall script with arbitrary code execution.
+          </p>
+
+          <h3>4. Dev toolchain and CI exposure</h3>
+          <p>
+            chokidar, nodemon, and cross-env run in development environments and CI pipelines. They have process-level access. chokidar watches file system events — it's in Webpack and Vite. nodemon restarts your server on file changes — it executes code directly. cross-env sets environment variables at build time — it runs in CI with full access to secrets.
+          </p>
+          <p>
+            These packages are less likely to be in production images, but CI pipeline compromise is increasingly the attack target. The CodeCov incident (2021), the XZ Utils attack (2024) — build toolchain is the new attack surface.
+          </p>
+
+          <hr style="margin: 2rem 0; border: none; border-top: 1px solid var(--rule);" />
+
+          <h2>The Packages That Passed</h2>
+
+          <p>
+            The safe packages earn it through demonstrated commitment over time — not certification, not promises.
+          </p>
+
+          <ul>
+            <li><strong>prettier</strong> (score=100, 11 maintainers, 87M/wk) — The most maintained package in the top 50 by active contributor count. Consistent weekly releases. 11 people with publish access means 11 tokens would need to be compromised simultaneously.</li>
+            <li><strong>webpack</strong> (score=100, 8 maintainers, 44M/wk) — 14 years of shipping. 8 maintainers. Behavioral record that predates most of its users.</li>
+            <li><strong>semver</strong> (score=95, 5 maintainers, 633M/wk) — The most-downloaded safe package. 15 years old, 5 maintainers, consistent release record. npm's versioning backbone, done right.</li>
+            <li><strong>typescript</strong> (score=98, 6 maintainers, 178M/wk) — Microsoft-backed, 6 maintainers, 14 years of behavioral record. The structural antithesis of esbuild (also from the JS toolchain, 5x fewer maintainers).</li>
+            <li><strong>tslib</strong> (score=89, 6 maintainers, 357M/wk) — Also Microsoft-backed TypeScript infrastructure. 6 maintainers, strong release cadence. Not the headline package, but well-governed.</li>
+          </ul>
+
+          <hr style="margin: 2rem 0; border: none; border-top: 1px solid var(--rule);" />
+
+          <h2>What You Can Do</h2>
+
+          <p>
+            The gap between the packages that passed and the ones that are CRITICAL isn't code quality — it's governance structure. Chalk is high-quality code. So is zod. So is esbuild. The risk isn't in the implementation; it's in the single point of failure for publish access.
+          </p>
+
+          <p>That's a solvable problem — but only if you can see it.</p>
+
+          <p><strong>Audit your stack in 30 seconds:</strong></p>
+          <pre style="background: #f5f5f5; padding: 1rem; border-radius: 4px; overflow-x: auto; font-size: 0.85rem;"><code>npx proof-of-commitment axios zod chalk hono esbuild
+# Or against your whole project:
+npx proof-of-commitment --file package.json</code></pre>
+
+          <p><strong>Add to CI (posts table directly on your PR):</strong></p>
+          <pre style="background: #f5f5f5; padding: 1rem; border-radius: 4px; overflow-x: auto; font-size: 0.85rem;"><code>- uses: piiiico/proof-of-commitment@main
+  with:
+    fail-on-critical: false
+    comment-on-pr: true</code></pre>
+
+          <p><strong>MCP server (works with Claude Desktop, Cursor, Windsurf):</strong></p>
+          <pre style="background: #f5f5f5; padding: 1rem; border-radius: 4px; overflow-x: auto; font-size: 0.85rem;"><code>&#123;
+  "mcpServers": &#123;
+    "proof-of-commitment": &#123;
+      "type": "streamable-http",
+      "url": "https://poc-backend.amdal-dev.workers.dev/mcp"
+    &#125;
+  &#125;
+&#125;</code></pre>
+          <p>Then: <em>"Audit the dependencies in vercel/ai"</em> — it fetches the package.json, scores everything, returns a risk table.</p>
+
+          <p><strong>Web interface:</strong> <a href="https://getcommit.dev/audit" target="_blank" rel="noopener">getcommit.dev/audit</a> — paste packages or drop your package.json.</p>
+
+          <hr style="margin: 2rem 0; border: none; border-top: 1px solid var(--rule);" />
+
+          <h2>Methodology</h2>
+
+          <p>
+            All data sourced from public npm registry and GitHub APIs via <a href="https://github.com/piiiico/proof-of-commitment" target="_blank" rel="noopener">proof-of-commitment</a>. Five behavioral dimensions, all from observable signals:
+          </p>
+
+          <div style="overflow-x: auto; margin: 2rem 0;">
+            <table style="width: 100%; border-collapse: collapse; font-size: 0.9rem;">
+              <thead>
+                <tr style="border-bottom: 2px solid var(--ink);">
+                  <th style="text-align: left; padding: 0.5rem 0.75rem;">Dimension</th>
+                  <th style="text-align: right; padding: 0.5rem 0.75rem;">Max</th>
+                  <th style="text-align: left; padding: 0.5rem 0.75rem;">What it measures</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr style="border-bottom: 1px solid #eee;">
+                  <td style="padding: 0.5rem 0.75rem;">Longevity</td>
+                  <td style="padding: 0.5rem 0.75rem; text-align: right;">25</td>
+                  <td style="padding: 0.5rem 0.75rem;">Package age — time in production is signal</td>
+                </tr>
+                <tr style="border-bottom: 1px solid #eee;">
+                  <td style="padding: 0.5rem 0.75rem;">Download Momentum</td>
+                  <td style="padding: 0.5rem 0.75rem; text-align: right;">25</td>
+                  <td style="padding: 0.5rem 0.75rem;">Weekly downloads + trend direction</td>
+                </tr>
+                <tr style="border-bottom: 1px solid #eee;">
+                  <td style="padding: 0.5rem 0.75rem;">Release Consistency</td>
+                  <td style="padding: 0.5rem 0.75rem; text-align: right;">20</td>
+                  <td style="padding: 0.5rem 0.75rem;">Cadence, recency, gaps</td>
+                </tr>
+                <tr style="border-bottom: 1px solid #eee;">
+                  <td style="padding: 0.5rem 0.75rem;">Maintainer Depth</td>
+                  <td style="padding: 0.5rem 0.75rem; text-align: right;">15</td>
+                  <td style="padding: 0.5rem 0.75rem;">Number of active maintainers with publish access</td>
+                </tr>
+                <tr style="border-bottom: 2px solid var(--ink);">
+                  <td style="padding: 0.5rem 0.75rem;">GitHub Backing</td>
+                  <td style="padding: 0.5rem 0.75rem; text-align: right;">15</td>
+                  <td style="padding: 0.5rem 0.75rem;">Star traction, repo activity, issue health</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <p>
+            <strong>CRITICAL</strong> = 1 maintainer + &gt;10M weekly downloads. This is the exact profile that the ua-parser-js attack (October 2021) and event-stream (2018) exploited. High download count means high value target. Single maintainer means one token to compromise.
+          </p>
+
+          <p>
+            This analysis does not replace <code>npm audit</code> — it answers a different question. <code>npm audit</code> scans for known CVEs in the NVD database. proof-of-commitment scores structural resilience: would this package survive a maintainer compromise, a token theft, or a gradual abandonment?
+          </p>
+
+          <p>
+            The ua-parser-js attack had zero CVE warnings. Zero npm audit flags. It had a structural flag for years. The same is true for axios, minimatch, chalk, and the other CRITICAL packages in this dataset — right now.
+          </p>
+
+          <p style="margin-top: 3rem;">
+            Download the raw dataset: <a href="https://github.com/piiiico/proof-of-commitment" target="_blank" rel="noopener">github.com/piiiico/proof-of-commitment</a>
+            · Run your own audit: <code>npx proof-of-commitment --file package.json</code>
+            · <a href="https://getcommit.dev/audit" target="_blank" rel="noopener">getcommit.dev/audit</a>
+          </p>
+
+          <p class="essay-coda">
+            <em>We're building <a href="/">Commit</a> — trust infrastructure for the autonomous economy. Behavioral commitment data, not declarations. Source: <a href="https://github.com/piiiico/proof-of-commitment" target="_blank" rel="noopener">github.com/piiiico/proof-of-commitment</a>.</em>
+          </p>
+          <p class="essay-coda">
+            <em>See also: <a href="/blog/benchmarks-lied">Benchmarks Lied. Now What?</a> · <a href="/blog/the-missing-layer">The Missing Layer</a> · <a href="/blog/declarations-are-gameable">Declarations Are Gameable</a></em>
+          </p>
+
+        </div>
+      </div>
+    </div>
+  </article>
+
+  <!-- Newsletter -->
+  <section class="newsletter-section">
+    <div class="container">
+      <div class="editorial reveal">
+        <h2 style="margin-bottom: 0.75rem;">Stay in the loop</h2>
+        <p style="margin-bottom: 2rem; font-size: 1rem;">
+          Early access, research updates, and the occasional strong opinion.
+        </p>
+
+        <form
+          action="https://buttondown.email/api/emails/embed-subscribe/commitgraph"
+          method="post"
+          target="popupwindow"
+          class="newsletter-form"
+        >
+          <input
+            type="email"
+            name="email"
+            placeholder="you@example.com"
+            required
+            class="newsletter-input"
+          />
+          <button type="submit" class="btn-primary" style="white-space: nowrap;">
+            Subscribe
+          </button>
+        </form>
+
+        <p class="newsletter-note">No spam. Unsubscribe anytime.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer>
+    <div class="container footer-inner">
+      <span class="footer-brand">Commit</span>
+      <ul class="footer-links">
+        <li><a href="/">Home</a></li>
+        <li><a href="/extension">Extension</a></li>
+        <li><a href="/blog">Writing</a></li>
+        <li><a href="/pricing">Pricing</a></li><li><a href="/docs">Docs</a></li><li><a href="https://github.com/piiiico/proof-of-commitment" target="_blank" rel="noopener">GitHub</a></li>
+        <li><a href="mailto:pico@amdal.dev">Contact</a></li>
+      </ul>
+      <span class="footer-locale">Stavanger, Norway</span>
+    </div>
+  </footer>
+
+</Layout>

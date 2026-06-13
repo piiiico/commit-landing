@@ -1,0 +1,610 @@
+---
+import Layout from '../../layouts/Layout.astro';
+---
+
+<Layout
+  title="State of npm Supply Chain Trust — Q2 2026 | Commit"
+  description="We audited the top 100 npm packages by weekly downloads. 7 of the top 10 have a single maintainer. 47% of all weekly npm traffic flows through single-maintainer packages. 15 billion downloads, one token each."
+  canonical="https://getcommit.dev/blog/npm-trust-q2-2026/"
+  publishDate="2026-04-24"
+>
+
+  <nav>
+    <div class="container nav-inner">
+      <a href="/" class="nav-brand">Commit</a>
+      <ul class="nav-links">
+        <li><a href="/quickstart" style="font-weight:600;color:var(--accent)">Quickstart</a></li>
+        <li><a href="/audit">Audit</a></li>
+        <li><a href="/rankings">Rankings</a></li>
+        <li><a href="/blog">Writing</a></li>
+        <li><a href="/pricing">Pricing</a></li><li><a href="/docs">Docs</a></li>
+        <li><a href="https://github.com/piiiico/proof-of-commitment" target="_blank" rel="noopener">GitHub</a></li>
+      </ul>
+    </div>
+  </nav>
+
+  <article class="essay">
+    <div class="container">
+      <div class="editorial">
+
+        <header class="essay-header">
+          <div class="essay-meta animate-in delay-1">
+            <time datetime="2026-04-24">April 24, 2026</time>
+          </div>
+          <h1 class="essay-title animate-in delay-2">State of npm Supply Chain Trust — Q2 2026</h1>
+          <p class="essay-subtitle animate-in delay-3">
+            We audited the top 100 npm packages by weekly downloads. 7 of the top 10 have a single maintainer. 47% of all weekly npm traffic — 7.2 billion downloads — flows through packages with one person at the helm.
+          </p>
+          <p class="essay-byline animate-in delay-4">Pico</p>
+        </header>
+
+        <div class="essay-body">
+
+          <p style="font-size: 1.15rem; font-weight: 500; line-height: 1.6;">
+            7 of the top 10 most-downloaded npm packages have a single maintainer. Combined, they handle 3.2 billion installs per week.
+          </p>
+
+          <p>
+            These aren't obscure packages. They're at the base of the JavaScript dependency graph — the ones pulled into virtually every Node.js application ever built. You almost certainly run them every time you execute <code>npm install</code>. Most developers couldn't name them.
+          </p>
+
+          <p>
+            We scored the top 100 npm packages by weekly download count using <a href="https://getcommit.dev">Commit's behavioral trust scoring</a>, which measures longevity, release consistency, maintainer depth, and organizational backing — signals that are hard to fake. Here's what the data shows.
+          </p>
+
+          <hr style="margin: 2rem 0; border: none; border-top: 1px solid var(--rule);" />
+
+          <h2>The Numbers</h2>
+
+          <div style="overflow-x: auto; margin: 1.5rem 0;">
+            <table style="width: 100%; border-collapse: collapse; font-size: 0.9rem;">
+              <tbody>
+                <tr style="border-bottom: 1px solid #eee;">
+                  <td style="padding: 0.5rem 0.75rem; color: var(--ink-muted);">Packages audited</td>
+                  <td style="padding: 0.5rem 0.75rem; font-weight: 600;">100</td>
+                </tr>
+                <tr style="border-bottom: 1px solid #eee;">
+                  <td style="padding: 0.5rem 0.75rem; color: var(--ink-muted);">Total weekly downloads</td>
+                  <td style="padding: 0.5rem 0.75rem; font-weight: 600;">15.15 billion</td>
+                </tr>
+                <tr style="border-bottom: 1px solid #eee; background: #fff5f5;">
+                  <td style="padding: 0.5rem 0.75rem;">CRITICAL-flagged packages</td>
+                  <td style="padding: 0.5rem 0.75rem; font-weight: 600; color: #c00;">14 (2.63B downloads/wk)</td>
+                </tr>
+                <tr style="border-bottom: 1px solid #eee;">
+                  <td style="padding: 0.5rem 0.75rem; color: var(--ink-muted);">Single-maintainer packages</td>
+                  <td style="padding: 0.5rem 0.75rem; font-weight: 600;">40 packages — <strong style="color:#c00">7.23B downloads/wk (47%)</strong></td>
+                </tr>
+                <tr style="border-bottom: 1px solid #eee;">
+                  <td style="padding: 0.5rem 0.75rem; color: var(--ink-muted);">Average trust score</td>
+                  <td style="padding: 0.5rem 0.75rem; font-weight: 600;">68.7 / 100</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <p>
+            <strong>47% of all weekly npm traffic flows through packages controlled by a single person.</strong> Not 14 packages — 40.
+          </p>
+
+          <hr style="margin: 2rem 0; border: none; border-top: 1px solid var(--rule);" />
+
+          <h2>The Top 10 Most Downloaded npm Packages</h2>
+
+          <div style="overflow-x: auto; margin: 1.5rem 0;">
+            <table style="width: 100%; border-collapse: collapse; font-size: 0.875rem;">
+              <thead>
+                <tr style="border-bottom: 2px solid var(--ink);">
+                  <th style="text-align: left; padding: 0.5rem 0.75rem;">#</th>
+                  <th style="text-align: left; padding: 0.5rem 0.75rem;">Package</th>
+                  <th style="text-align: right; padding: 0.5rem 0.75rem;">Score</th>
+                  <th style="text-align: center; padding: 0.5rem 0.75rem;">Risk</th>
+                  <th style="text-align: right; padding: 0.5rem 0.75rem;">Maint.</th>
+                  <th style="text-align: right; padding: 0.5rem 0.75rem;">Downloads/wk</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr style="border-bottom: 1px solid #eee;">
+                  <td style="padding: 0.4rem 0.75rem; color:#888;">1</td>
+                  <td style="padding: 0.4rem 0.75rem; font-family: monospace;">ansi-styles</td>
+                  <td style="padding: 0.4rem 0.75rem; text-align:right;">52</td>
+                  <td style="padding: 0.4rem 0.75rem; text-align:center; color:#3c7d3c;">✅</td>
+                  <td style="padding: 0.4rem 0.75rem; text-align:right; color:#c00; font-weight:bold;">1</td>
+                  <td style="padding: 0.4rem 0.75rem; text-align:right; font-family:monospace;">567M</td>
+                </tr>
+                <tr style="border-bottom: 1px solid #eee;">
+                  <td style="padding: 0.4rem 0.75rem; color:#888;">2</td>
+                  <td style="padding: 0.4rem 0.75rem; font-family: monospace;">semver</td>
+                  <td style="padding: 0.4rem 0.75rem; text-align:right;">90</td>
+                  <td style="padding: 0.4rem 0.75rem; text-align:center; color:#3c7d3c;">✅</td>
+                  <td style="padding: 0.4rem 0.75rem; text-align:right;">4</td>
+                  <td style="padding: 0.4rem 0.75rem; text-align:right; font-family:monospace;">536M</td>
+                </tr>
+                <tr style="border-bottom: 1px solid #eee;">
+                  <td style="padding: 0.4rem 0.75rem; color:#888;">3</td>
+                  <td style="padding: 0.4rem 0.75rem; font-family: monospace;">brace-expansion</td>
+                  <td style="padding: 0.4rem 0.75rem; text-align:right;">60</td>
+                  <td style="padding: 0.4rem 0.75rem; text-align:center; color:#3c7d3c;">✅</td>
+                  <td style="padding: 0.4rem 0.75rem; text-align:right;">2</td>
+                  <td style="padding: 0.4rem 0.75rem; text-align:right; font-family:monospace;">483M</td>
+                </tr>
+                <tr style="border-bottom: 1px solid #eee; background: #fff5f5;">
+                  <td style="padding: 0.4rem 0.75rem; color:#888;">4</td>
+                  <td style="padding: 0.4rem 0.75rem; font-family: monospace; font-weight:bold;">minimatch</td>
+                  <td style="padding: 0.4rem 0.75rem; text-align:right;">85</td>
+                  <td style="padding: 0.4rem 0.75rem; text-align:center; color:#c00;">🔴 CRITICAL</td>
+                  <td style="padding: 0.4rem 0.75rem; text-align:right; color:#c00; font-weight:bold;">1</td>
+                  <td style="padding: 0.4rem 0.75rem; text-align:right; font-family:monospace; font-weight:bold;">473M</td>
+                </tr>
+                <tr style="border-bottom: 1px solid #eee;">
+                  <td style="padding: 0.4rem 0.75rem; color:#888;">5</td>
+                  <td style="padding: 0.4rem 0.75rem; font-family: monospace;">debug</td>
+                  <td style="padding: 0.4rem 0.75rem; text-align:right;">79</td>
+                  <td style="padding: 0.4rem 0.75rem; text-align:center; color:#3c7d3c;">✅</td>
+                  <td style="padding: 0.4rem 0.75rem; text-align:right;">2</td>
+                  <td style="padding: 0.4rem 0.75rem; text-align:right; font-family:monospace;">462M</td>
+                </tr>
+                <tr style="border-bottom: 1px solid #eee;">
+                  <td style="padding: 0.4rem 0.75rem; color:#888;">6</td>
+                  <td style="padding: 0.4rem 0.75rem; font-family: monospace;">strip-ansi</td>
+                  <td style="padding: 0.4rem 0.75rem; text-align:right;">50</td>
+                  <td style="padding: 0.4rem 0.75rem; text-align:center; color:#3c7d3c;">✅</td>
+                  <td style="padding: 0.4rem 0.75rem; text-align:right; color:#c00; font-weight:bold;">1</td>
+                  <td style="padding: 0.4rem 0.75rem; text-align:right; font-family:monospace;">452M</td>
+                </tr>
+                <tr style="border-bottom: 1px solid #eee;">
+                  <td style="padding: 0.4rem 0.75rem; color:#888;">7</td>
+                  <td style="padding: 0.4rem 0.75rem; font-family: monospace;">supports-color</td>
+                  <td style="padding: 0.4rem 0.75rem; text-align:right;">53</td>
+                  <td style="padding: 0.4rem 0.75rem; text-align:center; color:#3c7d3c;">✅</td>
+                  <td style="padding: 0.4rem 0.75rem; text-align:right; color:#c00; font-weight:bold;">1</td>
+                  <td style="padding: 0.4rem 0.75rem; text-align:right; font-family:monospace;">409M</td>
+                </tr>
+                <tr style="border-bottom: 1px solid #eee;">
+                  <td style="padding: 0.4rem 0.75rem; color:#888;">8</td>
+                  <td style="padding: 0.4rem 0.75rem; font-family: monospace;">string-width</td>
+                  <td style="padding: 0.4rem 0.75rem; text-align:right;">51</td>
+                  <td style="padding: 0.4rem 0.75rem; text-align:center; color:#3c7d3c;">✅</td>
+                  <td style="padding: 0.4rem 0.75rem; text-align:right; color:#c00; font-weight:bold;">1</td>
+                  <td style="padding: 0.4rem 0.75rem; text-align:right; font-family:monospace;">407M</td>
+                </tr>
+                <tr style="border-bottom: 1px solid #eee;">
+                  <td style="padding: 0.4rem 0.75rem; color:#888;">9</td>
+                  <td style="padding: 0.4rem 0.75rem; font-family: monospace;">wrap-ansi</td>
+                  <td style="padding: 0.4rem 0.75rem; text-align:right;">51</td>
+                  <td style="padding: 0.4rem 0.75rem; text-align:center; color:#3c7d3c;">✅</td>
+                  <td style="padding: 0.4rem 0.75rem; text-align:right; color:#c00; font-weight:bold;">1</td>
+                  <td style="padding: 0.4rem 0.75rem; text-align:right; font-family:monospace;">359M</td>
+                </tr>
+                <tr style="border-bottom: 2px solid var(--ink); background: #fff5f5;">
+                  <td style="padding: 0.4rem 0.75rem; color:#888;">10</td>
+                  <td style="padding: 0.4rem 0.75rem; font-family: monospace; font-weight:bold;">ansi-regex</td>
+                  <td style="padding: 0.4rem 0.75rem; text-align:right;">70</td>
+                  <td style="padding: 0.4rem 0.75rem; text-align:center; color:#c00;">🔴 CRITICAL</td>
+                  <td style="padding: 0.4rem 0.75rem; text-align:right; color:#c00; font-weight:bold;">1</td>
+                  <td style="padding: 0.4rem 0.75rem; text-align:right; font-family:monospace; font-weight:bold;">348M</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <p>
+            The top package by weekly download count in the entire npm ecosystem isn't <code>react</code>. It isn't <code>typescript</code>. It's <strong>ansi-styles</strong> — a package that provides ANSI escape code strings for terminal colors. Its primary consumer is chalk. Chalk is used by nearly every build tool, CLI, and test runner in existence.
+          </p>
+
+          <p>
+            One maintainer. 567 million installs per week.
+          </p>
+
+          <p>
+            Numbers 1, 6, 7, 8, 9, and 10 in the rankings form a cluster: <code>ansi-styles</code>, <code>strip-ansi</code>, <code>supports-color</code>, <code>string-width</code>, <code>wrap-ansi</code>, and <code>ansi-regex</code>. All part of the ANSI terminal color ecosystem. All with a single maintainer. Combined: over 2.1 billion weekly downloads.
+          </p>
+
+          <hr style="margin: 2rem 0; border: none; border-top: 1px solid var(--rule);" />
+
+          <h2>The CRITICAL 14</h2>
+
+          <p>
+            CRITICAL = &gt;10M weekly downloads + single maintainer with npm publish access. One token. One compromise window.
+          </p>
+
+          <div style="overflow-x: auto; margin: 1.5rem 0;">
+            <table style="width: 100%; border-collapse: collapse; font-size: 0.875rem;">
+              <thead>
+                <tr style="border-bottom: 2px solid var(--ink);">
+                  <th style="text-align: left; padding: 0.5rem 0.75rem;">Package</th>
+                  <th style="text-align: right; padding: 0.5rem 0.75rem;">Score</th>
+                  <th style="text-align: right; padding: 0.5rem 0.75rem;">Downloads/wk</th>
+                  <th style="text-align: left; padding: 0.5rem 0.75rem;">Embedded in…</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr style="border-bottom: 1px solid #eee; background: #fff5f5;">
+                  <td style="padding: 0.4rem 0.75rem; font-family:monospace; font-weight:bold;">minimatch</td>
+                  <td style="padding: 0.4rem 0.75rem; text-align:right;">85</td>
+                  <td style="padding: 0.4rem 0.75rem; text-align:right; font-family:monospace;">473M</td>
+                  <td style="padding: 0.4rem 0.75rem; font-size:0.8rem; color:#666;">ESLint, Jest, webpack, Vite, npm CLI</td>
+                </tr>
+                <tr style="border-bottom: 1px solid #eee; background: #fff5f5;">
+                  <td style="padding: 0.4rem 0.75rem; font-family:monospace; font-weight:bold;">ansi-regex</td>
+                  <td style="padding: 0.4rem 0.75rem; text-align:right;">70</td>
+                  <td style="padding: 0.4rem 0.75rem; text-align:right; font-family:monospace;">348M</td>
+                  <td style="padding: 0.4rem 0.75rem; font-size:0.8rem; color:#666;">chalk, strip-ansi, every CLI with color</td>
+                </tr>
+                <tr style="border-bottom: 1px solid #eee; background: #fff5f5;">
+                  <td style="padding: 0.4rem 0.75rem; font-family:monospace; font-weight:bold;">chalk</td>
+                  <td style="padding: 0.4rem 0.75rem; text-align:right;">75</td>
+                  <td style="padding: 0.4rem 0.75rem; text-align:right; font-family:monospace;">339M</td>
+                  <td style="padding: 0.4rem 0.75rem; font-size:0.8rem; color:#666;">Everything with colored terminal output</td>
+                </tr>
+                <tr style="border-bottom: 1px solid #eee; background: #fff5f5;">
+                  <td style="padding: 0.4rem 0.75rem; font-family:monospace; font-weight:bold;">glob</td>
+                  <td style="padding: 0.4rem 0.75rem; text-align:right;">81</td>
+                  <td style="padding: 0.4rem 0.75rem; text-align:right; font-family:monospace;">276M</td>
+                  <td style="padding: 0.4rem 0.75rem; font-size:0.8rem; color:#666;">ESLint, webpack, Jest, Node.js</td>
+                </tr>
+                <tr style="border-bottom: 1px solid #eee; background: #fff5f5;">
+                  <td style="padding: 0.4rem 0.75rem; font-family:monospace; font-weight:bold;">@types/node</td>
+                  <td style="padding: 0.4rem 0.75rem; text-align:right;">88</td>
+                  <td style="padding: 0.4rem 0.75rem; text-align:right; font-family:monospace;">261M</td>
+                  <td style="padding: 0.4rem 0.75rem; font-size:0.8rem; color:#666;">Every TypeScript backend project</td>
+                </tr>
+                <tr style="border-bottom: 1px solid #eee; background: #fff5f5;">
+                  <td style="padding: 0.4rem 0.75rem; font-family:monospace; font-weight:bold;">esbuild</td>
+                  <td style="padding: 0.4rem 0.75rem; text-align:right;">88</td>
+                  <td style="padding: 0.4rem 0.75rem; text-align:right; font-family:monospace;">171M</td>
+                  <td style="padding: 0.4rem 0.75rem; font-size:0.8rem; color:#666;">Vite, Next.js, most modern bundlers</td>
+                </tr>
+                <tr style="border-bottom: 1px solid #eee; background: #fff5f5;">
+                  <td style="padding: 0.4rem 0.75rem; font-family:monospace; font-weight:bold;">chokidar</td>
+                  <td style="padding: 0.4rem 0.75rem; text-align:right;">81</td>
+                  <td style="padding: 0.4rem 0.75rem; text-align:right; font-family:monospace;">134M</td>
+                  <td style="padding: 0.4rem 0.75rem; font-size:0.8rem; color:#666;">webpack, Vite, Jest, all file watchers</td>
+                </tr>
+                <tr style="border-bottom: 1px solid #eee; background: #fff5f5;">
+                  <td style="padding: 0.4rem 0.75rem; font-family:monospace; font-weight:bold;">zod</td>
+                  <td style="padding: 0.4rem 0.75rem; text-align:right;">83</td>
+                  <td style="padding: 0.4rem 0.75rem; text-align:right; font-family:monospace;">134M</td>
+                  <td style="padding: 0.4rem 0.75rem; font-size:0.8rem; color:#666;">tRPC, Next.js, most validation layers</td>
+                </tr>
+                <tr style="border-bottom: 1px solid #eee; background: #fff5f5;">
+                  <td style="padding: 0.4rem 0.75rem; font-family:monospace; font-weight:bold;">caniuse-lite</td>
+                  <td style="padding: 0.4rem 0.75rem; text-align:right;">84</td>
+                  <td style="padding: 0.4rem 0.75rem; text-align:right; font-family:monospace;">132M</td>
+                  <td style="padding: 0.4rem 0.75rem; font-size:0.8rem; color:#666;">Babel, Browserslist, PostCSS</td>
+                </tr>
+                <tr style="border-bottom: 1px solid #eee; background: #fff5f5;">
+                  <td style="padding: 0.4rem 0.75rem; font-family:monospace; font-weight:bold;">fast-deep-equal</td>
+                  <td style="padding: 0.4rem 0.75rem; text-align:right;">68</td>
+                  <td style="padding: 0.4rem 0.75rem; text-align:right; font-family:monospace;">122M</td>
+                  <td style="padding: 0.4rem 0.75rem; font-size:0.8rem; color:#666;">React reconciler, Redux, Vue, ajv</td>
+                </tr>
+                <tr style="border-bottom: 1px solid #eee; background: #fff5f5;">
+                  <td style="padding: 0.4rem 0.75rem; font-family:monospace; font-weight:bold;">lodash</td>
+                  <td style="padding: 0.4rem 0.75rem; text-align:right;">87</td>
+                  <td style="padding: 0.4rem 0.75rem; text-align:right; font-family:monospace;">122M</td>
+                  <td style="padding: 0.4rem 0.75rem; font-size:0.8rem; color:#666;">Millions of direct dependencies</td>
+                </tr>
+                <tr style="border-bottom: 1px solid #eee; background: #fff5f5;">
+                  <td style="padding: 0.4rem 0.75rem; font-family:monospace; font-weight:bold;">axios</td>
+                  <td style="padding: 0.4rem 0.75rem; text-align:right;">86</td>
+                  <td style="padding: 0.4rem 0.75rem; text-align:right; font-family:monospace;">82M</td>
+                  <td style="padding: 0.4rem 0.75rem; font-size:0.8rem; color:#666;">Millions of direct dependencies</td>
+                </tr>
+                <tr style="border-bottom: 1px solid #eee; background: #fff5f5;">
+                  <td style="padding: 0.4rem 0.75rem; font-family:monospace; font-weight:bold;">husky</td>
+                  <td style="padding: 0.4rem 0.75rem; text-align:right;">77</td>
+                  <td style="padding: 0.4rem 0.75rem; text-align:right; font-family:monospace;">21M</td>
+                  <td style="padding: 0.4rem 0.75rem; font-size:0.8rem; color:#666;">Git hook management in most repos</td>
+                </tr>
+                <tr style="border-bottom: 2px solid var(--ink); background: #fff5f5;">
+                  <td style="padding: 0.4rem 0.75rem; font-family:monospace; font-weight:bold;">cross-env</td>
+                  <td style="padding: 0.4rem 0.75rem; text-align:right;">73</td>
+                  <td style="padding: 0.4rem 0.75rem; text-align:right; font-family:monospace;">14M</td>
+                  <td style="padding: 0.4rem 0.75rem; font-size:0.8rem; color:#666;">Cross-platform npm scripts</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <p>
+            <strong>axios</strong> carries an identical structural profile to ua-parser-js — which was CRITICAL-flagged before its October 2021 compromise. <code>npm audit</code> showed zero warnings before that attack. The structural signal was visible. The CVE database had nothing until four hours after the malicious publish.
+          </p>
+
+          <hr style="margin: 2rem 0; border: none; border-top: 1px solid var(--rule);" />
+
+          <h2>Score Distribution</h2>
+
+          <div style="overflow-x: auto; margin: 1.5rem 0;">
+            <table style="width: 100%; border-collapse: collapse; font-size: 0.875rem;">
+              <thead>
+                <tr style="border-bottom: 2px solid var(--ink);">
+                  <th style="text-align: left; padding: 0.5rem 0.75rem;">Tier</th>
+                  <th style="text-align: right; padding: 0.5rem 0.75rem;">Score</th>
+                  <th style="text-align: right; padding: 0.5rem 0.75rem;">Count</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr style="border-bottom: 1px solid #eee;">
+                  <td style="padding: 0.4rem 0.75rem;">Elite — multi-org backing, decade-long record</td>
+                  <td style="padding: 0.4rem 0.75rem; text-align:right;">90–100</td>
+                  <td style="padding: 0.4rem 0.75rem; text-align:right;">12</td>
+                </tr>
+                <tr style="border-bottom: 1px solid #eee;">
+                  <td style="padding: 0.4rem 0.75rem;">Healthy — established, active, watch depth</td>
+                  <td style="padding: 0.4rem 0.75rem; text-align:right;">70–89</td>
+                  <td style="padding: 0.4rem 0.75rem; text-align:right;">33</td>
+                </tr>
+                <tr style="border-bottom: 1px solid #eee; background: #fffbf0;">
+                  <td style="padding: 0.4rem 0.75rem;">Moderate — maintenance gaps, shallow contributor base</td>
+                  <td style="padding: 0.4rem 0.75rem; text-align:right;">50–69</td>
+                  <td style="padding: 0.4rem 0.75rem; text-align:right;">43</td>
+                </tr>
+                <tr style="border-bottom: 2px solid var(--ink); background: #fff5f5;">
+                  <td style="padding: 0.4rem 0.75rem;">At Risk — stalled releases, single point of failure</td>
+                  <td style="padding: 0.4rem 0.75rem; text-align:right;">&lt;50</td>
+                  <td style="padding: 0.4rem 0.75rem; text-align:right;">12</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <p>
+            43 packages score 50–69: technically not flagged, but with billions of weekly downloads between them and no organizational backup. This is the quiet risk — not alarming enough for a red flag, deep enough in the graph that nobody audits it.
+          </p>
+
+          <hr style="margin: 2rem 0; border: none; border-top: 1px solid var(--rule);" />
+
+          <h2>What SAFE Looks Like</h2>
+
+          <p>
+            The 12 packages scoring 90+:
+          </p>
+
+          <div style="overflow-x: auto; margin: 1.5rem 0;">
+            <table style="width: 100%; border-collapse: collapse; font-size: 0.875rem;">
+              <thead>
+                <tr style="border-bottom: 2px solid var(--ink);">
+                  <th style="text-align: left; padding: 0.5rem 0.75rem;">Package</th>
+                  <th style="text-align: right; padding: 0.5rem 0.75rem;">Score</th>
+                  <th style="text-align: right; padding: 0.5rem 0.75rem;">Maint.</th>
+                  <th style="text-align: right; padding: 0.5rem 0.75rem;">Downloads/wk</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr style="border-bottom: 1px solid #eee;"><td style="padding:.4rem .75rem;font-family:monospace;">rollup</td><td style="padding:.4rem .75rem;text-align:right;">99</td><td style="padding:.4rem .75rem;text-align:right;">5</td><td style="padding:.4rem .75rem;text-align:right;font-family:monospace;">90M</td></tr>
+                <tr style="border-bottom: 1px solid #eee;"><td style="padding:.4rem .75rem;font-family:monospace;">typescript</td><td style="padding:.4rem .75rem;text-align:right;">98</td><td style="padding:.4rem .75rem;text-align:right;">6</td><td style="padding:.4rem .75rem;text-align:right;font-family:monospace;">154M</td></tr>
+                <tr style="border-bottom: 1px solid #eee;"><td style="padding:.4rem .75rem;font-family:monospace;">express</td><td style="padding:.4rem .75rem;text-align:right;">97</td><td style="padding:.4rem .75rem;text-align:right;">5</td><td style="padding:.4rem .75rem;text-align:right;font-family:monospace;">77M</td></tr>
+                <tr style="border-bottom: 1px solid #eee;"><td style="padding:.4rem .75rem;font-family:monospace;">vite</td><td style="padding:.4rem .75rem;text-align:right;">96</td><td style="padding:.4rem .75rem;text-align:right;">4</td><td style="padding:.4rem .75rem;text-align:right;font-family:monospace;">92M</td></tr>
+                <tr style="border-bottom: 1px solid #eee;"><td style="padding:.4rem .75rem;font-family:monospace;">undici</td><td style="padding:.4rem .75rem;text-align:right;">96</td><td style="padding:.4rem .75rem;text-align:right;">3</td><td style="padding:.4rem .75rem;text-align:right;font-family:monospace;">75M</td></tr>
+                <tr style="border-bottom: 1px solid #eee;"><td style="padding:.4rem .75rem;font-family:monospace;">dotenv</td><td style="padding:.4rem .75rem;text-align:right;">94</td><td style="padding:.4rem .75rem;text-align:right;">3</td><td style="padding:.4rem .75rem;text-align:right;font-family:monospace;">100M</td></tr>
+                <tr style="border-bottom: 1px solid #eee;"><td style="padding:.4rem .75rem;font-family:monospace;">@babel/core</td><td style="padding:.4rem .75rem;text-align:right;">93</td><td style="padding:.4rem .75rem;text-align:right;">4</td><td style="padding:.4rem .75rem;text-align:right;font-family:monospace;">108M</td></tr>
+                <tr style="border-bottom: 1px solid #eee;"><td style="padding:.4rem .75rem;font-family:monospace;">eslint</td><td style="padding:.4rem .75rem;text-align:right;">91</td><td style="padding:.4rem .75rem;text-align:right;">2</td><td style="padding:.4rem .75rem;text-align:right;font-family:monospace;">108M</td></tr>
+                <tr style="border-bottom: 1px solid #eee;"><td style="padding:.4rem .75rem;font-family:monospace;">react</td><td style="padding:.4rem .75rem;text-align:right;">91</td><td style="padding:.4rem .75rem;text-align:right;">2</td><td style="padding:.4rem .75rem;text-align:right;font-family:monospace;">109M</td></tr>
+                <tr style="border-bottom: 1px solid #eee;"><td style="padding:.4rem .75rem;font-family:monospace;">react-dom</td><td style="padding:.4rem .75rem;text-align:right;">91</td><td style="padding:.4rem .75rem;text-align:right;">2</td><td style="padding:.4rem .75rem;text-align:right;font-family:monospace;">103M</td></tr>
+                <tr style="border-bottom: 1px solid #eee;"><td style="padding:.4rem .75rem;font-family:monospace;">ws</td><td style="padding:.4rem .75rem;text-align:right;">90</td><td style="padding:.4rem .75rem;text-align:right;">4</td><td style="padding:.4rem .75rem;text-align:right;font-family:monospace;">162M</td></tr>
+                <tr style="border-bottom: 2px solid var(--ink);"><td style="padding:.4rem .75rem;font-family:monospace;">semver</td><td style="padding:.4rem .75rem;text-align:right;">90</td><td style="padding:.4rem .75rem;text-align:right;">4</td><td style="padding:.4rem .75rem;text-align:right;font-family:monospace;">536M</td></tr>
+              </tbody>
+            </table>
+          </div>
+
+          <p>
+            <strong>semver</strong> (#2 by downloads, 536M/week) scores 90 and is team-maintained by npm Inc. That's what supply chain resilience looks like. The problem is that it's surrounded on both sides by packages with single maintainers.
+          </p>
+
+          <hr style="margin: 2rem 0; border: none; border-top: 1px solid var(--rule);" />
+
+          <h2>Full Dataset — Top 100 npm Packages</h2>
+
+          <p style="font-size: 0.85rem; color: var(--ink-muted);">
+            Ranked by weekly downloads. Data: April 16–22, 2026. Red = CRITICAL (single maintainer + &gt;10M/wk). Yellow = WARN.
+          </p>
+
+          <div style="overflow-x: auto; margin: 1.5rem 0;">
+            <table style="width: 100%; border-collapse: collapse; font-size: 0.82rem;">
+              <thead>
+                <tr style="border-bottom: 2px solid var(--ink);">
+                  <th style="text-align: left; padding: 0.4rem 0.5rem; color: #888;">#</th>
+                  <th style="text-align: left; padding: 0.4rem 0.5rem;">Package</th>
+                  <th style="text-align: right; padding: 0.4rem 0.5rem;">Score</th>
+                  <th style="text-align: center; padding: 0.4rem 0.5rem;">Risk</th>
+                  <th style="text-align: right; padding: 0.4rem 0.5rem;">Maint.</th>
+                  <th style="text-align: right; padding: 0.4rem 0.5rem;">Downloads/wk</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr style="border-bottom:1px solid #eee;"><td style="padding:.35rem .5rem;color:#999;">1</td><td style="padding:.35rem .5rem;font-family:monospace;">ansi-styles</td><td style="padding:.35rem .5rem;text-align:right;">52</td><td style="padding:.35rem .5rem;text-align:center;color:#3c7d3c;">✅</td><td style="padding:.35rem .5rem;text-align:right;color:#c00;font-weight:bold;">1</td><td style="padding:.35rem .5rem;text-align:right;font-family:monospace;">567M</td></tr>
+                <tr style="border-bottom:1px solid #eee;"><td style="padding:.35rem .5rem;color:#999;">2</td><td style="padding:.35rem .5rem;font-family:monospace;">semver</td><td style="padding:.35rem .5rem;text-align:right;">90</td><td style="padding:.35rem .5rem;text-align:center;color:#3c7d3c;">✅</td><td style="padding:.35rem .5rem;text-align:right;">4</td><td style="padding:.35rem .5rem;text-align:right;font-family:monospace;">536M</td></tr>
+                <tr style="border-bottom:1px solid #eee;"><td style="padding:.35rem .5rem;color:#999;">3</td><td style="padding:.35rem .5rem;font-family:monospace;">brace-expansion</td><td style="padding:.35rem .5rem;text-align:right;">60</td><td style="padding:.35rem .5rem;text-align:center;color:#3c7d3c;">✅</td><td style="padding:.35rem .5rem;text-align:right;">2</td><td style="padding:.35rem .5rem;text-align:right;font-family:monospace;">483M</td></tr>
+                <tr style="border-bottom:1px solid #eee;background:#fff5f5;"><td style="padding:.35rem .5rem;color:#999;">4</td><td style="padding:.35rem .5rem;font-family:monospace;font-weight:bold;">minimatch</td><td style="padding:.35rem .5rem;text-align:right;">85</td><td style="padding:.35rem .5rem;text-align:center;color:#c00;">🔴</td><td style="padding:.35rem .5rem;text-align:right;color:#c00;font-weight:bold;">1</td><td style="padding:.35rem .5rem;text-align:right;font-family:monospace;">473M</td></tr>
+                <tr style="border-bottom:1px solid #eee;"><td style="padding:.35rem .5rem;color:#999;">5</td><td style="padding:.35rem .5rem;font-family:monospace;">debug</td><td style="padding:.35rem .5rem;text-align:right;">79</td><td style="padding:.35rem .5rem;text-align:center;color:#3c7d3c;">✅</td><td style="padding:.35rem .5rem;text-align:right;">2</td><td style="padding:.35rem .5rem;text-align:right;font-family:monospace;">462M</td></tr>
+                <tr style="border-bottom:1px solid #eee;"><td style="padding:.35rem .5rem;color:#999;">6</td><td style="padding:.35rem .5rem;font-family:monospace;">strip-ansi</td><td style="padding:.35rem .5rem;text-align:right;">50</td><td style="padding:.35rem .5rem;text-align:center;color:#3c7d3c;">✅</td><td style="padding:.35rem .5rem;text-align:right;color:#c00;font-weight:bold;">1</td><td style="padding:.35rem .5rem;text-align:right;font-family:monospace;">452M</td></tr>
+                <tr style="border-bottom:1px solid #eee;"><td style="padding:.35rem .5rem;color:#999;">7</td><td style="padding:.35rem .5rem;font-family:monospace;">supports-color</td><td style="padding:.35rem .5rem;text-align:right;">53</td><td style="padding:.35rem .5rem;text-align:center;color:#3c7d3c;">✅</td><td style="padding:.35rem .5rem;text-align:right;color:#c00;font-weight:bold;">1</td><td style="padding:.35rem .5rem;text-align:right;font-family:monospace;">409M</td></tr>
+                <tr style="border-bottom:1px solid #eee;"><td style="padding:.35rem .5rem;color:#999;">8</td><td style="padding:.35rem .5rem;font-family:monospace;">string-width</td><td style="padding:.35rem .5rem;text-align:right;">51</td><td style="padding:.35rem .5rem;text-align:center;color:#3c7d3c;">✅</td><td style="padding:.35rem .5rem;text-align:right;color:#c00;font-weight:bold;">1</td><td style="padding:.35rem .5rem;text-align:right;font-family:monospace;">407M</td></tr>
+                <tr style="border-bottom:1px solid #eee;"><td style="padding:.35rem .5rem;color:#999;">9</td><td style="padding:.35rem .5rem;font-family:monospace;">wrap-ansi</td><td style="padding:.35rem .5rem;text-align:right;">51</td><td style="padding:.35rem .5rem;text-align:center;color:#3c7d3c;">✅</td><td style="padding:.35rem .5rem;text-align:right;color:#c00;font-weight:bold;">1</td><td style="padding:.35rem .5rem;text-align:right;font-family:monospace;">359M</td></tr>
+                <tr style="border-bottom:1px solid #eee;background:#fff5f5;"><td style="padding:.35rem .5rem;color:#999;">10</td><td style="padding:.35rem .5rem;font-family:monospace;font-weight:bold;">ansi-regex</td><td style="padding:.35rem .5rem;text-align:right;">70</td><td style="padding:.35rem .5rem;text-align:center;color:#c00;">🔴</td><td style="padding:.35rem .5rem;text-align:right;color:#c00;font-weight:bold;">1</td><td style="padding:.35rem .5rem;text-align:right;font-family:monospace;">348M</td></tr>
+                <tr style="border-bottom:1px solid #eee;"><td style="padding:.35rem .5rem;color:#999;">11</td><td style="padding:.35rem .5rem;font-family:monospace;">ms</td><td style="padding:.35rem .5rem;text-align:right;">85</td><td style="padding:.35rem .5rem;text-align:center;color:#3c7d3c;">✅</td><td style="padding:.35rem .5rem;text-align:right;">6</td><td style="padding:.35rem .5rem;text-align:right;font-family:monospace;">346M</td></tr>
+                <tr style="border-bottom:1px solid #eee;background:#fff5f5;"><td style="padding:.35rem .5rem;color:#999;">12</td><td style="padding:.35rem .5rem;font-family:monospace;font-weight:bold;">chalk</td><td style="padding:.35rem .5rem;text-align:right;">75</td><td style="padding:.35rem .5rem;text-align:center;color:#c00;">🔴</td><td style="padding:.35rem .5rem;text-align:right;color:#c00;font-weight:bold;">1</td><td style="padding:.35rem .5rem;text-align:right;font-family:monospace;">339M</td></tr>
+                <tr style="border-bottom:1px solid #eee;"><td style="padding:.35rem .5rem;color:#999;">13</td><td style="padding:.35rem .5rem;font-family:monospace;">commander</td><td style="padding:.35rem .5rem;text-align:right;">86</td><td style="padding:.35rem .5rem;text-align:center;color:#3c7d3c;">✅</td><td style="padding:.35rem .5rem;text-align:right;">2</td><td style="padding:.35rem .5rem;text-align:right;font-family:monospace;">309M</td></tr>
+                <tr style="border-bottom:1px solid #eee;"><td style="padding:.35rem .5rem;color:#999;">14</td><td style="padding:.35rem .5rem;font-family:monospace;">tslib</td><td style="padding:.35rem .5rem;text-align:right;">86</td><td style="padding:.35rem .5rem;text-align:center;color:#3c7d3c;">✅</td><td style="padding:.35rem .5rem;text-align:right;">6</td><td style="padding:.35rem .5rem;text-align:right;font-family:monospace;">297M</td></tr>
+                <tr style="border-bottom:1px solid #eee;"><td style="padding:.35rem .5rem;color:#999;">15</td><td style="padding:.35rem .5rem;font-family:monospace;">picomatch</td><td style="padding:.35rem .5rem;text-align:right;">86</td><td style="padding:.35rem .5rem;text-align:center;color:#3c7d3c;">✅</td><td style="padding:.35rem .5rem;text-align:right;">4</td><td style="padding:.35rem .5rem;text-align:right;font-family:monospace;">293M</td></tr>
+                <tr style="border-bottom:1px solid #eee;"><td style="padding:.35rem .5rem;color:#999;">16</td><td style="padding:.35rem .5rem;font-family:monospace;">color-name</td><td style="padding:.35rem .5rem;text-align:right;">54</td><td style="padding:.35rem .5rem;text-align:center;color:#3c7d3c;">✅</td><td style="padding:.35rem .5rem;text-align:right;">3</td><td style="padding:.35rem .5rem;text-align:right;font-family:monospace;">286M</td></tr>
+                <tr style="border-bottom:1px solid #eee;"><td style="padding:.35rem .5rem;color:#999;">17</td><td style="padding:.35rem .5rem;font-family:monospace;">color-convert</td><td style="padding:.35rem .5rem;text-align:right;">52</td><td style="padding:.35rem .5rem;text-align:center;color:#3c7d3c;">✅</td><td style="padding:.35rem .5rem;text-align:right;color:#c00;font-weight:bold;">1</td><td style="padding:.35rem .5rem;text-align:right;font-family:monospace;">284M</td></tr>
+                <tr style="border-bottom:1px solid #eee;background:#fff5f5;"><td style="padding:.35rem .5rem;color:#999;">18</td><td style="padding:.35rem .5rem;font-family:monospace;font-weight:bold;">glob</td><td style="padding:.35rem .5rem;text-align:right;">81</td><td style="padding:.35rem .5rem;text-align:center;color:#c00;">🔴</td><td style="padding:.35rem .5rem;text-align:right;color:#c00;font-weight:bold;">1</td><td style="padding:.35rem .5rem;text-align:right;font-family:monospace;">276M</td></tr>
+                <tr style="border-bottom:1px solid #eee;background:#fffbf0;"><td style="padding:.35rem .5rem;color:#999;">19</td><td style="padding:.35rem .5rem;font-family:monospace;">has-flag</td><td style="padding:.35rem .5rem;text-align:right;">39</td><td style="padding:.35rem .5rem;text-align:center;color:#a06000;">🟡</td><td style="padding:.35rem .5rem;text-align:right;color:#c00;font-weight:bold;">1</td><td style="padding:.35rem .5rem;text-align:right;font-family:monospace;">268M</td></tr>
+                <tr style="border-bottom:1px solid #eee;"><td style="padding:.35rem .5rem;color:#999;">20</td><td style="padding:.35rem .5rem;font-family:monospace;">balanced-match</td><td style="padding:.35rem .5rem;text-align:right;">51</td><td style="padding:.35rem .5rem;text-align:center;color:#3c7d3c;">✅</td><td style="padding:.35rem .5rem;text-align:right;color:#c00;font-weight:bold;">1</td><td style="padding:.35rem .5rem;text-align:right;font-family:monospace;">263M</td></tr>
+                <tr style="border-bottom:1px solid #eee;background:#fff5f5;"><td style="padding:.35rem .5rem;color:#999;">21</td><td style="padding:.35rem .5rem;font-family:monospace;font-weight:bold;">@types/node</td><td style="padding:.35rem .5rem;text-align:right;">88</td><td style="padding:.35rem .5rem;text-align:center;color:#c00;">🔴</td><td style="padding:.35rem .5rem;text-align:right;color:#c00;font-weight:bold;">1</td><td style="padding:.35rem .5rem;text-align:right;font-family:monospace;">261M</td></tr>
+                <tr style="border-bottom:1px solid #eee;"><td style="padding:.35rem .5rem;color:#999;">22</td><td style="padding:.35rem .5rem;font-family:monospace;">which</td><td style="padding:.35rem .5rem;text-align:right;">61</td><td style="padding:.35rem .5rem;text-align:center;color:#3c7d3c;">✅</td><td style="padding:.35rem .5rem;text-align:right;">4</td><td style="padding:.35rem .5rem;text-align:right;font-family:monospace;">245M</td></tr>
+                <tr style="border-bottom:1px solid #eee;background:#fffbf0;"><td style="padding:.35rem .5rem;color:#999;">23</td><td style="padding:.35rem .5rem;font-family:monospace;">json-schema-traverse</td><td style="padding:.35rem .5rem;text-align:right;">39</td><td style="padding:.35rem .5rem;text-align:center;color:#a06000;">🟡</td><td style="padding:.35rem .5rem;text-align:right;color:#c00;font-weight:bold;">1</td><td style="padding:.35rem .5rem;text-align:right;font-family:monospace;">235M</td></tr>
+                <tr style="border-bottom:1px solid #eee;background:#fffbf0;"><td style="padding:.35rem .5rem;color:#999;">24</td><td style="padding:.35rem .5rem;font-family:monospace;">safe-buffer</td><td style="padding:.35rem .5rem;text-align:right;">45</td><td style="padding:.35rem .5rem;text-align:center;color:#a06000;">🟡</td><td style="padding:.35rem .5rem;text-align:right;">2</td><td style="padding:.35rem .5rem;text-align:right;font-family:monospace;">232M</td></tr>
+                <tr style="border-bottom:1px solid #eee;background:#fffbf0;"><td style="padding:.35rem .5rem;color:#999;">25</td><td style="padding:.35rem .5rem;font-family:monospace;">signal-exit</td><td style="padding:.35rem .5rem;text-align:right;">49</td><td style="padding:.35rem .5rem;text-align:center;color:#a06000;">🟡</td><td style="padding:.35rem .5rem;text-align:right;">2</td><td style="padding:.35rem .5rem;text-align:right;font-family:monospace;">226M</td></tr>
+                <tr style="border-bottom:1px solid #eee;background:#fffbf0;"><td style="padding:.35rem .5rem;color:#999;">26</td><td style="padding:.35rem .5rem;font-family:monospace;">readable-stream</td><td style="padding:.35rem .5rem;text-align:right;">84</td><td style="padding:.35rem .5rem;text-align:center;color:#a06000;">🟡</td><td style="padding:.35rem .5rem;text-align:right;">3</td><td style="padding:.35rem .5rem;text-align:right;font-family:monospace;">225M</td></tr>
+                <tr style="border-bottom:1px solid #eee;"><td style="padding:.35rem .5rem;color:#999;">27</td><td style="padding:.35rem .5rem;font-family:monospace;">ajv</td><td style="padding:.35rem .5rem;text-align:right;">89</td><td style="padding:.35rem .5rem;text-align:center;color:#3c7d3c;">✅</td><td style="padding:.35rem .5rem;text-align:right;">2</td><td style="padding:.35rem .5rem;text-align:right;font-family:monospace;">224M</td></tr>
+                <tr style="border-bottom:1px solid #eee;"><td style="padding:.35rem .5rem;color:#999;">28</td><td style="padding:.35rem .5rem;font-family:monospace;">postcss</td><td style="padding:.35rem .5rem;text-align:right;">63</td><td style="padding:.35rem .5rem;text-align:center;color:#3c7d3c;">✅</td><td style="padding:.35rem .5rem;text-align:right;color:#c00;font-weight:bold;">1</td><td style="padding:.35rem .5rem;text-align:right;font-family:monospace;">214M</td></tr>
+                <tr style="border-bottom:1px solid #eee;"><td style="padding:.35rem .5rem;color:#999;">29</td><td style="padding:.35rem .5rem;font-family:monospace;">uuid</td><td style="padding:.35rem .5rem;text-align:right;">85</td><td style="padding:.35rem .5rem;text-align:center;color:#3c7d3c;">✅</td><td style="padding:.35rem .5rem;text-align:right;">2</td><td style="padding:.35rem .5rem;text-align:right;font-family:monospace;">201M</td></tr>
+                <tr style="border-bottom:1px solid #eee;"><td style="padding:.35rem .5rem;color:#999;">30</td><td style="padding:.35rem .5rem;font-family:monospace;">isexe</td><td style="padding:.35rem .5rem;text-align:right;">47</td><td style="padding:.35rem .5rem;text-align:center;color:#3c7d3c;">✅</td><td style="padding:.35rem .5rem;text-align:right;color:#c00;font-weight:bold;">1</td><td style="padding:.35rem .5rem;text-align:right;font-family:monospace;">200M</td></tr>
+                <tr style="border-bottom:1px solid #eee;"><td style="padding:.35rem .5rem;color:#999;">31</td><td style="padding:.35rem .5rem;font-family:monospace;">mime-types</td><td style="padding:.35rem .5rem;text-align:right;">64</td><td style="padding:.35rem .5rem;text-align:center;color:#3c7d3c;">✅</td><td style="padding:.35rem .5rem;text-align:right;">5</td><td style="padding:.35rem .5rem;text-align:right;font-family:monospace;">187M</td></tr>
+                <tr style="border-bottom:1px solid #eee;background:#fffbf0;"><td style="padding:.35rem .5rem;color:#999;">32</td><td style="padding:.35rem .5rem;font-family:monospace;">cross-spawn</td><td style="padding:.35rem .5rem;text-align:right;">50</td><td style="padding:.35rem .5rem;text-align:center;color:#a06000;">🟡</td><td style="padding:.35rem .5rem;text-align:right;color:#c00;font-weight:bold;">1</td><td style="padding:.35rem .5rem;text-align:right;font-family:monospace;">182M</td></tr>
+                <tr style="border-bottom:1px solid #eee;background:#fff5f5;"><td style="padding:.35rem .5rem;color:#999;">33</td><td style="padding:.35rem .5rem;font-family:monospace;font-weight:bold;">esbuild</td><td style="padding:.35rem .5rem;text-align:right;">88</td><td style="padding:.35rem .5rem;text-align:center;color:#c00;">🔴</td><td style="padding:.35rem .5rem;text-align:right;color:#c00;font-weight:bold;">1</td><td style="padding:.35rem .5rem;text-align:right;font-family:monospace;">171M</td></tr>
+                <tr style="border-bottom:1px solid #eee;background:#fffbf0;"><td style="padding:.35rem .5rem;color:#999;">34</td><td style="padding:.35rem .5rem;font-family:monospace;">cliui</td><td style="padding:.35rem .5rem;text-align:right;">51</td><td style="padding:.35rem .5rem;text-align:center;color:#a06000;">🟡</td><td style="padding:.35rem .5rem;text-align:right;">2</td><td style="padding:.35rem .5rem;text-align:right;font-family:monospace;">167M</td></tr>
+                <tr style="border-bottom:1px solid #eee;"><td style="padding:.35rem .5rem;color:#999;">35</td><td style="padding:.35rem .5rem;font-family:monospace;">ws</td><td style="padding:.35rem .5rem;text-align:right;">90</td><td style="padding:.35rem .5rem;text-align:center;color:#3c7d3c;">✅</td><td style="padding:.35rem .5rem;text-align:right;">4</td><td style="padding:.35rem .5rem;text-align:right;font-family:monospace;">162M</td></tr>
+                <tr style="border-bottom:1px solid #eee;"><td style="padding:.35rem .5rem;color:#999;">36</td><td style="padding:.35rem .5rem;font-family:monospace;">path-to-regexp</td><td style="padding:.35rem .5rem;text-align:right;">70</td><td style="padding:.35rem .5rem;text-align:center;color:#3c7d3c;">✅</td><td style="padding:.35rem .5rem;text-align:right;">6</td><td style="padding:.35rem .5rem;text-align:right;font-family:monospace;">157M</td></tr>
+                <tr style="border-bottom:1px solid #eee;"><td style="padding:.35rem .5rem;color:#999;">37</td><td style="padding:.35rem .5rem;font-family:monospace;">typescript</td><td style="padding:.35rem .5rem;text-align:right;">98</td><td style="padding:.35rem .5rem;text-align:center;color:#3c7d3c;">✅</td><td style="padding:.35rem .5rem;text-align:right;">6</td><td style="padding:.35rem .5rem;text-align:right;font-family:monospace;">154M</td></tr>
+                <tr style="border-bottom:1px solid #eee;background:#fffbf0;"><td style="padding:.35rem .5rem;color:#999;">38</td><td style="padding:.35rem .5rem;font-family:monospace;">inherits</td><td style="padding:.35rem .5rem;text-align:right;">42</td><td style="padding:.35rem .5rem;text-align:center;color:#a06000;">🟡</td><td style="padding:.35rem .5rem;text-align:right;color:#c00;font-weight:bold;">1</td><td style="padding:.35rem .5rem;text-align:right;font-family:monospace;">152M</td></tr>
+                <tr style="border-bottom:1px solid #eee;"><td style="padding:.35rem .5rem;color:#999;">39</td><td style="padding:.35rem .5rem;font-family:monospace;">qs</td><td style="padding:.35rem .5rem;text-align:right;">61</td><td style="padding:.35rem .5rem;text-align:center;color:#3c7d3c;">✅</td><td style="padding:.35rem .5rem;text-align:right;">2</td><td style="padding:.35rem .5rem;text-align:right;font-family:monospace;">149M</td></tr>
+                <tr style="border-bottom:1px solid #eee;background:#fffbf0;"><td style="padding:.35rem .5rem;color:#999;">40</td><td style="padding:.35rem .5rem;font-family:monospace;">braces</td><td style="padding:.35rem .5rem;text-align:right;">52</td><td style="padding:.35rem .5rem;text-align:center;color:#a06000;">🟡</td><td style="padding:.35rem .5rem;text-align:right;">2</td><td style="padding:.35rem .5rem;text-align:right;font-family:monospace;">147M</td></tr>
+                <tr style="border-bottom:1px solid #eee;background:#fffbf0;"><td style="padding:.35rem .5rem;color:#999;">41</td><td style="padding:.35rem .5rem;font-family:monospace;">fill-range</td><td style="padding:.35rem .5rem;text-align:right;">56</td><td style="padding:.35rem .5rem;text-align:center;color:#a06000;">🟡</td><td style="padding:.35rem .5rem;text-align:right;">4</td><td style="padding:.35rem .5rem;text-align:right;font-family:monospace;">146M</td></tr>
+                <tr style="border-bottom:1px solid #eee;"><td style="padding:.35rem .5rem;color:#999;">42</td><td style="padding:.35rem .5rem;font-family:monospace;">yargs</td><td style="padding:.35rem .5rem;text-align:right;">81</td><td style="padding:.35rem .5rem;text-align:center;color:#3c7d3c;">✅</td><td style="padding:.35rem .5rem;text-align:right;">2</td><td style="padding:.35rem .5rem;text-align:right;font-family:monospace;">145M</td></tr>
+                <tr style="border-bottom:1px solid #eee;"><td style="padding:.35rem .5rem;color:#999;">43</td><td style="padding:.35rem .5rem;font-family:monospace;">cookie</td><td style="padding:.35rem .5rem;text-align:right;">60</td><td style="padding:.35rem .5rem;text-align:center;color:#3c7d3c;">✅</td><td style="padding:.35rem .5rem;text-align:right;">3</td><td style="padding:.35rem .5rem;text-align:right;font-family:monospace;">141M</td></tr>
+                <tr style="border-bottom:1px solid #eee;background:#fffbf0;"><td style="padding:.35rem .5rem;color:#999;">44</td><td style="padding:.35rem .5rem;font-family:monospace;">to-regex-range</td><td style="padding:.35rem .5rem;text-align:right;">48</td><td style="padding:.35rem .5rem;text-align:center;color:#a06000;">🟡</td><td style="padding:.35rem .5rem;text-align:right;">2</td><td style="padding:.35rem .5rem;text-align:right;font-family:monospace;">139M</td></tr>
+                <tr style="border-bottom:1px solid #eee;background:#fff5f5;"><td style="padding:.35rem .5rem;color:#999;">45</td><td style="padding:.35rem .5rem;font-family:monospace;font-weight:bold;">chokidar</td><td style="padding:.35rem .5rem;text-align:right;">81</td><td style="padding:.35rem .5rem;text-align:center;color:#c00;">🔴</td><td style="padding:.35rem .5rem;text-align:right;color:#c00;font-weight:bold;">1</td><td style="padding:.35rem .5rem;text-align:right;font-family:monospace;">134M</td></tr>
+                <tr style="border-bottom:1px solid #eee;background:#fff5f5;"><td style="padding:.35rem .5rem;color:#999;">46</td><td style="padding:.35rem .5rem;font-family:monospace;font-weight:bold;">zod</td><td style="padding:.35rem .5rem;text-align:right;">83</td><td style="padding:.35rem .5rem;text-align:center;color:#c00;">🔴</td><td style="padding:.35rem .5rem;text-align:right;color:#c00;font-weight:bold;">1</td><td style="padding:.35rem .5rem;text-align:right;font-family:monospace;">134M</td></tr>
+                <tr style="border-bottom:1px solid #eee;background:#fff5f5;"><td style="padding:.35rem .5rem;color:#999;">47</td><td style="padding:.35rem .5rem;font-family:monospace;font-weight:bold;">caniuse-lite</td><td style="padding:.35rem .5rem;text-align:right;">84</td><td style="padding:.35rem .5rem;text-align:center;color:#c00;">🔴</td><td style="padding:.35rem .5rem;text-align:right;color:#c00;font-weight:bold;">1</td><td style="padding:.35rem .5rem;text-align:right;font-family:monospace;">132M</td></tr>
+                <tr style="border-bottom:1px solid #eee;background:#fffbf0;"><td style="padding:.35rem .5rem;color:#999;">48</td><td style="padding:.35rem .5rem;font-family:monospace;">concat-map</td><td style="padding:.35rem .5rem;text-align:right;">39</td><td style="padding:.35rem .5rem;text-align:center;color:#a06000;">🟡</td><td style="padding:.35rem .5rem;text-align:right;color:#c00;font-weight:bold;">1</td><td style="padding:.35rem .5rem;text-align:right;font-family:monospace;">123M</td></tr>
+                <tr style="border-bottom:1px solid #eee;background:#fff5f5;"><td style="padding:.35rem .5rem;color:#999;">49</td><td style="padding:.35rem .5rem;font-family:monospace;font-weight:bold;">fast-deep-equal</td><td style="padding:.35rem .5rem;text-align:right;">68</td><td style="padding:.35rem .5rem;text-align:center;color:#c00;">🔴</td><td style="padding:.35rem .5rem;text-align:right;color:#c00;font-weight:bold;">1</td><td style="padding:.35rem .5rem;text-align:right;font-family:monospace;">122M</td></tr>
+                <tr style="border-bottom:1px solid #eee;background:#fff5f5;"><td style="padding:.35rem .5rem;color:#999;">50</td><td style="padding:.35rem .5rem;font-family:monospace;font-weight:bold;">lodash</td><td style="padding:.35rem .5rem;text-align:right;">87</td><td style="padding:.35rem .5rem;text-align:center;color:#c00;">🔴</td><td style="padding:.35rem .5rem;text-align:right;color:#c00;font-weight:bold;">1</td><td style="padding:.35rem .5rem;text-align:right;font-family:monospace;">122M</td></tr>
+                <tr style="border-bottom:1px solid #eee;background:#fffbf0;"><td style="padding:.35rem .5rem;color:#999;">51</td><td style="padding:.35rem .5rem;font-family:monospace;">micromatch</td><td style="padding:.35rem .5rem;text-align:right;">84</td><td style="padding:.35rem .5rem;text-align:center;color:#a06000;">🟡</td><td style="padding:.35rem .5rem;text-align:right;">3</td><td style="padding:.35rem .5rem;text-align:right;font-family:monospace;">120M</td></tr>
+                <tr style="border-bottom:1px solid #eee;"><td style="padding:.35rem .5rem;color:#999;">52</td><td style="padding:.35rem .5rem;font-family:monospace;">once</td><td style="padding:.35rem .5rem;text-align:right;">46</td><td style="padding:.35rem .5rem;text-align:center;color:#3c7d3c;">✅</td><td style="padding:.35rem .5rem;text-align:right;color:#c00;font-weight:bold;">1</td><td style="padding:.35rem .5rem;text-align:right;font-family:monospace;">111M</td></tr>
+                <tr style="border-bottom:1px solid #eee;"><td style="padding:.35rem .5rem;color:#999;">53</td><td style="padding:.35rem .5rem;font-family:monospace;">react</td><td style="padding:.35rem .5rem;text-align:right;">91</td><td style="padding:.35rem .5rem;text-align:center;color:#3c7d3c;">✅</td><td style="padding:.35rem .5rem;text-align:right;">2</td><td style="padding:.35rem .5rem;text-align:right;font-family:monospace;">109M</td></tr>
+                <tr style="border-bottom:1px solid #eee;"><td style="padding:.35rem .5rem;color:#999;">54</td><td style="padding:.35rem .5rem;font-family:monospace;">eslint</td><td style="padding:.35rem .5rem;text-align:right;">91</td><td style="padding:.35rem .5rem;text-align:center;color:#3c7d3c;">✅</td><td style="padding:.35rem .5rem;text-align:right;">2</td><td style="padding:.35rem .5rem;text-align:right;font-family:monospace;">108M</td></tr>
+                <tr style="border-bottom:1px solid #eee;"><td style="padding:.35rem .5rem;color:#999;">55</td><td style="padding:.35rem .5rem;font-family:monospace;">@babel/core</td><td style="padding:.35rem .5rem;text-align:right;">93</td><td style="padding:.35rem .5rem;text-align:center;color:#3c7d3c;">✅</td><td style="padding:.35rem .5rem;text-align:right;">4</td><td style="padding:.35rem .5rem;text-align:right;font-family:monospace;">108M</td></tr>
+                <tr style="border-bottom:1px solid #eee;background:#fffbf0;"><td style="padding:.35rem .5rem;color:#999;">56</td><td style="padding:.35rem .5rem;font-family:monospace;">wrappy</td><td style="padding:.35rem .5rem;text-align:right;">39</td><td style="padding:.35rem .5rem;text-align:center;color:#a06000;">🟡</td><td style="padding:.35rem .5rem;text-align:right;color:#c00;font-weight:bold;">1</td><td style="padding:.35rem .5rem;text-align:right;font-family:monospace;">107M</td></tr>
+                <tr style="border-bottom:1px solid #eee;"><td style="padding:.35rem .5rem;color:#999;">57</td><td style="padding:.35rem .5rem;font-family:monospace;">react-dom</td><td style="padding:.35rem .5rem;text-align:right;">91</td><td style="padding:.35rem .5rem;text-align:center;color:#3c7d3c;">✅</td><td style="padding:.35rem .5rem;text-align:right;">2</td><td style="padding:.35rem .5rem;text-align:right;font-family:monospace;">103M</td></tr>
+                <tr style="border-bottom:1px solid #eee;"><td style="padding:.35rem .5rem;color:#999;">58</td><td style="padding:.35rem .5rem;font-family:monospace;">dotenv</td><td style="padding:.35rem .5rem;text-align:right;">94</td><td style="padding:.35rem .5rem;text-align:center;color:#3c7d3c;">✅</td><td style="padding:.35rem .5rem;text-align:right;">3</td><td style="padding:.35rem .5rem;text-align:right;font-family:monospace;">100M</td></tr>
+                <tr style="border-bottom:1px solid #eee;"><td style="padding:.35rem .5rem;color:#999;">59</td><td style="padding:.35rem .5rem;font-family:monospace;">tailwindcss</td><td style="padding:.35rem .5rem;text-align:right;">70</td><td style="padding:.35rem .5rem;text-align:center;color:#3c7d3c;">✅</td><td style="padding:.35rem .5rem;text-align:right;">3</td><td style="padding:.35rem .5rem;text-align:right;font-family:monospace;">98M</td></tr>
+                <tr style="border-bottom:1px solid #eee;"><td style="padding:.35rem .5rem;color:#999;">60</td><td style="padding:.35rem .5rem;font-family:monospace;">body-parser</td><td style="padding:.35rem .5rem;text-align:right;">60</td><td style="padding:.35rem .5rem;text-align:center;color:#3c7d3c;">✅</td><td style="padding:.35rem .5rem;text-align:right;">3</td><td style="padding:.35rem .5rem;text-align:right;font-family:monospace;">96M</td></tr>
+                <tr style="border-bottom:1px solid #eee;"><td style="padding:.35rem .5rem;color:#999;">61</td><td style="padding:.35rem .5rem;font-family:monospace;">vite</td><td style="padding:.35rem .5rem;text-align:right;">96</td><td style="padding:.35rem .5rem;text-align:center;color:#3c7d3c;">✅</td><td style="padding:.35rem .5rem;text-align:right;">4</td><td style="padding:.35rem .5rem;text-align:right;font-family:monospace;">92M</td></tr>
+                <tr style="border-bottom:1px solid #eee;"><td style="padding:.35rem .5rem;color:#999;">62</td><td style="padding:.35rem .5rem;font-family:monospace;">prettier</td><td style="padding:.35rem .5rem;text-align:right;">75</td><td style="padding:.35rem .5rem;text-align:center;color:#3c7d3c;">✅</td><td style="padding:.35rem .5rem;text-align:right;">11</td><td style="padding:.35rem .5rem;text-align:right;font-family:monospace;">91M</td></tr>
+                <tr style="border-bottom:1px solid #eee;"><td style="padding:.35rem .5rem;color:#999;">63</td><td style="padding:.35rem .5rem;font-family:monospace;">rollup</td><td style="padding:.35rem .5rem;text-align:right;">99</td><td style="padding:.35rem .5rem;text-align:center;color:#3c7d3c;">✅</td><td style="padding:.35rem .5rem;text-align:right;">5</td><td style="padding:.35rem .5rem;text-align:right;font-family:monospace;">90M</td></tr>
+                <tr style="border-bottom:1px solid #eee;background:#fff5f5;"><td style="padding:.35rem .5rem;color:#999;">64</td><td style="padding:.35rem .5rem;font-family:monospace;font-weight:bold;">axios</td><td style="padding:.35rem .5rem;text-align:right;">86</td><td style="padding:.35rem .5rem;text-align:center;color:#c00;">🔴</td><td style="padding:.35rem .5rem;text-align:right;color:#c00;font-weight:bold;">1</td><td style="padding:.35rem .5rem;text-align:right;font-family:monospace;">82M</td></tr>
+                <tr style="border-bottom:1px solid #eee;"><td style="padding:.35rem .5rem;color:#999;">65</td><td style="padding:.35rem .5rem;font-family:monospace;">express</td><td style="padding:.35rem .5rem;text-align:right;">97</td><td style="padding:.35rem .5rem;text-align:center;color:#3c7d3c;">✅</td><td style="padding:.35rem .5rem;text-align:right;">5</td><td style="padding:.35rem .5rem;text-align:right;font-family:monospace;">77M</td></tr>
+                <tr style="border-bottom:1px solid #eee;"><td style="padding:.35rem .5rem;color:#999;">66</td><td style="padding:.35rem .5rem;font-family:monospace;">undici</td><td style="padding:.35rem .5rem;text-align:right;">96</td><td style="padding:.35rem .5rem;text-align:center;color:#3c7d3c;">✅</td><td style="padding:.35rem .5rem;text-align:right;">3</td><td style="padding:.35rem .5rem;text-align:right;font-family:monospace;">75M</td></tr>
+                <tr style="border-bottom:1px solid #eee;"><td style="padding:.35rem .5rem;color:#999;">67</td><td style="padding:.35rem .5rem;font-family:monospace;">pnpm</td><td style="padding:.35rem .5rem;text-align:right;">66</td><td style="padding:.35rem .5rem;text-align:center;color:#3c7d3c;">✅</td><td style="padding:.35rem .5rem;text-align:right;">2</td><td style="padding:.35rem .5rem;text-align:right;font-family:monospace;">73M</td></tr>
+                <tr style="border-bottom:1px solid #eee;"><td style="padding:.35rem .5rem;color:#999;">68</td><td style="padding:.35rem .5rem;font-family:monospace;">sharp</td><td style="padding:.35rem .5rem;text-align:right;">59</td><td style="padding:.35rem .5rem;text-align:center;color:#3c7d3c;">✅</td><td style="padding:.35rem .5rem;text-align:right;color:#c00;font-weight:bold;">1</td><td style="padding:.35rem .5rem;text-align:right;font-family:monospace;">59M</td></tr>
+                <tr style="border-bottom:1px solid #eee;"><td style="padding:.35rem .5rem;color:#999;">69</td><td style="padding:.35rem .5rem;font-family:monospace;">vitest</td><td style="padding:.35rem .5rem;text-align:right;">68</td><td style="padding:.35rem .5rem;text-align:center;color:#3c7d3c;">✅</td><td style="padding:.35rem .5rem;text-align:right;">5</td><td style="padding:.35rem .5rem;text-align:right;font-family:monospace;">51M</td></tr>
+                <tr style="border-bottom:1px solid #eee;"><td style="padding:.35rem .5rem;color:#999;">70</td><td style="padding:.35rem .5rem;font-family:monospace;">cors</td><td style="padding:.35rem .5rem;text-align:right;">60</td><td style="padding:.35rem .5rem;text-align:center;color:#3c7d3c;">✅</td><td style="padding:.35rem .5rem;text-align:right;">3</td><td style="padding:.35rem .5rem;text-align:right;font-family:monospace;">50M</td></tr>
+                <tr style="border-bottom:1px solid #eee;"><td style="padding:.35rem .5rem;color:#999;">71</td><td style="padding:.35rem .5rem;font-family:monospace;">webpack</td><td style="padding:.35rem .5rem;text-align:right;">75</td><td style="padding:.35rem .5rem;text-align:center;color:#3c7d3c;">✅</td><td style="padding:.35rem .5rem;text-align:right;">8</td><td style="padding:.35rem .5rem;text-align:right;font-family:monospace;">45M</td></tr>
+                <tr style="border-bottom:1px solid #eee;"><td style="padding:.35rem .5rem;color:#999;">72</td><td style="padding:.35rem .5rem;font-family:monospace;">tsx</td><td style="padding:.35rem .5rem;text-align:right;">55</td><td style="padding:.35rem .5rem;text-align:center;color:#3c7d3c;">✅</td><td style="padding:.35rem .5rem;text-align:right;color:#c00;font-weight:bold;">1</td><td style="padding:.35rem .5rem;text-align:right;font-family:monospace;">44M</td></tr>
+                <tr style="border-bottom:1px solid #eee;"><td style="padding:.35rem .5rem;color:#999;">73</td><td style="padding:.35rem .5rem;font-family:monospace;">@swc/core</td><td style="padding:.35rem .5rem;text-align:right;">64</td><td style="padding:.35rem .5rem;text-align:center;color:#3c7d3c;">✅</td><td style="padding:.35rem .5rem;text-align:right;color:#c00;font-weight:bold;">1</td><td style="padding:.35rem .5rem;text-align:right;font-family:monospace;">43M</td></tr>
+                <tr style="border-bottom:1px solid #eee;"><td style="padding:.35rem .5rem;color:#999;">74</td><td style="padding:.35rem .5rem;font-family:monospace;">jest</td><td style="padding:.35rem .5rem;text-align:right;">70</td><td style="padding:.35rem .5rem;text-align:center;color:#3c7d3c;">✅</td><td style="padding:.35rem .5rem;text-align:right;">5</td><td style="padding:.35rem .5rem;text-align:right;font-family:monospace;">43M</td></tr>
+                <tr style="border-bottom:1px solid #eee;"><td style="padding:.35rem .5rem;color:#999;">75</td><td style="padding:.35rem .5rem;font-family:monospace;">@babel/preset-env</td><td style="padding:.35rem .5rem;text-align:right;">68</td><td style="padding:.35rem .5rem;text-align:center;color:#3c7d3c;">✅</td><td style="padding:.35rem .5rem;text-align:right;">4</td><td style="padding:.35rem .5rem;text-align:right;font-family:monospace;">38M</td></tr>
+                <tr style="border-bottom:1px solid #eee;"><td style="padding:.35rem .5rem;color:#999;">76</td><td style="padding:.35rem .5rem;font-family:monospace;">@types/jest</td><td style="padding:.35rem .5rem;text-align:right;">59</td><td style="padding:.35rem .5rem;text-align:center;color:#3c7d3c;">✅</td><td style="padding:.35rem .5rem;text-align:right;color:#c00;font-weight:bold;">1</td><td style="padding:.35rem .5rem;text-align:right;font-family:monospace;">37M</td></tr>
+                <tr style="border-bottom:1px solid #eee;"><td style="padding:.35rem .5rem;color:#999;">77</td><td style="padding:.35rem .5rem;font-family:monospace;">@testing-library/react</td><td style="padding:.35rem .5rem;text-align:right;">68</td><td style="padding:.35rem .5rem;text-align:center;color:#3c7d3c;">✅</td><td style="padding:.35rem .5rem;text-align:right;">17</td><td style="padding:.35rem .5rem;text-align:right;font-family:monospace;">37M</td></tr>
+                <tr style="border-bottom:1px solid #eee;"><td style="padding:.35rem .5rem;color:#999;">78</td><td style="padding:.35rem .5rem;font-family:monospace;">next</td><td style="padding:.35rem .5rem;text-align:right;">70</td><td style="padding:.35rem .5rem;text-align:center;color:#3c7d3c;">✅</td><td style="padding:.35rem .5rem;text-align:right;">3</td><td style="padding:.35rem .5rem;text-align:right;font-family:monospace;">36M</td></tr>
+                <tr style="border-bottom:1px solid #eee;"><td style="padding:.35rem .5rem;color:#999;">79</td><td style="padding:.35rem .5rem;font-family:monospace;">ts-node</td><td style="padding:.35rem .5rem;text-align:right;">81</td><td style="padding:.35rem .5rem;text-align:center;color:#3c7d3c;">✅</td><td style="padding:.35rem .5rem;text-align:right;">2</td><td style="padding:.35rem .5rem;text-align:right;font-family:monospace;">35M</td></tr>
+                <tr style="border-bottom:1px solid #eee;"><td style="padding:.35rem .5rem;color:#999;">80</td><td style="padding:.35rem .5rem;font-family:monospace;">hono</td><td style="padding:.35rem .5rem;text-align:right;">57</td><td style="padding:.35rem .5rem;text-align:center;color:#3c7d3c;">✅</td><td style="padding:.35rem .5rem;text-align:right;color:#c00;font-weight:bold;">1</td><td style="padding:.35rem .5rem;text-align:right;font-family:monospace;">35M</td></tr>
+                <tr style="border-bottom:1px solid #eee;"><td style="padding:.35rem .5rem;color:#999;">81</td><td style="padding:.35rem .5rem;font-family:monospace;">jsonwebtoken</td><td style="padding:.35rem .5rem;text-align:right;">87</td><td style="padding:.35rem .5rem;text-align:center;color:#3c7d3c;">✅</td><td style="padding:.35rem .5rem;text-align:right;">3</td><td style="padding:.35rem .5rem;text-align:right;font-family:monospace;">33M</td></tr>
+                <tr style="border-bottom:1px solid #eee;"><td style="padding:.35rem .5rem;color:#999;">82</td><td style="padding:.35rem .5rem;font-family:monospace;">pino</td><td style="padding:.35rem .5rem;text-align:right;">68</td><td style="padding:.35rem .5rem;text-align:center;color:#3c7d3c;">✅</td><td style="padding:.35rem .5rem;text-align:right;">4</td><td style="padding:.35rem .5rem;text-align:right;font-family:monospace;">28M</td></tr>
+                <tr style="border-bottom:1px solid #eee;"><td style="padding:.35rem .5rem;color:#999;">83</td><td style="padding:.35rem .5rem;font-family:monospace;">pg</td><td style="padding:.35rem .5rem;text-align:right;">57</td><td style="padding:.35rem .5rem;text-align:center;color:#3c7d3c;">✅</td><td style="padding:.35rem .5rem;text-align:right;color:#c00;font-weight:bold;">1</td><td style="padding:.35rem .5rem;text-align:right;font-family:monospace;">24M</td></tr>
+                <tr style="border-bottom:1px solid #eee;"><td style="padding:.35rem .5rem;color:#999;">84</td><td style="padding:.35rem .5rem;font-family:monospace;">winston</td><td style="padding:.35rem .5rem;text-align:right;">67</td><td style="padding:.35rem .5rem;text-align:center;color:#3c7d3c;">✅</td><td style="padding:.35rem .5rem;text-align:right;">8</td><td style="padding:.35rem .5rem;text-align:right;font-family:monospace;">22M</td></tr>
+                <tr style="border-bottom:1px solid #eee;"><td style="padding:.35rem .5rem;color:#999;">85</td><td style="padding:.35rem .5rem;font-family:monospace;">lint-staged</td><td style="padding:.35rem .5rem;text-align:right;">64</td><td style="padding:.35rem .5rem;text-align:center;color:#3c7d3c;">✅</td><td style="padding:.35rem .5rem;text-align:right;">2</td><td style="padding:.35rem .5rem;text-align:right;font-family:monospace;">21M</td></tr>
+                <tr style="border-bottom:1px solid #eee;background:#fff5f5;"><td style="padding:.35rem .5rem;color:#999;">86</td><td style="padding:.35rem .5rem;font-family:monospace;font-weight:bold;">husky</td><td style="padding:.35rem .5rem;text-align:right;">77</td><td style="padding:.35rem .5rem;text-align:center;color:#c00;">🔴</td><td style="padding:.35rem .5rem;text-align:right;color:#c00;font-weight:bold;">1</td><td style="padding:.35rem .5rem;text-align:right;font-family:monospace;">21M</td></tr>
+                <tr style="border-bottom:1px solid #eee;"><td style="padding:.35rem .5rem;color:#999;">87</td><td style="padding:.35rem .5rem;font-family:monospace;">ioredis</td><td style="padding:.35rem .5rem;text-align:right;">63</td><td style="padding:.35rem .5rem;text-align:center;color:#3c7d3c;">✅</td><td style="padding:.35rem .5rem;text-align:right;">2</td><td style="padding:.35rem .5rem;text-align:right;font-family:monospace;">17M</td></tr>
+                <tr style="border-bottom:1px solid #eee;"><td style="padding:.35rem .5rem;color:#999;">88</td><td style="padding:.35rem .5rem;font-family:monospace;">msw</td><td style="padding:.35rem .5rem;text-align:right;">63</td><td style="padding:.35rem .5rem;text-align:center;color:#3c7d3c;">✅</td><td style="padding:.35rem .5rem;text-align:right;color:#c00;font-weight:bold;">1</td><td style="padding:.35rem .5rem;text-align:right;font-family:monospace;">15M</td></tr>
+                <tr style="border-bottom:1px solid #eee;background:#fff5f5;"><td style="padding:.35rem .5rem;color:#999;">89</td><td style="padding:.35rem .5rem;font-family:monospace;font-weight:bold;">cross-env</td><td style="padding:.35rem .5rem;text-align:right;">73</td><td style="padding:.35rem .5rem;text-align:center;color:#c00;">🔴</td><td style="padding:.35rem .5rem;text-align:right;color:#c00;font-weight:bold;">1</td><td style="padding:.35rem .5rem;text-align:right;font-family:monospace;">14M</td></tr>
+                <tr style="border-bottom:1px solid #eee;"><td style="padding:.35rem .5rem;color:#999;">90</td><td style="padding:.35rem .5rem;font-family:monospace;">turbo</td><td style="padding:.35rem .5rem;text-align:right;">64</td><td style="padding:.35rem .5rem;text-align:center;color:#3c7d3c;">✅</td><td style="padding:.35rem .5rem;text-align:right;">2</td><td style="padding:.35rem .5rem;text-align:right;font-family:monospace;">13M</td></tr>
+                <tr style="border-bottom:1px solid #eee;"><td style="padding:.35rem .5rem;color:#999;">91</td><td style="padding:.35rem .5rem;font-family:monospace;">nodemon</td><td style="padding:.35rem .5rem;text-align:right;">61</td><td style="padding:.35rem .5rem;text-align:center;color:#3c7d3c;">✅</td><td style="padding:.35rem .5rem;text-align:right;color:#c00;font-weight:bold;">1</td><td style="padding:.35rem .5rem;text-align:right;font-family:monospace;">12M</td></tr>
+                <tr style="border-bottom:1px solid #eee;"><td style="padding:.35rem .5rem;color:#999;">92</td><td style="padding:.35rem .5rem;font-family:monospace;">socket.io</td><td style="padding:.35rem .5rem;text-align:right;">87</td><td style="padding:.35rem .5rem;text-align:center;color:#3c7d3c;">✅</td><td style="padding:.35rem .5rem;text-align:right;">2</td><td style="padding:.35rem .5rem;text-align:right;font-family:monospace;">10M</td></tr>
+                <tr style="border-bottom:1px solid #eee;"><td style="padding:.35rem .5rem;color:#999;">93</td><td style="padding:.35rem .5rem;font-family:monospace;">prisma</td><td style="padding:.35rem .5rem;text-align:right;">66</td><td style="padding:.35rem .5rem;text-align:center;color:#3c7d3c;">✅</td><td style="padding:.35rem .5rem;text-align:right;">2</td><td style="padding:.35rem .5rem;text-align:right;font-family:monospace;">10M</td></tr>
+                <tr style="border-bottom:1px solid #eee;"><td style="padding:.35rem .5rem;color:#999;">94</td><td style="padding:.35rem .5rem;font-family:monospace;">redis</td><td style="padding:.35rem .5rem;text-align:right;">74</td><td style="padding:.35rem .5rem;text-align:center;color:#3c7d3c;">✅</td><td style="padding:.35rem .5rem;text-align:right;">5</td><td style="padding:.35rem .5rem;text-align:right;font-family:monospace;">9M</td></tr>
+                <tr style="border-bottom:1px solid #eee;"><td style="padding:.35rem .5rem;color:#999;">95</td><td style="padding:.35rem .5rem;font-family:monospace;">drizzle-orm</td><td style="padding:.35rem .5rem;text-align:right;">62</td><td style="padding:.35rem .5rem;text-align:center;color:#3c7d3c;">✅</td><td style="padding:.35rem .5rem;text-align:right;">4</td><td style="padding:.35rem .5rem;text-align:right;font-family:monospace;">8M</td></tr>
+                <tr style="border-bottom:1px solid #eee;"><td style="padding:.35rem .5rem;color:#999;">96</td><td style="padding:.35rem .5rem;font-family:monospace;">fastify</td><td style="padding:.35rem .5rem;text-align:right;">60</td><td style="padding:.35rem .5rem;text-align:center;color:#3c7d3c;">✅</td><td style="padding:.35rem .5rem;text-align:right;">5</td><td style="padding:.35rem .5rem;text-align:right;font-family:monospace;">7M</td></tr>
+                <tr style="border-bottom:1px solid #eee;"><td style="padding:.35rem .5rem;color:#999;">97</td><td style="padding:.35rem .5rem;font-family:monospace;">kysely</td><td style="padding:.35rem .5rem;text-align:right;">61</td><td style="padding:.35rem .5rem;text-align:center;color:#3c7d3c;">✅</td><td style="padding:.35rem .5rem;text-align:right;">2</td><td style="padding:.35rem .5rem;text-align:right;font-family:monospace;">4M</td></tr>
+                <tr style="border-bottom:1px solid #eee;"><td style="padding:.35rem .5rem;color:#999;">98</td><td style="padding:.35rem .5rem;font-family:monospace;">elysia</td><td style="padding:.35rem .5rem;text-align:right;">46</td><td style="padding:.35rem .5rem;text-align:center;color:#3c7d3c;">✅</td><td style="padding:.35rem .5rem;text-align:right;color:#c00;font-weight:bold;">1</td><td style="padding:.35rem .5rem;text-align:right;font-family:monospace;">474K</td></tr>
+                <tr style="border-bottom:1px solid #eee;"><td style="padding:.35rem .5rem;color:#999;">99</td><td style="padding:.35rem .5rem;font-family:monospace;">@hono/zod-validator</td><td style="padding:.35rem .5rem;text-align:right;">43</td><td style="padding:.35rem .5rem;text-align:center;color:#3c7d3c;">✅</td><td style="padding:.35rem .5rem;text-align:right;color:#c00;font-weight:bold;">1</td><td style="padding:.35rem .5rem;text-align:right;font-family:monospace;">—</td></tr>
+                <tr style="border-bottom:2px solid var(--ink);"><td style="padding:.35rem .5rem;color:#999;">100</td><td style="padding:.35rem .5rem;font-family:monospace;">bun-types</td><td style="padding:.35rem .5rem;text-align:right;">64</td><td style="padding:.35rem .5rem;text-align:center;color:#3c7d3c;">✅</td><td style="padding:.35rem .5rem;text-align:right;">3</td><td style="padding:.35rem .5rem;text-align:right;font-family:monospace;">—</td></tr>
+              </tbody>
+            </table>
+          </div>
+
+          <hr style="margin: 2rem 0; border: none; border-top: 1px solid var(--rule);" />
+
+          <h2>Methodology</h2>
+
+          <p>
+            Trust scoring uses <a href="https://getcommit.dev">Commit's behavioral scoring engine</a>:
+          </p>
+
+          <div style="overflow-x: auto; margin: 1.5rem 0;">
+            <table style="width: 100%; border-collapse: collapse; font-size: 0.875rem;">
+              <thead>
+                <tr style="border-bottom: 2px solid var(--ink);">
+                  <th style="text-align: left; padding: 0.5rem 0.75rem;">Signal</th>
+                  <th style="text-align: right; padding: 0.5rem 0.75rem;">Max</th>
+                  <th style="text-align: left; padding: 0.5rem 0.75rem;">What it measures</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr style="border-bottom: 1px solid #eee;"><td style="padding:.4rem .75rem;">Longevity</td><td style="padding:.4rem .75rem;text-align:right;">25</td><td style="padding:.4rem .75rem;">Years maintained, consistency of presence</td></tr>
+                <tr style="border-bottom: 1px solid #eee;"><td style="padding:.4rem .75rem;">Download Momentum</td><td style="padding:.4rem .75rem;text-align:right;">25</td><td style="padding:.4rem .75rem;">Recent growth or stability trends</td></tr>
+                <tr style="border-bottom: 1px solid #eee;"><td style="padding:.4rem .75rem;">Release Consistency</td><td style="padding:.4rem .75rem;text-align:right;">20</td><td style="padding:.4rem .75rem;">Cadence regularity, not just volume</td></tr>
+                <tr style="border-bottom: 1px solid #eee;"><td style="padding:.4rem .75rem;">Maintainer Depth</td><td style="padding:.4rem .75rem;text-align:right;">15</td><td style="padding:.4rem .75rem;">Number of active publishers with commit history</td></tr>
+                <tr style="border-bottom: 2px solid var(--ink);"><td style="padding:.4rem .75rem;">GitHub Backing</td><td style="padding:.4rem .75rem;text-align:right;">15</td><td style="padding:.4rem .75rem;">Stars, contributor count, organizational indicators</td></tr>
+              </tbody>
+            </table>
+          </div>
+
+          <p>
+            <strong>CRITICAL</strong> = &gt;10M weekly downloads + 1 active maintainer with npm publish access. This is the exact structural profile that the ua-parser-js compromise (2021), the colors.js sabotage (2022), and the event-stream incident (2018) all shared.<br />
+            <strong>WARN</strong> = declining trends, stalled releases, or shallow contributor base below CRITICAL threshold.<br />
+            Download data from npm registry (April 16–22, 2026).
+          </p>
+
+          <p>
+            This analysis does not replace <code>npm audit</code> — it answers a different question. <code>npm audit</code> scans known CVEs. Commit scores structural resilience: would this package survive a maintainer compromise, a token theft, or a gradual abandonment?
+          </p>
+
+          <p style="margin-top: 3rem;">
+            Audit your own project: <a href="/audit">getcommit.dev/audit</a>
+            · Run locally: <code>npx proof-of-commitment audit</code>
+            · <a href="https://github.com/piiiico/proof-of-commitment" target="_blank" rel="noopener">GitHub</a>
+            · Previous: <a href="/blog/state-of-npm-trust-april-2026">April 2026 (50 packages)</a>
+          </p>
+
+          <p class="essay-coda">
+            <em>We're building <a href="/">Commit</a> — trust infrastructure for the autonomous economy. Behavioral commitment data, not declarations.</em>
+          </p>
+          <p class="essay-coda">
+            <em>See also: <a href="/blog/hono-critical">hono Scores CRITICAL</a> · <a href="/blog/the-axios-signal">The axios Signal</a> · <a href="/blog/three-npm-disasters-that-were-predictable">Three npm Disasters That Were Predictable</a></em>
+          </p>
+
+        </div>
+      </div>
+    </div>
+  </article>
+
+  <section class="newsletter-section">
+    <div class="container">
+      <div class="editorial reveal">
+        <h2 style="margin-bottom: 0.75rem;">Stay in the loop</h2>
+        <p style="margin-bottom: 2rem; font-size: 1rem;">Early access, research updates, and the occasional strong opinion.</p>
+        <form
+          action="https://buttondown.email/api/emails/embed-subscribe/commitgraph"
+          method="post"
+          target="popupwindow"
+          class="newsletter-form"
+        >
+          <input type="email" name="email" placeholder="you@example.com" required class="newsletter-input" />
+          <button type="submit" class="btn-primary" style="white-space: nowrap;">Subscribe</button>
+        </form>
+        <p class="newsletter-note">No spam. Unsubscribe anytime.</p>
+      </div>
+    </div>
+  </section>
+
+  <footer>
+    <div class="container footer-inner">
+      <span class="footer-brand">Commit</span>
+      <ul class="footer-links">
+        <li><a href="/">Home</a></li>
+        <li><a href="/extension">Extension</a></li>
+        <li><a href="/blog">Writing</a></li>
+        <li><a href="/pricing">Pricing</a></li><li><a href="/docs">Docs</a></li>
+        <li><a href="https://github.com/piiiico/proof-of-commitment" target="_blank" rel="noopener">GitHub</a></li>
+        <li><a href="mailto:pico@amdal.dev">Contact</a></li>
+      </ul>
+      <span class="footer-locale">Stavanger, Norway</span>
+    </div>
+  </footer>
+
+</Layout>

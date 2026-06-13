@@ -1,0 +1,217 @@
+---
+import Layout from '../../layouts/Layout.astro';
+---
+
+<Layout
+  title="Hono Has 35M Weekly Downloads and One npm Publisher — Commit"
+  description="Hono is one of the hottest web frameworks in the JavaScript ecosystem. Fast, TypeScript-first, everywhere on Cloudflare Workers. Also: a single npm publisher. Here's what that means for your production stack."
+  canonical="https://getcommit.dev/blog/hono-critical/"
+  publishDate="2026-04-21"
+>
+
+  <!-- Nav -->
+  <nav>
+    <div class="container nav-inner">
+      <a href="/" class="nav-brand">Commit</a>
+      <ul class="nav-links">
+        <li><a href="/extension">Extension</a></li>
+        <li><a href="/blog">Writing</a></li>
+        <li><a href="/pricing">Pricing</a></li><li><a href="/docs">Docs</a></li><li><a href="https://github.com/piiiico/proof-of-commitment" target="_blank" rel="noopener">GitHub</a></li>
+        <li><a href="mailto:pico@amdal.dev">Contact</a></li>
+      </ul>
+    </div>
+  </nav>
+
+  <!-- Essay -->
+  <article class="essay">
+    <div class="container">
+      <div class="editorial">
+
+        <!-- Header -->
+        <header class="essay-header">
+          <div class="essay-meta animate-in delay-1">
+            <time datetime="2026-04-21">April 21, 2026</time>
+          </div>
+          <h1 class="essay-title animate-in delay-2">Hono Has 35M Weekly Downloads and One npm Publisher</h1>
+          <p class="essay-subtitle animate-in delay-3">
+            Hono is one of the hottest web frameworks in the JavaScript ecosystem &mdash; fast, TypeScript-first,
+            everywhere on Cloudflare Workers and Bun. It&rsquo;s also a single point of failure for millions of
+            production environments. Here&rsquo;s what the behavioral data shows.
+          </p>
+          <p class="essay-byline animate-in delay-4">H&aring;kon &Aring;mdal</p>
+        </header>
+
+        <!-- Body -->
+        <div class="essay-body">
+
+          <p>
+            Hono is everywhere right now. If you&rsquo;re building on Cloudflare Workers, Bun, or Deno &mdash;
+            you&rsquo;ve almost certainly used it. Fast, lightweight, TypeScript-first. 35 million weekly downloads.
+            A GitHub star count in the tens of thousands.
+          </p>
+          <p>
+            And a single npm publisher.
+          </p>
+          <p>
+            I ran <a href="/package/hono/">hono</a> through <a href="https://github.com/piiiico/proof-of-commitment">proof-of-commitment</a>,
+            a supply chain risk scorer that evaluates npm packages on behavioral signals &mdash; the kind of
+            structural data that <code>npm audit</code> doesn&rsquo;t check.
+          </p>
+
+          <pre><code>npx proof-of-commitment hono</code></pre>
+
+          <pre><code>Package   Risk            Score  Publishers  Downloads    Age
+&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;
+hono      &#x1F534; CRITICAL     82     1           35.1M/wk     4.3y
+  &#x2514; longevity=20 momentum=25 releases=20 publishers=4 github=13</code></pre>
+
+          <p>
+            Score of 82 out of 100. One npm publisher. 35 million weekly downloads per week.
+          </p>
+          <p>
+            The result: <strong>CRITICAL</strong>.
+          </p>
+
+          <h2>What CRITICAL means</h2>
+
+          <p>
+            CRITICAL = sole publisher + &gt;10M weekly downloads. That&rsquo;s the structural profile of
+            a high-value attack target &mdash; not because hono is poorly maintained (it isn&rsquo;t), but
+            because it&rsquo;s concentrated risk: one person holds the npm publish key for a package that
+            runs in millions of production environments.
+          </p>
+          <p>
+            This is the same structural profile behind the ua-parser-js attack (October 2021):
+            one npm token compromised, malicious versions published, used by Facebook, Microsoft, and Google.
+            <code>npm audit</code> showed zero issues beforehand. Behavioral scoring had the structural flag
+            for years: sole maintainer, millions of downloads. The same profile applies to hono today.
+          </p>
+          <p>
+            The tool doesn&rsquo;t predict that hono <em>will</em> be attacked. It identifies the conditions
+            that make it a high-value target.
+          </p>
+
+          <h2>The score breakdown</h2>
+
+          <p>The breakdown tells a more nuanced story:</p>
+
+          <ul>
+            <li><strong>Longevity: 20/25</strong> &mdash; 4.3 years, solid but not ancient</li>
+            <li><strong>Download momentum: 25/25</strong> &mdash; 35M/week and growing fast (full marks)</li>
+            <li><strong>Release consistency: 20/20</strong> &mdash; actively maintained, regular releases</li>
+            <li><strong>Publisher depth: 4/15</strong> &mdash; this is where it falls apart</li>
+            <li><strong>GitHub backing: 13/15</strong> &mdash; strong</li>
+          </ul>
+
+          <p>
+            The package is well-maintained by yusukebe. It has excellent release cadence. The risk
+            isn&rsquo;t abandonment &mdash; it&rsquo;s concentration. Everything that makes hono popular
+            makes it a concentrated attack surface.
+          </p>
+
+          <h2>What this looks like in your project</h2>
+
+          <p>
+            If you have a <code>package.json</code> that depends on hono, run:
+          </p>
+
+          <pre><code>npx proof-of-commitment --file package.json</code></pre>
+
+          <p>
+            Or drop your <code>package.json</code> at <a href="https://getcommit.dev/audit">getcommit.dev/audit</a>.
+          </p>
+          <p>
+            You&rsquo;ll likely see <a href="/package/hono/">hono</a> flagged CRITICAL alongside <a href="/package/zod/">zod</a> (160M downloads/week, 1 publisher)
+            and possibly <a href="/package/chalk/">chalk</a> (424M/week, 1 publisher). Three packages that power most modern TypeScript projects.
+          </p>
+
+          <h2>What to do with this</h2>
+
+          <p>
+            Nothing immediately needs to change. Hono is a great framework. yusukebe is an active maintainer. But:
+          </p>
+
+          <ol>
+            <li>
+              <strong>Know your concentrated risk.</strong> When you have sole-publisher packages at 10M+
+              downloads/week in your stack, that&rsquo;s a dependency that warrants extra attention on
+              security advisories.
+            </li>
+            <li>
+              <strong>Watch for unusual releases.</strong> The ua-parser-js attack was a malicious publish &mdash;
+              a new version that wasn&rsquo;t expected. Having awareness that a package is high-concentration
+              means you pay closer attention when something unusual appears.
+            </li>
+            <li>
+              <strong>Consider it in your threat model.</strong> CI/CD pipelines that auto-update dependencies
+              are particularly exposed to this class of attack.
+            </li>
+          </ol>
+
+          <p>
+            The tool doesn&rsquo;t tell you to stop using hono. It tells you that hono is structurally
+            similar to axios &mdash; and that&rsquo;s worth knowing.
+          </p>
+
+          <hr style="margin: 3rem 0; border: none; border-top: 1px solid var(--border);" />
+
+          <p style="font-size: 0.875rem; color: var(--ink-muted);">
+            <a href="https://github.com/piiiico/proof-of-commitment">proof-of-commitment</a> is a
+            zero-install CLI, GitHub Action, and MCP server for supply chain risk scoring.
+            <a href="https://getcommit.dev/audit?packages=hono,zod,chalk,axios,express">Try it live</a>
+            &mdash; pre-loaded with common packages, auto-runs on arrival.
+          </p>
+
+        </div>
+      </div>
+    </div>
+  </article>
+
+  <!-- Newsletter -->
+  <section class="newsletter-section">
+    <div class="container">
+      <div class="editorial reveal">
+        <h2 style="margin-bottom: 0.75rem;">Stay in the loop</h2>
+        <p style="margin-bottom: 2rem; font-size: 1rem;">
+          Early access, research updates, and the occasional strong opinion.
+        </p>
+
+        <form
+          action="https://buttondown.email/api/emails/embed-subscribe/commitgraph"
+          method="post"
+          target="popupwindow"
+          class="newsletter-form"
+        >
+          <input
+            type="email"
+            name="email"
+            placeholder="you@example.com"
+            required
+            class="newsletter-input"
+          />
+          <button type="submit" class="btn-primary" style="white-space: nowrap;">
+            Subscribe
+          </button>
+        </form>
+
+        <p class="newsletter-note">No spam. Unsubscribe anytime.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer>
+    <div class="container footer-inner">
+      <span class="footer-brand">Commit</span>
+      <ul class="footer-links">
+        <li><a href="/">Home</a></li>
+        <li><a href="/extension">Extension</a></li>
+        <li><a href="/blog">Writing</a></li>
+        <li><a href="/pricing">Pricing</a></li><li><a href="/docs">Docs</a></li><li><a href="https://github.com/piiiico/proof-of-commitment" target="_blank" rel="noopener">GitHub</a></li>
+        <li><a href="mailto:pico@amdal.dev">Contact</a></li>
+      </ul>
+      <span class="footer-locale">Stavanger, Norway</span>
+    </div>
+  </footer>
+
+</Layout>

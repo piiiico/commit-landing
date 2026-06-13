@@ -1,0 +1,255 @@
+---
+import Layout from '../../layouts/Layout.astro';
+---
+
+<Layout
+  title="Two Types of npm Supply Chain Attack: What Catches Each — Commit"
+  description="Not all npm supply chain attacks are the same. Credential compromise and build pipeline attacks require different defenses. Here's how to tell them apart — and what tooling covers which."
+  canonical="https://getcommit.dev/blog/two-types-npm-attacks/"
+  publishDate="2026-04-26"
+>
+
+  <!-- Nav -->
+  <nav>
+    <div class="container nav-inner">
+      <a href="/" class="nav-brand">Commit</a>
+      <ul class="nav-links">
+        <li><a href="/extension">Extension</a></li>
+        <li><a href="/blog">Writing</a></li>
+        <li><a href="/pricing">Pricing</a></li><li><a href="/docs">Docs</a></li><li><a href="https://github.com/piiiico/proof-of-commitment" target="_blank" rel="noopener">GitHub</a></li>
+        <li><a href="mailto:pico@amdal.dev">Contact</a></li>
+      </ul>
+    </div>
+  </nav>
+
+  <!-- Essay -->
+  <article class="essay">
+    <div class="container">
+      <div class="editorial">
+
+        <!-- Header -->
+        <header class="essay-header">
+          <div class="essay-meta animate-in delay-1">
+            <time datetime="2026-04-26">April 26, 2026</time>
+          </div>
+          <h1 class="essay-title animate-in delay-2">Two Types of npm Supply Chain Attack: What Catches Each</h1>
+          <p class="essay-subtitle animate-in delay-3">
+            The @bitwarden/cli compromise and the ua-parser-js attack are both &ldquo;supply chain attacks&rdquo; &mdash; but they&rsquo;re
+            structurally different threats. One is a concentrated credentials problem. The other is a build pipeline problem.
+            The defenses don&rsquo;t overlap much.
+          </p>
+          <p class="essay-byline animate-in delay-4">Pico</p>
+        </header>
+
+        <!-- Body -->
+        <div class="essay-body">
+
+          <p>
+            On April 23, 2026, <code>@bitwarden/cli</code> was compromised as part of the ongoing
+            <a href="https://socket.dev/blog/bitwarden-cli-compromised" target="_blank" rel="noopener">Checkmarx supply chain campaign</a>.
+            Malicious code was injected into version 2026.4.0 via a GitHub Actions workflow in Bitwarden&rsquo;s own CI/CD pipeline.
+            The package had 9 maintainers, nearly 78K weekly downloads, and a behavioral trust score of 92 out of 100.
+          </p>
+
+          <p>
+            Three days later, this is still being discussed as a &ldquo;supply chain attack&rdquo; &mdash; which is accurate but flattening.
+            The category is real. The mechanism is completely different from the ua-parser-js attack in 2021,
+            and the defenses that would have helped are mostly non-overlapping. That distinction matters if you&rsquo;re trying
+            to actually protect your dependencies rather than check a compliance box.
+          </p>
+
+          <h2>Category 1: Credential compromise</h2>
+
+          <p>
+            In October 2021, ua-parser-js was compromised. The package had roughly 8 million weekly downloads and a single maintainer.
+            That maintainer&rsquo;s npm credentials were compromised and three malicious versions were published in quick succession.
+            The packages dropped a cryptominer and a credential harvester. CVE-2021-4229 followed.
+          </p>
+
+          <p>
+            <code>npm audit</code> showed zero issues before the attack. The vulnerability was structural, not in the code &mdash;
+            a package with massive download volume and one person holding the publish key.
+          </p>
+
+          <p>
+            This is the credential compromise pattern: the attack succeeds because the identity of the person who can publish
+            is concentrated. One phishing email, one compromised account, one malicious publish. The blast radius is determined
+            by how many projects pull the package.
+          </p>
+
+          <p>
+            Axios is the current example to watch. Roughly 100 million weekly downloads. One maintainer. Same structural profile
+            as ua-parser-js before the attack &mdash; concentrated publish authority over an enormous install base.
+          </p>
+
+          <h2>Category 2: Build pipeline compromise</h2>
+
+          <p>
+            The Bitwarden attack is structurally different. There was no phished maintainer. The organization is real, the team
+            is real, the 7+ year release history is real. Attackers didn&rsquo;t need to compromise a person &mdash; they
+            compromised the build environment.
+          </p>
+
+          <p>
+            A GitHub Action in Bitwarden&rsquo;s CI/CD pipeline was tampered with. That action ran during a legitimate release,
+            injected malicious code into the published artifact, and the package landed on the registry with Bitwarden&rsquo;s
+            legitimate credentials. From the registry&rsquo;s perspective, nothing was wrong. From a behavioral scoring
+            perspective, nothing was wrong. The package was published by its real maintainers, from their real account, as part
+            of a real release process.
+          </p>
+
+          <p>
+            What was compromised wasn&rsquo;t an identity. It was the chain of custody between source code and published artifact.
+          </p>
+
+          <h2>What structural scoring catches</h2>
+
+          <p>
+            <a href="https://getcommit.dev/audit?packages=@bitwarden/cli">proof-of-commitment</a> scored <code>@bitwarden/cli</code> at 92/100 before this attack.
+            That score was correct. Nine maintainers, consistent release history, strong download momentum, GitHub-backed organization &mdash;
+            all of these are genuine signals that the package is well-managed and not structurally fragile.
+          </p>
+
+          <p>
+            What behavioral scoring detects is the <em>structural conditions that make credential compromise likely and high-impact</em>:
+          </p>
+
+          <ul>
+            <li>Single maintainer with high download volume (ua-parser-js, axios)</li>
+            <li>No organizational backing &mdash; one person&rsquo;s npm account is the only barrier</li>
+            <li>Stale packages still pulled by millions of projects</li>
+            <li>Brand-new packages with zero history impersonating legitimate ones</li>
+          </ul>
+
+          <p>
+            It does not detect whether the build pipeline that published a well-maintained package was tampered with.
+            That&rsquo;s a different threat surface.
+          </p>
+
+          <h2>What catches build pipeline attacks</h2>
+
+          <p>
+            The npm ecosystem has a real answer for this: <strong>build provenance</strong>. Since 2023, npm supports
+            <a href="https://docs.npmjs.com/generating-provenance-statements" target="_blank" rel="noopener">provenance statements</a> &mdash;
+            cryptographically signed attestations that link a published package to a specific source repository,
+            commit, and build environment. When provenance is present, you can verify that a given version was built from
+            a specific commit in a specific GitHub Actions run.
+          </p>
+
+          <p>
+            A compromised action that injects code during the build produces a package that doesn&rsquo;t match the source.
+            That breaks the provenance chain. <code>npm audit signatures</code> checks this.
+          </p>
+
+          <pre><code>npm audit signatures</code></pre>
+
+          <p>
+            Beyond provenance, the broader SLSA framework (Supply-chain Levels for Software Artifacts) provides a graduated
+            set of requirements for build integrity &mdash; from basic provenance at SLSA Build L1 up to a hardened build
+            platform at SLSA Build L3. L3 requires that the build environment itself be isolated and hardened against tampering,
+            which is the category the Bitwarden attack falls into.
+          </p>
+
+          <p>
+            Tools like <a href="https://socket.dev" target="_blank" rel="noopener">Socket.dev</a> scan new publishes in
+            real time for malicious code patterns &mdash; another layer that catches active injection, not structural risk.
+          </p>
+
+          <h2>The two categories, side by side</h2>
+
+          <table>
+            <thead>
+              <tr>
+                <th>Category</th>
+                <th>Example</th>
+                <th>Attack vector</th>
+                <th>Caught by behavioral scoring?</th>
+                <th>Caught by provenance/SLSA?</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>Credential compromise</td>
+                <td>ua-parser-js (Oct 2021), axios (risk profile)</td>
+                <td>Compromised maintainer credentials</td>
+                <td>✅ Structural risk flag (sole maintainer + high volume)</td>
+                <td>❌ Credentials are legitimate; provenance will verify</td>
+              </tr>
+              <tr>
+                <td>Build pipeline compromise</td>
+                <td>@bitwarden/cli (Apr 2026)</td>
+                <td>Tampered CI/CD action</td>
+                <td>❌ Package is structurally sound; scores 92/100</td>
+                <td>✅ Provenance chain breaks at the tampered build step</td>
+              </tr>
+            </tbody>
+          </table>
+
+          <p>
+            There&rsquo;s a third column worth adding: <em>real-time publish scanning</em> (Socket, Snyk) catches both,
+            but after the fact &mdash; it detects malicious code in a published version, not before it lands in a lockfile.
+          </p>
+
+          <h2>What the Bitwarden attack doesn&rsquo;t invalidate</h2>
+
+          <p>
+            The argument I&rsquo;ve seen on HN today is that the Bitwarden attack proves structural scoring is useless
+            because a well-scored package got compromised. This is wrong in a specific way.
+          </p>
+
+          <p>
+            A package with 9 maintainers and a 7-year release history is genuinely harder to compromise via credential
+            phishing than a package with one maintainer and no organizational backing. That&rsquo;s not a scoring artifact &mdash;
+            it&rsquo;s real. ua-parser-js was attacked via its sole maintainer. Attacking Bitwarden required a more
+            sophisticated pipeline compromise because the credential vector was too hardened.
+          </p>
+
+          <p>
+            The structural score measures one threat surface accurately. It doesn&rsquo;t cover all threat surfaces.
+            That&rsquo;s not a flaw in the tool &mdash; it&rsquo;s a scope boundary. Knowing the scope is how you
+            build the right layered defense.
+          </p>
+
+          <h2>The stack that actually works</h2>
+
+          <p>
+            Defense against npm supply chain attacks requires layers that cover different threat surfaces:
+          </p>
+
+          <ol>
+            <li><strong>Structural scoring</strong> (<a href="https://getcommit.dev/audit">proof-of-commitment</a>) &mdash; identify concentration risk before an attack; catch sole-maintainer packages before they become ua-parser-js</li>
+            <li><strong>Provenance verification</strong> (<code>npm audit signatures</code>) &mdash; verify that published artifacts match their source builds; catches pipeline tampering</li>
+            <li><strong>Real-time publish scanning</strong> (Socket, Snyk) &mdash; detect malicious code patterns in new releases as they land</li>
+            <li><strong>Lock file pinning</strong> &mdash; don&rsquo;t pull new versions automatically; create a window to catch anomalies before they reach production</li>
+          </ol>
+
+          <p>
+            Each layer has a blind spot. The blind spots don&rsquo;t overlap much. Running all four means the attack
+            scenarios with no defense become significantly fewer.
+          </p>
+
+          <pre><code># Check structural risk
+npx proof-of-commitment --file package.json
+
+# Check build provenance
+npm audit signatures</code></pre>
+
+          <p>
+            These answer different questions. Both answers matter.
+          </p>
+
+          <hr />
+
+          <p style="font-size: 0.9rem; color: var(--ink-muted);">
+            <strong>proof-of-commitment</strong> is open-source and free to use.
+            <a href="https://github.com/piiiico/proof-of-commitment">GitHub</a> &middot;
+            <a href="https://getcommit.dev/audit">Web audit</a> &middot;
+            <a href="https://getcommit.dev/docs">API docs</a>
+          </p>
+
+        </div>
+      </div>
+    </div>
+  </article>
+
+</Layout>

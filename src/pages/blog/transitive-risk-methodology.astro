@@ -1,0 +1,278 @@
+---
+import Layout from '../../layouts/Layout.astro';
+---
+
+<Layout
+  title="npm audit ships yesterday's risk. Here's how to measure tomorrow's. — Commit"
+  description="A depth-2 supply chain audit methodology: concentration of weekly downloads behind sole-publisher npm tokens. Five popular packages, scanned."
+  canonical="https://getcommit.dev/blog/transitive-risk-methodology/"
+  publishDate="2026-05-13"
+>
+
+  <!-- Nav -->
+  <nav>
+    <div class="container nav-inner">
+      <a href="/" class="nav-brand">Commit</a>
+      <ul class="nav-links">
+        <li><a href="/extension">Extension</a></li>
+        <li><a href="/blog">Writing</a></li>
+        <li><a href="/pricing">Pricing</a></li><li><a href="/docs">Docs</a></li><li><a href="https://github.com/piiiico/proof-of-commitment" target="_blank" rel="noopener">GitHub</a></li>
+        <li><a href="mailto:pico@amdal.dev">Contact</a></li>
+      </ul>
+    </div>
+  </nav>
+
+  <!-- Essay -->
+  <article class="essay">
+    <div class="container">
+      <div class="editorial">
+
+        <!-- Header -->
+        <header class="essay-header">
+          <div class="essay-meta animate-in delay-1">
+            <time datetime="2026-05-13">May 13, 2026</time>
+          </div>
+          <h1 class="essay-title animate-in delay-2">npm audit ships yesterday&rsquo;s risk. Here&rsquo;s how to measure tomorrow&rsquo;s.</h1>
+          <p class="essay-subtitle animate-in delay-3">
+            A depth-2 audit methodology, run against five widely-used packages. The metric: how many weekly downloads sit behind single-person publish credentials across your transitive tree.
+          </p>
+          <p class="essay-byline animate-in delay-4">Pico</p>
+        </header>
+
+        <!-- Body -->
+        <div class="essay-body">
+
+          <p>
+            When the LiteLLM supply chain attack hit in March 2026, <code>npm audit</code> ran clean.
+            There was nothing to flag. The CVE got filed afterward, after the code shipped, after the
+            bill landed.
+          </p>
+
+          <p>
+            That&rsquo;s the structural problem with vulnerability scanning. It tells you what&rsquo;s
+            already exploded.
+          </p>
+
+          <p>
+            What the LiteLLM, axios, and ua-parser-js incidents had in common wasn&rsquo;t a known CVE.
+            It was the publisher profile: one account, millions of weekly downloads, often stale for
+            over a year. That population is identifiable <em>before</em> anything happens.
+          </p>
+
+          <p>
+            The follow-up I keep getting asked: how do you actually measure it?
+          </p>
+
+          <h2>The metric</h2>
+
+          <p>
+            Two values, summed across the transitive dependency tree:
+          </p>
+
+          <ol>
+            <li>
+              <code>critical_concentration</code> = sum of weekly downloads for every transitive
+              dependency where one npm account holds publish access and weekly downloads exceed 10M.
+            </li>
+            <li>
+              <code>critical_paths</code> = the dependency chains from your direct deps to each
+              critical package.
+            </li>
+          </ol>
+
+          <p>
+            The first maps directly to a credential-compromise attack. If one npm account gets phished,
+            the blast radius is the sum of downloads behind packages that account can push. The second
+            tells you which of <em>your</em> direct deps own that risk. You probably can&rsquo;t drop
+            <code>express</code>. You can swap <code>axios</code> for <code>fetch</code> if its
+            footprint is too concentrated for you.
+          </p>
+
+          <p>
+            There&rsquo;s nothing speculative here. npm publish access is queryable. Download stats are
+            queryable. Release cadence is queryable. The only work is summing it across the tree.
+          </p>
+
+          <h2>The scan</h2>
+
+          <pre><code>curl -X POST https://poc-backend.amdal-dev.workers.dev/api/graph/npm \
+  -H "Content-Type: application/json" \
+  -d '&#123;"package": "express", "depth": 2&#125;'</code></pre>
+
+          <p>
+            Flag rules: CRITICAL when one publisher controls publish access AND weekly downloads exceed
+            10M. WARN when no release has shipped in over 12 months. HEALTHY otherwise. Same data is at
+            <a href="https://getcommit.dev/npm/express"><code>getcommit.dev/npm/&#123;pkg&#125;</code></a>
+            for the human view.
+          </p>
+
+          <h2>Five packages, depth 2</h2>
+
+          <p>
+            I ran the scan against five widely-used npm packages. None of them look bad at depth 1.
+            All of them carry critical concentration at depth 2.
+          </p>
+
+          <h3><code>express</code> (102M weekly)</h3>
+
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr><th>Critical dep</th><th>Publisher</th><th>Weekly</th><th>Last release</th></tr>
+              </thead>
+              <tbody>
+                <tr><td><code>depd</code></td><td><code>dougwilson</code></td><td>114M</td><td>2018</td></tr>
+                <tr><td><code>escape-html</code></td><td><code>dougwilson</code></td><td>76M</td><td>2015</td></tr>
+                <tr><td><code>once</code></td><td><code>isaacs</code></td><td>111M</td><td>2016</td></tr>
+                <tr><td><code>wrappy</code> (via <code>once</code>)</td><td><code>isaacs</code></td><td>116M</td><td>2016</td></tr>
+              </tbody>
+            </table>
+          </div>
+
+          <p>
+            Critical concentration: <strong>417M downloads/week</strong>. The interesting part
+            isn&rsquo;t the count, it&rsquo;s the publisher overlap. Four packages, two npm identities.
+            Compromising <code>isaacs</code> (npm co-founder Isaac Schlueter) hits both <code>once</code>
+            and <code>wrappy</code>. Compromising <code>dougwilson</code> hits both <code>depd</code>
+            and <code>escape-html</code>. Two phished accounts, four critical paths.
+          </p>
+
+          <h3><code>axios</code> (109M weekly)</h3>
+
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr><th>Critical dep</th><th>Publisher</th><th>Weekly</th></tr>
+              </thead>
+              <tbody>
+                <tr><td><code>https-proxy-agent</code></td><td><code>tootallnate</code></td><td>177M</td></tr>
+                <tr><td><code>agent-base</code> (via <code>https-proxy-agent</code>)</td><td><code>tootallnate</code></td><td>187M</td></tr>
+                <tr><td><code>proxy-from-env</code></td><td><code>rob-w</code></td><td>105M</td></tr>
+              </tbody>
+            </table>
+          </div>
+
+          <p>
+            Critical concentration: <strong>469M downloads/week</strong>. Two of three under the same
+            npm identity. One caveat: <code>https-proxy-agent</code> now publishes via npm Trusted
+            Publishing (OIDC, not a personal token), which materially reduces the
+            credential-phishing risk. The metric is structural. Mitigations exist when teams adopt them.
+          </p>
+
+          <h3><code>vite</code></h3>
+
+          <p>
+            Eight critical transitive deps. Critical concentration: <strong>1.16B downloads/week</strong>.
+            <code>postcss</code> and <code>nanoid</code> ship from the same npm account
+            (<code>ai</code>, Andrey Sitnik), so another 399M sits behind one identity. The rest is
+            <code>lightningcss</code>, <code>tinyglobby</code>, <code>picocolors</code>,
+            <code>source-map-js</code>, <code>fdir</code>, and <code>detect-libc</code>. All sole-publisher.
+          </p>
+
+          <h3><code>next</code></h3>
+
+          <p>
+            Seven critical transitive deps. Critical concentration:
+            <strong>1.05B downloads/week</strong>. Shares <code>postcss</code>, <code>nanoid</code>,
+            <code>picocolors</code>, and <code>source-map-js</code> with <code>vite</code> &mdash;
+            same publishers, same blast radius. Adds <code>@swc/helpers</code>,
+            <code>caniuse-lite</code>, and <code>baseline-browser-mapping</code>.
+          </p>
+
+          <h3><code>webpack</code></h3>
+
+          <p>
+            Seventeen critical transitive deps. Critical concentration:
+            <strong>1.49B downloads/week</strong>. Includes the entire <code>@webassemblyjs/*</code>
+            family (one publisher, all stale), the <code>@types/*</code> packages that ship in every
+            TypeScript build, plus <code>graceful-fs</code>, <code>neo-async</code>,
+            <code>browserslist</code>, and friends.
+          </p>
+
+          <h2>What 2 billion downloads of surface area looks like</h2>
+
+          <p>
+            A normal modern stack pulling <code>webpack</code>, <code>vite</code>, and <code>next</code>
+            carries roughly 2B weekly downloads of transitive surface behind single-person tokens, after
+            deduping shared deps. Most of those packages will never get a CVE filed against them. They
+            aren&rsquo;t broken. They&rsquo;re load-bearing infrastructure that&rsquo;s one credential
+            reset away from being weaponizable.
+          </p>
+
+          <p>
+            That&rsquo;s the gap <code>npm audit</code> doesn&rsquo;t cover. CVEs are reactive by
+            construction. Concentration is structural and visible right now.
+          </p>
+
+          <h2>Why JavaScript carries this</h2>
+
+          <p>
+            Architectural problem, not a culture problem.
+          </p>
+
+          <p>
+            npm separates publish access from source-code access. A package&rsquo;s GitHub repo can
+            have 30 contributors and still ship from one npm account, because publish credentials are
+            personal tokens tied to one user. Compromising that user is enough. No PR review, no merge,
+            no second pair of eyes on what got published. The dependency tree is built from hundreds of
+            microscopic utility packages, mostly one-maintainer, because that&rsquo;s the pattern the
+            ecosystem rewards.
+          </p>
+
+          <p>
+            Go doesn&rsquo;t have this. Modules ship straight from VCS, anchored by <code>go.sum</code>
+            checksums. Compromising one developer&rsquo;s account compromises a GitHub repo, which
+            usually carries multiple maintainers and PR review. There is no separate publish credential
+            to phish. That&rsquo;s why our scan of the top 20 Go modules came back with
+            <a href="/blog/go-supply-chain-different-risk">zero CRITICAL flags</a>. The architecture
+            forecloses on the attack class.
+          </p>
+
+          <p>
+            PyPI and Cargo share npm&rsquo;s pattern. Sole-owner accounts are the rule. The download
+            volumes are smaller, but the structural exposure is the same.
+          </p>
+
+          <h2>Run this on your own tree</h2>
+
+          <pre><code>npx proof-of-commitment --file package-lock.json</code></pre>
+
+          <p>
+            Output lists every CRITICAL transitive package with its publisher, weekly downloads, and
+            the import path from your direct dependencies. From there the options are real: drop the
+            dep, vendor it, pin to a known-good version, or accept the risk explicitly.
+          </p>
+
+          <p>
+            The point isn&rsquo;t to scare you off <code>express</code>. It&rsquo;s to make the
+            concentration visible so the decision is informed instead of inherited.
+          </p>
+
+          <hr />
+
+          <p>
+            <em>
+              <a href="https://getcommit.dev">getcommit.dev</a> &mdash; behavioral supply chain scoring
+              for npm, PyPI, Cargo, and Go.
+              <a href="https://github.com/piiiico/proof-of-commitment" target="_blank" rel="noopener">GitHub</a>.
+            </em>
+          </p>
+
+        </div>
+
+        <!-- CTA -->
+        <div class="essay-cta reveal" style="margin-top: var(--space-block);">
+          <div class="cta-box">
+            <p class="cta-text">Scan your own dependency tree</p>
+            <div class="cta-buttons">
+              <a href="/audit" class="btn-primary">Try the scanner</a>
+              <a href="https://github.com/piiiico/proof-of-commitment" target="_blank" rel="noopener" class="btn-secondary">View on GitHub</a>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </article>
+
+</Layout>

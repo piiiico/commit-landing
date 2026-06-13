@@ -1,0 +1,233 @@
+---
+import Layout from '../layouts/Layout.astro';
+---
+
+<Layout
+  title="Commit for Windsurf — Block CRITICAL npm/pip/cargo/go installs before they run"
+  description="A Windsurf pre_run_command hook that scores every npm/pip/cargo/go install against Commit before it runs. CRITICAL packages blocked. One command to install. Free tier: 200 audits/day."
+  canonical="https://getcommit.dev/windsurf/"
+>
+  <!-- Nav -->
+  <nav>
+    <div class="container nav-inner">
+      <a href="/" class="nav-brand">Commit</a>
+      <ul class="nav-links">
+        <li><a href="/cursor">Cursor</a></li>
+        <li><a href="/claude-code">Claude Code</a></li>
+        <li><a href="/windsurf" style="color: var(--ink);">Windsurf</a></li>
+        <li><a href="/audit">Audit</a></li>
+        <li><a href="/blog">Writing</a></li>
+        <li><a href="/pricing">Pricing</a></li>
+        <li><a href="/docs">Docs</a></li>
+        <li><a href="https://github.com/piiiico/proof-of-commitment" target="_blank" rel="noopener">GitHub</a></li>
+      </ul>
+    </div>
+  </nav>
+
+  <!-- Hero -->
+  <section class="hero">
+    <div class="container">
+      <div class="editorial">
+        <span class="hero-eyebrow animate-in delay-1">Windsurf IDE Hook · pre_run_command · Free · Open Source</span>
+
+        <h1 class="hero-title animate-in delay-2" style="font-size: clamp(2rem, 5vw, 3.5rem);">
+          Block bad installs in Windsurf<br />
+          <em>before they touch the filesystem.</em>
+        </h1>
+
+        <p class="hero-lead animate-in delay-3">
+          Windsurf's Cascade agent runs <code>npm install</code>, <code>pip install</code>, <code>cargo add</code>, and
+          <code>go get</code> — often suggesting packages it has never seen before. Commit's
+          hook intercepts each install command via Windsurf's <code>pre_run_command</code> hook,
+          scores every package against the Commit Index, and
+          <strong>denies CRITICAL packages</strong> (sole publisher + high downloads — the attack profile of
+          ua-parser-js, event-stream, Shai-Hulud) before they hit disk.
+        </p>
+
+        <div class="hero-cta animate-in delay-4">
+          <a href="#install" class="btn-primary">Install in 30 seconds →</a>
+          <a href="/get-started?ref=windsurf-hook-429&utm_source=windsurf-landing" class="btn-ghost">Free API key</a>
+          <a href="https://github.com/piiiico/proof-of-commitment" class="btn-ghost" target="_blank" rel="noopener">GitHub →</a>
+        </div>
+
+        <p class="animate-in delay-5" style="margin-top: 1rem; font-size: 0.85rem; color: var(--muted);">
+          Works with Windsurf's Cascade hooks · No account required to start · Anonymous tier: 15 audits/day
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <hr class="section-divider" />
+
+  <!-- What happens -->
+  <section style="padding: var(--space-section) 0;">
+    <div class="container">
+      <p class="section-label">What happens when Windsurf runs npm install</p>
+      <div class="editorial reveal" style="max-width: var(--max-content);">
+        <h2 style="margin-bottom: 0.5rem;">A CRITICAL package never reaches the package manager.</h2>
+        <p style="margin-bottom: 1.5rem; font-size: 1rem; color: var(--ink-muted);">
+          Windsurf's Cascade agent decides to install <code>lodash</code>. Before the command runs,
+          the hook calls Commit, gets a score, and exits with code 2 (Windsurf's deny signal).
+          Cascade surfaces the reason in the chat — the install never runs.
+        </p>
+
+        <div style="background: var(--paper-dim); border: 1px solid var(--border); border-radius: 8px; padding: 1.5rem; font-family: var(--font-mono, 'JetBrains Mono', monospace); font-size: 0.78rem; color: var(--ink); line-height: 1.7; overflow-x: auto; margin-bottom: 1rem;">
+          <div style="font-size: 0.7rem; color: var(--ink-subtle); margin-bottom: 0.75rem; font-family: var(--font-body);">Windsurf Cascade → Commit hook → permission decision</div>
+          <pre style="margin: 0;"><span style="color: var(--ink-subtle);"># Cascade suggests:</span>
+$ npm install lodash
+
+<span style="color: var(--ink-subtle);"># Commit hook intercepts. Windsurf shows:</span>
+
+🔴 Commit blocked: lodash flagged CRITICAL
+
+  🔴 lodash (score 84) — CRITICAL: sole npm publisher + &gt;10M/wk
+
+→ https://getcommit.dev/audit?packages=lodash&amp;ecosystem=npm</pre>
+        </div>
+
+        <p style="margin-top: 1rem; font-size: 0.9rem; color: var(--ink-muted);">
+          The same flow runs on <code>pip install</code>, <code>cargo add</code>, and <code>go get</code>.
+          HIGH packages are blocked with a warning message. Everything else passes through silently.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <hr class="section-divider" />
+
+  <!-- Install -->
+  <section id="install" style="padding: var(--space-section) 0;">
+    <div class="container">
+      <p class="section-label">Install · 30 seconds</p>
+      <div class="editorial reveal" style="max-width: var(--max-content);">
+        <h2 style="margin-bottom: 0.5rem;">One command. Edits <code>.windsurf/hooks.json</code> in place.</h2>
+        <p style="margin-bottom: 1.5rem; font-size: 1rem; color: var(--ink-muted);">
+          Run the command in your project directory (per-project) or with <code>--global</code>
+          (all your projects). The hook script is registered as a <code>pre_run_command</code> entry
+          in <code>.windsurf/hooks.json</code>.
+        </p>
+
+        <div style="background: var(--paper-dim); border: 1px solid var(--border); border-radius: 8px; padding: 1.25rem 1.5rem; font-family: var(--font-mono, 'JetBrains Mono', monospace); font-size: 0.9rem; line-height: 1.8; overflow-x: auto; margin-bottom: 1rem;">
+          <pre style="margin: 0;"><span style="color: var(--ink-subtle);"># Per-project (recommended): writes .windsurf/hooks.json next to your repo</span>
+$ npx proof-of-commitment hook --windsurf
+
+<span style="color: var(--ink-subtle);"># Or apply to every Windsurf project on this machine</span>
+$ npx proof-of-commitment hook --windsurf --global
+
+<span style="color: var(--ink-subtle);"># Install for all three IDEs at once (Cursor + Claude Code + Windsurf)</span>
+$ npx proof-of-commitment hook
+
+<span style="color: var(--ink-subtle);"># Remove later</span>
+$ npx proof-of-commitment hook --uninstall</pre>
+        </div>
+
+        <p style="margin-top: 1rem; font-size: 0.9rem; color: var(--ink-muted);">
+          The hook merges into any existing <code>hooks.json</code> — your other
+          <code>pre_run_command</code> entries are preserved. No global npm install required.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <hr class="section-divider" />
+
+  <!-- Lift the limit -->
+  <section style="padding: var(--space-section) 0; background: var(--paper-dim);">
+    <div class="container">
+      <p class="section-label">Free API key · 200 audits/day · 30 seconds, no card</p>
+      <div class="editorial reveal" style="max-width: var(--max-content);">
+        <h2 style="margin-bottom: 0.5rem;">Anonymous tier: 15/day. Free key: 200/day. Both real.</h2>
+        <p style="margin-bottom: 1.5rem; font-size: 1rem; color: var(--ink-muted);">
+          The hook works without an account — anonymous IP gets 15 audits/day. CI runners and
+          dev containers share egress IPs, so the counter ticks faster than you'd think. A free key
+          lifts you to 200/day.
+        </p>
+
+        <div style="background: var(--paper); border: 1px solid var(--border); border-radius: 8px; padding: 1.25rem 1.5rem; font-family: var(--font-mono, 'JetBrains Mono', monospace); font-size: 0.88rem; line-height: 1.8; overflow-x: auto; margin-bottom: 1rem;">
+          <pre style="margin: 0;"><span style="color: var(--ink-subtle);"># In the terminal — saves to ~/.commit/config</span>
+$ npx proof-of-commitment login
+
+<span style="color: var(--ink-subtle);"># Or in the browser</span>
+<a href="/get-started?ref=windsurf-hook-429&utm_source=windsurf-landing" style="color: var(--accent);">https://getcommit.dev/get-started?ref=windsurf-hook-429</a></pre>
+        </div>
+
+        <p style="margin-top: 1.5rem;">
+          <a href="/get-started?ref=windsurf-hook-429&utm_source=windsurf-landing" class="btn-primary">
+            Get free API key →
+          </a>
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <hr class="section-divider" />
+
+  <!-- FAQ -->
+  <section style="padding: var(--space-section) 0;">
+    <div class="container">
+      <p class="section-label">FAQ</p>
+      <div class="editorial reveal" style="max-width: var(--max-content);">
+
+        <h3 style="margin-top: 1.5rem; margin-bottom: 0.5rem; font-size: 1.1rem;">Does the hook block legitimate installs?</h3>
+        <p style="font-size: 0.95rem; color: var(--ink-muted); margin-bottom: 1rem;">
+          Only CRITICAL packages are denied — the precise profile that preceded ua-parser-js (Oct 2021),
+          event-stream (2018), and the Shai-Hulud burst (Sep 2025): sole publisher + very high downloads.
+          HIGH packages are blocked with a warning. Everything else passes silently. False positives
+          on healthy popular packages are rare by design — see the <a href="/blog">writing</a> for the scoring rationale.
+        </p>
+
+        <h3 style="margin-top: 1.5rem; margin-bottom: 0.5rem; font-size: 1.1rem;">What gets sent to Commit?</h3>
+        <p style="font-size: 0.95rem; color: var(--ink-muted); margin-bottom: 1rem;">
+          Only the package names and ecosystem (npm/pypi/cargo/golang) — parsed from the shell
+          command. Not your code, not your environment, not the rest of the command. Source:
+          <a href="https://github.com/piiiico/proof-of-commitment/blob/main/npm-package/index.js" target="_blank" rel="noopener">npm-package/index.js</a>.
+        </p>
+
+        <h3 style="margin-top: 1.5rem; margin-bottom: 0.5rem; font-size: 1.1rem;">Does this work with Cursor and Claude Code too?</h3>
+        <p style="font-size: 0.95rem; color: var(--ink-muted); margin-bottom: 1rem;">
+          Yes. The same script auto-detects the client from stdin shape and replies in the right format.
+          Run <code>poc hook</code> (no flags) to install for all three IDEs at once.
+          See <a href="/cursor">Commit for Cursor</a> and <a href="/claude-code">Commit for Claude Code</a> for client-specific guides.
+        </p>
+
+        <h3 style="margin-top: 1.5rem; margin-bottom: 0.5rem; font-size: 1.1rem;">How does Windsurf's hook differ from Cursor's?</h3>
+        <p style="font-size: 0.95rem; color: var(--ink-muted); margin-bottom: 1rem;">
+          Windsurf uses exit code 2 to deny and stderr for the user message, while Cursor uses
+          a JSON response body. The hook auto-detects the client and handles this automatically —
+          you install once and it works regardless of which IDE triggers the command.
+        </p>
+
+        <h3 style="margin-top: 1.5rem; margin-bottom: 0.5rem; font-size: 1.1rem;">What happens if Commit is down?</h3>
+        <p style="font-size: 0.95rem; color: var(--ink-muted); margin-bottom: 1rem;">
+          The hook has a 4-second timeout. On timeout or non-429 errors, it exits 0 (allow) —
+          the install proceeds. On 429 (rate limit), it surfaces the signup prompt and warns about
+          unscored packages so you can decide explicitly instead of silently allowing.
+        </p>
+
+        <h3 style="margin-top: 1.5rem; margin-bottom: 0.5rem; font-size: 1.1rem;">How do I uninstall?</h3>
+        <p style="font-size: 0.95rem; color: var(--ink-muted); margin-bottom: 1rem;">
+          <code>npx proof-of-commitment hook --uninstall</code> — removes the entry from
+          <code>.windsurf/hooks.json</code>. Your other hooks are untouched.
+        </p>
+
+      </div>
+    </div>
+  </section>
+
+  <hr class="section-divider" />
+
+  <!-- Bottom CTA -->
+  <section style="padding: var(--space-section) 0;">
+    <div class="container">
+      <div class="editorial reveal" style="max-width: var(--max-content); text-align: center;">
+        <h2 style="margin-bottom: 1rem;">One command. One hook. Real packages stay. CRITICAL ones don't.</h2>
+        <p style="margin-bottom: 2rem; font-size: 1rem; color: var(--ink-muted);">
+          <code>npx proof-of-commitment hook --windsurf</code>
+        </p>
+        <p>
+          <a href="/get-started?ref=windsurf-hook-429&utm_source=windsurf-landing" class="btn-primary">Free API key — 200/day, no card →</a>
+        </p>
+      </div>
+    </div>
+  </section>
+</Layout>

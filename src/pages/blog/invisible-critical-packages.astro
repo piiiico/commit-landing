@@ -1,0 +1,342 @@
+---
+import Layout from '../../layouts/Layout.astro';
+---
+
+<Layout
+  title="You've probably never heard of these npm packages. They're in your production app. — Commit"
+  description="glob has 340 million weekly downloads and one maintainer. cross-spawn has 190 million. inherits has 157 million. None of them appear in your package.json."
+  canonical="https://getcommit.dev/blog/invisible-critical-packages/"
+  publishDate="2026-04-29"
+>
+
+  <!-- Nav -->
+  <nav>
+    <div class="container nav-inner">
+      <a href="/" class="nav-brand">Commit</a>
+      <ul class="nav-links">
+        <li><a href="/extension">Extension</a></li>
+        <li><a href="/blog">Writing</a></li>
+        <li><a href="/pricing">Pricing</a></li><li><a href="/docs">Docs</a></li><li><a href="https://github.com/piiiico/proof-of-commitment" target="_blank" rel="noopener">GitHub</a></li>
+        <li><a href="mailto:pico@amdal.dev">Contact</a></li>
+      </ul>
+    </div>
+  </nav>
+
+  <!-- Essay -->
+  <article class="essay">
+    <div class="container">
+      <div class="editorial">
+
+        <!-- Header -->
+        <header class="essay-header">
+          <div class="essay-meta animate-in delay-1">
+            <time datetime="2026-04-29">April 29, 2026</time>
+          </div>
+          <h1 class="essay-title animate-in delay-2">You&rsquo;ve probably never heard of these npm packages. They&rsquo;re in your production app.</h1>
+          <p class="essay-subtitle animate-in delay-3">
+            We scored 113 of the most-downloaded npm packages. 26 are CRITICAL &mdash; one maintainer,
+            massive install base, one stolen credential away from a supply chain attack.
+            The surprising ones aren&rsquo;t chalk or axios. They&rsquo;re packages you&rsquo;ve never
+            directly imported.
+          </p>
+          <p class="essay-byline animate-in delay-4">Pico</p>
+        </header>
+
+        <!-- Body -->
+        <div class="essay-body">
+
+          <p>
+            Everyone knows about <strong>chalk</strong> (422M weekly downloads, 1 maintainer)
+            and <strong>axios</strong> (100M/wk, 1 maintainer &mdash; <a href="/blog/the-axios-signal">compromised March 30, 2026</a>).
+            Those are in your <code>package.json</code>. You chose them.
+          </p>
+
+          <p>
+            But when we ran the 113 most-downloaded npm packages through
+            <a href="https://github.com/piiiico/proof-of-commitment">proof-of-commitment</a>
+            today, the packages that surprised me weren&rsquo;t the ones developers deliberately install.
+            They were the invisible ones &mdash; the load-bearing infrastructure nobody chose, nobody
+            monitors, and nobody thinks about.
+          </p>
+
+          <hr class="essay-divider" />
+
+          <h2>glob: 340 million weekly downloads. You&rsquo;ve probably never typed it.</h2>
+
+          <pre><code>$ npx proof-of-commitment glob
+
+Package  Risk            Score  Maintainers  Downloads/wk  Age
+────────────────────────────────────────────────────────────────
+glob     🔴 CRITICAL     78     1            340M/wk       13.7y</code></pre>
+
+          <p>
+            <code>glob</code> turns file patterns like <code>**/*.ts</code> into file lists.
+            It&rsquo;s in webpack, Jest, ESLint, TypeScript, Vite &mdash; every build tool you use.
+            340 million installs every week. One maintainer for 13 years.
+          </p>
+
+          <p>
+            If you don&rsquo;t have <code>glob</code> in your <code>package.json</code>, you almost
+            certainly have it in your <code>package-lock.json</code>. Pulled in three or four levels
+            deep through tools you do have in your package.json.
+          </p>
+
+          <hr class="essay-divider" />
+
+          <h2>cross-spawn: 190 million weekly downloads. Used by your package manager.</h2>
+
+          <pre><code>$ npx proof-of-commitment cross-spawn
+
+Package      Risk            Score  Maintainers  Downloads/wk  Age
+───────────────────────────────────────────────────────────────────
+cross-spawn  🔴 CRITICAL     72     1            190M/wk       10.9y</code></pre>
+
+          <p>
+            <code>cross-spawn</code> makes Node.js child process spawning work on Windows.
+            npm uses it. yarn uses it. Your testing framework uses it. 190 million downloads a week.
+            One maintainer. Score of 72, which puts it in the riskier tier of CRITICAL packages.
+          </p>
+
+          <p>
+            The attack pattern is known: acquire publish access, push a malicious version
+            that runs at build time. Every developer running <code>npm install</code> anywhere
+            in the world is a potential target.
+          </p>
+
+          <hr class="essay-divider" />
+
+          <h2>@types/node: 316 million weekly downloads. It&rsquo;s &ldquo;just types.&rdquo;</h2>
+
+          <pre><code>$ npx proof-of-commitment @types/node
+
+Package      Risk            Score  Maintainers  Downloads/wk  Age
+───────────────────────────────────────────────────────────────────
+@types/node  🔴 CRITICAL     88     1            316M/wk       11.8y</code></pre>
+
+          <p>
+            This one gets dismissed most often: &ldquo;it&rsquo;s just TypeScript types, not runtime code.&rdquo;
+            Technically true for most uses. But <code>@types/node</code> is installed in millions of
+            production build pipelines &mdash; CI/CD systems, Docker containers, development environments
+            that build the production artifact.
+          </p>
+
+          <p>
+            A compromised <code>@types/node</code> version wouldn&rsquo;t affect runtime behavior.
+            It would affect <em>build time</em> &mdash; every system running <code>npm install</code>
+            before compiling and deploying. That includes your CI/CD pipeline. That includes the environment
+            that packages and ships your app.
+          </p>
+
+          <p>
+            316 million weekly downloads. One maintainer.
+          </p>
+
+          <hr class="essay-divider" />
+
+          <h2>The full CRITICAL list: 26 packages, 10.3B weekly downloads</h2>
+
+          <p>
+            We scored 113 packages. These 26 came back CRITICAL (sole maintainer, &gt;10M weekly downloads):
+          </p>
+
+          <div style="overflow-x: auto; margin: 1.5rem 0;">
+            <table style="width: 100%; border-collapse: collapse; font-size: 0.85rem;">
+              <thead>
+                <tr style="border-bottom: 2px solid var(--border); text-align: left;">
+                  <th style="padding: 0.5rem 0.75rem;">Package</th>
+                  <th style="padding: 0.5rem 0.75rem; text-align: right;">Downloads/wk</th>
+                  <th style="padding: 0.5rem 0.75rem; text-align: right;">Score</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr style="border-bottom: 1px solid var(--border-light);">
+                  <td style="padding: 0.4rem 0.75rem;"><code>chalk</code></td>
+                  <td style="padding: 0.4rem 0.75rem; text-align: right;">422M</td>
+                  <td style="padding: 0.4rem 0.75rem; text-align: right; color: var(--red);">75</td>
+                </tr>
+                <tr style="border-bottom: 1px solid var(--border-light);">
+                  <td style="padding: 0.4rem 0.75rem;"><code>glob</code></td>
+                  <td style="padding: 0.4rem 0.75rem; text-align: right;">340M</td>
+                  <td style="padding: 0.4rem 0.75rem; text-align: right; color: var(--red);">78</td>
+                </tr>
+                <tr style="border-bottom: 1px solid var(--border-light);">
+                  <td style="padding: 0.4rem 0.75rem;"><code>@types/node</code></td>
+                  <td style="padding: 0.4rem 0.75rem; text-align: right;">316M</td>
+                  <td style="padding: 0.4rem 0.75rem; text-align: right; color: var(--red);">88</td>
+                </tr>
+                <tr style="border-bottom: 1px solid var(--border-light);">
+                  <td style="padding: 0.4rem 0.75rem;"><code>esbuild</code></td>
+                  <td style="padding: 0.4rem 0.75rem; text-align: right;">216M</td>
+                  <td style="padding: 0.4rem 0.75rem; text-align: right; color: var(--red);">85</td>
+                </tr>
+                <tr style="border-bottom: 1px solid var(--border-light);">
+                  <td style="padding: 0.4rem 0.75rem;"><code>cross-spawn</code></td>
+                  <td style="padding: 0.4rem 0.75rem; text-align: right;">190M</td>
+                  <td style="padding: 0.4rem 0.75rem; text-align: right; color: var(--red);">72</td>
+                </tr>
+                <tr style="border-bottom: 1px solid var(--border-light);">
+                  <td style="padding: 0.4rem 0.75rem;"><code>zod</code></td>
+                  <td style="padding: 0.4rem 0.75rem; text-align: right;">163M</td>
+                  <td style="padding: 0.4rem 0.75rem; text-align: right; color: var(--red);">82</td>
+                </tr>
+                <tr style="border-bottom: 1px solid var(--border-light);">
+                  <td style="padding: 0.4rem 0.75rem;"><code>inherits</code></td>
+                  <td style="padding: 0.4rem 0.75rem; text-align: right;">157M</td>
+                  <td style="padding: 0.4rem 0.75rem; text-align: right; color: var(--red);">64</td>
+                </tr>
+                <tr style="border-bottom: 1px solid var(--border-light);">
+                  <td style="padding: 0.4rem 0.75rem;"><code>lodash</code></td>
+                  <td style="padding: 0.4rem 0.75rem; text-align: right;">149M</td>
+                  <td style="padding: 0.4rem 0.75rem; text-align: right; color: var(--red);">84</td>
+                </tr>
+                <tr style="border-bottom: 1px solid var(--border-light);">
+                  <td style="padding: 0.4rem 0.75rem;"><code>rimraf</code></td>
+                  <td style="padding: 0.4rem 0.75rem; text-align: right;">138M</td>
+                  <td style="padding: 0.4rem 0.75rem; text-align: right; color: var(--red);">77</td>
+                </tr>
+                <tr style="border-bottom: 1px solid var(--border-light);">
+                  <td style="padding: 0.4rem 0.75rem;"><code>mkdirp</code></td>
+                  <td style="padding: 0.4rem 0.75rem; text-align: right;">120M</td>
+                  <td style="padding: 0.4rem 0.75rem; text-align: right; color: var(--red);">72</td>
+                </tr>
+                <tr style="border-bottom: 1px solid var(--border-light);">
+                  <td style="padding: 0.4rem 0.75rem;"><code>@types/react</code></td>
+                  <td style="padding: 0.4rem 0.75rem; text-align: right;">117M</td>
+                  <td style="padding: 0.4rem 0.75rem; text-align: right; color: var(--red);">88</td>
+                </tr>
+                <tr style="border-bottom: 1px solid var(--border-light);">
+                  <td style="padding: 0.4rem 0.75rem;"><code>once</code></td>
+                  <td style="padding: 0.4rem 0.75rem; text-align: right;">114M</td>
+                  <td style="padding: 0.4rem 0.75rem; text-align: right; color: var(--red);">68</td>
+                </tr>
+                <tr style="border-bottom: 1px solid var(--border-light);">
+                  <td style="padding: 0.4rem 0.75rem;"><code>axios</code></td>
+                  <td style="padding: 0.4rem 0.75rem; text-align: right;">100M</td>
+                  <td style="padding: 0.4rem 0.75rem; text-align: right; color: var(--red);">86</td>
+                </tr>
+                <tr style="border-bottom: 1px solid var(--border-light);">
+                  <td style="padding: 0.4rem 0.75rem;"><code>date-fns</code></td>
+                  <td style="padding: 0.4rem 0.75rem; text-align: right;">84M</td>
+                  <td style="padding: 0.4rem 0.75rem; text-align: right; color: var(--red);">78</td>
+                </tr>
+                <tr style="border-bottom: 1px solid var(--border-light);">
+                  <td style="padding: 0.4rem 0.75rem;"><code>chai</code></td>
+                  <td style="padding: 0.4rem 0.75rem; text-align: right;">70M</td>
+                  <td style="padding: 0.4rem 0.75rem; text-align: right; color: var(--red);">80</td>
+                </tr>
+                <tr style="border-bottom: 1px solid var(--border-light);">
+                  <td style="padding: 0.4rem 0.75rem;"><code>sharp</code></td>
+                  <td style="padding: 0.4rem 0.75rem; text-align: right;">59M</td>
+                  <td style="padding: 0.4rem 0.75rem; text-align: right; color: var(--red);">81</td>
+                </tr>
+                <tr style="border-bottom: 1px solid var(--border-light);">
+                  <td style="padding: 0.4rem 0.75rem;"><code>dayjs</code></td>
+                  <td style="padding: 0.4rem 0.75rem; text-align: right;">47M</td>
+                  <td style="padding: 0.4rem 0.75rem; text-align: right; color: var(--red);">81</td>
+                </tr>
+                <tr style="border-bottom: 1px solid var(--border-light);">
+                  <td style="padding: 0.4rem 0.75rem;"><code>bluebird</code></td>
+                  <td style="padding: 0.4rem 0.75rem; text-align: right;">44M</td>
+                  <td style="padding: 0.4rem 0.75rem; text-align: right; color: var(--red);">77</td>
+                </tr>
+                <tr style="border-bottom: 1px solid var(--border-light);">
+                  <td style="padding: 0.4rem 0.75rem;"><code>got</code></td>
+                  <td style="padding: 0.4rem 0.75rem; text-align: right;">34M</td>
+                  <td style="padding: 0.4rem 0.75rem; text-align: right; color: var(--red);">85</td>
+                </tr>
+                <tr style="border-bottom: 1px solid var(--border-light);">
+                  <td style="padding: 0.4rem 0.75rem;"><code>ejs</code></td>
+                  <td style="padding: 0.4rem 0.75rem; text-align: right;">31M</td>
+                  <td style="padding: 0.4rem 0.75rem; text-align: right; color: var(--red);">80</td>
+                </tr>
+                <tr style="border-bottom: 1px solid var(--border-light);">
+                  <td style="padding: 0.4rem 0.75rem;"><code>archiver</code></td>
+                  <td style="padding: 0.4rem 0.75rem; text-align: right;">25M</td>
+                  <td style="padding: 0.4rem 0.75rem; text-align: right; color: var(--red);">74</td>
+                </tr>
+                <tr style="border-bottom: 1px solid var(--border-light);">
+                  <td style="padding: 0.4rem 0.75rem;"><code>cross-env</code></td>
+                  <td style="padding: 0.4rem 0.75rem; text-align: right;">18M</td>
+                  <td style="padding: 0.4rem 0.75rem; text-align: right; color: var(--red);">70</td>
+                </tr>
+                <tr style="border-bottom: 1px solid var(--border-light);">
+                  <td style="padding: 0.4rem 0.75rem;"><code>crypto-js</code></td>
+                  <td style="padding: 0.4rem 0.75rem; text-align: right;">16M</td>
+                  <td style="padding: 0.4rem 0.75rem; text-align: right; color: var(--red);">70</td>
+                </tr>
+                <tr style="border-bottom: 1px solid var(--border-light);">
+                  <td style="padding: 0.4rem 0.75rem;"><code>nodemon</code></td>
+                  <td style="padding: 0.4rem 0.75rem; text-align: right;">12M</td>
+                  <td style="padding: 0.4rem 0.75rem; text-align: right; color: var(--red);">83</td>
+                </tr>
+                <tr style="border-bottom: 1px solid var(--border-light);">
+                  <td style="padding: 0.4rem 0.75rem;"><code>unzipper</code></td>
+                  <td style="padding: 0.4rem 0.75rem; text-align: right;">11M</td>
+                  <td style="padding: 0.4rem 0.75rem; text-align: right; color: var(--red);">73</td>
+                </tr>
+                <tr>
+                  <td style="padding: 0.4rem 0.75rem;"><code>yup</code></td>
+                  <td style="padding: 0.4rem 0.75rem; text-align: right;">11M</td>
+                  <td style="padding: 0.4rem 0.75rem; text-align: right; color: var(--red);">72</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <p>
+            Full interactive table at <a href="/rankings">getcommit.dev/rankings</a>.
+            Data pulled from npm registry today (April 29, 2026).
+          </p>
+
+          <hr class="essay-divider" />
+
+          <h2>What &ldquo;CRITICAL&rdquo; means and what it doesn&rsquo;t</h2>
+
+          <p>
+            CRITICAL = sole maintainer + &gt;10M weekly downloads. That&rsquo;s the structural profile
+            shared by ua-parser-js before October 2021 (sole maintainer, ~8M/wk, credentials compromised,
+            malicious versions published &mdash; CVE-2021-41265/CVE-2021-41266). Same profile as axios
+            in March 2026 (100M/wk, sole maintainer, North Korea-linked group UNC1069 via stolen npm token).
+          </p>
+
+          <p>
+            What it doesn&rsquo;t mean: that the maintainer is careless, or that the package will be
+            attacked. Isaac Z. Schlueter has maintained some of these packages for over a decade.
+            They&rsquo;re excellent software. The risk is structural, not personal &mdash; one person&rsquo;s
+            credentials are the only barrier between 340 million weekly installs and a malicious publish.
+          </p>
+
+          <p>
+            <code>npm audit</code> showed zero issues on axios for its entire history. The structural
+            signal existed before the attack. It just wasn&rsquo;t surfaced.
+          </p>
+
+          <hr class="essay-divider" />
+
+          <h2>Check your own lock file</h2>
+
+          <p>Zero install, runs against your actual resolved dep tree:</p>
+
+          <pre><code>npx proof-of-commitment --file package-lock.json</code></pre>
+
+          <p>
+            Or try the browser demo at <a href="/audit?packages=glob,cross-spawn,inherits,once,chalk">getcommit.dev/audit</a>
+            &mdash; the five invisible packages above, scored live.
+          </p>
+
+          <p>
+            The MCP server works with Claude, Cursor, or any MCP-compatible tool &mdash;
+            add <code>poc-backend.amdal-dev.workers.dev/mcp</code> to your config and ask:
+            &ldquo;score the riskiest packages in vercel/ai&rdquo;.
+          </p>
+
+          <p>
+            GitHub Action for CI integration: <a href="https://github.com/piiiico/proof-of-commitment" target="_blank" rel="noopener">github.com/piiiico/proof-of-commitment</a>.
+          </p>
+
+        </div>
+      </div>
+    </div>
+  </article>
+
+</Layout>

@@ -1,0 +1,194 @@
+---
+import Layout from '../../layouts/Layout.astro';
+---
+
+<Layout
+  title="The Best AI Model Found a Firebase Exploit 7 Out of 10 Times — Commit"
+  description="A researcher spent $1,500 testing 9 AI models on a real vulnerability. GPT-5.5 scored 7/10. Claude scored 2/10. Five models scored zero. The spread is the signal."
+  canonical="https://getcommit.dev/blog/llm-security-audit-noise/"
+  publishDate="2026-06-04"
+>
+
+  <!-- Nav -->
+  <nav>
+    <div class="container nav-inner">
+      <a href="/" class="nav-brand">Commit</a>
+      <ul class="nav-links">
+        <li><a href="/extension">Extension</a></li>
+        <li><a href="/blog">Writing</a></li>
+        <li><a href="/pricing">Pricing</a></li><li><a href="/docs">Docs</a></li><li><a href="https://github.com/piiiico/proof-of-commitment" target="_blank" rel="noopener">GitHub</a></li>
+        <li><a href="mailto:pico@amdal.dev">Contact</a></li>
+      </ul>
+    </div>
+  </nav>
+
+  <!-- Essay -->
+  <article class="essay">
+    <div class="container">
+      <div class="editorial">
+
+        <!-- Header -->
+        <header class="essay-header">
+          <div class="essay-meta animate-in delay-1">
+            <time datetime="2026-06-04">June 4, 2026</time>
+          </div>
+          <h1 class="essay-title animate-in delay-2">The Best AI Model Found a Firebase Exploit 7 Out of 10 Times</h1>
+          <p class="essay-subtitle animate-in delay-3">
+            A researcher spent $1,500 testing 9 AI models on a real vulnerability. GPT-5.5 scored 7/10. Claude scored 2/10. Five models scored zero. The spread is the signal — not which model won.
+          </p>
+          <p class="essay-byline animate-in delay-4">Pico</p>
+        </header>
+
+        <!-- Body -->
+        <div class="essay-body">
+
+          <p>
+            Last week, Kasra Rahjerdi published <a href="https://kasra.blog/blog/i-spent-1500-seeing-if-llms-could-hack-my-app/" target="_blank" rel="noopener">a benchmark</a> that made 305 points on Hacker News. He built BookNook — a vulnerable fake book review app with a real Firebase broken access control flaw — and gave nine AI models $10 and two hours each to find and exploit it.
+          </p>
+          <p>
+            The top performer: GPT-5.5 at <strong>7/10</strong>. Claude: <strong>2/10</strong>. Several of the nine models tested scored zero. Total spend: $1,500.
+          </p>
+          <p>
+            The immediate reaction was about the winner. GPT-5.5 beats Claude. OpenAI wins security. But that framing misses the actual result.
+          </p>
+          <p>
+            The actual result is this: <strong>the best AI model in the world failed to find a known vulnerability three times out of ten.</strong>
+          </p>
+
+          <h2>A 3.5x variance problem</h2>
+
+          <p>
+            The gap between GPT-5.5 (7/10) and Claude (2/10) is 3.5x. Multiple models couldn't find the exploit at all, despite being frontier-class systems.
+          </p>
+          <p>
+            This is the same vulnerability. The same application. The same budget. The same two-hour window. The spread isn't measurement noise — it's a 350% swing in detection capability across a selection of frontier models.
+          </p>
+          <p>
+            If you ran this benchmark on a different day with slightly different prompting, the rankings would shift. The HN comments noted as much: the methodology gave GPT-5.5 a research whitelist that Claude didn't have, making Claude's guardrail-hampered 2/10 a partially independent variable. Change the harness, change the results. The numbers aren't stable.
+          </p>
+          <p>
+            That instability is precisely the problem. "We ran an AI security audit" is becoming a trust signal — appearing in SOC2 supplements, security questionnaires, due diligence checklists. That signal is backed by a process with 30-100% failure rates depending on which model ran it and how the prompt was written.
+          </p>
+
+          <h2>Why single-pass audits fail structurally</h2>
+
+          <p>
+            A security audit is a search problem. You're looking for a vulnerability that, by design, isn't labeled as one. The attacker has infinite patience; the audit has a budget and a clock.
+          </p>
+          <p>
+            LLMs solve search problems probabilistically. Run the same prompt ten times and you get ten different exploration paths. That's not a defect — it's how the sampling works. The problem is that a single-pass audit picks exactly one path, then stops.
+          </p>
+          <p>
+            GPT-5.5 found the Firebase exploit in seven of its ten attempts. In the three it missed, it explored the wrong paths first, ran out of budget, and stopped. There's nothing wrong with those three runs in isolation. They were doing exactly what the model does. The problem is that a real audit doesn't get ten attempts — it gets one.
+          </p>
+          <p>
+            A single $10 run of GPT-5.5 has a 30% chance of missing a vulnerability it's capable of finding. A single $10 run of Claude has an 80% chance of missing it.
+          </p>
+          <p>
+            "AI reviewed this" is not a trust signal. It's a lottery ticket.
+          </p>
+
+          <h2>Commit-level checking changes the math</h2>
+
+          <p>
+            The $1,500 benchmark was structured as one big audit per model. That's the wrong unit of analysis.
+          </p>
+          <p>
+            The right unit is the commit. Every code change is a delta — smaller surface, bounded scope, immediately after the vulnerability was introduced. Checking at commit time costs a fraction of a full-repo audit. And you don't have to be right every time; you have to be right before the code ships.
+          </p>
+          <p>
+            If your CI runs a security check on every pull request, and that check runs multiple models in parallel, the math shifts dramatically. Three models that independently have a 70%, 30%, and 20% detection rate produce a combined false-negative rate of 17% when you require at least one detection. Require two of three to agree, and you filter out most hallucinated findings while still catching what's real.
+          </p>
+          <p>
+            The noise in single-pass LLM audits is real and documented. Multi-pass, multi-model, commit-level checking absorbs that noise — not by making any individual model more reliable, but by not relying on any individual model being reliable.
+          </p>
+
+          <h2>The behavioral signal that accumulates</h2>
+
+          <p>
+            There's a second insight buried in Rahjerdi's data that goes beyond the security audit framing.
+          </p>
+          <p>
+            The benchmark measures detection capability at a point in time. But the packages and repositories you depend on aren't audited once — they ship continuously. A maintainer who ships 800 releases over a decade generates a different behavioral signal than one who shipped 12 releases before going dark. That behavioral history is evidence that the code is being actively reviewed, updated, and maintained by someone with skin in the game.
+          </p>
+          <p>
+            That's not an AI audit. That's a commitment record. It's hard to fake because it requires time, sustained effort, and real-world deployments that would surface bugs if they existed.
+          </p>
+          <p>
+            The AI benchmark proves that single-shot detection is noisy. Behavioral history proves something the benchmark can't: that this maintainer kept caring about this code across hundreds of consecutive commits, years of releases, and 400M weekly downloads.
+          </p>
+          <p>
+            Those are different signals. The AI audit catches what's verifiable in a two-hour window. The behavioral record captures what's hard to fake over time.
+          </p>
+          <p>
+            Both matter. Neither alone is sufficient. The trust layer that combines them — continuous commit-level checking plus behavioral commitment history — is the one worth building.
+          </p>
+          <p>
+            We're building it at <a href="/">Commit</a>.
+          </p>
+
+          <hr class="essay-divider" />
+
+          <p class="essay-coda">
+            <em>The full benchmark is at <a href="https://kasra.blog/blog/i-spent-1500-seeing-if-llms-could-hack-my-app/" target="_blank" rel="noopener">kasra.blog</a>. The HN thread is <a href="https://news.ycombinator.com/item?id=48392343" target="_blank" rel="noopener">here</a>.</em>
+          </p>
+          <p class="essay-coda">
+            <em>We're building <a href="/">Commit</a> — behavioral trust infrastructure for code and the people who ship it. If your security posture currently rests on "AI reviewed this," <a href="mailto:pico@amdal.dev">let's talk</a>.</em>
+          </p>
+          <p class="essay-coda">
+            <em>Related: <a href="/blog/benchmarks-lied">Benchmarks Lied. Now What?</a> · <a href="/blog/npm-audit-zero-vulnerabilities">Why npm audit Returns Zero Vulnerabilities for the Most Dangerous Packages</a></em>
+          </p>
+
+        </div>
+      </div>
+    </div>
+  </article>
+
+  <!-- Newsletter -->
+  <section class="newsletter-section">
+    <div class="container">
+      <div class="editorial reveal">
+        <h2 style="margin-bottom: 0.75rem;">Stay in the loop</h2>
+        <p style="margin-bottom: 2rem; font-size: 1rem;">
+          Early access, research updates, and the occasional strong opinion.
+        </p>
+
+        <form
+          action="https://buttondown.email/api/emails/embed-subscribe/commitgraph"
+          method="post"
+          target="popupwindow"
+          class="newsletter-form"
+        >
+          <input
+            type="email"
+            name="email"
+            placeholder="you@example.com"
+            required
+            class="newsletter-input"
+          />
+          <button type="submit" class="btn-primary" style="white-space: nowrap;">
+            Subscribe
+          </button>
+        </form>
+
+        <p class="newsletter-note">No spam. Unsubscribe anytime.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer>
+    <div class="container footer-inner">
+      <span class="footer-brand">Commit</span>
+      <ul class="footer-links">
+        <li><a href="/">Home</a></li>
+        <li><a href="/extension">Extension</a></li>
+        <li><a href="/blog">Writing</a></li>
+        <li><a href="/pricing">Pricing</a></li><li><a href="/docs">Docs</a></li><li><a href="https://github.com/piiiico/proof-of-commitment" target="_blank" rel="noopener">GitHub</a></li>
+        <li><a href="mailto:pico@amdal.dev">Contact</a></li>
+      </ul>
+      <span class="footer-locale">Stavanger, Norway</span>
+    </div>
+  </footer>
+
+</Layout>

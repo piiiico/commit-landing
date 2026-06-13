@@ -1,0 +1,89 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import { posts } from '../../data/posts';
+
+const sortedPosts = [...posts].sort((a, b) => b.date.localeCompare(a.date));
+---
+
+<Layout
+  title="Writing — Commit"
+  description="Essays and research on behavioral commitment, trust infrastructure, and the future of signals that cannot be faked."
+  canonical="https://getcommit.dev/blog/"
+>
+
+  <!-- Nav -->
+  <nav>
+    <div class="container nav-inner">
+      <a href="/" class="nav-brand">Commit</a>
+      <ul class="nav-links">
+        <li><a href="/extension">Extension</a></li>
+        <li><a href="/blog" style="color: var(--ink);">Writing</a></li>
+        <li><a href="/pricing">Pricing</a></li><li><a href="/docs">Docs</a></li><li><a href="https://github.com/piiiico/proof-of-commitment" target="_blank" rel="noopener">GitHub</a></li>
+        <li><a href="mailto:pico@amdal.dev">Contact</a></li>
+      </ul>
+    </div>
+  </nav>
+
+  <!-- Header -->
+  <section style="padding: var(--space-section) 0 calc(var(--space-section) * 0.5);">
+    <div class="container">
+      <div class="editorial">
+        <span class="hero-eyebrow animate-in delay-1">Writing</span>
+        <h1 class="animate-in delay-2" style="font-size: clamp(2rem, 4.5vw, 3rem);">
+          Essays on commitment,<br />trust, and what AI cannot fake.
+        </h1>
+      </div>
+    </div>
+  </section>
+
+  <hr class="section-divider" />
+
+  <!-- Post list -->
+  <section style="padding: var(--space-block) 0 var(--space-section);">
+    <div class="container">
+      <div class="editorial">
+        <ul class="blog-post-list">
+          {sortedPosts.map(post => (
+            <li class="blog-post-item reveal">
+              <div class="blog-post-date">{post.dateLabel}</div>
+              <a href={`/blog/${post.slug}`} class="blog-post-title">
+                {post.title}
+              </a>
+              <p class="blog-post-excerpt">
+                {post.description}
+              </p>
+            </li>
+          ))}
+        </ul>
+
+        <div style="margin-top: 3rem; padding-top: 2rem; border-top: 1px solid var(--border-light); display: flex; align-items: center; gap: 1.5rem; flex-wrap: wrap;">
+          <p style="font-size: 0.875rem; color: var(--ink-subtle); margin: 0;">
+            More essays in progress. <a href="mailto:pico@amdal.dev">Subscribe</a> to get them first.
+          </p>
+          <div style="display: flex; gap: 1rem; align-items: center;">
+            <a href="/blog/rss.xml" style="font-size: 0.8125rem; color: var(--ink-subtle); text-decoration: none; display: flex; align-items: center; gap: 0.35rem;" title="RSS Feed">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M6.18 15.64a2.18 2.18 0 0 1 2.18 2.18C8.36 19.01 7.38 20 6.18 20C4.98 20 4 19.01 4 17.82a2.18 2.18 0 0 1 2.18-2.18M4 4.44A15.56 15.56 0 0 1 19.56 20h-2.83A12.73 12.73 0 0 0 4 7.27V4.44m0 5.66a9.9 9.9 0 0 1 9.9 9.9h-2.83A7.07 7.07 0 0 0 4 12.93V10.1z"/></svg>
+              RSS
+            </a>
+            <a href="/blog/feed.json" style="font-size: 0.8125rem; color: var(--ink-subtle); text-decoration: none;" title="JSON Feed">JSON Feed</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer>
+    <div class="container footer-inner">
+      <span class="footer-brand">Commit</span>
+      <ul class="footer-links">
+        <li><a href="/">Home</a></li>
+        <li><a href="/pricing">Pricing</a></li><li><a href="/docs">Docs</a></li><li><a href="https://github.com/piiiico/proof-of-commitment" target="_blank" rel="noopener">GitHub</a></li>
+        <li><a href="mailto:pico@amdal.dev">Contact</a></li>
+        <li><a href="/blog/rss.xml" title="RSS Feed">RSS</a></li>
+      </ul>
+      <span class="footer-locale">Stavanger, Norway</span>
+    </div>
+  </footer>
+
+</Layout>

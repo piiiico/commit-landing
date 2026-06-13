@@ -1,0 +1,290 @@
+---
+import Layout from '../../layouts/Layout.astro';
+---
+
+<Layout
+  title="npm Trusted Publishing is a column now — Commit"
+  description="v1.7.0 of proof-of-commitment adds a Provenance column: 🔐 verified vs — for every package you scan. Here's what Trusted Publishing actually is, how to set it up, and what the data shows."
+  canonical="https://getcommit.dev/blog/npm-trusted-publishing-provenance/"
+  publishDate="2026-05-16"
+>
+
+  <!-- Nav -->
+  <nav>
+    <div class="container nav-inner">
+      <a href="/" class="nav-brand">Commit</a>
+      <ul class="nav-links">
+        <li><a href="/quickstart">Quickstart</a></li>
+        <li><a href="/audit">Audit</a></li>
+        <li><a href="/rankings">Rankings</a></li>
+        <li><a href="/blog">Writing</a></li>
+        <li><a href="https://github.com/piiiico/proof-of-commitment" target="_blank" rel="noopener">GitHub</a></li>
+      </ul>
+    </div>
+  </nav>
+
+  <!-- Essay -->
+  <article class="essay">
+    <div class="container">
+      <div class="editorial">
+
+        <!-- Header -->
+        <header class="essay-header">
+          <div class="essay-meta animate-in delay-1">
+            <time datetime="2026-05-16">May 16, 2026</time>
+          </div>
+          <h1 class="essay-title animate-in delay-2">npm Trusted Publishing is a column now</h1>
+          <p class="essay-subtitle animate-in delay-3">
+            v1.7.0 added a Provenance column to <code>proof-of-commitment</code>.
+            Here&rsquo;s what npm Trusted Publishing actually is, how to turn it on,
+            and what it does (and doesn&rsquo;t) tell you about a package&rsquo;s supply chain.
+          </p>
+          <p class="essay-byline animate-in delay-4">H&aring;kon &Aring;mdal</p>
+        </header>
+
+        <!-- Body -->
+        <div class="essay-body">
+
+          <p>
+            npm has had provenance attestations since 2023. When a package uses Trusted Publishing,
+            the registry records a signed statement that this exact tarball was built by a specific
+            GitHub Actions workflow on a specific commit. You can verify it. The badge shows up on
+            the registry page.
+          </p>
+
+          <p>
+            But registry pages are where packages go to be admired, not where they get installed.
+            By the time you run <code>npm install</code>, you&rsquo;re looking at a lock file, not a
+            browser tab. The provenance badge might as well not exist.
+          </p>
+
+          <p>
+            v1.7.0 puts that signal where you can actually see it: in the CLI output, next to the
+            risk score.
+          </p>
+
+          <hr class="essay-divider" />
+
+          <h2>What Trusted Publishing actually is</h2>
+
+          <p>
+            The standard npm publish flow requires a personal access token (PAT) stored as a
+            CI secret. The token authenticates the publisher. If a maintainer&rsquo;s machine is
+            compromised or the token leaks from a CI log, an attacker can publish a malicious version.
+            The published artifact traces back to a human identity, not to a specific build.
+          </p>
+
+          <p>
+            Trusted Publishing replaces the token with OIDC. During a GitHub Actions run,
+            the workflow requests a short-lived identity token from GitHub&rsquo;s OIDC provider.
+            npm verifies that token against pre-configured expectations: this specific repository,
+            this specific workflow file, optionally this specific environment. If everything matches,
+            npm issues a short-lived publish token automatically. No long-lived secret needed.
+          </p>
+
+          <p>
+            The result is a signed attestation attached to the package version.
+            That attestation links the published tarball to a specific commit SHA and workflow run.
+            Anyone can verify it. The provenance chain is now: tarball &rarr; workflow run &rarr; commit &rarr; source code.
+          </p>
+
+          <hr class="essay-divider" />
+
+          <h2>How to set it up</h2>
+
+          <p>
+            Three changes from the typical setup. First, your publish workflow needs the OIDC token permission:
+          </p>
+
+          <pre><code>permissions:
+  id-token: write
+  contents: read</code></pre>
+
+          <p>
+            Second, pass <code>--provenance</code> to the publish command:
+          </p>
+
+          <pre><code>- name: Publish
+  run: npm publish --provenance --access public</code></pre>
+
+          <p>
+            Third, remove <code>NPM_TOKEN</code> from your secrets and configure Trusted Publishing
+            in your npm account settings instead. Under your package settings on npmjs.com, add a new
+            trusted publisher and point it at your repository and workflow file.
+          </p>
+
+          <p>
+            After publishing, the attestation shows up at:
+            <code>registry.npmjs.org/-/npm/v1/attestations/[package]@[version]</code>
+          </p>
+
+          <hr class="essay-divider" />
+
+          <h2>The column in practice</h2>
+
+          <p>
+            Running <code>npx proof-of-commitment axios chalk zod</code> after v1.7.0:
+          </p>
+
+          <pre><code>Package               Risk            Score    Publishers    Downloads     Age       Provenance
+───────────────────────────────────────────────────────────────────────────────────────────────
+chalk                 🔴 CRITICAL     75       1             439.6M/wk     12.8y     -
+  ↳ 30+ GitHub contributors, publish-access concentration risk despite active community
+axios                 🔴 CRITICAL     88       1             108.0M/wk     11.7y     🔐 verified
+  ↳ 30+ GitHub contributors, publish-access concentration risk despite active community
+zod                   🔴 CRITICAL     88       1             142.7M/wk      6.2y     🔐 verified
+  ↳ 30+ GitHub contributors, publish-access concentration risk despite active community
+───────────────────────────────────────────────────────────────────────────────────────────────
+
+⚠ 3 CRITICAL packages found.
+   CRITICAL = sole npm publisher + >10M weekly downloads (publish-access concentration risk)
+   🔐 2/3 use Trusted Publishing (OIDC provenance), partial mitigation</code></pre>
+
+          <p>
+            Axios and zod use Trusted Publishing. Chalk doesn&rsquo;t. All three are flagged CRITICAL
+            because provenance doesn&rsquo;t eliminate the concentration risk (one npm publisher account
+            controls the release).
+          </p>
+
+          <p>
+            That&rsquo;s the honest read: provenance tells you about the build pipeline, not about
+            the human controlling it. Axios with provenance is still 108 million weekly downloads
+            going through one publisher account. Better than without. Not solved.
+          </p>
+
+          <hr class="essay-divider" />
+
+          <h2>Where this fits with --fail-on</h2>
+
+          <p>
+            <a href="/blog/critical-flag-silent-regression">v1.7.0 also shipped the <code>--fail-on</code> flag</a>
+            via PR #6, which lets you make CI fail on CRITICAL packages. Provenance becomes a
+            useful companion signal there.
+          </p>
+
+          <p>
+            A CRITICAL package with provenance is a different risk than one without.
+            Both have a single npm publisher controlling 100M+ weekly downloads. But with provenance,
+            at least you know a compromised token can&rsquo;t silently inject a different artifact.
+            The published tarball has a verifiable build chain. That&rsquo;s worth distinguishing.
+          </p>
+
+          <p>
+            The JSON output (via <code>--json</code>) now includes <code>provenanceCount</code>
+            alongside <code>criticalCount</code>, so you can build custom gate logic in CI if you
+            want to treat &ldquo;CRITICAL with provenance&rdquo; differently from
+            &ldquo;CRITICAL without.&rdquo;
+          </p>
+
+          <hr class="essay-divider" />
+
+          <h2>One signal, not a moat</h2>
+
+          <p>
+            Provenance doesn&rsquo;t tell you whether the CI workflow itself is trustworthy.
+            It doesn&rsquo;t protect against a compromised GitHub runner or a malicious
+            <code>prepare</code> hook. It doesn&rsquo;t help with packages that don&rsquo;t use
+            GitHub Actions at all.
+          </p>
+
+          <p>
+            A package with provenance can still be a supply chain risk. A package without it
+            can be well-maintained and safe. The column is a data point, not a verdict.
+          </p>
+
+          <p>
+            What it eliminates is the token-theft publish path. That&rsquo;s a real attack vector
+            (the axios compromise in March 2026 happened via stolen credentials), and Trusted Publishing
+            closes it. That matters. It just doesn&rsquo;t make the whole supply-chain problem go away.
+          </p>
+
+          <hr class="essay-divider" />
+
+          <h2>Where this is heading</h2>
+
+          <p>
+            The current state of npm Trusted Publishing adoption is uneven. Axios has it.
+            Chalk doesn&rsquo;t. Many popular packages are somewhere in between. npm is pushing
+            adoption via registry-side announcements, but there&rsquo;s no enforcement.
+          </p>
+
+          <p>
+            The direction the ecosystem is moving: provenance as baseline, not differentiator.
+            SLSA levels applied to package ecosystems. Software bills of materials as contractual
+            requirements in regulated industries. In five years, a package without provenance may
+            look like a package without a readme looks today.
+          </p>
+
+          <p>
+            The Provenance column in <code>proof-of-commitment</code> is there so you can see
+            where your dependencies are on that curve, right now, without opening a browser.
+          </p>
+
+          <hr class="essay-divider" />
+
+          <p class="essay-coda">
+            <em>
+              <a href="https://github.com/piiiico/proof-of-commitment"><code>proof-of-commitment</code></a>
+              v1.7.0 is on npm. Run <code>npx proof-of-commitment [packages]</code> against your
+              own dependencies to see provenance coverage. If you&rsquo;re a package maintainer
+              and want to set up Trusted Publishing,
+              <a href="https://docs.npmjs.com/generating-provenance-statements">the npm docs</a>
+              are clear and the setup takes about 10 minutes.
+            </em>
+          </p>
+
+        </div>
+      </div>
+    </div>
+  </article>
+
+  <!-- Newsletter -->
+  <section class="newsletter-section">
+    <div class="container">
+      <div class="editorial reveal">
+        <h2 style="margin-bottom: 0.75rem;">Stay in the loop</h2>
+        <p style="margin-bottom: 2rem; font-size: 1rem;">
+          Early access, research updates, and the occasional strong opinion.
+        </p>
+
+        <form
+          action="https://buttondown.email/api/emails/embed-subscribe/commitgraph"
+          method="post"
+          target="popupwindow"
+          class="newsletter-form"
+        >
+          <input
+            type="email"
+            name="email"
+            placeholder="you@example.com"
+            required
+            class="newsletter-input"
+          />
+          <button type="submit" class="btn-primary" style="white-space: nowrap;">
+            Subscribe
+          </button>
+        </form>
+
+        <p class="newsletter-note">No spam. Unsubscribe anytime.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer>
+    <div class="container footer-inner">
+      <span class="footer-brand">Commit</span>
+      <ul class="footer-links">
+        <li><a href="/">Home</a></li>
+        <li><a href="/extension">Extension</a></li>
+        <li><a href="/blog">Writing</a></li>
+        <li><a href="/pricing">Pricing</a></li>
+        <li><a href="/docs">Docs</a></li>
+        <li><a href="https://github.com/piiiico/proof-of-commitment" target="_blank" rel="noopener">GitHub</a></li>
+        <li><a href="mailto:pico@amdal.dev">Contact</a></li>
+      </ul>
+      <span class="footer-locale">Stavanger, Norway</span>
+    </div>
+  </footer>
+
+</Layout>

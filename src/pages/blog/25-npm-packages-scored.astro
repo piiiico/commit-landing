@@ -1,0 +1,269 @@
+---
+import Layout from '../../layouts/Layout.astro';
+---
+
+<Layout
+  title="I Scored 25 Top npm Packages for Supply Chain Risk. Here's Who Passes. — Commit"
+  description="esbuild has 201M weekly downloads and one maintainer — more than TypeScript. I ran 25 of the most downloaded npm packages through a behavioral risk scorer. The results are worse than expected."
+  canonical="https://getcommit.dev/blog/25-npm-packages-scored/"
+  publishDate="2026-04-21"
+>
+
+  <!-- Nav -->
+  <nav>
+    <div class="container nav-inner">
+      <a href="/" class="nav-brand">Commit</a>
+      <ul class="nav-links">
+        <li><a href="/extension">Extension</a></li>
+        <li><a href="/blog">Writing</a></li>
+        <li><a href="/pricing">Pricing</a></li><li><a href="/docs">Docs</a></li><li><a href="https://github.com/piiiico/proof-of-commitment" target="_blank" rel="noopener">GitHub</a></li>
+        <li><a href="mailto:pico@amdal.dev">Contact</a></li>
+      </ul>
+    </div>
+  </nav>
+
+  <!-- Essay -->
+  <article class="essay">
+    <div class="container">
+      <div class="editorial">
+
+        <!-- Header -->
+        <header class="essay-header">
+          <div class="essay-meta animate-in delay-1">
+            <time datetime="2026-04-21">April 21, 2026</time>
+          </div>
+          <h1 class="essay-title animate-in delay-2">I Scored 25 Top npm Packages for Supply Chain Risk. Here&rsquo;s Who Passes.</h1>
+          <p class="essay-subtitle animate-in delay-3">
+            esbuild has 201M weekly downloads and one maintainer &mdash; more than TypeScript.
+            I ran 25 of the most downloaded npm packages through a behavioral risk scorer.
+            The results are worse than I expected.
+          </p>
+          <p class="essay-byline animate-in delay-4">H&aring;kon &Aring;mdal</p>
+        </header>
+
+        <!-- Body -->
+        <div class="essay-body">
+
+          <pre><code>npx proof-of-commitment react zod chalk lodash axios typescript</code></pre>
+
+          <p>
+            That&rsquo;s it. No install, no API key, no account. Run it against any package &mdash;
+            or drop your <code>package.json</code> at <a href="https://getcommit.dev/audit">getcommit.dev/audit</a>.
+          </p>
+          <p>
+            I ran it against 25 of the most downloaded npm packages. Here&rsquo;s what the data shows.
+          </p>
+
+          <h2>The scoring model</h2>
+
+          <p>Five behavioral dimensions, all from public registry data:</p>
+
+          <div style="overflow-x: auto; margin: 1.5rem 0;">
+            <table style="width: 100%; border-collapse: collapse; font-size: 0.875rem;">
+              <thead>
+                <tr style="border-bottom: 2px solid var(--border);">
+                  <th style="text-align: left; padding: 0.5rem 1rem 0.5rem 0;">Dimension</th>
+                  <th style="text-align: center; padding: 0.5rem;">Max</th>
+                  <th style="text-align: left; padding: 0.5rem 0 0.5rem 1rem;">What it measures</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr style="border-bottom: 1px solid var(--border);"><td style="padding: 0.5rem 1rem 0.5rem 0;">Longevity</td><td style="text-align: center; padding: 0.5rem;">25</td><td style="padding: 0.5rem 0 0.5rem 1rem;">Package age — time in production is signal</td></tr>
+                <tr style="border-bottom: 1px solid var(--border);"><td style="padding: 0.5rem 1rem 0.5rem 0;">Download Momentum</td><td style="text-align: center; padding: 0.5rem;">25</td><td style="padding: 0.5rem 0 0.5rem 1rem;">Weekly downloads + trend direction</td></tr>
+                <tr style="border-bottom: 1px solid var(--border);"><td style="padding: 0.5rem 1rem 0.5rem 0;">Release Consistency</td><td style="text-align: center; padding: 0.5rem;">20</td><td style="padding: 0.5rem 0 0.5rem 1rem;">Cadence, recency, gaps</td></tr>
+                <tr style="border-bottom: 1px solid var(--border);"><td style="padding: 0.5rem 1rem 0.5rem 0;">Maintainer Depth</td><td style="text-align: center; padding: 0.5rem;">15</td><td style="padding: 0.5rem 0 0.5rem 1rem;">Number of active maintainers</td></tr>
+                <tr><td style="padding: 0.5rem 1rem 0.5rem 0;">GitHub Backing</td><td style="text-align: center; padding: 0.5rem;">15</td><td style="padding: 0.5rem 0 0.5rem 1rem;">Star traction, repo activity</td></tr>
+              </tbody>
+            </table>
+          </div>
+
+          <p>
+            <strong>CRITICAL</strong> = 1 maintainer + &gt;10M weekly downloads. Same profile as the ua-parser-js attack
+            (October 2021) and the event-stream incident (2018).
+          </p>
+
+          <h2>25 packages scored — April 21, 2026</h2>
+
+          <div style="overflow-x: auto; margin: 1.5rem 0;">
+            <table style="width: 100%; border-collapse: collapse; font-size: 0.8rem;">
+              <thead>
+                <tr style="border-bottom: 2px solid var(--border);">
+                  <th style="text-align: left; padding: 0.4rem 0.75rem 0.4rem 0;">Package</th>
+                  <th style="text-align: center; padding: 0.4rem 0.5rem;">Score</th>
+                  <th style="text-align: left; padding: 0.4rem 0.5rem;">Risk</th>
+                  <th style="text-align: center; padding: 0.4rem 0.5rem;">Maintainers</th>
+                  <th style="text-align: right; padding: 0.4rem 0 0.4rem 0.75rem;">Downloads/wk</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr style="border-bottom: 1px solid var(--border);"><td style="padding: 0.35rem 0.75rem 0.35rem 0;"><a href="/npm/webpack">webpack</a></td><td style="text-align: center; padding: 0.35rem 0.5rem; color: #3c7d3c;">100</td><td style="padding: 0.35rem 0.5rem;">✅ SAFE</td><td style="text-align: center; padding: 0.35rem 0.5rem;">8</td><td style="text-align: right; padding: 0.35rem 0 0.35rem 0.75rem;">44M</td></tr>
+                <tr style="border-bottom: 1px solid var(--border);"><td style="padding: 0.35rem 0.75rem 0.35rem 0;"><a href="/npm/prettier">prettier</a></td><td style="text-align: center; padding: 0.35rem 0.5rem; color: #3c7d3c;">100</td><td style="padding: 0.35rem 0.5rem;">✅ SAFE</td><td style="text-align: center; padding: 0.35rem 0.5rem;">11</td><td style="text-align: right; padding: 0.35rem 0 0.35rem 0.75rem;">87M</td></tr>
+                <tr style="border-bottom: 1px solid var(--border);"><td style="padding: 0.35rem 0.75rem 0.35rem 0;"><a href="/npm/rollup">rollup</a></td><td style="text-align: center; padding: 0.35rem 0.5rem; color: #3c7d3c;">99</td><td style="padding: 0.35rem 0.5rem;">✅ SAFE</td><td style="text-align: center; padding: 0.35rem 0.5rem;">5</td><td style="text-align: right; padding: 0.35rem 0 0.35rem 0.75rem;">102M</td></tr>
+                <tr style="border-bottom: 1px solid var(--border);"><td style="padding: 0.35rem 0.75rem 0.35rem 0;"><a href="/npm/typescript">typescript</a></td><td style="text-align: center; padding: 0.35rem 0.5rem; color: #3c7d3c;">98</td><td style="padding: 0.35rem 0.5rem;">✅ SAFE</td><td style="text-align: center; padding: 0.35rem 0.5rem;">6</td><td style="text-align: right; padding: 0.35rem 0 0.35rem 0.75rem;">178M</td></tr>
+                <tr style="border-bottom: 1px solid var(--border);"><td style="padding: 0.35rem 0.75rem 0.35rem 0;"><a href="/npm/express">express</a></td><td style="text-align: center; padding: 0.35rem 0.5rem; color: #3c7d3c;">97</td><td style="padding: 0.35rem 0.5rem;">✅ SAFE</td><td style="text-align: center; padding: 0.35rem 0.5rem;">5</td><td style="text-align: right; padding: 0.35rem 0 0.35rem 0.75rem;">93M</td></tr>
+                <tr style="border-bottom: 1px solid var(--border);"><td style="padding: 0.35rem 0.75rem 0.35rem 0;"><a href="/npm/jest">jest</a></td><td style="text-align: center; padding: 0.35rem 0.5rem; color: #3c7d3c;">95</td><td style="padding: 0.35rem 0.5rem;">✅ SAFE</td><td style="text-align: center; padding: 0.35rem 0.5rem;">5</td><td style="text-align: right; padding: 0.35rem 0 0.35rem 0.75rem;">44M</td></tr>
+                <tr style="border-bottom: 1px solid var(--border);"><td style="padding: 0.35rem 0.75rem 0.35rem 0;"><a href="/npm/tailwindcss">tailwindcss</a></td><td style="text-align: center; padding: 0.35rem 0.5rem; color: #3c7d3c;">95</td><td style="padding: 0.35rem 0.5rem;">✅ SAFE</td><td style="text-align: center; padding: 0.35rem 0.5rem;">3</td><td style="text-align: right; padding: 0.35rem 0 0.35rem 0.75rem;">89M</td></tr>
+                <tr style="border-bottom: 1px solid var(--border);"><td style="padding: 0.35rem 0.75rem 0.35rem 0;"><a href="/npm/fastify">fastify</a></td><td style="text-align: center; padding: 0.35rem 0.5rem; color: #3c7d3c;">95</td><td style="padding: 0.35rem 0.5rem;">✅ SAFE</td><td style="text-align: center; padding: 0.35rem 0.5rem;">5</td><td style="text-align: right; padding: 0.35rem 0 0.35rem 0.75rem;">6M</td></tr>
+                <tr style="border-bottom: 1px solid var(--border);"><td style="padding: 0.35rem 0.75rem 0.35rem 0;"><a href="/npm/dotenv">dotenv</a></td><td style="text-align: center; padding: 0.35rem 0.5rem; color: #3c7d3c;">93</td><td style="padding: 0.35rem 0.5rem;">✅ SAFE</td><td style="text-align: center; padding: 0.35rem 0.5rem;">3</td><td style="text-align: right; padding: 0.35rem 0 0.35rem 0.75rem;">120M</td></tr>
+                <tr style="border-bottom: 1px solid var(--border);"><td style="padding: 0.35rem 0.75rem 0.35rem 0;"><a href="/npm/react">react</a></td><td style="text-align: center; padding: 0.35rem 0.5rem; color: #3c7d3c;">91</td><td style="padding: 0.35rem 0.5rem;">✅ SAFE</td><td style="text-align: center; padding: 0.35rem 0.5rem;">2</td><td style="text-align: right; padding: 0.35rem 0 0.35rem 0.75rem;">127M</td></tr>
+                <tr style="border-bottom: 1px solid var(--border);"><td style="padding: 0.35rem 0.75rem 0.35rem 0;"><a href="/npm/eslint">eslint</a></td><td style="text-align: center; padding: 0.35rem 0.5rem; color: #3c7d3c;">91</td><td style="padding: 0.35rem 0.5rem;">✅ SAFE</td><td style="text-align: center; padding: 0.35rem 0.5rem;">2</td><td style="text-align: right; padding: 0.35rem 0 0.35rem 0.75rem;">125M</td></tr>
+                <tr style="border-bottom: 1px solid var(--border);"><td style="padding: 0.35rem 0.75rem 0.35rem 0;"><a href="/npm/vite">vite</a></td><td style="text-align: center; padding: 0.35rem 0.5rem; color: #3c7d3c;">91</td><td style="padding: 0.35rem 0.5rem;">✅ SAFE</td><td style="text-align: center; padding: 0.35rem 0.5rem;">4</td><td style="text-align: right; padding: 0.35rem 0 0.35rem 0.75rem;">105M</td></tr>
+                <tr style="border-bottom: 1px solid var(--border);"><td style="padding: 0.35rem 0.75rem 0.35rem 0;"><a href="/npm/next">next</a></td><td style="text-align: center; padding: 0.35rem 0.5rem; color: #3c7d3c;">91</td><td style="padding: 0.35rem 0.5rem;">✅ SAFE</td><td style="text-align: center; padding: 0.35rem 0.5rem;">2</td><td style="text-align: right; padding: 0.35rem 0 0.35rem 0.75rem;">36M</td></tr>
+                <tr style="border-bottom: 1px solid var(--border);"><td style="padding: 0.35rem 0.75rem 0.35rem 0;"><a href="/npm/prisma">prisma</a></td><td style="text-align: center; padding: 0.35rem 0.5rem; color: #3c7d3c;">91</td><td style="padding: 0.35rem 0.5rem;">✅ SAFE</td><td style="text-align: center; padding: 0.35rem 0.5rem;">2</td><td style="text-align: right; padding: 0.35rem 0 0.35rem 0.75rem;">10M</td></tr>
+                <tr style="border-bottom: 1px solid var(--border);"><td style="padding: 0.35rem 0.75rem 0.35rem 0;"><a href="/npm/drizzle-orm">drizzle-orm</a></td><td style="text-align: center; padding: 0.35rem 0.5rem; color: #3c7d3c;">87</td><td style="padding: 0.35rem 0.5rem;">✅ SAFE</td><td style="text-align: center; padding: 0.35rem 0.5rem;">4</td><td style="text-align: right; padding: 0.35rem 0 0.35rem 0.75rem;">7M</td></tr>
+                <tr style="border-bottom: 1px solid var(--border);"><td style="padding: 0.35rem 0.75rem 0.35rem 0;"><a href="/npm/uuid">uuid</a></td><td style="text-align: center; padding: 0.35rem 0.5rem; color: #3c7d3c;">82</td><td style="padding: 0.35rem 0.5rem;">✅ SAFE</td><td style="text-align: center; padding: 0.35rem 0.5rem;">2</td><td style="text-align: right; padding: 0.35rem 0 0.35rem 0.75rem;">239M</td></tr>
+                <tr style="border-bottom: 1px solid var(--border); background: rgba(200,50,50,0.04);"><td style="padding: 0.35rem 0.75rem 0.35rem 0;"><strong><a href="/npm/esbuild">esbuild</a></strong></td><td style="text-align: center; padding: 0.35rem 0.5rem; color: #c63232;"><strong>88</strong></td><td style="padding: 0.35rem 0.5rem;">🔴 CRITICAL</td><td style="text-align: center; padding: 0.35rem 0.5rem;"><strong>1</strong></td><td style="text-align: right; padding: 0.35rem 0 0.35rem 0.75rem;"><strong>201M</strong></td></tr>
+                <tr style="border-bottom: 1px solid var(--border); background: rgba(200,50,50,0.04);"><td style="padding: 0.35rem 0.75rem 0.35rem 0;"><strong><a href="/npm/axios">axios</a></strong></td><td style="text-align: center; padding: 0.35rem 0.5rem; color: #c63232;"><strong>86</strong></td><td style="padding: 0.35rem 0.5rem;">🔴 CRITICAL</td><td style="text-align: center; padding: 0.35rem 0.5rem;"><strong>1</strong></td><td style="text-align: right; padding: 0.35rem 0 0.35rem 0.75rem;"><strong>100M</strong></td></tr>
+                <tr style="border-bottom: 1px solid var(--border); background: rgba(200,50,50,0.04);"><td style="padding: 0.35rem 0.75rem 0.35rem 0;"><strong><a href="/npm/nodemon">nodemon</a></strong></td><td style="text-align: center; padding: 0.35rem 0.5rem; color: #c63232;"><strong>83</strong></td><td style="padding: 0.35rem 0.5rem;">🔴 CRITICAL</td><td style="text-align: center; padding: 0.35rem 0.5rem;"><strong>1</strong></td><td style="text-align: right; padding: 0.35rem 0 0.35rem 0.75rem;"><strong>12M</strong></td></tr>
+                <tr style="border-bottom: 1px solid var(--border); background: rgba(200,50,50,0.04);"><td style="padding: 0.35rem 0.75rem 0.35rem 0;"><strong><a href="/npm/zod">zod</a></strong></td><td style="text-align: center; padding: 0.35rem 0.5rem; color: #c63232;"><strong>83</strong></td><td style="padding: 0.35rem 0.5rem;">🔴 CRITICAL</td><td style="text-align: center; padding: 0.35rem 0.5rem;"><strong>1</strong></td><td style="text-align: right; padding: 0.35rem 0 0.35rem 0.75rem;"><strong>160M</strong></td></tr>
+                <tr style="border-bottom: 1px solid var(--border); background: rgba(200,50,50,0.04);"><td style="padding: 0.35rem 0.75rem 0.35rem 0;"><strong><a href="/npm/sharp">sharp</a></strong></td><td style="text-align: center; padding: 0.35rem 0.5rem; color: #c63232;"><strong>84</strong></td><td style="padding: 0.35rem 0.5rem;">🔴 CRITICAL</td><td style="text-align: center; padding: 0.35rem 0.5rem;"><strong>1</strong></td><td style="text-align: right; padding: 0.35rem 0 0.35rem 0.75rem;"><strong>55M</strong></td></tr>
+                <tr style="border-bottom: 1px solid var(--border); background: rgba(200,50,50,0.04);"><td style="padding: 0.35rem 0.75rem 0.35rem 0;"><strong><a href="/npm/lodash">lodash</a></strong></td><td style="text-align: center; padding: 0.35rem 0.5rem; color: #c63232;"><strong>87</strong></td><td style="padding: 0.35rem 0.5rem;">🔴 CRITICAL</td><td style="text-align: center; padding: 0.35rem 0.5rem;"><strong>1</strong></td><td style="text-align: right; padding: 0.35rem 0 0.35rem 0.75rem;"><strong>147M</strong></td></tr>
+                <tr style="border-bottom: 1px solid var(--border); background: rgba(200,50,50,0.04);"><td style="padding: 0.35rem 0.75rem 0.35rem 0;"><strong><a href="/npm/hono">hono</a></strong></td><td style="text-align: center; padding: 0.35rem 0.5rem; color: #c63232;"><strong>82</strong></td><td style="padding: 0.35rem 0.5rem;">🔴 CRITICAL</td><td style="text-align: center; padding: 0.35rem 0.5rem;"><strong>1</strong></td><td style="text-align: right; padding: 0.35rem 0 0.35rem 0.75rem;"><strong>35M</strong></td></tr>
+                <tr style="border-bottom: 1px solid var(--border); background: rgba(200,50,50,0.04);"><td style="padding: 0.35rem 0.75rem 0.35rem 0;"><strong><a href="/npm/chalk">chalk</a></strong></td><td style="text-align: center; padding: 0.35rem 0.5rem; color: #c63232;"><strong>75</strong></td><td style="padding: 0.35rem 0.5rem;">🔴 CRITICAL</td><td style="text-align: center; padding: 0.35rem 0.5rem;"><strong>1</strong></td><td style="text-align: right; padding: 0.35rem 0 0.35rem 0.75rem;"><strong>412M</strong></td></tr>
+                <tr style="background: rgba(180,130,0,0.04);"><td style="padding: 0.35rem 0.75rem 0.35rem 0;"><a href="/npm/ts-node">ts-node</a></td><td style="text-align: center; padding: 0.35rem 0.5rem; color: #8a6d00;">59</td><td style="padding: 0.35rem 0.5rem;">⚠️ WARN</td><td style="text-align: center; padding: 0.35rem 0.5rem;">2</td><td style="text-align: right; padding: 0.35rem 0 0.35rem 0.75rem;">&mdash;</td></tr>
+              </tbody>
+            </table>
+          </div>
+
+          <h2>What stands out</h2>
+
+          <p>
+            <strong>esbuild has 201M weekly downloads. One maintainer.</strong> Evan Wallace built one of the most
+            important tools in the JavaScript ecosystem &mdash; the bundler that powers Vite, Next.js, and dozens
+            of other frameworks. It&rsquo;s exceptional engineering. It&rsquo;s also a single point of failure
+            for roughly half the JavaScript build toolchain. If something happens to Evan&rsquo;s npm token,
+            the blast radius is enormous.
+          </p>
+          <p>
+            <strong>That&rsquo;s more downloads than TypeScript (178M/wk).</strong> TypeScript has 6 maintainers.
+            esbuild has 1.
+          </p>
+          <p>
+            <strong>Sharp processes images on ~55M npm installs per week.</strong> One maintainer. Server-side
+            image processing for most Node.js production deployments. It has native bindings. A malicious version
+            would be hard to detect and devastating.
+          </p>
+          <p>
+            <strong>Chalk (412M downloads/week) is still the biggest exposure.</strong> The most downloaded package
+            on npm that&rsquo;s sole-maintained. It colors your terminal output. Every project that has a CLI, every
+            build script, every logging framework &mdash; chalk is in there. One token compromise.
+          </p>
+          <p>
+            <strong>The &ldquo;safe&rdquo; packages earn it.</strong> webpack (score=100) has 8 maintainers, 44M
+            weekly downloads, and 15 years of shipping. prettier has 11 maintainers. TypeScript is Microsoft-backed.
+            These packages would survive a maintainer leaving. The CRITICAL packages wouldn&rsquo;t.
+          </p>
+          <p>
+            <strong>The ua-parser-js attack (October 2021) proved the model.</strong> A compromised npm token published
+            malicious versions in minutes. <code>npm audit</code> showed zero issues beforehand. The structural
+            profile had been visible for years: 1 maintainer, millions of downloads/week = prime target.
+          </p>
+
+          <h2>Why this matters now</h2>
+
+          <p>Three patterns converged in early 2026:</p>
+
+          <ol>
+            <li>
+              <strong>AI-assisted supply chain attacks are getting faster.</strong> Identifying a high-value target
+              (1 maintainer + massive downloads), generating a plausible malicious payload, and timing the publish
+              to a token compromise &mdash; all of this can be automated.
+            </li>
+            <li>
+              <strong>npm audit waits for CVEs.</strong> The database catches known vulnerabilities. It has nothing
+              to say about structural risk. Both tools answer different questions. You need both.
+            </li>
+            <li>
+              <strong>Transitive dependencies hide the risk.</strong> I audited <code>@anthropic-ai/sdk</code> &mdash;
+              score=86, 14 maintainers, looks solid. But two levels deep: <code>json-schema-to-ts</code> (CRITICAL,
+              sole maintainer, 12M downloads/week). You&rsquo;d never find that in a direct audit.
+            </li>
+          </ol>
+
+          <h2>How to run it yourself</h2>
+
+          <pre><code># Zero install — try it now
+npx proof-of-commitment axios zod chalk hono esbuild
+
+# Against your own project
+npx proof-of-commitment --file package.json
+
+# Scan ALL transitive dependencies (lock file)
+npx proof-of-commitment --file package-lock.json
+
+# PyPI too
+npx proof-of-commitment --pypi litellm langchain requests</code></pre>
+
+          <p>
+            Or drop your <code>package.json</code> at <a href="https://getcommit.dev/audit?packages=chalk,zod,axios,hono,express,esbuild">getcommit.dev/audit</a>.
+          </p>
+          <p>
+            The GitHub Action posts this table directly on your PRs:
+          </p>
+
+          <pre><code>- uses: piiiico/proof-of-commitment@main
+  with:
+    fail-on-critical: false
+    comment-on-pr: true</code></pre>
+
+          <hr style="margin: 3rem 0; border: none; border-top: 1px solid var(--border);" />
+
+          <p style="font-size: 0.875rem; color: var(--ink-muted);">
+            What surprises you most? esbuild? The dotenv result? And what signals matter most &mdash;
+            maintainer count, release recency, something else?
+            Source: <a href="https://github.com/piiiico/proof-of-commitment">github.com/piiiico/proof-of-commitment</a>
+          </p>
+
+        </div>
+      </div>
+    </div>
+  </article>
+
+  <!-- Newsletter -->
+  <section class="newsletter-section">
+    <div class="container">
+      <div class="editorial reveal">
+        <h2 style="margin-bottom: 0.75rem;">Stay in the loop</h2>
+        <p style="margin-bottom: 2rem; font-size: 1rem;">
+          Early access, research updates, and the occasional strong opinion.
+        </p>
+
+        <form
+          action="https://buttondown.email/api/emails/embed-subscribe/commitgraph"
+          method="post"
+          target="popupwindow"
+          class="newsletter-form"
+        >
+          <input
+            type="email"
+            name="email"
+            placeholder="you@example.com"
+            required
+            class="newsletter-input"
+          />
+          <button type="submit" class="btn-primary" style="white-space: nowrap;">
+            Subscribe
+          </button>
+        </form>
+
+        <p class="newsletter-note">No spam. Unsubscribe anytime.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer>
+    <div class="container footer-inner">
+      <span class="footer-brand">Commit</span>
+      <ul class="footer-links">
+        <li><a href="/">Home</a></li>
+        <li><a href="/extension">Extension</a></li>
+        <li><a href="/blog">Writing</a></li>
+        <li><a href="/pricing">Pricing</a></li><li><a href="/docs">Docs</a></li><li><a href="https://github.com/piiiico/proof-of-commitment" target="_blank" rel="noopener">GitHub</a></li>
+        <li><a href="mailto:pico@amdal.dev">Contact</a></li>
+      </ul>
+      <span class="footer-locale">Stavanger, Norway</span>
+    </div>
+  </footer>
+
+</Layout>

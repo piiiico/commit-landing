@@ -1,0 +1,296 @@
+---
+import Layout from '../../layouts/Layout.astro';
+---
+
+<Layout
+  title="Mini Shai-Hulud Didn't Need Your Maintainer's Password — Commit"
+  description="The TanStack supply chain attack didn't compromise a single npm credential. It extracted OIDC tokens from GitHub Actions memory. Here's what behavioral scoring catches — and what it doesn't — and why the attacker left traces in public repos the whole time."
+  canonical="https://getcommit.dev/blog/tanstack-mini-shai-hulud-behavioral-analysis/"
+  publishDate="2026-05-19"
+>
+
+  <!-- Nav -->
+  <nav>
+    <div class="container nav-inner">
+      <a href="/" class="nav-brand">Commit</a>
+      <ul class="nav-links">
+        <li><a href="/extension">Extension</a></li>
+        <li><a href="/blog">Writing</a></li>
+        <li><a href="/pricing">Pricing</a></li><li><a href="/docs">Docs</a></li><li><a href="https://github.com/piiiico/proof-of-commitment" target="_blank" rel="noopener">GitHub</a></li>
+        <li><a href="mailto:pico@amdal.dev">Contact</a></li>
+      </ul>
+    </div>
+  </nav>
+
+  <!-- Essay -->
+  <article class="essay">
+    <div class="container">
+      <div class="editorial">
+
+        <!-- Header -->
+        <header class="essay-header">
+          <div class="essay-meta animate-in delay-1">
+            <time datetime="2026-05-19">May 19, 2026</time>
+          </div>
+          <h1 class="essay-title animate-in delay-2">Mini Shai-Hulud Didn&rsquo;t Need Your Maintainer&rsquo;s Password</h1>
+          <p class="essay-subtitle animate-in delay-3">
+            On May 11, 84 malicious @tanstack artifacts were published using TanStack&rsquo;s own legitimate OIDC identity.
+            No stolen credentials. No phished maintainer. The attacker extracted tokens from GitHub Actions runner memory
+            after poisoning the build cache. This is wave four of the same campaign &mdash; and the attacker left
+            behavioral traces in public repos the whole time.
+          </p>
+          <p class="essay-byline animate-in delay-4">Pico</p>
+        </header>
+
+        <!-- Body -->
+        <div class="essay-body">
+
+          <!-- Update banner -->
+          <div style="background: #f0f7ff; border: 1px solid #c7dafc; border-left: 4px solid #2b5fb8; border-radius: 4px; padding: 1.5rem; margin: 0 0 2rem 0;">
+            <h3 style="margin: 0 0 0.5rem 0; font-size: 0.9rem; text-transform: uppercase; letter-spacing: 0.08em; color: #2b5fb8;">Update — June 10, 2026: OpenAI confirmed the gap</h3>
+            <p style="margin: 0 0 0.75rem 0; font-size: 0.9rem; line-height: 1.6;">
+              Two OpenAI employee devices were hit by this attack. OpenAI's incident response, published May 14, says:
+            </p>
+            <blockquote style="margin: 0 0 0.75rem 0; padding: 0 0 0 1rem; border-left: 2px solid #2b5fb8; font-size: 0.9rem; font-style: italic; color: #1f3a6e; line-height: 1.55;">
+              "The two employee devices had not yet been updated with the new configurations, which would have prevented the malicious package downloads. The incident occurred during the transition to hardened configurations and credentials material."
+            </blockquote>
+            <p style="margin: 0; font-size: 0.9rem; line-height: 1.6;">
+              The controls existed. The rollout was in progress. The worm arrived first. That's the structural argument this post made on May 19 &mdash; hardening is administrative and slow; the attack iteration cadence is monthly. Behavioral analysis of what packages do at install time is the layer that runs continuously regardless of which configuration version has been pushed to which fleet. <a href="https://www.securityweek.com/openai-hit-by-tanstack-supply-chain-attack/" target="_blank" rel="noopener" style="color: #2b5fb8; font-weight: 600;">SecurityWeek coverage →</a>
+            </p>
+          </div>
+
+          <p>
+            On May 11, 2026, between 19:20 and 19:26 UTC, TeamPCP published 84 malicious artifacts across 42 packages
+            in the <code>@tanstack</code> namespace. <code>@tanstack/react-router</code> alone has 12.7 million weekly downloads.
+            The total affected install base across npm and PyPI exceeded 518 million cumulative downloads.
+          </p>
+
+          <p>
+            This is the fourth wave of the Mini Shai-Hulud campaign. Wave one targeted Aqua Security&rsquo;s Trivy scanner in March.
+            Wave two hit <code>@bitwarden/cli</code> in April.
+            Wave three hit Mistral AI and Guardrails AI packages.
+            Wave four hit TanStack &mdash; and demonstrated something no prior supply chain attack had managed:
+            publishing malicious packages indistinguishable from legitimate ones <em>by provenance attestation</em>.
+          </p>
+
+          <p>
+            TanStack was not structurally fragile. This is the part worth sitting with.
+          </p>
+
+          <h2>Why TanStack scored high</h2>
+
+          <p>
+            If you had run <a href="/audit?packages=@tanstack/react-router">proof-of-commitment on @tanstack/react-router</a>
+            before May 11, you would have seen a package with strong behavioral signals:
+            organization-backed, consistent release cadence, multiple maintainers, years of sustained activity,
+            no single point of credential failure.
+          </p>
+
+          <p>
+            That score was accurate. TanStack is a real project with real maintainers and a real release pipeline.
+            That&rsquo;s precisely the attack surface the attackers chose &mdash; not because it was weak,
+            but because a high-credibility target makes the payload harder to reject.
+          </p>
+
+          <p>
+            The ua-parser-js credential attack in 2021 succeeded because one person held the publish key to a package
+            with 8 million weekly downloads. The TanStack attack succeeded because TanStack&rsquo;s
+            <em>build pipeline</em> held the publish key &mdash; and that pipeline was reachable through a forked pull request.
+          </p>
+
+          <h2>The attack chain</h2>
+
+          <p>
+            TeamPCP created a fork of the TanStack/router repository, renamed to <code>zblgg/configuration</code>
+            to evade fork-list searches. They opened a pull request that triggered a
+            <code>pull_request_target</code> workflow &mdash; a GitHub Actions event that, unlike <code>pull_request</code>,
+            runs with write permissions to the base repository.
+          </p>
+
+          <p>
+            The workflow executed attacker-controlled code, which poisoned the GitHub Actions runner cache
+            with a malicious pnpm store. The attack then waited.
+          </p>
+
+          <p>
+            When legitimate TanStack maintainers later merged unrelated PRs to main, the release workflow
+            restored the poisoned cache. Attacker-controlled binaries in that cache extracted OIDC tokens
+            directly from the GitHub Actions runner&rsquo;s process memory &mdash; specifically from
+            <code>/proc/&lt;pid&gt;/mem</code>. Those tokens were used to publish the malicious package versions
+            to npm with TanStack&rsquo;s own legitimate identity.
+          </p>
+
+          <p>
+            From the npm registry&rsquo;s perspective: legitimate publisher, legitimate OIDC identity, valid provenance attestation.
+            Nothing was wrong.
+          </p>
+
+          <h2>What provenance verification can&rsquo;t see</h2>
+
+          <p>
+            This attack broke a property most security teams assumed was reliable: if a package was published
+            by the real maintainer, from the real source repository, the provenance chain is valid.
+          </p>
+
+          <p>
+            The Mini Shai-Hulud attack shows that assumption fails when the build environment itself is
+            compromised mid-run. The OIDC token was real. The publisher was real. The source repository was
+            TanStack&rsquo;s actual repo. The malicious code was injected between &ldquo;build starts&rdquo;
+            and &ldquo;artifact is published,&rdquo; inside the runner&rsquo;s own process space.
+          </p>
+
+          <p>
+            <code>npm audit signatures</code> verifies that the published artifact was signed by the expected identity.
+            It does not verify what happened inside the build environment that produced the artifact.
+          </p>
+
+          <h2>The behavioral trace the attacker left</h2>
+
+          <p>
+            Here&rsquo;s what&rsquo;s unusual about this campaign: the attacker was not invisible.
+          </p>
+
+          <p>
+            The GitHub account <code>voicproducoes</code> was the identity behind the fork that initiated the attack.
+            That account had public repositories including one named <strong>&ldquo;A Mini Shai-Hulud has Appeared.&rdquo;</strong>
+            The attacker named their project after the attack campaign, in public, on the platform they used to execute it.
+          </p>
+
+          <p>
+            The malicious commit injected into the build was authored under
+            <code>claude &lt;claude@users.noreply.github.com&gt;</code> &mdash;
+            impersonating the Anthropic Claude GitHub App &mdash; and prefixed with <code>[skip ci]</code>
+            to suppress automated CI checks. The impersonation was deliberate camouflage, not sloppy execution.
+          </p>
+
+          <p>
+            What this tells you: the attacker had public GitHub activity that, in retrospect, was directly traceable
+            to the campaign. <code>voicproducoes</code> was not a brand-new throwaway account created the day of the attack.
+            It had a commit history, public repositories, behavioral fingerprints.
+          </p>
+
+          <p>
+            If you could profile <em>who is submitting pull requests to your dependencies&rsquo; repositories</em>
+            the same way you profile the packages themselves, the behavioral signal was there before the attack landed.
+          </p>
+
+          <h2>What this means for the scoring model</h2>
+
+          <p>
+            Behavioral commitment scoring &mdash; as proof-of-commitment implements it &mdash; measures
+            structural concentration risk at the package and publisher level. It caught what it was designed to catch:
+            packages with sole maintainers and no organizational backing (ua-parser-js in 2021, the current axios profile).
+            It did not flag TanStack, because TanStack was not structurally fragile. That was the correct output.
+          </p>
+
+          <p>
+            The TanStack attack represents a different threat model: not &ldquo;the legitimate maintainer is a single point of failure,&rdquo;
+            but &ldquo;the build pipeline is reachable by external contributors via pull requests.&rdquo;
+            That surface exists at any project that accepts external PRs and uses GitHub Actions with
+            <code>pull_request_target</code>. It&rsquo;s widespread.
+          </p>
+
+          <p>
+            The scoring extension that this attack suggests: behavioral profiling of external contributors
+            to a package&rsquo;s repository &mdash; not just the maintainers. A PR from an account with
+            zero meaningful history, or whose public repos signal campaign participation, is a different
+            risk profile than a PR from a long-standing contributor. That&rsquo;s checkable today, manually.
+            It will be automatable.
+          </p>
+
+          <h2>The wave pattern matters</h2>
+
+          <p>
+            TeamPCP compromised Trivy in March, <code>@bitwarden/cli</code> in April, and TanStack in May.
+            Three waves in three months. The targets escalated in download volume and behavioral credibility
+            with each wave.
+          </p>
+
+          <p>
+            The campaign&rsquo;s persistence is itself a behavioral signal. A threat actor that returns
+            monthly, escalates target selection, and refines the technical approach between waves is not
+            an opportunistic attacker. They have a program. The behavioral fingerprint of the campaign
+            &mdash; the specific exploitation of <code>pull_request_target</code>, the cache poisoning technique,
+            the OIDC extraction method &mdash; is consistent and attributable.
+          </p>
+
+          <p>
+            Supply chain defense that waits for CVEs to catch these is defending against the previous wave.
+          </p>
+
+          <h2>The defense stack after TanStack</h2>
+
+          <p>
+            The TanStack attack doesn&rsquo;t invalidate any existing layer. It identifies which threat surfaces
+            each layer covers:
+          </p>
+
+          <ol>
+            <li>
+              <strong>Behavioral scoring</strong> (<a href="/audit">proof-of-commitment</a>) &mdash;
+              catches concentration risk: sole maintainer + high download volume, organizational vacuum,
+              stale-but-depended-on packages. Did not and should not have flagged TanStack.
+            </li>
+            <li>
+              <strong>Provenance verification</strong> (<code>npm audit signatures</code>) &mdash;
+              catches builds where the artifact doesn&rsquo;t match the signed source. Failed against TanStack
+              because the OIDC token was legitimately obtained mid-build.
+            </li>
+            <li>
+              <strong>Real-time publish scanning</strong> (Socket, Snyk) &mdash; catches malicious code patterns
+              in new releases as they land. This is what actually caught the TanStack artifacts in practice.
+            </li>
+            <li>
+              <strong>Pull request contributor profiling</strong> &mdash; not yet automated at scale,
+              but the voicproducoes account was behaviorally flaggable before the attack executed.
+              Projects using <code>pull_request_target</code> should treat external PR authors with the same
+              scrutiny as external publishers.
+            </li>
+          </ol>
+
+          <pre><code># Check structural risk across your dependencies
+npx proof-of-commitment --file package.json
+
+# Check build provenance (won't catch TanStack-style attacks)
+npm audit signatures</code></pre>
+
+          <p>
+            Lock your <code>package-lock.json</code>. Pin exact versions. Create the window between &ldquo;new version published&rdquo;
+            and &ldquo;it enters your build&rdquo; so that real-time scanning has time to flag it.
+          </p>
+
+          <h2>The malware payload, for completeness</h2>
+
+          <p>
+            On developer machines, the injected code installed a persistent <code>gh-token-monitor</code> daemon
+            via macOS LaunchAgent or Linux systemd. The daemon polled GitHub every 60 seconds.
+            On receiving a 40X response due to token revocation, it attempted to execute <code>rm -rf ~/</code>
+            and exited after 24 hours without triggering the destructive handler.
+          </p>
+
+          <p>
+            The payload is destructive but not subtle. The interesting technical work was getting it
+            published in the first place &mdash; which required no stolen credentials, no phished maintainer,
+            and produced provenance attestations that looked legitimate from every external checkpoint.
+          </p>
+
+          <p>
+            That&rsquo;s the part that changes the threat model. Not the destructive payload.
+            The fact that the attack published legitimately-attested malicious code.
+          </p>
+
+          <hr />
+
+          <p style="font-size: 0.9rem; color: var(--ink-muted);">
+            <strong>proof-of-commitment</strong> is open-source and free to use.
+            <a href="https://github.com/piiiico/proof-of-commitment">GitHub</a> &middot;
+            <a href="/audit">Web audit</a> &middot;
+            <a href="/docs">API docs</a>
+          </p>
+
+        </div>
+      </div>
+    </div>
+  </article>
+
+</Layout>
