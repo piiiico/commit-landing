@@ -1,0 +1,190 @@
+---
+import Layout from '../../layouts/Layout.astro';
+---
+
+<Layout
+  title="57 Packages Compromised Without a Single Lifecycle Script. The binding.gyp Bypass Is Here. &mdash; Commit"
+  description="The Phantom Gyp technique ships a weaponized binding.gyp that triggers code execution during npm install. No preinstall, no postinstall — bypasses every lifecycle script monitor. 57 packages, 286 malicious versions, under two hours."
+  canonical="https://getcommit.dev/blog/phantom-gyp-binding-gyp-bypass/"
+  publishDate="2026-06-10"
+>
+
+  <!-- Nav -->
+  <nav>
+    <div class="container nav-inner">
+      <a href="/" class="nav-brand">Commit</a>
+      <ul class="nav-links">
+        <li><a href="/extension">Extension</a></li>
+        <li><a href="/blog">Writing</a></li>
+        <li><a href="/pricing">Pricing</a></li><li><a href="/docs">Docs</a></li><li><a href="https://github.com/piiiico/proof-of-commitment" target="_blank" rel="noopener">GitHub</a></li>
+        <li><a href="mailto:pico@amdal.dev">Contact</a></li>
+      </ul>
+    </div>
+  </nav>
+
+  <!-- Essay -->
+  <article class="essay">
+    <div class="container">
+      <div class="editorial">
+
+        <!-- Header -->
+        <header class="essay-header">
+          <div class="essay-meta animate-in delay-1">
+            <time datetime="2026-06-10">June 10, 2026</time>
+          </div>
+          <h1 class="essay-title animate-in delay-2">57 Packages Compromised Without a Single Lifecycle Script</h1>
+          <p class="essay-subtitle animate-in delay-3">
+            The Phantom Gyp technique ships a weaponized <code>binding.gyp</code> that triggers code execution
+            during <code>npm install</code>. No preinstall hook, no postinstall hook. It bypasses every
+            lifecycle script monitor on the market.
+          </p>
+          <p class="essay-byline animate-in delay-4">Pico</p>
+        </header>
+
+        <!-- Body -->
+        <div class="essay-body">
+
+          <p>
+            Two days after the
+            <a href="/blog/redhat-miasma-provenance-bypass">Red Hat Miasma attack</a> compromised 32 packages
+            using provenance-valid lifecycle scripts, the same malware family pivoted. This time it didn't use
+            lifecycle scripts at all.
+          </p>
+
+          <p>
+            On June 3 at 23:30 UTC, a compromised maintainer account published malicious versions of
+            <code>@vapi-ai/server-sdk</code> &mdash; the official Vapi voice AI SDK, 408,000 monthly downloads.
+            Over the next hour, 56 more packages fell across the autotel, awaitly, executable-stories,
+            and node-env-resolver families. 286 malicious versions total.
+          </p>
+
+          <p>
+            <a href="https://www.stepsecurity.io/blog/binding-gyp-npm-supply-chain-attack-spreads-like-worm" target="_blank" rel="noopener">StepSecurity named the technique "Phantom Gyp."</a>
+            <a href="https://snyk.io/blog/node-gyp-supply-chain-compromise-self-propagating-npm-worm-binding-gyp/" target="_blank" rel="noopener">Snyk tracks the full incident.</a>
+          </p>
+
+          <p>
+            <strong>Update (June 13, 2026):</strong> The same pattern hit Arch Linux's AUR at scale &mdash;
+            1,579 packages <a href="/blog/aur-1579-packages-adoption-bypass">taken over through the standard adoption process</a>
+            in a single weekend.
+          </p>
+
+          <h2>The technique</h2>
+
+          <p>
+            Every major security tool monitors lifecycle scripts: <code>preinstall</code>,
+            <code>postinstall</code>, <code>install</code>. Socket flags them. Snyk scans them.
+            npm warns about them. The Red Hat Miasma wave two days earlier used <code>preinstall</code>
+            and got caught within hours.
+          </p>
+
+          <p>
+            Phantom Gyp doesn't use any of them.
+          </p>
+
+          <p>
+            Instead, it ships a 157-byte <code>binding.gyp</code> file. When <code>npm install</code>
+            detects a <code>binding.gyp</code>, it automatically invokes <code>node-gyp rebuild</code>
+            to compile native addons. The attacker's <code>binding.gyp</code> calls
+            <code>node -e "&lt;payload&gt;"</code> as a "build action" &mdash; executing arbitrary
+            JavaScript during install without triggering a single lifecycle script alert.
+          </p>
+
+          <p>
+            This is a 14-year-old npm behavior. It's documented. It's how native modules build.
+            And until last week, nobody used it as an attack vector.
+          </p>
+
+          <h2>The payloads</h2>
+
+          <p>
+            Same Miasma/Shai-Hulud malware family. The payload harvested npm, GitHub, AWS, GCP, Azure,
+            HashiCorp Vault, and Kubernetes credentials. It exfiltrated through attacker-controlled
+            GitHub repos. It injected GitHub Actions workflows for persistence. And it self-propagated
+            by republishing packages from every maintainer account it could reach.
+          </p>
+
+          <p>
+            The largest victim, <code>@vapi-ai/server-sdk</code>, is the primary way developers
+            integrate Vapi's voice AI platform. A compromised version in a CI pipeline could propagate
+            through every downstream project that depends on it.
+          </p>
+
+          <h2>What behavioral signals show</h2>
+
+          <p>
+            I scored the compromised packages with <a href="/">Commit</a>:
+          </p>
+
+          <table>
+            <thead>
+              <tr><th>Package</th><th>Score</th><th>Publishers</th><th>Weekly DL</th><th>Age</th><th>Provenance</th></tr>
+            </thead>
+            <tbody>
+              <tr><td>@vapi-ai/server-sdk</td><td>47</td><td>5</td><td>100K</td><td>1.1y</td><td>&#x2713;</td></tr>
+              <tr><td>ai-sdk-ollama</td><td>49</td><td>1</td><td>42K</td><td>0.8y</td><td>&#x2713;</td></tr>
+              <tr><td>autotel</td><td>40</td><td>1</td><td>6K</td><td>1.2y</td><td>&mdash;</td></tr>
+              <tr><td>awaitly</td><td>32</td><td>1</td><td>287</td><td>0.5y</td><td>&mdash;</td></tr>
+              <tr><td>node-env-resolver</td><td>28</td><td>1</td><td>92</td><td>0.4y</td><td>&mdash;</td></tr>
+            </tbody>
+          </table>
+
+          <p>
+            Every package except <code>@vapi-ai/server-sdk</code> has a single npm publisher.
+            Three are under a year old. The attack surface is the same one Commit flags by design:
+            single-publisher packages with limited oversight.
+          </p>
+
+          <p>
+            The Red Hat packages two days earlier scored 65&ndash;83 &mdash; high enough that
+            static scoring alone wouldn't have flagged them.
+            These score 28&ndash;49. Behavioral signals would have.
+          </p>
+
+          <h2>What this changes</h2>
+
+          <p>
+            Lifecycle script monitoring is necessary but no longer sufficient.
+            <code>binding.gyp</code> opens a second execution path that most security tools don't scan.
+            And it's been there since 2012.
+          </p>
+
+          <p>
+            The Miasma lineage has now used three distinct execution vectors in three weeks:
+          </p>
+
+          <ul>
+            <li><strong>TanStack (May 11):</strong> <code>postinstall</code> lifecycle script</li>
+            <li><strong>Red Hat (June 1):</strong> <code>preinstall</code> lifecycle script with valid SLSA provenance</li>
+            <li><strong>Phantom Gyp (June 3):</strong> <code>binding.gyp</code> native addon hook &mdash; no lifecycle script at all</li>
+          </ul>
+
+          <p>
+            Each iteration bypasses the defense that caught the last one.
+            The constant across all three: compromised single-point-of-failure accounts.
+          </p>
+
+          <h2>Check your project</h2>
+
+          <pre><code>npx proof-of-commitment</code></pre>
+
+          <p>
+            Scores every dependency in your lockfile. Packages compromised in the Phantom Gyp attack
+            are flagged in results. If you depend on <code>@vapi-ai/server-sdk</code>,
+            <code>ai-sdk-ollama</code>, or any autotel/awaitly/executable-stories package &mdash;
+            verify you're on a clean version.
+          </p>
+
+        </div>
+
+        <!-- CTA -->
+        <footer class="essay-cta animate-in delay-5">
+          <p><a href="/audit?packages=@vapi-ai/server-sdk,ai-sdk-ollama,autotel,awaitly" class="cta-button">Score Phantom Gyp packages &rarr;</a></p>
+          <p class="cta-sub">Free CLI &middot; API &middot; MCP server &middot; No account required</p>
+        </footer>
+
+      </div>
+    </div>
+  </article>
+
+</Layout>
