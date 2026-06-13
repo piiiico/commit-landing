@@ -55,6 +55,14 @@ export const posts: Post[] = [
     description: "The Phantom Gyp technique ships a weaponized binding.gyp that triggers code execution during npm install. No preinstall, no postinstall — bypasses every lifecycle script monitor. 57 packages, 286 malicious versions, under two hours.",
     date: '2026-06-10',
     dateLabel: 'June 10, 2026',
+    // June 13 AUR incident is the largest expression of the same
+    // maintainer-identity-bypass pattern this post sits inside. Miasma is the
+    // immediate predecessor; mini-shai-hulud is the three-wave synthesis.
+    relatedSlugs: [
+      'aur-1579-packages-adoption-bypass',
+      'redhat-miasma-provenance-bypass',
+      'mini-shai-hulud-source-code-public',
+    ],
   },
   {
     slug: 'ironworm-rust-malware-targets-ai-credentials',
@@ -62,6 +70,14 @@ export const posts: Post[] = [
     description: "37 npm packages infected with a Rust-based infostealer that hides behind an eBPF rootkit, talks over Tor, and self-propagates through npm's Trusted Publishing. The commit author on every malicious push: claude@users.noreply.github.com.",
     date: '2026-06-06',
     dateLabel: 'June 6, 2026',
+    // AUR shipped same-day cross-ecosystem expression of identity-bypass.
+    // TrapDoor (same day) covers the AI-assistant-poisoning side; the
+    // synthesis post threads all three June waves together.
+    relatedSlugs: [
+      'aur-1579-packages-adoption-bypass',
+      'trapdoor-ai-assistant-poisoning',
+      'mini-shai-hulud-source-code-public',
+    ],
   },
   {
     slug: 'trapdoor-ai-assistant-poisoning',
@@ -83,6 +99,14 @@ export const posts: Post[] = [
     description: "The Miasma attack hijacked 32 @redhat-cloud-services npm packages through a compromised GitHub account. SLSA provenance attestations were valid on every malicious version. Provenance tells you who published. It doesn't tell you whether to trust them.",
     date: '2026-06-01',
     dateLabel: 'June 1, 2026',
+    // Phantom Gyp is Miasma's direct successor (same malware family, new
+    // bypass two days later). AUR is the cross-ecosystem June 13 expression
+    // of the same trust-attaches-to-the-slug pattern.
+    relatedSlugs: [
+      'phantom-gyp-binding-gyp-bypass',
+      'aur-1579-packages-adoption-bypass',
+      'mini-shai-hulud-source-code-public',
+    ],
   },
   {
     slug: 'microsoft-14-typosquatted-packages',

@@ -1,0 +1,260 @@
+---
+import Layout from '../../layouts/Layout.astro';
+---
+
+<Layout
+  title="32 Red Hat Packages Had Valid Provenance. All 32 Were Compromised. &mdash; Commit"
+  description="The Miasma attack hijacked 32 @redhat-cloud-services npm packages through a compromised GitHub account. SLSA provenance attestations were valid on every malicious version. Provenance tells you who published. It doesn't tell you whether to trust them."
+  canonical="https://getcommit.dev/blog/redhat-miasma-provenance-bypass/"
+  publishDate="2026-06-01"
+>
+
+  <!-- Nav -->
+  <nav>
+    <div class="container nav-inner">
+      <a href="/" class="nav-brand">Commit</a>
+      <ul class="nav-links">
+        <li><a href="/extension">Extension</a></li>
+        <li><a href="/blog">Writing</a></li>
+        <li><a href="/pricing">Pricing</a></li><li><a href="/docs">Docs</a></li><li><a href="https://github.com/piiiico/proof-of-commitment" target="_blank" rel="noopener">GitHub</a></li>
+        <li><a href="mailto:pico@amdal.dev">Contact</a></li>
+      </ul>
+    </div>
+  </nav>
+
+  <!-- Essay -->
+  <article class="essay">
+    <div class="container">
+      <div class="editorial">
+
+        <!-- Header -->
+        <header class="essay-header">
+          <div class="essay-meta animate-in delay-1">
+            <time datetime="2026-06-01">June 1, 2026</time>
+          </div>
+          <h1 class="essay-title animate-in delay-2">32 Red Hat Packages Had Valid Provenance. All 32 Were Compromised.</h1>
+          <p class="essay-subtitle animate-in delay-3">
+            The Miasma attack hijacked the @redhat-cloud-services npm namespace through a compromised GitHub account.
+            The CI/CD pipeline produced valid SLSA provenance attestations on every malicious version.
+            Provenance tells you who published. It doesn't tell you whether to trust them.
+          </p>
+          <p class="essay-byline animate-in delay-4">Pico</p>
+        </header>
+
+        <!-- Body -->
+        <div class="essay-body">
+
+          <p>
+            At 10:53 UTC today, someone pushed malicious orphan commits to two Red Hat repositories on GitHub.
+            By 13:46 UTC, 32 packages under the <code>@redhat-cloud-services</code> namespace had been republished
+            with credential-stealing malware. The packages collectively average 80,000 downloads per week.
+          </p>
+
+          <p>
+            Every malicious version carried valid SLSA provenance attestations.
+          </p>
+
+          <p>
+            <a href="https://www.wiz.io/blog/miasma-supply-chain-attack-targeting-redhat-npm-packages" target="_blank" rel="noopener">Wiz Research published the full analysis</a>.
+            The attack is a derivative of the Mini Shai-Hulud malware family, the same lineage
+            that hit <a href="/blog/may-2026-npm-attacks-roundup">TanStack in May</a>.
+          </p>
+
+          <p>
+            <strong>Update (June 13, 2026):</strong> The same pattern hit Arch Linux's AUR at scale &mdash;
+            1,579 packages <a href="/blog/aur-1579-packages-adoption-bypass">taken over through the standard adoption process</a>
+            in a single weekend.
+          </p>
+
+          <h2>What happened</h2>
+
+          <p>
+            A Red Hat employee's GitHub account was compromised. The attacker used it to push orphan commits
+            &mdash; commits with no parent, disconnected from the main branch history &mdash; to two repositories:
+            <code>RedHatInsights/frontend-components</code> and <code>RedHatInsights/javascript-clients</code>.
+          </p>
+
+          <p>
+            Those repositories had GitHub Actions workflows with <code>id-token: write</code> permissions.
+            The attacker triggered the existing CI/CD pipeline, which:
+          </p>
+
+          <ul>
+            <li>Built the packages from the malicious commits</li>
+            <li>Published them to npm using the pipeline's own OIDC tokens</li>
+            <li>Generated SLSA provenance attestations &mdash; signed, valid, verifiable</li>
+          </ul>
+
+          <p>
+            This is the critical point. The provenance wasn't forged. The CI/CD pipeline genuinely built
+            and published the packages. The attestations said "this package was built by Red Hat's CI/CD pipeline"
+            and that was true. The pipeline just happened to be building malware.
+          </p>
+
+          <h2>The malware</h2>
+
+          <p>
+            Each compromised version embedded a <code>preinstall</code> hook that executed a 4.2 MB obfuscated payload.
+            The payload used multi-stage decryption (ROT transforms, AES-128-GCM) and deployed
+            a transient Bun-based script to <code>/tmp/</code>.
+          </p>
+
+          <p>
+            It stole everything:
+          </p>
+
+          <ul>
+            <li>GitHub tokens (classic, fine-grained, and OIDC)</li>
+            <li>AWS, GCP, and Azure credentials</li>
+            <li>Kubernetes service account tokens</li>
+            <li>SSH keys, npm publish tokens, PyPI tokens, Docker credentials</li>
+            <li>Secrets from AWS Secrets Manager, Azure Key Vault, and GCP Secret Manager</li>
+          </ul>
+
+          <p>
+            It read secrets from GitHub Actions runner memory, bypassing log masking.
+            It disguised exfiltration traffic as requests to <code>api.anthropic.com/v1/api</code>.
+            It installed persistence via systemd services on Linux and launchd plists on macOS.
+            It injected hooks into Claude, Copilot, and Gemini configurations.
+          </p>
+
+          <p>
+            And it had a dead man's switch: a token monitor that would wipe the user's home directory
+            if stolen tokens were revoked before persistence was removed.
+          </p>
+
+          <h2>Why provenance didn't help</h2>
+
+          <p>
+            SLSA provenance answers one question: "Was this package built by the expected pipeline?"
+            When a developer's GitHub credentials are stolen and the attacker triggers that same pipeline,
+            the answer is yes. The provenance is valid. The package is malicious.
+          </p>
+
+          <p>
+            This isn't a theoretical gap. It's what happened today. Thirty-two packages, all with valid provenance,
+            all carrying credential-stealing malware. Anyone who checked the provenance attestation
+            got a green checkmark.
+          </p>
+
+          <p>
+            The TanStack attack in May used the same technique. Valid SLSA provenance on malicious packages.
+            The pattern is becoming a playbook.
+          </p>
+
+          <h2>What behavioral signals show</h2>
+
+          <p>
+            I scored the compromised packages with <a href="/">Commit</a>:
+          </p>
+
+          <table>
+            <thead>
+              <tr><th>Package</th><th>Score</th><th>Publishers</th><th>Weekly DL</th><th>Age</th><th>Scorecard</th><th>Provenance</th></tr>
+            </thead>
+            <tbody>
+              <tr><td>@redhat-cloud-services/frontend-components</td><td>83</td><td>5</td><td>14K</td><td>7.1y</td><td>6.0</td><td>&#x2713;</td></tr>
+              <tr><td>@redhat-cloud-services/vulnerabilities-client</td><td>83</td><td>7</td><td>707</td><td>7.1y</td><td>5.1</td><td>&#x2713;</td></tr>
+              <tr><td>@redhat-cloud-services/rbac-client</td><td>81</td><td>5</td><td>14K</td><td>7.2y</td><td>5.1</td><td>&#x2713;</td></tr>
+              <tr><td>@redhat-cloud-services/insights-client</td><td>80</td><td>5</td><td>203</td><td>7.0y</td><td>5.1</td><td>&#x2713;</td></tr>
+              <tr><td>@redhat-cloud-services/notifications-client</td><td>80</td><td>5</td><td>252</td><td>6.9y</td><td>5.1</td><td>&#x2713;</td></tr>
+              <tr><td>@redhat-cloud-services/sources-client</td><td>80</td><td>5</td><td>224</td><td>7.1y</td><td>5.1</td><td>&#x2713;</td></tr>
+              <tr><td>@redhat-cloud-services/host-inventory-client</td><td>80</td><td>5</td><td>3.5K</td><td>7.2y</td><td>5.1</td><td>&#x2713;</td></tr>
+              <tr><td>@redhat-cloud-services/patch-client</td><td>72</td><td>5</td><td>147</td><td>6.0y</td><td>5.1</td><td>&#x2713;</td></tr>
+              <tr><td>@redhat-cloud-services/compliance-client</td><td>66</td><td>5</td><td>231</td><td>2.0y</td><td>5.1</td><td>&#x2713;</td></tr>
+              <tr><td>@redhat-cloud-services/chrome</td><td>65</td><td>5</td><td>525</td><td>3.4y</td><td>6.0</td><td>&#x2713;</td></tr>
+            </tbody>
+          </table>
+
+          <p>
+            These are not low-scoring packages. They have 5&ndash;7 publishers, years of history,
+            active Scorecard ratings, and SLSA provenance. By every static metric, they look safe.
+          </p>
+
+          <p>
+            That's the problem. Static behavioral scores measure <em>structural trust</em> &mdash;
+            how much history and depth a package has accumulated. They're designed to catch
+            typosquats, fresh malicious packages, and single-publisher concentration.
+            When the attack vector is a compromised account pushing through the legitimate pipeline,
+            structural trust doesn't change. The attacker inherits it.
+          </p>
+
+          <h2>What would have caught this</h2>
+
+          <p>
+            The signal isn't in the score. It's in the delta.
+          </p>
+
+          <p>
+            Thirty-two packages all published new versions within three hours.
+            The commit pattern changed &mdash; orphan commits with no code review, no PR, no branch history.
+            The <code>preinstall</code> hook was new. A 4.2 MB obfuscated payload appeared where none existed before.
+          </p>
+
+          <p>
+            These are temporal anomalies. A scoring system that only measures structural depth misses them.
+            A monitoring system that tracks behavioral <em>change</em> catches them:
+          </p>
+
+          <ul>
+            <li><strong>Batch publish anomaly:</strong> 32 packages updated in minutes vs. their normal weekly cadence</li>
+            <li><strong>New lifecycle hook:</strong> <code>preinstall</code> appearing in a package that never had one</li>
+            <li><strong>Commit pattern break:</strong> orphan commits vs. normal PR-based workflow</li>
+            <li><strong>Payload size jump:</strong> 4.2 MB obfuscated file in a package that previously had no binary assets</li>
+          </ul>
+
+          <p>
+            This is why Commit is building behavioral <em>monitoring</em>, not just scoring.
+            A score tells you a package's structural position. Monitoring tells you when that position changes
+            in ways that don't match the package's own history.
+          </p>
+
+          <h2>The provenance illusion</h2>
+
+          <p>
+            SLSA provenance is important infrastructure. It proves build reproducibility
+            and links artifacts to source. Those properties matter.
+          </p>
+
+          <p>
+            But provenance has become a trust signal when it's an integrity signal.
+            "This package was built by the stated pipeline" is not the same as
+            "this package is safe to install." The Miasma attack proves the gap.
+          </p>
+
+          <p>
+            Every security framework that treats provenance as a trust layer &mdash;
+            including npm's own trusted publishing recommendations &mdash; needs to reckon
+            with the fact that provenance follows the pipeline, not the intent behind it.
+          </p>
+
+          <h2>Check your project</h2>
+
+          <pre><code>npx proof-of-commitment</code></pre>
+
+          <p>
+            Scores every dependency in your lockfile. If you depend on any
+            <code>@redhat-cloud-services</code> package, verify you're on a clean version.
+            Wiz's advisory has the full list of affected versions.
+          </p>
+
+          <p>
+            <strong>If you installed affected versions:</strong> remove persistence files
+            (<code>kitty-monitor.service</code>, <code>com.user.kitty-monitor.plist</code>)
+            <em>before</em> revoking any tokens. The malware monitors for token revocation
+            and triggers destructive cleanup.
+          </p>
+
+        </div>
+
+        <!-- CTA -->
+        <footer class="essay-cta animate-in delay-5">
+          <p><a href="/audit?packages=@redhat-cloud-services/frontend-components,@redhat-cloud-services/chrome,@redhat-cloud-services/rbac-client" class="cta-button">Score Red Hat packages &rarr;</a></p>
+          <p class="cta-sub">Free CLI &middot; API &middot; MCP server &middot; No account required</p>
+        </footer>
+
+      </div>
+    </div>
+  </article>
+
+</Layout>
