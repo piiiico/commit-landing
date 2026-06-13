@@ -223,16 +223,16 @@ jobs:
 
   <hr class="section-divider" />
 
-  <!-- Step 4: IDE Hook (Cursor / Claude Code) -->
+  <!-- Step 4: IDE Hook (Cursor / Claude Code / Windsurf) -->
   <section class="qs-section">
     <div class="container">
       <div class="editorial" style="max-width: var(--max-content); margin: 0 auto;">
         <span class="qs-section-number">04</span>
-        <h2 class="qs-section-title">Block bad installs in Cursor / Claude Code</h2>
+        <h2 class="qs-section-title">Block bad installs in Cursor / Claude Code / Windsurf</h2>
         <p class="qs-intro">
           The IDE hook intercepts <code>npm install</code>, <code>pip install</code>, <code>cargo add</code>, and <code>go get</code>
-          before they run. A single <code>poc hook</code> wires up <strong>both</strong> Cursor's
-          <code>beforeShellExecution</code> and Claude Code's <code>PreToolUse</code> from one command.
+          before they run. A single <code>poc hook</code> wires up Cursor's <code>beforeShellExecution</code>,
+          Claude Code's <code>PreToolUse</code>, and Windsurf's <code>pre_run_command</code> from one command.
           CRITICAL packages get blocked. HIGH triggers a confirmation prompt. Clean installs pass through silently.
         </p>
 
@@ -245,8 +245,9 @@ jobs:
  wrote ~/.commit/cursor-hook.js
  configured .cursor/hooks.json
  configured .claude/settings.json
+ configured .windsurf/hooks.json
 
-<span class="c-comment"># That's it. Next install attempt in Cursor or Claude Code hits the gate.</span>
+<span class="c-comment"># That's it. Next install attempt in Cursor, Claude Code, or Windsurf hits the gate.</span>
 <span class="c-comment"># Inside the agent chat:</span>
 > Install lodash
 <span class="c-comment"># &#x2192; Hook intercepts &#x2192; lodash scores 81 / CRITICAL &#x2192; install blocked.</span>
@@ -266,8 +267,8 @@ jobs:
         </div>
 
         <p class="qs-note">
-          Same hook script serves both clients — Cursor's <code>beforeShellExecution</code> spec (v1.7+) and Claude Code's <code>PreToolUse</code>. The hook auto-detects which client called it and replies in the matching format. Shared scoring API means rate limits and API keys carry across.
-          <a href="/blog/cursor-hook-supply-chain-gate">Full walkthrough &rarr;</a>
+          Same hook script serves all three clients — auto-detects Cursor (<code>beforeShellExecution</code> v1.7+), Claude Code (<code>PreToolUse</code>), and Windsurf (<code>pre_run_command</code>) from stdin shape and replies in the matching format. Shared scoring API means rate limits and API keys carry across.
+          <a href="/windsurf">Windsurf setup →</a> &nbsp; <a href="/cursor">Cursor →</a> &nbsp; <a href="/claude-code">Claude Code →</a>
         </p>
       </div>
     </div>
