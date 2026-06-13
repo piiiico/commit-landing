@@ -407,8 +407,13 @@ console.log(data.results[0].score); // 0–100 trust score</code></pre>
         // with 0 organic signups, so knowing which README the (eventual)
         // signup came from is the first measurable signal on a discovery
         // surface that has produced nothing in 92 days. Hero copy here picks
-        // up the README's promise — "behavioral signals that can't be faked"
-        // — and gives the next concrete step (run an audit on your own tree).
+        // up the README promise (behavioral signals that cannot be faked)
+        // and gives the next concrete step (run an audit on your own tree).
+        // NOTE: comment must not contain single quotes — deploy.ts GUARD 3
+        // brace-walker (extractObjectKeys) treats apostrophes as string
+        // delimiters and skips the following keys when there is no closing
+        // quote until end of body. Bug filed in deploy.ts but the comment-
+        // free phrasing is the safer short-term workaround.
         'readme-monitoring': {
           eyebrow: 'From the GitHub README',
           title: 'Free monitoring on your supply chain',
