@@ -3,7 +3,7 @@
  * check-funnel-surface-parity.ts
  *
  * Build-time gate: asserts every ref=X URL emitted by proof-of-commitment
- * npm-package/index.js has matching entries in all 4 gate sites:
+ * runtime AND static-doc surfaces has matching entries in all 4 gate sites:
  *   1. get-started.astro HERO_BY_REF
  *   2. get-started.astro REF_TO_SOURCE
  *   3. pricing.astro CONTEXT_BY_CAMPAIGN
@@ -15,8 +15,15 @@
  * (2026-05-23, 06-10 ×3, 06-12) without a build-time intercept.
  * This script is that intercept.
  *
- * SCOPE: literal URL strings in npm-package/index.js only.
- *        No AST parsing, no generalising beyond 4 gates.
+ * 2026-06-13: extended SCOPE to scan README.md + npm-package/README.md after
+ * the v1.31.1 README ship (visible CRITICAL demo) was found unmeasurable —
+ * both README CTAs used refs (?ref=readme-monitoring / npm-readme-monitoring)
+ * that fell through all 4 gates → source=web. The same funnel-surface-gap
+ * pattern, just on a discovery surface the gate didn't watch. Adding the
+ * READMEs to scanned sources catches the next variant before deploy.
+ *
+ * SCOPE: literal URL strings in npm-package/index.js + README.md +
+ *        npm-package/README.md. No AST parsing, no generalising beyond 4 gates.
  */
 
 import { readFileSync } from "fs";
@@ -25,28 +32,37 @@ import { join, resolve } from "path";
 // ── Paths ────────────────────────────────────────────────────────────────────
 const ROOT = resolve(import.meta.dir, "../..");
 const NPM_PKG   = join(ROOT, "proof-of-commitment/npm-package/index.js");
+const NPM_README = join(ROOT, "proof-of-commitment/npm-package/README.md");
+const GH_README  = join(ROOT, "proof-of-commitment/README.md");
 const GET_STARTED = join(ROOT, "commit-landing-v2/src/pages/get-started.astro");
 const PRICING   = join(ROOT, "commit-landing-v2/src/pages/pricing.astro");
 const WORKER    = join(ROOT, "proof-of-commitment/src/backend/worker.ts");
 
 // ── Read sources ─────────────────────────────────────────────────────────────
 const npmSrc    = readFileSync(NPM_PKG, "utf8");
+const npmReadmeSrc = readFileSync(NPM_README, "utf8");
+const ghReadmeSrc  = readFileSync(GH_README, "utf8");
 const gsSrc     = readFileSync(GET_STARTED, "utf8");
 const priceSrc  = readFileSync(PRICING, "utf8");
 const workerSrc = readFileSync(WORKER, "utf8");
 
-// ── Extract refs from npm-package ────────────────────────────────────────────
-// Refs that route to /get-started?ref=X
-const gsRefRe  = /getcommit\.dev\/get-started[^'"]*[?&]ref=([a-zA-Z0-9_-]+)/g;
+// ── Extract refs from emitter surfaces ───────────────────────────────────────
+// Refs that route to /get-started?ref=X (URLs may end at quote, paren, space, '#', '<')
+const gsRefRe  = /getcommit\.dev\/get-started[^'")\s<>]*[?&]ref=([a-zA-Z0-9_-]+)/g;
 // Refs that route to /pricing?ref=X
-const priceRefRe = /getcommit\.dev\/pricing[^'"]*[?&]ref=([a-zA-Z0-9_-]+)/g;
+const priceRefRe = /getcommit\.dev\/pricing[^'")\s<>]*[?&]ref=([a-zA-Z0-9_-]+)/g;
 
 const getStartedRefs = new Set<string>();
 const pricingRefs    = new Set<string>();
 
 let m: RegExpExecArray | null;
-while ((m = gsRefRe.exec(npmSrc)) !== null)    getStartedRefs.add(m[1]);
-while ((m = priceRefRe.exec(npmSrc)) !== null) pricingRefs.add(m[1]);
+// CLI runtime + both README discovery surfaces (npm + GH README)
+for (const src of [npmSrc, npmReadmeSrc, ghReadmeSrc]) {
+  gsRefRe.lastIndex = 0;
+  priceRefRe.lastIndex = 0;
+  while ((m = gsRefRe.exec(src)) !== null)    getStartedRefs.add(m[1]);
+  while ((m = priceRefRe.exec(src)) !== null) pricingRefs.add(m[1]);
+}
 
 const allRefs = new Set([...getStartedRefs, ...pricingRefs]);
 
