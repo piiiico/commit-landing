@@ -15,6 +15,30 @@ export interface Post {
 // Sorted newest first
 export const posts: Post[] = [
   {
+    slug: 'snyk-scores-chalk-81-we-score-it-critical',
+    title: 'Snyk Scores Chalk 81. We Score It CRITICAL.',
+    description: "Snyk's Package Health Score gives chalk 81/100. Commit flags it CRITICAL. Same package, opposite conclusions. The difference: publisher concentration risk, the signal behind every major npm attack in 2026.",
+    date: '2026-06-14',
+    dateLabel: 'June 14, 2026',
+    relatedSlugs: [
+      'commit-vs-socket-snyk-npm-audit',
+      'scorecard-vs-behavioral',
+      'npm-audit-zero-vulnerabilities',
+    ],
+  },
+  {
+    slug: 'unit42-80-percent-agent-skills-lie',
+    title: '80% of Agent Skills Lie About What They Do',
+    description: "Palo Alto Unit42 crawled 49,943 OpenClaw skills and found 80% have behavioral deviations from their declared intent. Then they admitted their own scanner can't catch the dangerous tail. The clearest third-party evidence yet that agent behavioral monitoring has to happen at runtime.",
+    date: '2026-06-14',
+    dateLabel: 'June 14, 2026',
+    relatedSlugs: [
+      'mcp-security-crisis',
+      'behavioral-trust-vs-surveillance',
+      'declarations-are-gameable',
+    ],
+  },
+  {
     slug: 'aur-1579-packages-adoption-bypass',
     title: '1,579 AUR Packages Were Taken Over Through the Adoption Process. The Bypass Was the Process.',
     description: "Arch Linux's AUR has a documented mechanism for orphaned packages to be adopted by new maintainers. Last week attackers used it as designed. Number started at 400. Ended at 1,579. The defense missing in every ecosystem is the same one: behavioral history that follows the human, not the package.",

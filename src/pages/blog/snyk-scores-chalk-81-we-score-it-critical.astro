@@ -1,0 +1,196 @@
+---
+import Layout from '../../layouts/Layout.astro';
+---
+
+<Layout
+  title="Snyk Scores Chalk 81. We Score It CRITICAL. Here's Why That Matters. &mdash; Commit"
+  description="Snyk's Package Health Score gives chalk 81/100. Commit flags it CRITICAL. Same package, opposite conclusions. The difference: publisher concentration risk, the signal behind every major npm attack in 2026."
+  canonical="https://getcommit.dev/blog/snyk-scores-chalk-81-we-score-it-critical/"
+  publishDate="2026-06-14"
+>
+
+  <!-- Nav -->
+  <nav>
+    <div class="container nav-inner">
+      <a href="/" class="nav-brand">Commit</a>
+      <ul class="nav-links">
+        <li><a href="/extension">Extension</a></li>
+        <li><a href="/blog">Writing</a></li>
+        <li><a href="/pricing">Pricing</a></li><li><a href="/docs">Docs</a></li><li><a href="https://github.com/piiiico/proof-of-commitment" target="_blank" rel="noopener">GitHub</a></li>
+        <li><a href="mailto:pico@amdal.dev">Contact</a></li>
+      </ul>
+    </div>
+  </nav>
+
+  <!-- Essay -->
+  <article class="essay">
+    <div class="container">
+      <div class="editorial">
+
+        <!-- Header -->
+        <header class="essay-header">
+          <div class="essay-meta animate-in delay-1">
+            <time datetime="2026-06-14">June 14, 2026</time>
+          </div>
+          <h1 class="essay-title animate-in delay-2">Snyk Scores Chalk 81. We Score It CRITICAL.</h1>
+          <p class="essay-subtitle animate-in delay-3">
+            Same package. Opposite conclusions.
+            The difference is one signal: how many people can push a new version to npm.
+            That signal predicted every major npm attack this year.
+          </p>
+          <p class="essay-byline animate-in delay-4">Pico</p>
+        </header>
+
+        <!-- Body -->
+        <div class="essay-body">
+
+          <p>
+            Go to <a href="https://security.snyk.io/package/npm/chalk" target="_blank" rel="noopener">Snyk's vulnerability database</a> right now and look up chalk.
+            You'll see a Package Health Score of 81 out of 100. No known security issues. Sustainable maintenance.
+            The assessment: this is a healthy package.
+          </p>
+
+          <p>
+            Run <code>npx proof-of-commitment chalk</code> and you'll see something different:
+          </p>
+
+          <pre><code>Package   Risk            Score   Publishers   Downloads     Age       Provenance
+chalk     🔴 CRITICAL     75      1            445.5M/wk     12.9y     &mdash;
+  &#8627; 30+ GitHub contributors &mdash; publish-access concentration risk despite active community</code></pre>
+
+          <p>
+            CRITICAL. One npm publisher controls 445 million weekly downloads. That's not a vulnerability.
+            It's a structural concentration risk &mdash; the exact profile that every major npm attack in 2026 has exploited.
+          </p>
+
+          <h2>What Snyk measures</h2>
+
+          <p>
+            Snyk's Package Health Score is built from four dimensions: security (known CVEs),
+            popularity (download volume, GitHub stars), maintenance (commit frequency, release cadence),
+            and community (contributors, documentation). These are real signals. They tell you whether
+            a project is active and whether it has known bugs.
+          </p>
+
+          <p>
+            What they don't tell you: how many humans can push a malicious version.
+          </p>
+
+          <p>
+            Snyk shows "1 maintainer" as a data point in its maintenance section. It's listed next to
+            "0 open PRs" and "last commit 4 months ago." The number is visible but not actionable &mdash;
+            it doesn't change the score, doesn't trigger a warning, and isn't framed as a risk factor.
+          </p>
+
+          <h2>What Commit measures</h2>
+
+          <p>
+            Commit scores packages on behavioral signals: longevity, release consistency, download trend,
+            OpenSSF Scorecard data, and &mdash; crucially &mdash; <strong>publisher depth</strong>.
+            How many distinct humans have <code>npm publish</code> access?
+          </p>
+
+          <p>
+            When a package with 445 million weekly downloads has a single npm publisher,
+            one stolen token, one compromised laptop, one phishing email reaches every project
+            that depends on it. That is the attack that keeps happening.
+          </p>
+
+          <h2>The 2026 track record</h2>
+
+          <p>
+            Six major npm supply chain attacks have hit this year. Every one exploited
+            a package with a sole publisher or a compromised publisher credential:
+          </p>
+
+          <ul>
+            <li><strong>axios</strong> &mdash; March 30. Token theft. 119M downloads/week. <a href="/blog/axios-attack-prediction">1 npm publisher.</a></li>
+            <li><strong>TanStack</strong> &mdash; May 11. <a href="/blog/two-attacks-one-week">Mini Shai-Hulud worm.</a> Hijacked CI/CD to publish malicious versions.</li>
+            <li><strong>TrapDoor</strong> &mdash; May 22. <a href="/blog/trapdoor-ai-assistant-poisoning">21 npm + 7 PyPI + 6 Cargo</a> packages planting persistence hooks in AI coding assistants.</li>
+            <li><strong>Red Hat Miasma</strong> &mdash; June 1. <a href="/blog/redhat-miasma-provenance-bypass">32 @redhat-cloud-services packages</a> via compromised GitHub account. Valid SLSA provenance on every malicious version.</li>
+            <li><strong>Phantom Gyp</strong> &mdash; June 3. <a href="/blog/phantom-gyp-binding-gyp-bypass">57 packages</a> including @vapi-ai/server-sdk (408K/month). Used binding.gyp to bypass install-script monitors.</li>
+            <li><strong>IronWorm</strong> &mdash; June 4. <a href="/blog/ironworm-rust-malware-targets-ai-credentials">37 packages</a> with eBPF rootkit + Tor C2 + self-propagation via stolen npm tokens.</li>
+          </ul>
+
+          <p>
+            <code>npm audit</code> flagged zero of these before the attack.
+            Snyk's vulnerability database flagged zero before the attack.
+            A publisher concentration check would have flagged all of them as structural risk.
+          </p>
+
+          <h2>The 26 packages that matter most</h2>
+
+          <p>
+            26 of the 91 npm packages with more than 10 million weekly downloads have a single npm publisher.
+            Together they account for over 3 billion downloads per week. They include packages that are
+            probably in your lock file right now:
+          </p>
+
+          <ul>
+            <li><strong>minimatch</strong> &mdash; 625M/week, 1 publisher</li>
+            <li><strong>chalk</strong> &mdash; 445M/week, 1 publisher</li>
+            <li><strong>glob</strong> &mdash; 366M/week, 1 publisher</li>
+            <li><strong>cross-spawn</strong> &mdash; 215M/week, 1 publisher</li>
+            <li><strong>zod</strong> &mdash; 194M/week, 1 publisher</li>
+            <li><strong>lodash</strong> &mdash; 156M/week, 1 publisher</li>
+          </ul>
+
+          <p>
+            None of them are vulnerable. All of them are structural concentration risk.
+            The distinction matters because vulnerability scanning and behavioral risk analysis
+            serve different functions &mdash; and confusing the two leaves the gap attackers keep walking through.
+          </p>
+
+          <h2>Not a replacement. A different question.</h2>
+
+          <p>
+            Snyk tells you: <em>does this package have known bugs?</em>
+          </p>
+
+          <p>
+            Commit tells you: <em>if this package's publisher gets phished tomorrow, how bad is it?</em>
+          </p>
+
+          <p>
+            Both questions matter. They measure different attack surfaces.
+            The problem is that most teams only ask the first one.
+          </p>
+
+          <h2>Try it</h2>
+
+          <p>
+            Zero install, 30 seconds:
+          </p>
+
+          <pre><code>npx proof-of-commitment --file package-lock.json</code></pre>
+
+          <p>
+            Or paste your packages into the <a href="/audit">web demo</a>.
+          </p>
+
+          <p>
+            If you want monitoring &mdash; automated scans, alerts when a score drops,
+            email when a package you depend on gets compromised:
+          </p>
+
+          <pre><code>poc watch chalk --email you@company.com</code></pre>
+
+          <p>
+            <a href="/get-started?ref=blog-snyk-comparison">Free key</a> &mdash; 3 packages, weekly digest, 30 seconds, no card.
+            <a href="/pricing?ref=blog-snyk-comparison">Developer</a> &mdash; 15 packages, daily scans, $15/month.
+          </p>
+
+        </div>
+
+        <!-- Footer -->
+        <footer class="essay-footer">
+          <p>
+            <a href="/compare">Full comparison: Commit vs. Socket, Snyk, OpenSSF Scorecard</a>
+          </p>
+        </footer>
+
+      </div>
+    </div>
+  </article>
+
+</Layout>
