@@ -15,15 +15,39 @@ export interface Post {
 // Sorted newest first
 export const posts: Post[] = [
   {
+    slug: 'atomic-arch-targets-bun',
+    title: 'Atomic Arch Targets Bun. The Entry Point Was AUR.',
+    description: "1,500 Arch Linux packages hijacked to inject three malicious npm dependencies. Wave 2 adds Bun-specific install paths — the runtime check explicitly branches for Bun. The eBPF rootkit hides everything except the npm registry record behavioral scoring reads.",
+    date: '2026-06-14',
+    dateLabel: 'June 14, 2026',
+    relatedSlugs: [
+      'aur-1579-packages-adoption-bypass',
+      'ironworm-rust-malware-targets-ai-credentials',
+      'trapdoor-ai-assistant-poisoning',
+    ],
+  },
+  {
+    slug: 'snyk-scores-lodash-86-we-score-it-critical',
+    title: 'Snyk Scores Lodash 86. We Score It CRITICAL.',
+    description: "Snyk's Package Health Score gives lodash 86/100 and labels it HEALTHY. Commit flags it CRITICAL. Same package, opposite conclusions. The difference: one npm publisher controls 162M weekly downloads — the structural signal behind every major 2026 supply chain attack.",
+    date: '2026-06-14',
+    dateLabel: 'June 14, 2026',
+    relatedSlugs: [
+      'snyk-scores-chalk-81-we-score-it-critical',
+      'commit-vs-socket-snyk-npm-audit',
+      'axios-attack-prediction',
+    ],
+  },
+  {
     slug: 'snyk-scores-chalk-81-we-score-it-critical',
     title: 'Snyk Scores Chalk 81. We Score It CRITICAL.',
     description: "Snyk's Package Health Score gives chalk 81/100. Commit flags it CRITICAL. Same package, opposite conclusions. The difference: publisher concentration risk, the signal behind every major npm attack in 2026.",
     date: '2026-06-14',
     dateLabel: 'June 14, 2026',
     relatedSlugs: [
+      'snyk-scores-lodash-86-we-score-it-critical',
       'commit-vs-socket-snyk-npm-audit',
       'scorecard-vs-behavioral',
-      'npm-audit-zero-vulnerabilities',
     ],
   },
   {
