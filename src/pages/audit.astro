@@ -2868,5 +2868,68 @@ uuid</textarea>
 
     // ── Audit CTA is now a direct link to /get-started?ref=audit-web ──
     // (removed dead /api/waitlist 404 form 2026-05-22 — 0 real signups in 6 weeks)
+    //
+    // 2026-06-14: when the page loads with a packages URL param (npm, pypi,
+    // cargo, golang), rewrite the bottom "Get your free API key" CTA href to
+    // carry those packages as `?watch=…&eco=…`. Closes context-loss leak: pre-
+    // this commit, user landing on /audit?packages=react,axios → click bottom
+    // CTA → /get-started?ref=audit-web → submit → key with empty watchlist
+    // (welcome email + weekly digest orthogonal to original intent). Now the
+    // signup carries the scanned packages, /get-started parses ?watch, backend
+    // seeds the watchlist, welcome email lists them, weekly digest is relevant.
+    // The inline renderInlineForm flow (CRITICAL/healthy/compromised states)
+    // already passes watch via buildWatchSeeds; this fixes the supplementary
+    // bottom CTA which is the only signup surface when the page first loads
+    // with a packages URL but the user clicks before scan completes (or when
+    // scan ran but renderInlineForm gating didn't show an inline form).
+    (function rewriteBottomCtaWithWatch() {
+      try {
+        const params = new URLSearchParams(window.location.search);
+        // Match the same lookup order as initFromUrlParams (repo / cargo /
+        // golang / pypi / packages) — first ecosystem hit wins. Skip repo
+        // entirely: github repo audit returns hundreds of transitive deps
+        // and the bottom CTA shouldn't try to seed all of them.
+        const ECO_PARAMS: Array<[string, string]> = [
+          ['cargo', 'cargo'],
+          ['go', 'golang'],
+          ['pypi', 'pypi'],
+          ['packages', 'npm'],
+        ];
+        let raw = '';
+        let eco = '';
+        for (const [paramName, ecoName] of ECO_PARAMS) {
+          const v = params.get(paramName);
+          if (v) {
+            raw = v;
+            // If qualified ecosystem param is present (?packages=…&ecosystem=pypi),
+            // it overrides the inferred ecosystem from the param name.
+            const qualifier = (params.get('ecosystem') || params.get('eco') || '').toLowerCase().trim();
+            const QUALIFIED_ECOS: Record<string, string> = {
+              npm: 'npm', pypi: 'pypi', cargo: 'cargo', go: 'golang', golang: 'golang',
+            };
+            eco = QUALIFIED_ECOS[qualifier] ?? ecoName;
+            break;
+          }
+        }
+        if (!raw) return;
+        // Sanitize: same shape /get-started accepts (npm-name regex), cap 3
+        // to mirror PACKAGE_LIMITS.free even though /get-started also caps.
+        const names = raw
+          .split(',')
+          .map(n => n.trim())
+          .filter(n => /^@?[a-z0-9._/-]{1,100}$/i.test(n))
+          .slice(0, 3);
+        if (names.length === 0) return;
+        const cta = document.querySelector('a.audit-waitlist-btn[data-cta="audit-get-key"]') as HTMLAnchorElement | null;
+        if (!cta) return;
+        const url = new URL(cta.href, window.location.origin);
+        url.searchParams.set('watch', names.join(','));
+        url.searchParams.set('eco', eco);
+        cta.href = url.toString();
+      } catch (_err) {
+        // Best-effort: any failure (bad URL parse, missing DOM) silently
+        // falls back to the static href which still works (just unseeded).
+      }
+    })();
   </script>
 </Layout>
