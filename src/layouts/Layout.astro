@@ -90,11 +90,227 @@ if (isBlogPost) {
 }
 
 // JSON-LD structured data
+//
+// Single source of truth for schema.org markup across the site. Uses @graph so
+// each page can declare multiple typed entries (Organization + WebSite + Product
+// on the homepage, Organization + Product + FAQPage on /pricing, etc.) and they
+// cross-reference via @id. AI assistants and Google Rich Results both prefer a
+// single @graph block over multiple sibling <script> tags.
+//
+// Stable @ids used across pages:
+//   https://getcommit.dev/#org      — Organization (Commit)
+//   https://getcommit.dev/#website  — WebSite (search action)
+//   https://getcommit.dev/#product  — Product (Commit API + tiers)
+
+const ORG_ID = "https://getcommit.dev/#org";
+const WEBSITE_ID = "https://getcommit.dev/#website";
+const PRODUCT_ID = "https://getcommit.dev/#product";
+
+const ORGANIZATION = {
+  "@type": "Organization",
+  "@id": ORG_ID,
+  "name": "Commit",
+  "alternateName": "getcommit.dev",
+  "url": "https://getcommit.dev",
+  "logo": {
+    "@type": "ImageObject",
+    "url": "https://getcommit.dev/og-default.png",
+    "width": 1200,
+    "height": 630,
+  },
+  "description":
+    "Behavioral commitment signals for software supply chain risk. Scores npm, PyPI, Cargo, and Go packages on publisher depth, release patterns, and maintenance consistency.",
+  "sameAs": [
+    "https://github.com/piiiico/proof-of-commitment",
+    "https://www.npmjs.com/package/proof-of-commitment",
+  ],
+  // hasOfferCatalog declares the public-facing API products. AEO analyzers
+  // (Synlig + Schema App Validator) read this as the canonical service surface.
+  "hasOfferCatalog": {
+    "@type": "OfferCatalog",
+    "name": "Commit API plans",
+    "url": "https://getcommit.dev/pricing/",
+    "itemListElement": [
+      {
+        "@type": "OfferCatalog",
+        "name": "Supply-chain risk scoring",
+        "itemListElement": [
+          {
+            "@type": "Offer",
+            "itemOffered": {
+              "@type": "Service",
+              "name": "Free package audit",
+              "description":
+                "Audit any npm, PyPI, Cargo, or Go package via CLI or web — free, no signup required.",
+            },
+          },
+          {
+            "@type": "Offer",
+            "itemOffered": {
+              "@type": "Service",
+              "name": "REST API access",
+              "description":
+                "Programmatic access to risk scores: single-package + batch endpoints, MCP server, IDE hooks for Cursor / Claude Code / Windsurf.",
+            },
+          },
+          {
+            "@type": "Offer",
+            "itemOffered": {
+              "@type": "Service",
+              "name": "Continuous monitoring",
+              "description":
+                "Watch packages, repos, or projects — daily / hourly scans, email + Slack + webhook alerts the moment a score drops.",
+            },
+          },
+        ],
+      },
+    ],
+  },
+};
+
+const WEBSITE_NODE = {
+  "@type": "WebSite",
+  "@id": WEBSITE_ID,
+  "url": "https://getcommit.dev",
+  "name": "Commit",
+  "publisher": { "@id": ORG_ID },
+  "potentialAction": {
+    "@type": "SearchAction",
+    "target": "https://getcommit.dev/audit?packages={search_term_string}",
+    "query-input": "required name=search_term_string",
+  },
+};
+
+// Offers and FAQ live with pricing — keep them next to the canonical source so
+// when /pricing copy changes, the structured data changes in the same edit.
+// Prices/usage limits mirror pricing.astro tier cards exactly; treat as a contract.
+const PRICING_OFFERS = [
+  {
+    "@type": "Offer",
+    "name": "Free",
+    "price": "0",
+    "priceCurrency": "USD",
+    "category": "FreeTrial",
+    "description":
+      "Single-package API — 200 req/day with free API key. CLI, web audit, MCP server unlimited. Watchlist for 3 packages with weekly digest.",
+    "availability": "https://schema.org/InStock",
+    "url": "https://getcommit.dev/get-started/",
+  },
+  {
+    "@type": "Offer",
+    "name": "Developer",
+    "price": "15",
+    "priceCurrency": "USD",
+    "billingDuration": "P1M",
+    "description":
+      "Single-package API 1,000 req/day, batch API up to 5 packages (2,000 req/month), GitHub repo audit 50 req/month, watchlist 15 packages with daily scans + instant email alerts.",
+    "availability": "https://schema.org/InStock",
+    "url": "https://getcommit.dev/pricing/#developer",
+  },
+  {
+    "@type": "Offer",
+    "name": "Pro",
+    "price": "29",
+    "priceCurrency": "USD",
+    "billingDuration": "P1M",
+    "description":
+      "Batch API up to 20 packages (10,000 req/month pooled), GitHub repo audit 500 req/month, dependency graph 200 req/month, monitor 10 projects, Slack/webhook alerts, 90-day history.",
+    "availability": "https://schema.org/InStock",
+    "url": "https://getcommit.dev/pricing/#pro",
+  },
+  {
+    "@type": "Offer",
+    "name": "Enterprise",
+    "price": "199",
+    "priceCurrency": "USD",
+    "billingDuration": "P1M",
+    "description":
+      "Everything in Pro plus unlimited projects, hourly scans, SSO, SOC 2 evidence, dedicated support.",
+    "availability": "https://schema.org/InStock",
+    "url": "https://getcommit.dev/pricing/#enterprise",
+  },
+];
+
+const PRICING_FAQ = [
+  {
+    q: "What's the difference between Developer and Pro?",
+    a:
+      "Developer ($15/mo) is for builders: 5× more API requests than free, batch scanning for up to 5 packages, GitHub Action auto-triggers on PR, and monitoring for 15 packages with daily scans and instant email alerts. Pro ($29/mo) is for teams in production: 10,000 requests/month pooled, batch up to 20 packages, 10 monitored projects, Slack/webhook alerts, 90-day history, and priority badge CDN.",
+  },
+  {
+    q: "Why per-project, not per-seat?",
+    a:
+      "Per-seat pricing creates perverse incentives: teams avoid adding contributors to save costs, and security coverage gets gaps. Commit's data comes from public registries — we don't touch your code, so we don't need to count seats. A growing team shouldn't cost more for the same security coverage.",
+  },
+  {
+    q: "Is Commit replacing Socket or Snyk?",
+    a:
+      "No. Use all of them. Socket detects malicious code after it's published. Snyk finds known CVEs. Commit identifies structural exposure before any code changes — it maps which packages are the kind of thing that gets targeted. The ua-parser-js attack (October 2021) triggered zero warnings in Socket or Snyk beforehand. The structural signal — 1 maintainer, 100M+ downloads/week — was visible for years.",
+  },
+  {
+    q: "What counts as a project for Pro monitoring?",
+    a:
+      "A project is a dependency manifest you want Commit to monitor continuously — typically a package.json or GitHub repository. Pro covers 10 projects with daily scans. Enterprise covers unlimited projects with hourly scans. Single-package audits via the API don't count toward your project limit.",
+  },
+  {
+    q: "Is the CLI really free forever?",
+    a:
+      "Yes. The CLI (npx proof-of-commitment), the scoring algorithm, and the web audit tool are MIT-licensed and free forever. The value in Pro and Enterprise isn't the algorithm (it's public) — it's the infrastructure: monitoring, alerts, historical data, and CI/CD integration.",
+  },
+  {
+    q: "What's the API rate limit on the free tier?",
+    a:
+      "Free tier: 200 single-package requests per day with a free API key (instant signup at /get-started, no card). Anonymous (no key): 15/day per IP. Batch requests (up to 5 packages) come with Developer ($15/mo); up to 20 packages with Pro ($29/mo). If you hit the limit, the API returns HTTP 429 with a Retry-After header.",
+  },
+];
+
+const COMMIT_PRODUCT = {
+  "@type": "SoftwareApplication",
+  "@id": PRODUCT_ID,
+  "name": "Commit",
+  "alternateName": "Commit Index",
+  "applicationCategory": "DeveloperApplication",
+  "operatingSystem": "Web, CLI (Node.js), MCP",
+  "url": "https://getcommit.dev",
+  "publisher": { "@id": ORG_ID },
+  "description":
+    "Score npm, PyPI, Cargo, and Go packages on behavioral commitment signals — publisher depth, release patterns, maintenance consistency. Both axios and node-ipc scored CRITICAL before they were attacked.",
+  "featureList": [
+    "CLI (npx proof-of-commitment)",
+    "Web audit",
+    "REST API",
+    "MCP server",
+    "GitHub Action",
+    "Cursor / Claude Code / Windsurf hook",
+  ],
+  "offers": PRICING_OFFERS,
+};
+
+const FAQ_NODE = {
+  "@type": "FAQPage",
+  "@id": "https://getcommit.dev/pricing/#faq",
+  "mainEntity": PRICING_FAQ.map((item) => ({
+    "@type": "Question",
+    "name": item.q,
+    "acceptedAnswer": {
+      "@type": "Answer",
+      "text": item.a,
+    },
+  })),
+};
+
+function wrapGraph(nodes: any[]): string {
+  return JSON.stringify({
+    "@context": "https://schema.org",
+    "@graph": nodes,
+  });
+}
+
 function buildJsonLd(): string | null {
   if (isBlogPost) {
     const article: Record<string, any> = {
-      "@context": "https://schema.org",
       "@type": "BlogPosting",
+      "@id": canonical + "#post",
       "headline": headline,
       "description": description,
       "url": canonical,
@@ -102,61 +318,56 @@ function buildJsonLd(): string | null {
       "author": {
         "@type": "Person",
         "name": "Håkon Åmdal",
-        "url": "https://getcommit.dev"
-      },
-      "publisher": {
-        "@type": "Organization",
-        "name": "Commit",
         "url": "https://getcommit.dev",
-        "logo": {
-          "@type": "ImageObject",
-          "url": "https://getcommit.dev/og-default.png"
-        }
       },
+      "publisher": { "@id": ORG_ID },
       "mainEntityOfPage": {
         "@type": "WebPage",
-        "@id": canonical
-      }
+        "@id": canonical,
+      },
     };
     if (publishDate) article.datePublished = publishDate;
     if (modifiedDate) article.dateModified = modifiedDate;
-    return JSON.stringify(article);
+    return wrapGraph([ORGANIZATION, article]);
   }
 
   if (canonical === "https://getcommit.dev" || canonical === "https://getcommit.dev/") {
-    return JSON.stringify({
-      "@context": "https://schema.org",
-      "@type": "WebSite",
-      "name": "Commit",
-      "url": "https://getcommit.dev",
-      "description": description,
-      "potentialAction": {
-        "@type": "SearchAction",
-        "target": "https://getcommit.dev/audit?packages={search_term_string}",
-        "query-input": "required name=search_term_string"
-      }
-    });
+    return wrapGraph([ORGANIZATION, WEBSITE_NODE, COMMIT_PRODUCT]);
+  }
+
+  if (canonical.includes("/pricing")) {
+    // Pricing page surfaces all offers + FAQ — the canonical AI-assistant
+    // citation target for "how much does Commit cost" / "what's in Pro tier"
+    // / "is Commit replacing Snyk".
+    return wrapGraph([ORGANIZATION, COMMIT_PRODUCT, FAQ_NODE]);
   }
 
   // Software tool pages
   if (canonical.includes("/audit") || canonical.includes("/scan")) {
-    return JSON.stringify({
-      "@context": "https://schema.org",
-      "@type": "SoftwareApplication",
-      "name": "Commit — Supply Chain Auditing",
-      "url": canonical,
-      "description": description,
-      "applicationCategory": "DeveloperApplication",
-      "operatingSystem": "Web",
-      "offers": {
-        "@type": "Offer",
-        "price": "0",
-        "priceCurrency": "USD"
-      }
-    });
+    return wrapGraph([
+      ORGANIZATION,
+      {
+        "@type": "SoftwareApplication",
+        "@id": canonical + "#tool",
+        "name": "Commit — Supply Chain Auditing",
+        "url": canonical,
+        "description": description,
+        "applicationCategory": "DeveloperApplication",
+        "operatingSystem": "Web",
+        "publisher": { "@id": ORG_ID },
+        "offers": {
+          "@type": "Offer",
+          "price": "0",
+          "priceCurrency": "USD",
+          "availability": "https://schema.org/InStock",
+        },
+      },
+    ]);
   }
 
-  return null;
+  // All other pages get Organization at minimum so the Knowledge Graph has a
+  // stable @id to bind citations to no matter which page an assistant lands on.
+  return wrapGraph([ORGANIZATION]);
 }
 
 const jsonLd = buildJsonLd();
