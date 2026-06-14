@@ -1166,13 +1166,30 @@ $ npx proof-of-commitment --fail-on=critical
 
   <hr class="section-divider" />
 
-  <!-- Newsletter -->
+  <!-- Final CTA: product first, newsletter second -->
+  <!--
+    2026-06-14: Renamed from "Get early access" (waitlist framing for an unshipped
+    product) to "Start free" — the CLI, MCP, REST API and IDE hooks are live
+    (proof-of-commitment 1.31.1 on npm, ~1.8K weekly downloads). High-intent
+    visitors scrolling to the bottom of the homepage were routed to a Buttondown
+    newsletter signup that is invisible to /api/keys/stats organic tracking; the
+    actual product onboarding (/get-started) is now the primary action, and the
+    newsletter remains as a secondary option below for research-only readers.
+  -->
   <section class="newsletter-section" id="early-access">
     <div class="container">
       <div class="editorial reveal">
-        <h2 style="margin-bottom: 0.75rem;">Get early access</h2>
-        <p style="margin-bottom: 2rem; font-size: 1rem;">
-          First access to the Trust API and browser extension. Research updates and the occasional strong opinion.
+        <h2 style="margin-bottom: 0.75rem;">Start free. The product is live.</h2>
+        <p style="margin-bottom: 1.5rem; font-size: 1rem;">
+          200 audits/day on a free API key — no credit card. CLI, MCP server, REST API, GitHub Action and IDE hooks for Cursor / Claude Code / Windsurf, all in production today.
+        </p>
+
+        <p style="margin-bottom: 2rem;">
+          <a href="/get-started?ref=homepage-bottom" class="btn-primary" style="display: inline-block; padding: 0.7rem 1.4rem;">Get a free API key →</a>
+        </p>
+
+        <p style="margin-bottom: 1rem; font-size: 0.95rem; color: var(--ink-muted);">
+          Or get the research notes: occasional analysis of supply chain attacks, behavioral signals, and the gap between vulnerability scanning and commitment scoring.
         </p>
 
         <form
@@ -1189,7 +1206,7 @@ $ npx proof-of-commitment --fail-on=critical
             class="newsletter-input"
           />
           <button type="submit" class="btn-primary" style="white-space: nowrap;">
-            Subscribe
+            Subscribe to research notes
           </button>
         </form>
 
