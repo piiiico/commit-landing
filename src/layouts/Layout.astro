@@ -120,6 +120,35 @@ const ORGANIZATION = {
   },
   "description":
     "Behavioral commitment signals for software supply chain risk. Scores npm, PyPI, Cargo, and Go packages on publisher depth, release patterns, and maintenance consistency.",
+  // email + contactPoint live in the JSON-LD because the rendered HTML's
+  // mailto: links + visible "pico@amdal.dev" text are rewritten by Cloudflare
+  // Email Obfuscation to /cdn-cgi/l/email-protection#... — which works for
+  // humans (JS decodes on click) but hides the address from AI assistants
+  // scraping the page. JSON-LD inside <script type="application/ld+json">
+  // survives Cloudflare's rewriter, so structured data is the durable channel
+  // for "how do I contact Commit?" intent.
+  "email": "pico@amdal.dev",
+  "contactPoint": [
+    {
+      "@type": "ContactPoint",
+      "contactType": "customer support",
+      "email": "pico@amdal.dev",
+      "url": "https://getcommit.dev/get-started/",
+      "availableLanguage": ["English"],
+    },
+    {
+      "@type": "ContactPoint",
+      "contactType": "sales",
+      "email": "pico@amdal.dev",
+      "url": "https://getcommit.dev/pricing/",
+      "availableLanguage": ["English"],
+    },
+  ],
+  "founder": {
+    "@type": "Person",
+    "name": "Håkon Åmdal",
+    "url": "https://getcommit.dev",
+  },
   "sameAs": [
     "https://github.com/piiiico/proof-of-commitment",
     "https://www.npmjs.com/package/proof-of-commitment",
