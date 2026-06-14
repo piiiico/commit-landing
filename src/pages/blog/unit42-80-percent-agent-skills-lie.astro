@@ -1,0 +1,261 @@
+---
+import Layout from '../../layouts/Layout.astro';
+---
+
+<Layout
+  title="80% of Agent Skills Lie About What They Do — Unit42 BIV — Commit"
+  description="Palo Alto Unit42 crawled 49,943 OpenClaw skills and found 80% have behavioral deviations from their declared behavior. Then they admitted their own tool can't catch the rest. Here's what that means for agent trust scoring."
+  canonical="https://getcommit.dev/blog/unit42-80-percent-agent-skills-lie/"
+  publishDate="2026-06-14"
+>
+
+  <!-- Nav -->
+  <nav>
+    <div class="container nav-inner">
+      <a href="/" class="nav-brand">Commit</a>
+      <ul class="nav-links">
+        <li><a href="/extension">Extension</a></li>
+        <li><a href="/blog">Writing</a></li>
+        <li><a href="/pricing">Pricing</a></li><li><a href="/docs">Docs</a></li><li><a href="https://github.com/piiiico/proof-of-commitment" target="_blank" rel="noopener">GitHub</a></li>
+        <li><a href="mailto:pico@amdal.dev">Contact</a></li>
+      </ul>
+    </div>
+  </nav>
+
+  <!-- Essay -->
+  <article class="essay">
+    <div class="container">
+      <div class="editorial">
+
+        <!-- Header -->
+        <header class="essay-header">
+          <div class="essay-meta animate-in delay-1">
+            <time datetime="2026-06-14">June 14, 2026</time>
+          </div>
+          <h1 class="essay-title animate-in delay-2">80% of Agent Skills Lie About What They Do</h1>
+          <p class="essay-subtitle animate-in delay-3">
+            Palo Alto Unit42 crawled 49,943 OpenClaw skills and found 80% have behavioral deviations from their declared behavior. Then they admitted their own static analysis tool can&rsquo;t catch the rest. This is the clearest third-party data we&rsquo;ve seen on why agent trust scoring has to happen at runtime, not at install.
+          </p>
+          <p class="essay-byline animate-in delay-4">Pico</p>
+        </header>
+
+        <!-- Body -->
+        <div class="essay-body">
+
+          <p>
+            On June 11, 2026, Palo Alto Networks Unit42 published results from their Behavioral Integrity Verification (BIV) scanner applied to the OpenClaw skill ecosystem. They crawled <strong>49,943 skills</strong> &mdash; the largest systematic analysis of agent skill behavior published to date.
+          </p>
+          <p>
+            The headline: <strong>80% of skills (39,933) have at least one behavioral deviation from their declared intent.</strong> Across those skills, Unit42 documented 250,706 total deviations &mdash; an average of roughly six per non-compliant skill.
+          </p>
+          <p>
+            18.9% of skills showed adversarial intent. 5% &mdash; 2,490 skills &mdash; carried multi-stage attack chains.
+          </p>
+          <p>
+            The threat taxonomy is specific: Instruction-Level Threats were the most adversarial category, with 96% of skills in that class showing adversarial intent &mdash; the highest rate of any category. Credential theft was the largest single adversarial leaf, accounting for 8.2% of classified deviations. These aren&rsquo;t edge cases. They&rsquo;re systematic.
+          </p>
+
+          <hr class="essay-divider" />
+
+          <h2>The disclosure that matters more than the data</h2>
+
+          <p>
+            The data is striking. But the more significant finding is a single sentence in Unit42&rsquo;s methodology section:
+          </p>
+          <blockquote>
+            <p>&ldquo;BIV is static-only, so dynamic dispatch, reflection, and obfuscated payloads escape AST-level extraction.&rdquo;</p>
+          </blockquote>
+          <p>
+            This is a major security vendor saying, in their own words, that their tool &mdash; which just found behavioral deviations in 80% of skills &mdash; cannot catch the adversarial skills that matter most. Dynamic dispatch and obfuscation are standard tradecraft for any skill designed to evade detection. The 5% with multi-stage attack chains almost certainly overlap heavily with the class of skills that BIV can&rsquo;t see.
+          </p>
+          <p>
+            Read that carefully: the tool that found 39,933 deviating skills explicitly cannot analyze the class of skills most likely to cause serious harm.
+          </p>
+          <p>
+            This is not a criticism of Unit42&rsquo;s research &mdash; it&rsquo;s honest methodology disclosure. But it has a direct implication: static pre-installation analysis, however thorough, has a hard ceiling. The dangerous payloads are specifically designed to be invisible to it.
+          </p>
+
+          <hr class="essay-divider" />
+
+          <h2>What behavioral deviations actually look like</h2>
+
+          <p>
+            A behavioral deviation, in Unit42&rsquo;s framework, is a gap between what a skill declares it does (in its manifest, its description, its metadata) and what it actually does when executed. The deviation types they documented are not subtle:
+          </p>
+          <ul>
+            <li><strong>Instruction-level threats:</strong> Skills that modify the agent&rsquo;s system prompt or override task instructions mid-execution. This category had the highest adversarial rate: 96% of skills flagged here showed adversarial intent rather than developer oversight.</li>
+            <li><strong>Credential theft:</strong> Skills that access authentication tokens, API keys, or session credentials beyond their stated scope. The largest single adversarial leaf at 8.2% of all classified deviations.</li>
+            <li><strong>Exfiltration chains and remote code execution chains:</strong> Two of the four novel compound threat categories identified. Multi-stage attacks that distribute malicious behavior across steps, each of which looks benign in isolation.</li>
+          </ul>
+          <p>
+            In aggregate, this is a picture of an ecosystem where the declaration layer &mdash; what skills <em>say</em> they do &mdash; has almost entirely decoupled from the behavioral layer &mdash; what they <em>actually</em> do. 80% deviation rate at scale is not an anomaly. It&rsquo;s a structural condition.
+          </p>
+
+          <hr class="essay-divider" />
+
+          <h2>Why this happens</h2>
+
+          <p>
+            The declaration layer was never designed to be enforceable. A skill manifest is a string of text that describes intent. Nothing in the current agent skill infrastructure verifies that the manifest accurately reflects behavior. Nothing monitors runtime execution against declared scope. Nothing signals when execution diverges from declaration.
+          </p>
+          <p>
+            This is the same pattern that produced the npm supply chain crisis, applied at a faster velocity. npm&rsquo;s package metadata &mdash; README, description, keywords &mdash; said nothing enforceable about what the package code would do at runtime. Malicious packages published with plausible descriptions and then executed adversarially when installed. The declaration layer was gameable by construction.
+          </p>
+          <p>
+            Agent skills are worse. Skills are designed to operate autonomously, with elevated access to orchestration infrastructure, in contexts where human review of each action is impossible. A malicious npm package needs a human to run it. A malicious agent skill executes inside an automated pipeline that may process thousands of actions per hour. The blast radius per adversarial skill is larger, and the detection window is shorter.
+          </p>
+          <p>
+            The Unit42 data confirms what the architecture implied: when declarations aren&rsquo;t enforceable, most won&rsquo;t be accurate.
+          </p>
+
+          <hr class="essay-divider" />
+
+          <h2>The L3/L4 gap</h2>
+
+          <p>
+            In the trust infrastructure stack, there are four layers:
+          </p>
+          <ul>
+            <li><strong>L1: Identity.</strong> Who is this agent? JWT/OIDC, did:key, JWKS-verifiable credentials. The <a href="https://www.ietf.org/archive/id/draft-ietf-oauth-transaction-tokens-01.txt" target="_blank" rel="noopener">IETF Transaction Tokens draft</a>, DIF&rsquo;s MCP-I profile, and the A2A protocol all operate here.</li>
+            <li><strong>L2: Authorization.</strong> What is this agent allowed to do? OAuth scopes, capability declarations, allowlists.</li>
+            <li><strong>L3: Pre-installation verification.</strong> Static analysis, manifest scanning, provenance checks. Unit42 BIV operates at L3.</li>
+            <li><strong>L4: Runtime behavioral monitoring.</strong> Continuous observation of what the agent actually does during execution, compared against its declared scope and historical baseline.</li>
+          </ul>
+          <p>
+            The industry has made significant progress on L1 and L2 in 2026. The IETF, DIF, and OpenClaw itself have active working groups on agent identity and authorization. L3 has credible tooling &mdash; Unit42 BIV, static analysis scanners, manifest validators.
+          </p>
+          <p>
+            L4 is nearly empty.
+          </p>
+          <p>
+            Unit42&rsquo;s methodology admission tells us exactly why this matters: the attacks that escape L3 are the ones that require L4. Static analysis finds deviations in skills that didn&rsquo;t bother to hide. Dynamic dispatch and obfuscation are evasion techniques for L3. A skill that uses them passes every static scan and then executes adversarially at runtime.
+          </p>
+          <p>
+            The 5% multi-stage attack chain finding is especially relevant here. Multi-stage attacks, by definition, distribute their adversarial behavior across multiple execution steps. Step one looks clean. Step two looks clean. The harm happens at step three, when context from steps one and two enables an action that no individual step would have triggered. Static analysis examines each skill in isolation &mdash; it cannot see the chain.
+          </p>
+
+          <hr class="essay-divider" />
+
+          <h2>Agent trust scoring at runtime</h2>
+
+          <p>
+            The question this data raises isn&rsquo;t &ldquo;how do we build a better static scanner?&rdquo; Unit42 just built one and found 39,933 deviating skills &mdash; and acknowledged it can&rsquo;t see the dangerous tail. The question is: <strong>what does the trust signal look like at the moment an agent is executing?</strong>
+          </p>
+          <p>
+            Runtime <a href="/blog/scoring-methodology">behavioral trust scoring</a> works differently from static analysis. Instead of asking &ldquo;does this skill&rsquo;s code match its declaration?&rdquo; it asks a continuous set of questions during execution:
+          </p>
+          <ul>
+            <li>Is this agent accessing resources outside its declared scope?</li>
+            <li>Is this agent&rsquo;s action pattern consistent with its historical baseline?</li>
+            <li>Is this agent communicating with endpoints not present in its manifest?</li>
+            <li>Is this agent&rsquo;s token consumption pattern anomalous for its stated task?</li>
+            <li>Is this agent modifying its own instructions or those of downstream agents?</li>
+          </ul>
+          <p>
+            These signals are continuous. They degrade naturally when behavior changes. A skill that passed static analysis and operated cleanly for thirty days produces a different runtime signal than a skill that starts exfiltrating credentials on day thirty-one. Static analysis gives you a snapshot. Runtime monitoring gives you a stream.
+          </p>
+          <p>
+            The Unit42 BIV data is the strongest third-party evidence to date that the snapshot is insufficient. 250,706 behavioral deviations across 49,943 skills tell you the ecosystem has a systematic declaration problem. The explicit methodology admission tells you that the solution to the declaration problem cannot itself be declarative. You need the stream.
+          </p>
+
+          <hr class="essay-divider" />
+
+          <h2>What this means for agent deployments today</h2>
+
+          <p>
+            If your infrastructure runs agent skills &mdash; MCP servers, OpenClaw tools, custom agent pipelines &mdash; the Unit42 data has a direct operational implication: the skills you&rsquo;re running have probably not been verified against their declared behavior, and static scanning won&rsquo;t catch the most dangerous ones even if you run it.
+          </p>
+          <p>
+            A few concrete steps:
+          </p>
+          <p>
+            <strong>Audit your agent skill declarations.</strong> Start by comparing what your running skills say they do against what network traffic, system calls, and API access logs show they actually do. The gap is the risk surface. You can run a structural scan against any npm-distributed skill:
+          </p>
+          <pre><code>npx proof-of-commitment npm &lt;your-skill-package&gt;
+
+# For MCP servers
+npx proof-of-commitment mcp-remote &lt;server-url&gt;
+
+# Web UI
+# https://getcommit.dev/audit</code></pre>
+          <p>
+            <strong>Add behavioral gates to your CI pipeline.</strong> Structural risk flags &mdash; anomalous dependency additions, publishing pattern changes, maintainer transfers &mdash; show up before compromised skills reach production. We published a <a href="/blog/ci-trust-scoring-tutorial">5-minute CI integration</a> that puts these flags in PR comments.
+          </p>
+          <p>
+            <strong>Don&rsquo;t rely on marketplace verification.</strong> The OpenClaw ecosystem is not the only place this applies. We documented <a href="/blog/mcp-security-crisis">9 of 11 MCP marketplaces accepting a malicious server</a> without detection. The Unit42 data confirms this isn&rsquo;t an MCP-specific problem &mdash; it&rsquo;s a declaration-layer problem. Any ecosystem that trusts manifests over behavior has the same exposure.
+          </p>
+          <p>
+            <strong>Plan for L4.</strong> The agent behavioral monitoring layer is thin right now. That&rsquo;s not because the problem is solved &mdash; it&rsquo;s because the tooling hasn&rsquo;t caught up with the deployment curve. Unit42&rsquo;s explicit acknowledgment that static analysis has a hard ceiling is a signal that the industry knows this gap exists. Plan for monitoring infrastructure before your agent deployment scales past the point where manual review is possible.
+          </p>
+
+          <hr class="essay-divider" />
+
+          <p>
+            The 80% figure will age badly in one of two directions. Either the ecosystem invests in L4 monitoring and the deviation rate drops as adversarial skills get caught faster &mdash; or the deviation rate climbs as agent deployments scale faster than detection. Unit42&rsquo;s data is a snapshot. The dynamic depends on whether the industry treats L3 as sufficient or as the floor.
+          </p>
+          <p>
+            The methodology admission says it&rsquo;s the floor.
+          </p>
+
+          <hr class="essay-divider" />
+
+          <p class="essay-coda">
+            <em>Source: <a href="https://unit42.paloaltonetworks.com/ai-agent-supply-chain-risks/" target="_blank" rel="noopener">Palo Alto Networks Unit42</a> / <a href="https://arxiv.org/abs/2605.11770" target="_blank" rel="noopener">arXiv 2605.11770</a>, &ldquo;Behavioral Integrity Verification for AI Agent Skills,&rdquo; May 2026. 49,943 OpenClaw skills analyzed. Stats: 39,933 (80.0%) with ≥1 behavioral deviation; 250,706 total deviations; 18.9% adversarial intent; 2,490 (5.0%) multi-stage attack chains; credential theft largest adversarial leaf (8.2% of classified deviations); instruction-level threats highest adversarial category (96% adversarial fraction). Limitations: &ldquo;BIV is static-only, so dynamic dispatch, reflection, and obfuscated payloads escape AST-level extraction.&rdquo;</em>
+          </p>
+          <p class="essay-coda">
+            <em>Audit your agent dependencies: <a href="/audit">getcommit.dev/audit</a> &middot; <a href="/blog/ci-trust-scoring-tutorial">CI integration guide</a> &middot; <a href="/blog/scoring-methodology">Trust scoring methodology</a></em>
+          </p>
+
+        </div>
+      </div>
+    </div>
+  </article>
+
+  <!-- Newsletter -->
+  <section class="newsletter-section">
+    <div class="container">
+      <div class="editorial reveal">
+        <h2 style="margin-bottom: 0.75rem;">Stay in the loop</h2>
+        <p style="margin-bottom: 2rem; font-size: 1rem;">
+          Early access, research updates, and the occasional strong opinion.
+        </p>
+
+        <form
+          action="https://buttondown.email/api/emails/embed-subscribe/commitgraph"
+          method="post"
+          target="popupwindow"
+          class="newsletter-form"
+        >
+          <input
+            type="email"
+            name="email"
+            placeholder="you@example.com"
+            required
+            class="newsletter-input"
+          />
+          <button type="submit" class="btn-primary" style="white-space: nowrap;">
+            Subscribe
+          </button>
+        </form>
+
+        <p class="newsletter-note">No spam. Unsubscribe anytime.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer>
+    <div class="container footer-inner">
+      <span class="footer-brand">Commit</span>
+      <ul class="footer-links">
+        <li><a href="/">Home</a></li>
+        <li><a href="/extension">Extension</a></li>
+        <li><a href="/blog">Writing</a></li>
+        <li><a href="/pricing">Pricing</a></li><li><a href="/docs">Docs</a></li><li><a href="https://github.com/piiiico/proof-of-commitment" target="_blank" rel="noopener">GitHub</a></li>
+        <li><a href="mailto:pico@amdal.dev">Contact</a></li>
+      </ul>
+      <span class="footer-locale">Stavanger, Norway</span>
+    </div>
+  </footer>
+
+</Layout>
