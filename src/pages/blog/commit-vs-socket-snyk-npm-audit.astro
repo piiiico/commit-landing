@@ -44,10 +44,11 @@ import Layout from '../../layouts/Layout.astro';
         <div class="essay-body">
 
           <p>
-            If you landed here from a search for &ldquo;best npm security tool,&rdquo; you&rsquo;re
-            probably evaluating a list that includes Socket, Snyk, and npm audit. Commit is newer and
-            does something different. This page will tell you exactly what each tool does, where it
-            wins, and where it doesn&rsquo;t &mdash; including Commit&rsquo;s genuine gaps.
+            If you landed here from a search for &ldquo;best npm security tool&rdquo; or
+            &ldquo;Snyk alternatives,&rdquo; you&rsquo;re probably evaluating a list that includes
+            Socket, Snyk, and npm audit. Commit is newer and does something different. This piece
+            tells you exactly what each tool measures, where each one wins, and where each one
+            fails &mdash; including Commit&rsquo;s genuine gaps.
           </p>
           <p>
             Short answer: most of these tools scan for <em>known</em> vulnerabilities. Commit scans
@@ -202,7 +203,7 @@ import Layout from '../../layouts/Layout.astro';
                   <td style="text-align: center; padding: 0.75rem 0.5rem;">Free</td>
                   <td style="text-align: center; padding: 0.75rem 0.5rem;">$25/dev/mo</td>
                   <td style="text-align: center; padding: 0.75rem 0.5rem;">$25/dev/mo</td>
-                  <td style="text-align: center; padding: 0.75rem 0 0.75rem 0.5rem;">Free</td>
+                  <td style="text-align: center; padding: 0.75rem 0 0.75rem 0.5rem;">$15/dev/mo</td>
                 </tr>
               </tbody>
             </table>
@@ -252,7 +253,7 @@ import Layout from '../../layouts/Layout.astro';
                 </tr>
                 <tr>
                   <td style="padding: 0.75rem 1rem 0.75rem 0; font-weight: 500;">Commit</td>
-                  <td style="padding: 0.75rem 1rem;">&#x1F534; CRITICAL &mdash; flagged for months: 1 maintainer, 101M weekly downloads</td>
+                  <td style="padding: 0.75rem 1rem;">&#x1F534; CRITICAL &mdash; flagged for months: 1 maintainer, 7M weekly downloads</td>
                   <td style="padding: 0.75rem 0 0.75rem 1rem;">Still CRITICAL (structural risk unchanged) &mdash; no code-level detection</td>
                 </tr>
               </tbody>
@@ -262,15 +263,40 @@ import Layout from '../../layouts/Layout.astro';
           <p>
             Two different signals. Socket detected the attack six minutes after it was launched by
             scanning the malicious code. Commit had identified the structural vulnerability &mdash;
-            one person controls the publish button for 101 million weekly downloads &mdash; for months
+            one person controls the publish button for 7 million weekly downloads &mdash; for months
             before anyone pulled the trigger.
           </p>
           <p>
             Socket is genuinely impressive here. Fast detection can prevent most damage
-            if you have auto-blocking enabled. But the structural conditions that make axios a
-            high-value target are visible right now, and no amount of
-            malware scanning changes those conditions. The attack calculus is rational: single
+            if you have auto-blocking enabled. But the structural conditions that make ua-parser-js
+            a high-value target are visible right now for dozens of equivalent packages, and no amount
+            of malware scanning changes those conditions. The attack calculus is rational: single
             maintainer, enormous blast radius.
+          </p>
+
+          <hr class="essay-divider" />
+
+          <h2>The 2026 update: six attacks, every one fit the same shape</h2>
+
+          <p>
+            Since this comparison was first written in April, six major npm supply chain attacks
+            have hit. Every one of them exploited a package with a sole publisher or a compromised
+            publisher credential:
+          </p>
+
+          <ul>
+            <li><strong>axios</strong> &mdash; March 30. Token theft. 119M downloads/week. One npm publisher.</li>
+            <li><strong>TanStack</strong> &mdash; May 11. Mini Shai-Hulud worm. Hijacked CI/CD to publish malicious versions.</li>
+            <li><strong>TrapDoor</strong> &mdash; May 22. 21 npm + 7 PyPI + 6 Cargo packages planting persistence hooks in AI coding assistants.</li>
+            <li><strong>Red Hat Miasma</strong> &mdash; June 1. 32 <code>@redhat-cloud-services</code> packages via compromised GitHub account. Valid SLSA provenance on every malicious version.</li>
+            <li><strong>Phantom Gyp</strong> &mdash; June 3. 57 packages including <code>@vapi-ai/server-sdk</code>. Used <code>binding.gyp</code> to bypass install-script monitors.</li>
+            <li><strong>IronWorm</strong> &mdash; June 4. 37 packages with eBPF rootkit + Tor C2 + self-propagation via stolen npm tokens.</li>
+          </ul>
+
+          <p>
+            <code>npm audit</code> flagged zero of these before the attack. Snyk&rsquo;s vulnerability
+            database flagged zero before the attack. A publisher-concentration check would have flagged
+            all of them as structural risk &mdash; months before, in some cases years before.
           </p>
 
           <hr class="essay-divider" />
@@ -302,14 +328,14 @@ import Layout from '../../layouts/Layout.astro';
               <tbody>
                 <tr style="border-bottom: 1px solid var(--border-light);">
                   <td style="padding: 0.75rem 1rem 0.75rem 0;"><code>chalk</code></td>
-                  <td style="text-align: right; padding: 0.75rem 1rem;">413M</td>
+                  <td style="text-align: right; padding: 0.75rem 1rem;">445M</td>
                   <td style="text-align: right; padding: 0.75rem 1rem;">1</td>
                   <td style="padding: 0.75rem 1rem;"><code>0 vulnerabilities</code></td>
                   <td style="padding: 0.75rem 0 0.75rem 1rem;">&#x1F534; CRITICAL</td>
                 </tr>
                 <tr>
                   <td style="padding: 0.75rem 1rem 0.75rem 0;"><code>zod</code></td>
-                  <td style="text-align: right; padding: 0.75rem 1rem;">158M</td>
+                  <td style="text-align: right; padding: 0.75rem 1rem;">194M</td>
                   <td style="text-align: right; padding: 0.75rem 1rem;">1</td>
                   <td style="padding: 0.75rem 1rem;"><code>0 vulnerabilities</code></td>
                   <td style="padding: 0.75rem 0 0.75rem 1rem;">&#x1F534; CRITICAL</td>
@@ -353,7 +379,7 @@ import Layout from '../../layouts/Layout.astro';
             <strong>Use Socket if:</strong> You want real-time protection against active malware in
             the npm registry. Socket is genuinely doing something the others don&rsquo;t &mdash;
             scanning package source code as it&rsquo;s published and catching malicious payloads
-            before most humans have noticed. The six-minute axios detection is not marketing;
+            before most humans have noticed. The six-minute ua-parser-js detection is not marketing;
             it&rsquo;s the product working as designed. If your threat model includes active supply
             chain attacks, Socket belongs in your pipeline.
           </p>
@@ -363,7 +389,7 @@ import Layout from '../../layouts/Layout.astro';
             dependency portfolio before anything bad happens. If you&rsquo;re doing architecture
             review, onboarding new dependencies, evaluating critical-path packages, or just want
             to understand which of your dependencies is a single point of failure at massive scale
-            &mdash; that&rsquo;s what Commit measures. The signal that chalk at 413 million weekly
+            &mdash; that&rsquo;s what Commit measures. The signal that chalk at 445 million weekly
             downloads runs on one maintainer&rsquo;s npm account is not a CVE. It&rsquo;s a
             structural condition. It matters.
           </p>
@@ -401,9 +427,28 @@ import Layout from '../../layouts/Layout.astro';
           </p>
           <p>
             Add Commit to understand the structural risk in what you&rsquo;re already depending on.
-            It takes 60 seconds to get an MCP server running that answers &ldquo;is this package
-            a single point of failure?&rdquo; for any npm or PyPI package you ask Claude about.
+            Zero install, 30 seconds:
           </p>
+
+          <pre><code>npx proof-of-commitment --file package-lock.json</code></pre>
+
+          <p>
+            Or paste your <code>package.json</code> into the
+            <a href="/audit">web demo</a> and get structural risk scores in seconds.
+          </p>
+
+          <p>
+            If you want monitoring &mdash; automated scans, alerts when a score drops, email when
+            a package you depend on gets compromised:
+          </p>
+
+          <pre><code>poc watch chalk --email you@company.com</code></pre>
+
+          <p>
+            <a href="/get-started">Free key</a> &mdash; watchlist, weekly digest, 30 seconds, no card.
+            <a href="/pricing">Developer</a> &mdash; 15 packages, daily scans, $15/month.
+          </p>
+
           <p>
             The ua-parser-js attack wasn&rsquo;t a failure of security tooling. Every tool performed as
             designed. The failure was thinking that vulnerability scanning and supply chain security
@@ -412,9 +457,6 @@ import Layout from '../../layouts/Layout.astro';
 
           <hr class="essay-divider" />
 
-          <p class="essay-coda">
-            <em>Try Commit: <a href="/audit">getcommit.dev/audit</a> &mdash; paste any <code>package.json</code> and get structural risk scores in seconds.</em>
-          </p>
           <p class="essay-coda">
             <em>MCP server (Claude Desktop, Cursor): <a href="/docs">getcommit.dev/docs</a> &mdash; zero install, no API key.</em>
           </p>
