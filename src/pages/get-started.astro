@@ -521,6 +521,32 @@ console.log(data.results[0].score); // 0–100 trust score</code></pre>
             const eco = VALID_ECOS.has(rawEco) ? rawEco : 'npm';
             body.watch = [{ name: pkgNameSubmit, ecosystem: eco }];
           }
+          // 2026-06-14: generic `?watch=pkg1,pkg2,pkg3&eco=npm` multi-package URL
+          // seeding. Closes the context-loss leak where any CTA pointing to
+          // /get-started (e.g. /audit's bottom "Run this in CI?" button) lost
+          // the scanned-packages context — user signed up, watchlist was empty,
+          // welcome email + weekly digest were orthogonal to original intent.
+          // Mirrors the pkg-profile single-pkg path above but for multi-pkg
+          // callers. Safe to coexist: pkg-profile sets body.watch first; this
+          // block only fills if pkg-profile didn't. Validation identical
+          // (npm-name regex, ECOSYSTEMS set, free-tier cap of 3 — defense in
+          // depth, backend also caps at PACKAGE_LIMITS.free).
+          if (!body.watch) {
+            const watchRawSubmit = params.get('watch') ?? '';
+            if (watchRawSubmit) {
+              const rawEcoMulti = (params.get('eco') ?? 'npm').toLowerCase();
+              const VALID_ECOS_MULTI = new Set(['npm', 'pypi', 'cargo', 'golang']);
+              const ecoMulti = VALID_ECOS_MULTI.has(rawEcoMulti) ? rawEcoMulti : 'npm';
+              const names = watchRawSubmit
+                .split(',')
+                .map(n => n.trim())
+                .filter(n => /^@?[a-z0-9._/-]{1,100}$/i.test(n))
+                .slice(0, 3);
+              if (names.length > 0) {
+                body.watch = names.map(name => ({ name, ecosystem: ecoMulti }));
+              }
+            }
+          }
           const res = await fetch('https://poc-backend.amdal-dev.workers.dev/api/keys/create', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
