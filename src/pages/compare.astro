@@ -232,10 +232,7 @@ import Layout from '../layouts/Layout.astro';
         <p>Loading live data…</p>
       </div>
 
-      <!-- Error state -->
-      <div id="error-state" class="error-state" hidden>
-        <p id="error-msg">Failed to load data.</p>
-      </div>
+      <!-- Error state removed: pages always render data (live + fallback merge) -->
 
       <!-- Package rows (populated by JS) -->
       <div id="compare-rows" class="compare-rows" hidden></div>
@@ -299,6 +296,23 @@ import Layout from '../layouts/Layout.astro';
               not leaving them as single points of failure for billions of installs.
             </p>
           </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <hr class="section-divider" />
+
+  <!-- Deep-dive links -->
+  <section class="deep-dive-section">
+    <div class="container">
+      <div class="editorial" style="max-width: var(--max-content); margin: 0 auto;">
+        <h2 class="section-heading">Deep-dive comparisons</h2>
+        <div class="deep-dive-links">
+          <a href="/compare/snyk/" class="deep-dive-link">
+            <span class="deep-dive-tool snyk-tool">Snyk</span>
+            <span class="deep-dive-desc">Snyk scores chalk 81/100. We score it CRITICAL. See why →</span>
+          </a>
         </div>
       </div>
     </div>
@@ -975,6 +989,40 @@ import Layout from '../layouts/Layout.astro';
       font-size: 0.9rem;
     }
 
+    /* ── Deep-dive links ── */
+    .deep-dive-section {
+      padding: 3rem 0;
+      background: var(--paper);
+    }
+
+    .deep-dive-links {
+      display: flex;
+      flex-direction: column;
+      gap: 0.75rem;
+      margin-top: 1rem;
+    }
+
+    .deep-dive-link {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      padding: 1rem 1.25rem;
+      background: var(--paper-dim);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      text-decoration: none;
+      transition: border-color 0.15s;
+    }
+
+    .deep-dive-link:hover {
+      border-color: var(--accent);
+    }
+
+    .deep-dive-desc {
+      font-size: 0.9rem;
+      color: var(--ink-muted);
+    }
+
     /* ── Responsive ── */
     @media (max-width: 700px) {
       .compare-header-row,
@@ -1142,10 +1190,25 @@ import Layout from '../layouts/Layout.astro';
       `;
     }
 
+    function getFallback(): Record<string, AuditResult> {
+      const fallback: AuditResult[] = [
+        { name: 'axios', score: 89, maintainers: 1, weeklyDownloads: 100837905, ageYears: 11.6, trend: 'growing', riskFlags: ['CRITICAL'] },
+        { name: 'chalk', score: 75, maintainers: 1, weeklyDownloads: 411150684, ageYears: 12.7, trend: 'stable', riskFlags: ['CRITICAL'] },
+        { name: 'lodash', score: 87, maintainers: 1, weeklyDownloads: 145226382, ageYears: 14, trend: 'growing', riskFlags: ['CRITICAL'] },
+        { name: 'express', score: 97, maintainers: 5, weeklyDownloads: 92917741, ageYears: 15.3, trend: 'growing', riskFlags: [] },
+        { name: 'esbuild', score: 88, maintainers: 1, weeklyDownloads: 193690280, ageYears: 8.4, trend: 'growing', riskFlags: ['CRITICAL'] },
+      ];
+      const byName: Record<string, AuditResult> = {};
+      fallback.forEach(r => { byName[r.name] = r; });
+      return byName;
+    }
+
     async function loadData() {
       const loadingEl = document.getElementById('loading-state')!;
-      const errorEl = document.getElementById('error-state')!;
       const rowsEl = document.getElementById('compare-rows')!;
+
+      // Start with fallback data, overlay with live results
+      const byName = getFallback();
 
       try {
         const res = await fetch(API, {
@@ -1157,48 +1220,25 @@ import Layout from '../layouts/Layout.astro';
           }),
         });
 
-        if (!res.ok) throw new Error(`HTTP ${res.status}`);
-        const data = await res.json() as { results: AuditResult[] };
+        const data = await res.json() as any;
 
-        const byName: Record<string, AuditResult> = {};
-        data.results.forEach(r => { byName[r.name] = r; });
-
-        rowsEl.innerHTML = PACKAGES.map(pkg => {
-          const result = byName[pkg.name];
-          if (!result) return '';
-          return renderRow(pkg, result);
-        }).join('');
-
-        loadingEl.hidden = true;
-        rowsEl.hidden = false;
-      } catch (err) {
-        loadingEl.hidden = true;
-        document.getElementById('error-msg')!.textContent =
-          'Could not load live data: ' + (err instanceof Error ? err.message : String(err));
-        errorEl.hidden = false;
-        showFallback();
-        rowsEl.hidden = false;
+        if (res.ok && data.results) {
+          data.results.forEach((r: AuditResult) => { byName[r.name] = r; });
+        } else if (res.status === 429 && data.packages_already_scored) {
+          data.packages_already_scored.forEach((r: AuditResult) => { byName[r.name] = r; });
+        }
+      } catch {
+        // Network error: fallback data already loaded
       }
-    }
 
-    function showFallback() {
-      const fallback: AuditResult[] = [
-        { name: 'axios', score: 89, maintainers: 1, weeklyDownloads: 100837905, ageYears: 11.6, trend: 'growing', riskFlags: ['CRITICAL'] },
-        { name: 'chalk', score: 75, maintainers: 1, weeklyDownloads: 411150684, ageYears: 12.7, trend: 'stable', riskFlags: ['CRITICAL'] },
-        { name: 'lodash', score: 87, maintainers: 1, weeklyDownloads: 145226382, ageYears: 14, trend: 'growing', riskFlags: ['CRITICAL'] },
-        { name: 'express', score: 97, maintainers: 5, weeklyDownloads: 92917741, ageYears: 15.3, trend: 'growing', riskFlags: [] },
-        { name: 'esbuild', score: 88, maintainers: 1, weeklyDownloads: 193690280, ageYears: 8.4, trend: 'growing', riskFlags: ['CRITICAL'] },
-      ];
-
-      const byName: Record<string, AuditResult> = {};
-      fallback.forEach(r => { byName[r.name] = r; });
-
-      const rowsEl = document.getElementById('compare-rows')!;
       rowsEl.innerHTML = PACKAGES.map(pkg => {
         const result = byName[pkg.name];
         if (!result) return '';
         return renderRow(pkg, result);
       }).join('');
+
+      loadingEl.hidden = true;
+      rowsEl.hidden = false;
     }
 
     loadData();

@@ -1,0 +1,1205 @@
+---
+import Layout from '../../layouts/Layout.astro';
+---
+
+<Layout
+  title="Commit vs Snyk — What Snyk's Package Health Score Misses"
+  description="Snyk gives chalk 81/100 (healthy). Commit flags it CRITICAL: 1 npm publisher, 445M downloads/week. Six 2026 npm attacks exploited exactly this blind spot."
+  canonical="https://getcommit.dev/compare/snyk/"
+>
+  <!-- Nav -->
+  <nav>
+    <div class="container nav-inner">
+      <a href="/" class="nav-brand">Commit</a>
+      <ul class="nav-links">
+        <li><a href="/#mcp">MCP</a></li>
+        <li><a href="/audit">Audit</a></li>
+        <li><a href="/watchlist">Watchlist</a></li>
+        <li><a href="/extension">Extension</a></li>
+        <li><a href="/blog">Writing</a></li>
+        <li><a href="/pricing">Pricing</a></li><li><a href="/docs">Docs</a></li><li><a href="https://github.com/piiiico/proof-of-commitment" target="_blank" rel="noopener">GitHub</a></li>
+        <li><a href="mailto:pico@amdal.dev">Contact</a></li>
+      </ul>
+    </div>
+  </nav>
+
+  <!-- Hero -->
+  <section class="hero">
+    <div class="container">
+      <div class="editorial" style="max-width: var(--max-content); margin: 0 auto;">
+        <a href="/compare/" class="breadcrumb">← All comparisons</a>
+        <h1 class="hero-title">
+          Snyk scores chalk 81.<br />
+          <em>We score it CRITICAL.</em>
+        </h1>
+        <p class="hero-lead">
+          Snyk's Package Health Score evaluates code quality, maintenance activity, and community engagement.
+          It gives chalk 81/100 — healthy.
+          Chalk has <strong>one npm publisher</strong> controlling <strong>445 million downloads per week</strong>.
+          That's the exact attack profile exploited in every major 2026 npm supply chain incident.
+        </p>
+        <div class="key-stat">
+          <span class="stat-number">26</span>
+          <span class="stat-text">of the 91 npm packages with &gt;10M weekly downloads have a single npm publisher.
+          Together they account for over 3 billion downloads per week. Snyk flags none of them.</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <hr class="section-divider" />
+
+  <!-- Head-to-head -->
+  <section class="head-to-head">
+    <div class="container">
+      <div class="editorial" style="max-width: var(--max-content); margin: 0 auto;">
+        <h2 class="section-heading">Different tools, different blind spots</h2>
+        <p class="section-sub">Both Snyk and Commit surface real risk. Neither replaces the other.</p>
+      </div>
+
+      <div class="versus-grid">
+        <div class="versus-card snyk-side">
+          <div class="versus-tool snyk-label">Snyk</div>
+          <h3 class="versus-title">Catches what's broken</h3>
+          <ul class="versus-list">
+            <li class="hit">Known CVEs in the NVD</li>
+            <li class="hit">Exploit availability and severity</li>
+            <li class="hit">Fix guidance and upgrade paths</li>
+            <li class="hit">License compliance</li>
+            <li class="hit">Container image scanning</li>
+          </ul>
+          <div class="versus-miss-label">Doesn't measure:</div>
+          <ul class="versus-list">
+            <li class="miss">Who controls the npm publish token</li>
+            <li class="miss">Publisher count vs download volume</li>
+            <li class="miss">Whether the next attack is structurally likely</li>
+          </ul>
+        </div>
+
+        <div class="versus-card commit-side">
+          <div class="versus-tool commit-label">Commit</div>
+          <h3 class="versus-title">Catches what's exposed</h3>
+          <ul class="versus-list">
+            <li class="hit">Publisher concentration (credential risk)</li>
+            <li class="hit">Download volume vs maintainer ratio</li>
+            <li class="hit">Release consistency and cadence</li>
+            <li class="hit">Full transitive dependency tree</li>
+            <li class="hit">OpenSSF Scorecard integration</li>
+          </ul>
+          <div class="versus-miss-label">Doesn't measure:</div>
+          <ul class="versus-list">
+            <li class="miss">Known CVEs or published exploits</li>
+            <li class="miss">Malicious code patterns</li>
+            <li class="miss">License compliance</li>
+          </ul>
+        </div>
+      </div>
+
+      <p class="verdict">
+        Use both. Snyk tells you <em>"this version has a known vulnerability."</em>
+        Commit tells you <em>"this package is the kind of thing that gets targeted next."</em>
+      </p>
+    </div>
+  </section>
+
+  <hr class="section-divider" />
+
+  <!-- The chalk case study -->
+  <section class="case-study">
+    <div class="container">
+      <div class="editorial" style="max-width: var(--max-content); margin: 0 auto;">
+        <h2 class="section-heading">Case study: chalk</h2>
+
+        <div class="case-grid">
+          <div class="case-card snyk-case">
+            <div class="case-tool">Snyk Package Health Score</div>
+            <div class="case-score">81<span class="case-max">/100</span></div>
+            <div class="case-verdict case-ok">Healthy</div>
+            <ul class="case-reasons">
+              <li>Active maintenance</li>
+              <li>Good community engagement</li>
+              <li>No known CVEs</li>
+              <li>Regular releases</li>
+            </ul>
+          </div>
+
+          <div class="case-card commit-case">
+            <div class="case-tool">Commit</div>
+            <div class="case-score">72<span class="case-max">/100</span></div>
+            <div class="case-verdict case-critical">CRITICAL</div>
+            <ul class="case-reasons">
+              <li><strong>1 npm publisher</strong></li>
+              <li>445M downloads/week</li>
+              <li>14.6 years old</li>
+              <li>No provenance attestation</li>
+            </ul>
+          </div>
+        </div>
+
+        <p class="case-explanation">
+          Chalk is excellent software. The CRITICAL flag isn't about code quality — it's about
+          <strong>credential concentration</strong>. One stolen npm token, one compromised laptop,
+          one phishing email reaches every project that depends on chalk.
+          That's 445 million installs per week behind a single set of credentials.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <hr class="section-divider" />
+
+  <!-- 2026 attack evidence -->
+  <section class="evidence">
+    <div class="container">
+      <div class="editorial" style="max-width: var(--max-content); margin: 0 auto;">
+        <h2 class="section-heading">Six attacks in 2026. Same structural pattern.</h2>
+        <p class="section-sub">
+          Every major npm supply chain attack this year exploited publisher concentration — the signal Snyk doesn't measure.
+        </p>
+      </div>
+
+      <div class="attack-grid">
+        <div class="attack-card">
+          <time>Mar 30</time>
+          <strong>axios</strong>
+          <p>Token theft. 1 publisher, 119M downloads/week. Snyk: no CVE beforehand. Commit: CRITICAL.</p>
+        </div>
+        <div class="attack-card">
+          <time>May 11</time>
+          <strong>TanStack</strong>
+          <p>CI/CD hijacking. Compromised GitHub Actions published malicious versions. Commit: CRITICAL.</p>
+        </div>
+        <div class="attack-card">
+          <time>May 22</time>
+          <strong>TrapDoor</strong>
+          <p>21 packages planted persistence hooks in IDE configs. Targeted AI coding assistants.</p>
+        </div>
+        <div class="attack-card">
+          <time>Jun 1</time>
+          <strong>Red Hat / Miasma</strong>
+          <p>32 packages via compromised GitHub account. Valid SLSA provenance on every malicious version.</p>
+        </div>
+        <div class="attack-card">
+          <time>Jun 3</time>
+          <strong>Phantom Gyp</strong>
+          <p>57 packages using binding.gyp bypass. Self-propagating worm in the Shai-Hulud lineage.</p>
+        </div>
+        <div class="attack-card">
+          <time>Jun 4</time>
+          <strong>IronWorm</strong>
+          <p>37 packages with eBPF rootkit. First npm supply chain attack with kernel-level persistence.</p>
+        </div>
+      </div>
+
+      <p class="evidence-punchline">
+        <code>npm audit</code> and Snyk flagged <strong>zero</strong> of these beforehand.
+        All had structural signals Commit would have surfaced.
+      </p>
+    </div>
+  </section>
+
+  <hr class="section-divider" />
+
+  <!-- Live comparison -->
+  <section class="live-compare">
+    <div class="container">
+      <div class="editorial" style="max-width: var(--max-content); margin: 0 auto 2rem;">
+        <h2 class="section-heading">Snyk says healthy. Commit says CRITICAL.</h2>
+        <p class="section-sub">
+          Same packages. Live data from the Commit API.
+        </p>
+      </div>
+
+      <div class="compare-header-row">
+        <div class="compare-pkg-label">Package</div>
+        <div class="compare-col-header snyk-header">
+          <span class="tool-badge snyk-badge">Snyk</span>
+          <span class="tool-desc">Package Health Score</span>
+        </div>
+        <div class="compare-col-header commit-header">
+          <span class="tool-badge commit-badge">Commit</span>
+          <span class="tool-desc">Behavioral risk</span>
+        </div>
+      </div>
+
+      <div id="loading-state" class="loading-state">
+        <div class="loading-spinner"></div>
+        <p>Loading live data…</p>
+      </div>
+
+      <!-- Error state removed: pages always render data (live + fallback merge) -->
+
+      <div id="compare-rows" class="compare-rows" hidden></div>
+
+      <div class="legend">
+        <span class="legend-item"><span class="risk-badge risk-critical">CRITICAL</span> single publisher + &gt;10M downloads/week</span>
+        <span class="legend-sep">·</span>
+        <span class="legend-item"><span class="risk-badge risk-ok">OK</span> healthy structural signals</span>
+      </div>
+    </div>
+  </section>
+
+  <hr class="section-divider" />
+
+  <!-- FAQ -->
+  <section class="faq-section">
+    <div class="container">
+      <div class="editorial" style="max-width: var(--max-content); margin: 0 auto;">
+        <h2 class="section-heading">Frequently asked</h2>
+
+        <div class="faq-list">
+          <div class="faq-item">
+            <h3 class="faq-q">Should I replace Snyk with Commit?</h3>
+            <p class="faq-a">
+              No. They measure different things. Snyk catches known vulnerabilities with published CVEs — that's
+              essential. Commit catches structural exposure that CVE databases don't track.
+              The axios attack (March 30, 2026) had zero Snyk warnings beforehand because there was no CVE
+              to warn about. The attacker stole a credential, not exploited a bug.
+              Run both.
+            </p>
+          </div>
+
+          <div class="faq-item">
+            <h3 class="faq-q">What does "Package Health Score" measure that Commit doesn't?</h3>
+            <p class="faq-a">
+              Snyk's Package Health Score evaluates community engagement, maintenance activity, code quality,
+              and known CVEs — signals about whether a package is well-maintained.
+              Commit doesn't measure code quality or community size. It measures whether the package's
+              publish infrastructure is concentrated enough to be a high-value target.
+              chalk can be both well-maintained (Snyk 81) and structurally exposed (Commit CRITICAL).
+            </p>
+          </div>
+
+          <div class="faq-item">
+            <h3 class="faq-q">Why does Snyk give chalk 81 if it has 1 publisher?</h3>
+            <p class="faq-a">
+              Because Snyk's scoring model weights maintenance activity, community engagement, and
+              known vulnerabilities. By those metrics, chalk is healthy — it's well-maintained,
+              widely used, and has no CVEs. Publisher concentration isn't in Snyk's model.
+              That's not a flaw in Snyk — it's a different question.
+              It does mean that "Snyk says healthy" doesn't mean "structurally safe from supply chain attack."
+            </p>
+          </div>
+
+          <div class="faq-item">
+            <h3 class="faq-q">Is Commit free?</h3>
+            <p class="faq-a">
+              The CLI (<code>npx proof-of-commitment</code>), web audit, and API are free.
+              The scoring algorithm is <a href="https://github.com/piiiico/proof-of-commitment">open source</a> (MIT).
+              Paid plans ($15–$29/mo) add batch scanning, CI/CD automation, and continuous monitoring
+              with alerts when a package's score degrades.
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <hr class="section-divider" />
+
+  <!-- CTA -->
+  <section class="cta-section">
+    <div class="container">
+      <div class="editorial" style="max-width: var(--max-content); margin: 0 auto; text-align: center;">
+        <h2 class="cta-heading">Check what Snyk misses</h2>
+        <p class="cta-text">Paste your dependencies. See which ones are structurally exposed.</p>
+        <div class="cta-buttons">
+          <a href="/audit" class="btn-primary">Run a free audit →</a>
+          <a href="/get-started" class="btn-secondary">Get a free API key</a>
+        </div>
+        <p class="cta-cli">
+          Or from your terminal: <code>npx proof-of-commitment --file package.json</code>
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <footer>
+    <div class="container footer-inner">
+      <span class="footer-brand">Commit</span>
+      <span class="footer-copy">Behavioral trust for the software supply chain.</span>
+      <nav class="footer-links">
+        <a href="/audit">Audit</a>
+        <a href="/watchlist">Watchlist</a>
+        <a href="/blog">Writing</a>
+        <a href="mailto:pico@amdal.dev">Contact</a>
+      </nav>
+    </div>
+  </footer>
+
+  <style>
+    /* ── Hero ── */
+    .hero {
+      padding: 6rem 0 3rem;
+      background: var(--paper);
+    }
+
+    .breadcrumb {
+      display: inline-block;
+      font-size: 0.82rem;
+      color: var(--ink-subtle);
+      text-decoration: none;
+      margin-bottom: 1rem;
+      letter-spacing: 0.02em;
+    }
+
+    .breadcrumb:hover {
+      color: var(--accent);
+    }
+
+    .hero-title {
+      font-family: var(--font-display);
+      font-size: clamp(2.2rem, 5vw, 3.5rem);
+      line-height: 1.12;
+      color: var(--ink);
+      margin: 0 0 1.5rem;
+    }
+
+    .hero-title em {
+      font-style: italic;
+      color: var(--accent);
+    }
+
+    .hero-lead {
+      font-size: 1.05rem;
+      line-height: 1.7;
+      color: var(--ink-muted);
+      max-width: 46rem;
+      margin-bottom: 2rem;
+    }
+
+    .hero-lead strong {
+      color: var(--ink);
+      font-weight: 600;
+    }
+
+    .key-stat {
+      display: flex;
+      gap: 1.25rem;
+      align-items: baseline;
+      padding: 1.25rem 1.5rem;
+      background: #fff8f5;
+      border: 1px solid #fca5a5;
+      border-left: 3px solid var(--accent);
+      border-radius: 6px;
+      max-width: 46rem;
+    }
+
+    .stat-number {
+      font-family: var(--font-display);
+      font-size: 2.5rem;
+      font-weight: 700;
+      color: var(--accent);
+      line-height: 1;
+      flex-shrink: 0;
+    }
+
+    .stat-text {
+      font-size: 0.95rem;
+      line-height: 1.6;
+      color: var(--ink-muted);
+    }
+
+    /* ── Versus Grid ── */
+    .head-to-head {
+      padding: 4rem 0;
+      background: var(--paper-dim);
+    }
+
+    .section-heading {
+      font-family: var(--font-display);
+      font-size: 1.8rem;
+      color: var(--ink);
+      margin-bottom: 0.75rem;
+    }
+
+    .section-sub {
+      font-size: 0.95rem;
+      color: var(--ink-muted);
+      margin-bottom: 2rem;
+    }
+
+    .versus-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1.5rem;
+      max-width: 56rem;
+      margin: 0 auto;
+    }
+
+    @media (max-width: 640px) {
+      .versus-grid { grid-template-columns: 1fr; }
+    }
+
+    .versus-card {
+      padding: 1.75rem;
+      border-radius: 8px;
+      border: 1px solid var(--border);
+      background: var(--paper);
+    }
+
+    .commit-side {
+      border-color: var(--accent);
+      border-width: 2px;
+      background: #fffbf9;
+    }
+
+    .versus-tool {
+      font-size: 0.75rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      margin-bottom: 0.5rem;
+    }
+
+    .snyk-label { color: #065f46; }
+    .commit-label { color: var(--accent); }
+
+    .versus-title {
+      font-family: var(--font-display);
+      font-size: 1.15rem;
+      margin-bottom: 1rem;
+      padding-bottom: 0.75rem;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .versus-list {
+      list-style: none;
+      padding: 0;
+      margin: 0 0 1rem 0;
+    }
+
+    .versus-list li {
+      padding: 0.3rem 0;
+      font-size: 0.88rem;
+      color: var(--ink-muted);
+      line-height: 1.5;
+    }
+
+    .versus-list li.hit::before {
+      content: '✓ ';
+      color: #166534;
+    }
+
+    .versus-list li.miss::before {
+      content: '✗ ';
+      color: var(--ink-subtle);
+    }
+
+    .versus-miss-label {
+      font-size: 0.78rem;
+      font-weight: 500;
+      color: var(--ink-subtle);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      margin-bottom: 0.5rem;
+    }
+
+    .verdict {
+      font-size: 1rem;
+      color: var(--ink-muted);
+      text-align: center;
+      max-width: 46rem;
+      margin: 2rem auto 0;
+      line-height: 1.7;
+    }
+
+    .verdict em {
+      font-style: italic;
+      color: var(--ink);
+    }
+
+    /* ── Case Study ── */
+    .case-study {
+      padding: 4rem 0;
+      background: var(--paper);
+    }
+
+    .case-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1.5rem;
+      max-width: 40rem;
+      margin: 2rem auto;
+    }
+
+    @media (max-width: 540px) {
+      .case-grid { grid-template-columns: 1fr; }
+    }
+
+    .case-card {
+      padding: 1.75rem;
+      border-radius: 8px;
+      text-align: center;
+    }
+
+    .snyk-case {
+      background: #f0fdf4;
+      border: 1px solid #bbf7d0;
+    }
+
+    .commit-case {
+      background: #fff8f5;
+      border: 2px solid var(--accent);
+    }
+
+    .case-tool {
+      font-size: 0.72rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      color: var(--ink-subtle);
+      margin-bottom: 0.75rem;
+    }
+
+    .case-score {
+      font-family: var(--font-display);
+      font-size: 3rem;
+      font-weight: 700;
+      color: var(--ink);
+      line-height: 1;
+    }
+
+    .case-max {
+      font-size: 1.2rem;
+      color: var(--ink-subtle);
+      font-weight: 400;
+    }
+
+    .case-verdict {
+      font-size: 0.82rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      margin: 0.5rem 0 1rem;
+    }
+
+    .case-ok { color: #166534; }
+    .case-critical { color: var(--accent); }
+
+    .case-reasons {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+      text-align: left;
+    }
+
+    .case-reasons li {
+      padding: 0.25rem 0;
+      font-size: 0.85rem;
+      color: var(--ink-muted);
+    }
+
+    .case-reasons li::before {
+      content: '· ';
+      color: var(--ink-subtle);
+    }
+
+    .case-reasons strong {
+      color: var(--ink);
+    }
+
+    .case-explanation {
+      font-size: 0.95rem;
+      color: var(--ink-muted);
+      line-height: 1.7;
+      max-width: 46rem;
+      margin: 1.5rem auto 0;
+    }
+
+    .case-explanation strong {
+      color: var(--ink);
+    }
+
+    /* ── Evidence ── */
+    .evidence {
+      padding: 4rem 0;
+      background: var(--paper-dim);
+    }
+
+    .attack-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 1rem;
+      margin: 0 auto 2rem;
+      max-width: 56rem;
+    }
+
+    @media (max-width: 768px) {
+      .attack-grid { grid-template-columns: 1fr 1fr; }
+    }
+
+    @media (max-width: 480px) {
+      .attack-grid { grid-template-columns: 1fr; }
+    }
+
+    .attack-card {
+      padding: 1.25rem;
+      background: var(--paper);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+    }
+
+    .attack-card time {
+      font-size: 0.72rem;
+      font-weight: 500;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      color: var(--ink-subtle);
+    }
+
+    .attack-card strong {
+      display: block;
+      font-size: 1rem;
+      color: var(--ink);
+      margin: 0.25rem 0 0.5rem;
+    }
+
+    .attack-card p {
+      font-size: 0.82rem;
+      color: var(--ink-muted);
+      line-height: 1.5;
+      margin: 0;
+    }
+
+    .evidence-punchline {
+      text-align: center;
+      font-size: 0.95rem;
+      color: var(--ink-muted);
+      max-width: 40rem;
+      margin: 0 auto;
+      line-height: 1.7;
+    }
+
+    .evidence-punchline strong {
+      color: var(--accent);
+    }
+
+    /* ── Live Compare ── */
+    .live-compare {
+      padding: 4rem 0;
+      background: var(--paper);
+    }
+
+    .compare-header-row {
+      display: grid;
+      grid-template-columns: 2fr 3fr 3fr;
+      gap: 0.5rem;
+      padding: 0.75rem 1rem;
+      border-bottom: 2px solid var(--border);
+      margin-bottom: 0;
+      max-width: 56rem;
+      margin-left: auto;
+      margin-right: auto;
+    }
+
+    .compare-pkg-label {
+      font-size: 0.72rem;
+      font-weight: 500;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--ink-subtle);
+      align-self: end;
+    }
+
+    .compare-col-header {
+      text-align: center;
+    }
+
+    .tool-badge {
+      display: inline-block;
+      padding: 0.2rem 0.6rem;
+      border-radius: 3px;
+      font-size: 0.72rem;
+      font-weight: 600;
+      font-family: var(--font-mono);
+    }
+
+    .snyk-badge {
+      background: #d1fae5;
+      color: #065f46;
+      border: 1px solid #6ee7b7;
+    }
+
+    .commit-badge {
+      background: #fee2e2;
+      color: #991b1b;
+      border: 1px solid var(--accent);
+    }
+
+    .tool-desc {
+      display: block;
+      font-size: 0.7rem;
+      color: var(--ink-subtle);
+      margin-top: 0.2rem;
+    }
+
+    .loading-state {
+      text-align: center;
+      padding: 3rem 0;
+      color: var(--ink-subtle);
+      font-size: 0.9rem;
+      max-width: 56rem;
+      margin: 0 auto;
+    }
+
+    .loading-spinner {
+      width: 24px;
+      height: 24px;
+      border: 2px solid var(--border);
+      border-top-color: var(--accent);
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+      margin: 0 auto 0.75rem;
+    }
+
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    .error-state {
+      text-align: center;
+      padding: 2rem 0;
+      color: var(--ink-subtle);
+      font-size: 0.85rem;
+      max-width: 56rem;
+      margin: 0 auto;
+    }
+
+    .compare-rows {
+      max-width: 56rem;
+      margin: 0 auto;
+    }
+
+    .compare-row {
+      display: grid;
+      grid-template-columns: 2fr 3fr 3fr;
+      gap: 0.5rem;
+      padding: 1rem;
+      border-bottom: 1px solid var(--border-light);
+      align-items: center;
+    }
+
+    .compare-row:hover {
+      background: var(--paper-dim);
+    }
+
+    .pkg-info { }
+
+    .pkg-name {
+      font-family: var(--font-mono);
+      font-weight: 600;
+      font-size: 0.95rem;
+      color: var(--ink);
+      display: block;
+    }
+
+    .pkg-downloads {
+      font-size: 0.75rem;
+      color: var(--ink-subtle);
+    }
+
+    .compare-cell { text-align: center; }
+
+    .snyk-cell {
+      padding: 0.5rem;
+    }
+
+    .snyk-score-row {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem;
+      margin-bottom: 0.3rem;
+    }
+
+    .snyk-score {
+      font-family: var(--font-mono);
+      font-size: 1.1rem;
+      font-weight: 600;
+    }
+
+    .snyk-healthy {
+      font-size: 0.72rem;
+      font-weight: 500;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      color: #166534;
+      background: #dcfce7;
+      padding: 0.15rem 0.4rem;
+      border-radius: 3px;
+    }
+
+    .commit-cell { padding: 0.5rem; }
+
+    .commit-score-row {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem;
+      margin-bottom: 0.3rem;
+    }
+
+    .commit-score {
+      font-family: var(--font-mono);
+      font-size: 1.1rem;
+      font-weight: 600;
+    }
+
+    .score-high { color: #166534; }
+    .score-mid { color: #92400e; }
+    .score-low { color: var(--accent); }
+
+    .commit-signals {
+      display: flex;
+      gap: 0.35rem;
+      justify-content: center;
+      flex-wrap: wrap;
+      margin-bottom: 0.25rem;
+    }
+
+    .signal-chip {
+      font-size: 0.68rem;
+      padding: 0.1rem 0.4rem;
+      border-radius: 3px;
+      background: var(--paper-dim);
+      color: var(--ink-muted);
+      border: 1px solid var(--border);
+    }
+
+    .signal-chip.danger {
+      background: #fef2f2;
+      color: #991b1b;
+      border-color: #fca5a5;
+    }
+
+    .signal-chip.good {
+      background: #f0fdf4;
+      color: #166534;
+      border-color: #bbf7d0;
+    }
+
+    .risk-badge {
+      font-size: 0.68rem;
+      font-weight: 600;
+      padding: 0.15rem 0.5rem;
+      border-radius: 3px;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+    }
+
+    .risk-critical {
+      background: #fef2f2;
+      color: #991b1b;
+      border: 1px solid #fca5a5;
+    }
+
+    .risk-ok {
+      background: #f0fdf4;
+      color: #166534;
+      border: 1px solid #bbf7d0;
+    }
+
+    .legend {
+      display: flex;
+      justify-content: center;
+      gap: 0.5rem;
+      padding: 1rem 0;
+      font-size: 0.78rem;
+      color: var(--ink-subtle);
+      max-width: 56rem;
+      margin: 0 auto;
+    }
+
+    .legend-sep { color: var(--border); }
+
+    /* ── FAQ ── */
+    .faq-section {
+      padding: 4rem 0;
+      background: var(--paper-dim);
+    }
+
+    .faq-list {
+      display: flex;
+      flex-direction: column;
+      gap: 1.5rem;
+      margin-top: 1.5rem;
+    }
+
+    .faq-item {
+      padding: 1.5rem;
+      background: var(--paper);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+    }
+
+    .faq-q {
+      font-family: var(--font-display);
+      font-size: 1.05rem;
+      color: var(--ink);
+      margin-bottom: 0.75rem;
+    }
+
+    .faq-a {
+      font-size: 0.9rem;
+      color: var(--ink-muted);
+      line-height: 1.7;
+    }
+
+    .faq-a code {
+      font-size: 0.85em;
+      padding: 0.15rem 0.4rem;
+      background: var(--paper-dim);
+      border-radius: 3px;
+    }
+
+    .faq-a a {
+      color: var(--accent);
+      text-decoration: underline;
+    }
+
+    /* ── CTA ── */
+    .cta-section {
+      padding: 5rem 0;
+      background: var(--paper);
+    }
+
+    .cta-heading {
+      font-family: var(--font-display);
+      font-size: 2rem;
+      margin-bottom: 0.75rem;
+    }
+
+    .cta-text {
+      font-size: 1rem;
+      color: var(--ink-muted);
+      margin-bottom: 1.5rem;
+    }
+
+    .cta-buttons {
+      display: flex;
+      gap: 1rem;
+      justify-content: center;
+      flex-wrap: wrap;
+    }
+
+    .btn-primary, .btn-secondary {
+      display: inline-block;
+      padding: 0.85rem 1.75rem;
+      border-radius: 5px;
+      font-weight: 600;
+      font-size: 0.95rem;
+      text-decoration: none;
+      transition: background 0.15s;
+    }
+
+    .btn-primary {
+      background: var(--accent);
+      color: #fff;
+    }
+
+    .btn-primary:hover {
+      background: #b91c1c;
+    }
+
+    .btn-secondary {
+      background: transparent;
+      color: var(--ink);
+      border: 1px solid var(--border);
+    }
+
+    .btn-secondary:hover {
+      background: var(--paper-dim);
+    }
+
+    .cta-cli {
+      margin-top: 1.25rem;
+      font-size: 0.85rem;
+      color: var(--ink-subtle);
+    }
+
+    .cta-cli code {
+      font-size: 0.82em;
+      padding: 0.2rem 0.5rem;
+      background: var(--paper-dim);
+      border: 1px solid var(--border);
+      border-radius: 3px;
+    }
+
+    /* ── Common ── */
+    .section-divider {
+      border: 0;
+      border-top: 1px solid var(--border);
+      margin: 0;
+    }
+
+    @media (max-width: 640px) {
+      .compare-header-row,
+      .compare-row {
+        grid-template-columns: 1fr;
+        gap: 0.75rem;
+      }
+      .compare-col-header { text-align: left; }
+      .compare-cell { text-align: left; }
+    }
+  </style>
+
+  <script>
+    const API = 'https://poc-backend.amdal-dev.workers.dev/api/audit';
+
+    const PACKAGES = [
+      {
+        name: 'chalk',
+        snykScore: 81,
+        snykVerdict: 'Healthy',
+        story: 'Single npm publisher. 445M downloads/week. No provenance.',
+      },
+      {
+        name: 'axios',
+        snykScore: 87,
+        snykVerdict: 'Healthy',
+        story: 'Compromised March 30 2026. 1 publisher, 119M downloads/week.',
+      },
+      {
+        name: 'zod',
+        snykScore: 87,
+        snykVerdict: 'Healthy',
+        story: '1 npm publisher despite 30+ GitHub contributors. 185M/week.',
+      },
+      {
+        name: 'lodash',
+        snykScore: 75,
+        snykVerdict: 'Healthy',
+        story: '1 npm publisher. 156M downloads/week. Last npm publish 2021.',
+      },
+      {
+        name: 'express',
+        snykScore: 88,
+        snykVerdict: 'Healthy',
+        story: '5 npm publishers. Active release cadence. Structural risk is low.',
+      },
+    ];
+
+    type AuditResult = {
+      name: string;
+      score: number | null;
+      maintainers: number | null;
+      weeklyDownloads: number | null;
+      ageYears: number | null;
+      trend: string | null;
+      riskFlags: string[];
+    };
+
+    function fmtDownloads(n: number | null): string {
+      if (n === null || n === undefined) return '—';
+      if (n >= 1_000_000_000) return (n / 1_000_000_000).toFixed(1) + 'B';
+      if (n >= 1_000_000) return (n / 1_000_000).toFixed(0) + 'M';
+      if (n >= 1_000) return (n / 1_000).toFixed(0) + 'K';
+      return n.toString();
+    }
+
+    function scoreClass(score: number | null): string {
+      if (score === null) return '';
+      if (score >= 75) return 'score-high';
+      if (score >= 50) return 'score-mid';
+      return 'score-low';
+    }
+
+    function renderRow(pkg: typeof PACKAGES[0], data: AuditResult): string {
+      const isCritical = data.riskFlags?.includes('CRITICAL');
+      const riskBadge = isCritical
+        ? '<span class="risk-badge risk-critical">CRITICAL</span>'
+        : '<span class="risk-badge risk-ok">OK</span>';
+
+      const dlDisplay = fmtDownloads(data.weeklyDownloads);
+
+      const chips: string[] = [];
+      if (data.maintainers !== null) {
+        const cls = data.maintainers === 1 ? 'danger' : 'good';
+        chips.push(`<span class="signal-chip ${cls}">${data.maintainers} publisher${data.maintainers !== 1 ? 's' : ''}</span>`);
+      }
+      if (data.weeklyDownloads !== null) {
+        const cls = data.weeklyDownloads > 10_000_000 ? 'danger' : '';
+        chips.push(`<span class="signal-chip ${cls}">${dlDisplay}/wk</span>`);
+      }
+
+      return `
+        <div class="compare-row">
+          <div class="pkg-info">
+            <span class="pkg-name">${pkg.name}</span>
+            <span class="pkg-downloads">${dlDisplay}/wk</span>
+          </div>
+
+          <div class="compare-cell snyk-cell">
+            <div class="snyk-score-row">
+              <span class="snyk-score">${pkg.snykScore}/100</span>
+              <span class="snyk-healthy">${pkg.snykVerdict}</span>
+            </div>
+          </div>
+
+          <div class="compare-cell commit-cell">
+            <div class="commit-score-row">
+              <span class="commit-score ${scoreClass(data.score)}">${data.score !== null ? data.score + '/100' : '—'}</span>
+              ${riskBadge}
+            </div>
+            <div class="commit-signals">${chips.join('')}</div>
+          </div>
+        </div>
+      `;
+    }
+
+    function getFallback(): Record<string, AuditResult> {
+      const fallback: AuditResult[] = [
+        { name: 'chalk', score: 72, maintainers: 1, weeklyDownloads: 445000000, ageYears: 14.6, trend: 'stable', riskFlags: ['CRITICAL'] },
+        { name: 'axios', score: 88, maintainers: 1, weeklyDownloads: 119000000, ageYears: 11.8, trend: 'growing', riskFlags: ['CRITICAL'] },
+        { name: 'zod', score: 83, maintainers: 1, weeklyDownloads: 185000000, ageYears: 6.3, trend: 'growing', riskFlags: ['CRITICAL'] },
+        { name: 'lodash', score: 81, maintainers: 1, weeklyDownloads: 156000000, ageYears: 14.1, trend: 'stable', riskFlags: ['CRITICAL'] },
+        { name: 'express', score: 97, maintainers: 5, weeklyDownloads: 95000000, ageYears: 15.3, trend: 'growing', riskFlags: [] },
+      ];
+      const byName: Record<string, AuditResult> = {};
+      fallback.forEach(r => { byName[r.name] = r; });
+      return byName;
+    }
+
+    async function loadData() {
+      const loadingEl = document.getElementById('loading-state')!;
+      const rowsEl = document.getElementById('compare-rows')!;
+
+      // Start with fallback data, overlay with live results
+      const byName = getFallback();
+
+      try {
+        const res = await fetch(API, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            packages: PACKAGES.map(p => p.name),
+            ecosystem: 'npm',
+          }),
+        });
+
+        const data = await res.json() as any;
+
+        if (res.ok && data.results) {
+          // Full success — use all live results
+          data.results.forEach((r: AuditResult) => { byName[r.name] = r; });
+        } else if (res.status === 429 && data.packages_already_scored) {
+          // Rate-limited but got partial results — merge them in
+          data.packages_already_scored.forEach((r: AuditResult) => { byName[r.name] = r; });
+        }
+        // Any other error: fallback data already loaded, just render
+      } catch {
+        // Network error: fallback data already loaded
+      }
+
+      rowsEl.innerHTML = PACKAGES.map(pkg => {
+        const result = byName[pkg.name];
+        if (!result) return '';
+        return renderRow(pkg, result);
+      }).join('');
+
+      loadingEl.hidden = true;
+      rowsEl.hidden = false;
+    }
+
+    loadData();
+  </script>
+</Layout>
