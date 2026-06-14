@@ -428,6 +428,31 @@ console.log(data.results[0].score); // 0–100 trust score</code></pre>
             'You already have the CLI installed (or one <code>npx</code> away). A free key bumps you to 200 audits/day — no card. Enter your email; the key appears on screen.<br />' +
             'Then score your tree: <code>npx proof-of-commitment --file package-lock.json</code>. Developer ($15/mo) adds push alerts when any watched package degrades.',
         },
+        // 2026-06-14: Echo destination for /blog/snyk-scores-chalk-81 (top
+        // organic blog at 15 visits/7d per first-party analytics). Lands the
+        // reader who clicked a per-package watch CTA on the same question the
+        // post asked — Snyk 81 vs Commit CRITICAL — rather than the generic
+        // "Get your API key" hero that produces zero echo of what they just
+        // read. Lead names the inbound package when /get-started?watch=<pkg>
+        // is set so the CTA-to-page chain reads as one continuous answer.
+        'blog-snyk-comparison': pkgName
+          ? {
+              eyebrow: `Watch ${pkgName}`,
+              title: `Free alerts on ${pkgName}`,
+              lead:
+                `Snyk scores <code>${pkgName}</code> healthy. ` +
+                `Commit watches the signal Snyk doesn't track — publisher concentration — and emails you when ${pkgName}'s publisher count drops, its release cadence stalls, or its score degrades.<br />` +
+                `Free key, watchlist pre-seeded with <code>${pkgName}</code>, 200 audits/day for the rest of your tree. No card.`,
+            }
+          : {
+              eyebrow: 'Past the Snyk score',
+              title: 'Get the publisher signal Snyk misses',
+              lead:
+                'Snyk\'s Package Health Score rewards downloads, stars, and commit cadence. ' +
+                'It doesn\'t score publisher concentration — the structural risk behind every major npm attack this year. ' +
+                'A free key watches your packages for publisher-count drops, release-cadence stalls, and score degradation, and emails you the moment any of them changes. 200 audits/day, no card.<br />' +
+                'Want continuous monitoring across your whole tree? Developer ($15/mo) watches 15 packages with daily scans.',
+            },
       };
       const variant = HERO_BY_REF[ref];
       if (!variant) return;
@@ -491,7 +516,16 @@ console.log(data.results[0].score); // 0–100 trust score</code></pre>
         const UTM_TO_SOURCE: Record<string, string> = {
           'cli': 'cli',
         };
-        const source = REF_TO_SOURCE[refParam] ?? UTM_TO_SOURCE[utmSource];
+        // 2026-06-14: per-blog refs (blog-snyk-comparison, blog-stripe-gcs,
+        // blog-drizzle-kit, …) pass through to the backend as-is. Backend
+        // worker.ts /api/keys/create accepts /^blog-[a-z0-9-]{1,40}$/ via the
+        // matching BLOG_REF_RE — pattern-admit replaces per-blog hardcoded
+        // map entries (three were already leaking pre-this fix to source=web).
+        // Charset + length match keeps analytics labels well-shaped; mirrors
+        // backend regex.
+        const BLOG_REF_RE = /^blog-[a-z0-9-]{1,40}$/;
+        const blogSource = BLOG_REF_RE.test(refParam) ? refParam : undefined;
+        const source = REF_TO_SOURCE[refParam] ?? blogSource ?? UTM_TO_SOURCE[utmSource];
 
         try {
           const body: { email: string; source?: string; watch?: Array<{ name: string; ecosystem: string }> } = { email };
