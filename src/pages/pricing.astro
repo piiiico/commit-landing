@@ -553,8 +553,9 @@ import Layout from '../layouts/Layout.astro';
               No. Use all of them. Socket detects malicious code <em>after</em> it's published.
               Snyk finds known CVEs. Commit identifies structural exposure <em>before</em> any code changes —
               it maps which packages are the kind of thing that gets targeted.
-              The ua-parser-js attack (October 2021) triggered zero warnings in Socket or Snyk beforehand.
-              The structural signal — 1 maintainer, 100M+ downloads/week — was visible for years.
+              The ua-parser-js attack (October 2021, ~8M weekly downloads, one maintainer) triggered zero warnings in Socket or Snyk beforehand.
+              The same structural pattern — concentrated publish authority over a high-volume install base —
+              flagged axios CRITICAL months before its March 2026 credential-theft incident.
             </p>
           </div>
 

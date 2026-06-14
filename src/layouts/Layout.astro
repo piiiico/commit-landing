@@ -245,7 +245,7 @@ const PRICING_FAQ = [
   {
     q: "Is Commit replacing Socket or Snyk?",
     a:
-      "No. Use all of them. Socket detects malicious code after it's published. Snyk finds known CVEs. Commit identifies structural exposure before any code changes — it maps which packages are the kind of thing that gets targeted. The ua-parser-js attack (October 2021) triggered zero warnings in Socket or Snyk beforehand. The structural signal — 1 maintainer, 100M+ downloads/week — was visible for years.",
+      "No. Use all of them. Socket detects malicious code after it's published. Snyk finds known CVEs. Commit identifies structural exposure before any code changes — it maps which packages are the kind of thing that gets targeted. The ua-parser-js attack (October 2021, ~8M weekly downloads, one maintainer) triggered zero warnings in Socket or Snyk beforehand. The same structural pattern — concentrated publish authority over a high-volume install base — flagged axios CRITICAL months before its March 2026 credential-theft incident.",
   },
   {
     q: "What counts as a project for Pro monitoring?",
