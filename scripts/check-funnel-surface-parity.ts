@@ -106,6 +106,29 @@ for (const src of [npmSrc, npmReadmeSrc, ghReadmeSrc]) {
   while ((m = priceRefRe.exec(src)) !== null) pricingRefs.add(m[1]);
 }
 
+// 2026-06-15: buildWatchUrl(results, 'X') call sites — the URL is constructed
+// inside the helper via template literal `…?ref=${ref}…`, so the literal
+// `ref=cli-watch` never appears in the source text. The regex above
+// (gsRefRe) misses these by design — it requires the URL string. v1.32.0
+// shipped 'cli-watch' on 2026-06-15 05:14Z; this gate ran green an hour later
+// because cli-watch was nowhere in the URL-literal scan, while the landing
+// page had no HERO_BY_REF entry, no REF_TO_SOURCE entry, and no CLI_SOURCES
+// membership. Real-money cost: the highest-intent CI/CRITICAL upsell audience
+// landed on the generic "Get your API key" hero. Same class as audit-baseline
+// (also passed via buildWatchUrl) — accidentally OK because its hero was hand-
+// added earlier, not because the gate caught it. Scanning call sites closes
+// the blind spot: every ref passed to buildWatchUrl is treated as a routing
+// ref destined for /get-started, same gate requirements as URL-literal refs.
+// Pattern is conservative: matches `buildWatchUrl(<anything-non-comma>,
+// 'STRING')` and the trailing arg only — same arity buildWatchUrl actually
+// has in npm-package/index.js. Extra args / refactors break loudly via
+// unit tests + this gate flagging missing entries on the next run.
+const buildWatchUrlRefRe = /buildWatchUrl\s*\([^,]+,\s*['"]([a-zA-Z0-9_-]+)['"]/g;
+for (const src of [npmSrc]) {
+  buildWatchUrlRefRe.lastIndex = 0;
+  while ((m = buildWatchUrlRefRe.exec(src)) !== null) getStartedRefs.add(m[1]);
+}
+
 // utm_campaign scan adds worker.ts because server-side URL construction
 // (buildUpgradeUrl, weekly digest email) emits utm_campaign directly to
 // /pricing without going through CLI. README surfaces use ?ref= not

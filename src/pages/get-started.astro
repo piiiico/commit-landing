@@ -319,6 +319,32 @@ console.log(data.results[0].score); // 0–100 trust score</code></pre>
             'A free key auto-seeds your watchlist from your CLI session and emails you when any of those packages get attacked or score lower. No card. Enter your email; your key appears on screen.<br />' +
             'Then save it: <code>npx proof-of-commitment login</code> or <code>export COMMIT_API_KEY=sk_commit_…</code>.',
         },
+        // 2026-06-15: npm-package v1.32.0 (shipped 05:14Z) emits this ref for
+        // the CRITICAL non-TTY upsell + the GitHub Actions PR-check annotation
+        // — both call buildWatchUrl(results, 'cli-watch'). The reader is in a
+        // CI log or piped output and clicked the Web link because the CRITICAL
+        // packages were flagged with sole-publisher + >10M dl/wk shape. The
+        // landing needs to lead with that finding, not the generic API-key
+        // hero. Mirror structure of audit-web-critical (CRITICAL found, alert
+        // promise) but adapted for the CI/non-TTY surface that emits the link.
+        // Pairs with: REF_TO_SOURCE['cli-watch'] (attribution), CLI_SOURCES
+        // (success-note), worker.ts CLI_SOURCES_WELCOME (welcome step 2).
+        // The blind spot that hid this: scripts/check-funnel-surface-parity.ts
+        // scans URL literals for ref=X but buildWatchUrl() passes the ref as
+        // a function arg — extended in this same commit so the next CLI ship
+        // cannot introduce another orphan ref unnoticed.
+        // NOTE: comment must not contain unescaped apostrophes (e.g., "can't")
+        // — deploy.ts GUARD 3 brace-walker (extractObjectKeys) treats them as
+        // string delimiters and orphans every following HERO_BY_REF key.
+        // Same bug class as the line-412 readme-monitoring comment note.
+        'cli-watch': {
+          eyebrow: 'CRITICAL packages found in your scan',
+          title: 'Free email alerts the moment scores drop',
+          lead:
+            'Your CLI run flagged CRITICAL packages — sole npm publisher + >10M downloads/week — the structural shape behind every major supply-chain attack this year. ' +
+            'A free key seeds your watchlist from this scan and emails you the moment any of those packages get attacked or score lower. 200 audits/day, no card.<br />' +
+            'Want continuous monitoring across your whole tree? Developer ($15/mo) watches 15 packages with daily scans + push alerts.',
+        },
         'cli': {
           eyebrow: 'From the CLI',
           title: 'Get a free key, keep auditing',
@@ -505,6 +531,7 @@ console.log(data.results[0].score); // 0–100 trust score</code></pre>
           'claude-code-hook-429': 'claude-code-hook-429', // Claude Code PreToolUse hook 429 (npm-package v1.22.0) — 2026-05-29
           'poc-hook': 'poc-hook',                      // Fresh `poc hook` install with no API key configured (npm-package v1.21.0+) — 2026-05-29
           'audit-cli-soft-cta': 'cli-soft-cta',        // CLI inline-prompt engagement-signal gate-bypass (npm-package v1.28.0+) — 2026-06-10
+          'cli-watch': 'cli-watch',                    // CRITICAL non-TTY upsell + GH Actions PR-check annotation watchlist auto-seed (npm-package v1.32.0 buildWatchUrl) — 2026-06-15
           'ci-annotation': 'ci-annotation',            // GitHub Actions PR-checks rate-limit annotation (npm-package v1.31.0) — 2026-06-12
           'readme-monitoring': 'readme-monitoring',    // GitHub README CTA (proof-of-commitment/README.md) — 2026-06-13
           'npm-readme-monitoring': 'npm-readme-monitoring', // npm package-page README CTA (npm-package/README.md) — 2026-06-13
@@ -620,7 +647,7 @@ console.log(data.results[0].score); // 0–100 trust score</code></pre>
               // windsurf-hook-429 added to HOOK_SOURCES — VALID_SOURCES on the
               // worker has it but this set didn't, so windsurf signups got the
               // generic REST snippet instead of `poc login`. Same gap class.
-              const CLI_SOURCES = new Set(['audit-cli-429', 'audit-baseline', 'cli', 'audit-cli', 'cli-soft-cta']);
+              const CLI_SOURCES = new Set(['audit-cli-429', 'audit-baseline', 'cli', 'audit-cli', 'cli-soft-cta', 'cli-watch']);
               const HOOK_SOURCES = new Set(['cursor-hook-429', 'claude-code-hook-429', 'windsurf-hook-429', 'poc-hook']);
               const MCP_SOURCES = new Set(['mcp-soft-cta']);
               const CI_SOURCES = new Set(['ci-annotation']);
