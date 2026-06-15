@@ -1090,6 +1090,25 @@ import Layout from '../layouts/Layout.astro';
           eyebrow: 'From your abandoned checkout',
           msg: buildRecoveryMsg(),
         },
+        // 2026-06-15: welcome-upgrade fires from the welcome email footer
+        // (worker.ts:3375). After a visitor creates a free API key the
+        // welcome email pitches Developer + Pro and links to /pricing —
+        // historically bare, no email, no campaign, so /pricing read as
+        // generic for the cohort that just signed up. The welcome email
+        // is the most reliably-delivered re-engagement surface in the
+        // free-tier lifecycle (sits in inbox indefinitely, gets re-read
+        // when the user actually hits a limit). Carries email so modal
+        // pre-fills, defaults CTA to Developer (the natural upgrade path
+        // from free; Pro is reserved for ?tier= override which welcome-
+        // upgrade doesn't pass). 9th orphan-banner class closed since
+        // 2026-06-10 (audit-healthy-key) — pattern: every URL that ships
+        // from a server-side surface to /pricing must declare its
+        // utm_campaign + matching CONTEXT_BY_CAMPAIGN variant or land in
+        // a silent banner.
+        'welcome-upgrade': {
+          eyebrow: 'From your welcome email',
+          msg: 'You just got your free Commit API key. Free covers 200 audits/day and 3 watched packages with a weekly digest. Developer ($15/mo) bumps you to 1,000 audits/day, batches up to 5 packages per call, watches 15 packages (5× free) with daily re-scans, and emails you within minutes the moment any score drops a tier. Pro ($29/mo) adds 10K audits/month, batch up to 20, monitors 50 packages, and routes alerts to Slack + webhooks. 30-day money-back guarantee.',
+        },
       };
       const variant = CONTEXT_BY_CAMPAIGN[campaign];
       if (!variant) return;
