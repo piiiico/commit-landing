@@ -1012,6 +1012,54 @@ import Layout from '../layouts/Layout.astro';
           eyebrow: 'From your PR checks',
           msg: 'Your CI hit a Commit rate limit on this repo. Free key gives 200 audits/day — works for a small project but not every PR on every push. Developer ($15/mo) gives 1,000 audits/day, batches up to 5 packages per call, watches 15 packages with daily re-scans, and instantly emails you the moment any score drops a tier. 30-day money-back guarantee.',
         },
+        // 2026-06-15: free-watch-cmd fires from the free-tier weekly digest
+        // email (worker.ts:6715). Recipient is a free-tier user who has 1–3
+        // watched packages and just received a weekly score report — their
+        // strongest re-engagement moment with the product. URL carries
+        // ?email=... so the modal pre-fills on click. Pre-2026-06-15 the
+        // banner stayed silent (variant lookup missed) and /pricing read as
+        // generic to the visitor most likely to convert that week. Same
+        // class of bug as the 2026-06-12 ci-annotation fix and the
+        // 2026-06-10 audit-healthy-key fix — campaign tag emitted but no
+        // matching CONTEXT_BY_CAMPAIGN entry.
+        'free-watch-cmd': {
+          eyebrow: 'From your weekly digest',
+          msg: 'You\'re watching packages on the free tier (3 packages, weekly digest). Developer ($15/mo) raises the watchlist to 15 packages (5× free), upgrades the weekly digest to daily re-scans, and adds instant email alerts the moment any score drops a tier — minutes after the burst, not the following Monday.',
+        },
+        // 2026-06-15: upgrade-from-free-key fires when a user clicks the
+        // "Upgrade to Developer — $15/mo →" button on /get-started right
+        // after creating a free key (get-started.astro:189-190). Highest
+        // possible intent — they just signed up, saw the product surface,
+        // and explicitly clicked Upgrade. The previous silent banner read
+        // as generic /pricing despite the visitor coming directly from
+        // their fresh signup. Most-frequent orphan campaign by volume.
+        'upgrade-from-free-key': {
+          eyebrow: 'From your fresh signup',
+          msg: 'You just created a free Commit key and clicked Upgrade. Developer ($15/mo) watches 15 packages (vs 3 free) with daily re-scans, gives 1,000 audits/day, batches up to 5 packages per call, and adds instant email alerts the moment any score drops a tier. 30-day money-back guarantee.',
+        },
+        // 2026-06-15: CLI campaign tags from npm-package/index.js. Each
+        // fires from a distinct CLI surface but the visitor's mental state
+        // is similar: they\'re in their terminal, they\'ve seen Commit
+        // output, they clicked an upgrade link. Surface-specific eyebrows
+        // anchor the copy to the moment they came from; the msg pitches
+        // Developer across all four since the underlying intent is the
+        // same upgrade decision.
+        'status-limit': {
+          eyebrow: 'From your terminal',
+          msg: '`poc status` flagged your free-tier limit. Developer ($15/mo) gives 1,000 audits/day, watches 15 packages (5× free) with daily re-scans, and emails you the moment any score drops a tier — so the next time you run `poc status`, the wall is gone.',
+        },
+        'post-login': {
+          eyebrow: 'From your terminal',
+          msg: 'You just signed into Commit from the CLI. Developer ($15/mo) watches 15 packages (vs 3 free) with daily re-scans, gives 1,000 audits/day, batches up to 5 packages per call, and adds instant email alerts the moment any score drops a tier. 30-day money-back guarantee.',
+        },
+        'init': {
+          eyebrow: 'From your terminal',
+          msg: 'You just ran `poc init` to wire Commit into your project. Developer ($15/mo) watches 15 packages with daily re-scans (vs 3 packages weekly on free), gives 1,000 audits/day, batches up to 5 packages per call, and adds instant email alerts the moment any score drops a tier.',
+        },
+        'help': {
+          eyebrow: 'From your terminal',
+          msg: 'You followed the monitoring link from `poc --help`. Developer ($15/mo) watches 15 packages with daily re-scans (vs 3 weekly on free), gives 1,000 audits/day, batches up to 5 packages per call, and adds instant email alerts the moment any score drops a tier. 30-day money-back guarantee.',
+        },
       };
       const variant = CONTEXT_BY_CAMPAIGN[campaign];
       if (!variant) return;

@@ -71,17 +71,65 @@ const workerSrc = readFileSync(WORKER, "utf8");
 const gsRefRe  = /getcommit\.dev\/get-started[^'")\s<>]*[?&]ref=([a-zA-Z0-9_-]+)/g;
 // Refs that route to /pricing?ref=X
 const priceRefRe = /getcommit\.dev\/pricing[^'")\s<>]*[?&]ref=([a-zA-Z0-9_-]+)/g;
+// 2026-06-15: utm_campaign=X arriving at /pricing — distinct emitter
+// pattern from ?ref=X. The backend buildUpgradeUrl flow (worker.ts) and
+// CLI upgrade prompts (npm-package/index.js) write URLs like
+//   /pricing?email=...&utm_source=key&utm_campaign=key-upgrade
+// pricing.astro CONTEXT_BY_CAMPAIGN reads utm_campaign and shows a
+// surface-aware banner. If a campaign tag emits but isn\'t in the map,
+// the banner stays silent and /pricing reads as a generic page to a
+// visitor with maximum engagement context. This regressed 6× before
+// this gate (audit-healthy-key 2026-06-10, ci-annotation 2026-06-12,
+// free-watch-cmd + upgrade-from-free-key + status-limit + post-login +
+// init + help all caught simultaneously 2026-06-15). Now caught at
+// build time — every utm_campaign emitted toward /pricing in scanned
+// surfaces must have a matching CONTEXT_BY_CAMPAIGN entry.
+// Broad scan: any [?&]utm_campaign=X URL-parameter literal in scoped files.
+// All utm_campaign usages in this codebase target /pricing — the buildUpgradeUrl
+// helper (worker.ts:4622), the weekly digest URL (worker.ts:6715), and the
+// CLI upgrade prompts (npm-package/index.js) — so we can scan flat instead of
+// trying to bracket-match through template literal interpolations like
+// `?email=${encodeURIComponent(row.email)}&utm_campaign=...` which the old
+// /pricing[^...)...]/ pattern stopped at the first `)` and missed.
+const priceCampaignRe = /[?&]utm_campaign=([a-zA-Z0-9_-]+)/g;
 
 const getStartedRefs = new Set<string>();
 const pricingRefs    = new Set<string>();
+const pricingCampaigns = new Set<string>();
 
 let m: RegExpExecArray | null;
-// CLI runtime + both README discovery surfaces (npm + GH README)
+// CLI runtime + both README discovery surfaces (npm + GH README) — pre-existing scope
 for (const src of [npmSrc, npmReadmeSrc, ghReadmeSrc]) {
   gsRefRe.lastIndex = 0;
   priceRefRe.lastIndex = 0;
   while ((m = gsRefRe.exec(src)) !== null)    getStartedRefs.add(m[1]);
   while ((m = priceRefRe.exec(src)) !== null) pricingRefs.add(m[1]);
+}
+
+// utm_campaign scan adds worker.ts because server-side URL construction
+// (buildUpgradeUrl, weekly digest email) emits utm_campaign directly to
+// /pricing without going through CLI. README surfaces use ?ref= not
+// utm_campaign so they\'re skipped here — refs are still covered by
+// the ?ref= pass above. get-started.astro contributes its
+// data-utm-campaign HTML attributes (post-signup upgrade buttons) and
+// pricing.astro itself contributes the ref→utm_campaign promotion list
+// — both sides should match what their downstream banner can render.
+const paramSetRe = /params\.set\(\s*['"]utm_campaign['"]\s*,\s*['"]([a-zA-Z0-9_-]+)['"]\s*\)/g;
+const dataAttrRe = /data-utm-campaign=['"]([a-zA-Z0-9_-]+)['"]/g;
+for (const src of [npmSrc, workerSrc]) {
+  priceCampaignRe.lastIndex = 0;
+  while ((m = priceCampaignRe.exec(src)) !== null) pricingCampaigns.add(m[1]);
+}
+// params.set('utm_campaign', X) — backend buildUpgradeUrl pattern (worker.ts).
+for (const src of [workerSrc]) {
+  paramSetRe.lastIndex = 0;
+  while ((m = paramSetRe.exec(src)) !== null) pricingCampaigns.add(m[1]);
+}
+// data-utm-campaign="X" — frontend buttons that POST to /api/checkout-intent
+// (get-started.astro post-signup upgrade buttons).
+for (const src of [gsSrc]) {
+  dataAttrRe.lastIndex = 0;
+  while ((m = dataAttrRe.exec(src)) !== null) pricingCampaigns.add(m[1]);
 }
 
 const allRefs = new Set([...getStartedRefs, ...pricingRefs]);
@@ -123,6 +171,15 @@ for (const ref of getStartedRefs) {
 for (const ref of pricingRefs) {
   if (!inBlock(priceSrc, "CONTEXT_BY_CAMPAIGN", ref))
     gaps.push(`MISSING: pricing.astro CONTEXT_BY_CAMPAIGN['${ref}']`);
+}
+
+// utm_campaign coverage — every campaign emitted toward /pricing in
+// worker.ts or npm-package/index.js must have a banner variant. Missing
+// = silent banner on highest-intent surfaces. See 2026-06-15 fix for
+// rationale; this check is the recurrence intercept.
+for (const campaign of pricingCampaigns) {
+  if (!inBlock(priceSrc, "CONTEXT_BY_CAMPAIGN", campaign))
+    gaps.push(`MISSING: pricing.astro CONTEXT_BY_CAMPAIGN['${campaign}'] (utm_campaign emitted by worker.ts or npm-package/index.js)`);
 }
 
 for (const ref of allRefs) {
@@ -177,6 +234,7 @@ for (const ref of getStartedRefs) {
 console.log(`Funnel surface parity check`);
 console.log(`  npm-package refs → get-started: [${[...getStartedRefs].join(", ")}]`);
 console.log(`  npm-package refs → pricing:     [${[...pricingRefs].join(", ")}]`);
+console.log(`  worker+cli utm_campaign → pricing: [${[...pricingCampaigns].join(", ")}]`);
 console.log();
 
 if (gaps.length === 0) {
