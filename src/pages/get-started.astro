@@ -632,6 +632,16 @@ console.log(data.results[0].score); // 0–100 trust score</code></pre>
               // parity fix as ci-annotation: hero + success-note + welcome step 2 all
               // agree on the next action.
               const README_SOURCES = new Set(['readme-monitoring', 'npm-readme-monitoring']);
+              // 2026-06-15: blog-<slug> sources (e.g. blog-aur-1579, blog-redhat-miasma,
+              // blog-snyk-comparison) share intent with README sources: discovery
+              // channel, "expand my coverage" mindset, and most have already pre-seeded
+              // a watchlist via ?watch=… so step 1 (gs-watching) confirms what they're
+              // watching. The generic "Authorization: Bearer" default contradicts that
+              // by handing them a REST snippet they didn't ask for. Route blog-* through
+              // the same login+score path. Mirrors worker.ts welcome-email step 2.
+              const BLOG_SOURCE_RE = /^blog-[a-z0-9-]{1,40}$/;
+              const isDiscoverySource = (s: string) =>
+                README_SOURCES.has(s) || BLOG_SOURCE_RE.test(s);
               if (source && HOOK_SOURCES.has(source)) {
                 // Hook users have the proof-of-commitment package already (it wrote the hook script).
                 // `poc login <key>` writes to ~/.commit/config which all hook paths read via readApiKey().
@@ -672,7 +682,7 @@ console.log(data.results[0].score); // 0–100 trust score</code></pre>
                   'gh secret set COMMIT_API_KEY --body ' + data.key +
                   '</code><br>' +
                   '<span style="display:inline-block;margin-top:0.5rem;font-size:0.9rem;">(or paste in <strong>Settings → Secrets and variables → Actions</strong>). Re-run the failed job and the annotation goes away.</span>';
-              } else if (source && README_SOURCES.has(source)) {
+              } else if (source && isDiscoverySource(source)) {
                 // README readers came for the monitoring pitch — get them onto
                 // login + audit immediately. The hero says "score your tree" /
                 // "Developer adds push alerts when any watched package degrades."
