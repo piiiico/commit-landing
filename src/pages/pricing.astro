@@ -939,6 +939,29 @@ import Layout from '../layouts/Layout.astro';
         return `You audited ${nameList}${overflow} — clean today. axios scored clean too, until a stolen token shipped malware to 11M weekly downloads on March 30. Developer ($15/mo) re-scans ${them} daily, watches up to 15 packages (5× free), and emails you within minutes the moment any score drops a tier — so the next compromise pages you, not your users.`;
       };
 
+      // 2026-06-15: checkout-recovery — abandonment-recovery email after a
+      // Stripe checkout.session.expired (worker.ts:8028). HIGHEST intent in
+      // the funnel: visitor created a free key, hit a limit, clicked the
+      // upgrade URL, entered Stripe, then bailed. Pre-this-ship, the recovery
+      // email link was bare `https://getcommit.dev/pricing` — strip email,
+      // strip utm_campaign, strip tier. Visitor had to re-type email, re-find
+      // the tier they were on, re-click Subscribe. Same orphan-banner class
+      // as 2026-06-12 ci-annotation, 2026-06-10 audit-healthy-key, and the
+      // 2026-06-15 04:35Z batch (free-watch-cmd, upgrade-from-free-key,
+      // status-limit, post-login, init, help). Recovery email now carries
+      // email + utm_campaign=checkout-recovery + utm_medium=recovery + tier=
+      // {pro|developer}. Banner reads tier from URL, msg picks Developer vs
+      // Pro copy, CTA opens the matching modal so the next click resumes
+      // the abandoned flow at the original tier.
+      const buildRecoveryMsg = (): string => {
+        const tierParam = sp.get('tier');
+        const isPro = tierParam === 'pro';
+        if (isPro) {
+          return 'You started a Pro ($29/mo) checkout but didn\'t finish. Pro unlocks 10,000 audits/month, batch up to 20 packages per call, monitors 10 projects with daily re-scans, sends alerts to Slack + webhooks (vs email-only on Developer), and keeps 90 days of historical score data. 30-day money-back guarantee — pick up where you left off.';
+        }
+        return 'You started a Developer ($15/mo) checkout but didn\'t finish. Developer unlocks 1,000 audits/day, batch up to 5 packages per call, watches 15 packages with daily re-scans (vs 3 weekly on free), and adds instant email alerts the moment any score drops a tier. 30-day money-back guarantee — pick up where you left off.';
+      };
+
       const CONTEXT_BY_CAMPAIGN: Record<string, { eyebrow: string; msg: string }> = {
         'watch-cmd': {
           eyebrow: 'From your terminal',
@@ -1060,6 +1083,13 @@ import Layout from '../layouts/Layout.astro';
           eyebrow: 'From your terminal',
           msg: 'You followed the monitoring link from `poc --help`. Developer ($15/mo) watches 15 packages with daily re-scans (vs 3 weekly on free), gives 1,000 audits/day, batches up to 5 packages per call, and adds instant email alerts the moment any score drops a tier. 30-day money-back guarantee.',
         },
+        // 2026-06-15: see buildRecoveryMsg() above for rationale. Single
+        // eyebrow + tier-conditional msg; the banner CTA also reads ?tier=
+        // so the modal opens at the tier the visitor abandoned.
+        'checkout-recovery': {
+          eyebrow: 'From your abandoned checkout',
+          msg: buildRecoveryMsg(),
+        },
       };
       const variant = CONTEXT_BY_CAMPAIGN[campaign];
       if (!variant) return;
@@ -1071,7 +1101,15 @@ import Layout from '../layouts/Layout.astro';
       eyebrowEl.textContent = variant.eyebrow;
       msgEl.textContent = variant.msg;
       banner.hidden = false;
-      ctaEl.addEventListener('click', () => openModal('developer'));
+      // 2026-06-15: tier-aware CTA. Pre-this-ship, openModal('developer') was
+      // hardcoded for every campaign. checkout-recovery NEEDS to honor the
+      // tier the visitor abandoned (Pro $29 vs Developer $15) or the banner
+      // CTA pivots the user mid-flow into the wrong tier modal. Read ?tier=
+      // from URL with a 2-value safelist; default 'developer' preserves the
+      // pre-ship behavior for every other campaign that omits the param.
+      const tierParam = sp.get('tier');
+      const ctaTier = (tierParam === 'pro' || tierParam === 'developer') ? tierParam : 'developer';
+      ctaEl.addEventListener('click', () => openModal(ctaTier));
     })();
 
     // Close on overlay click or close button
