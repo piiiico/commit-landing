@@ -285,6 +285,34 @@ if (gsHasDevto || workerHasDevto) {
     gaps.push(`MISSING: get-started.astro DEVTO_SOURCE_RE — devto-<slug> infra present elsewhere but landing success-note isDiscoverySource has no DEVTO_SOURCE_RE branch; success-note pivots to "Authorization: Bearer" mid-flow.`);
 }
 
+// 2026-06-15: outreach-<slug> fallback infrastructure check — same shape as
+// devto-* but the emitters are cold-email bodies sent from commit@getcommit.dev
+// (Convex E1 ref=outreach-convex shipped 11:15Z today; e2b E1 ref=outreach-e2b
+// shipped 07:12Z). Email bodies live in send-email.ts task descriptions /
+// drafts, not in this repo — the gate cannot scan them. Same approach as
+// DEVTO: once OUTREACH infra is wired in on either side, the gate insists
+// both sides stay in sync. Removing outreach attribution would require
+// removing the fallback from both sides in one commit (intentional).
+// 9th occurrence of "new ref symbol ships, downstream gates do not know
+// about it" pattern (after ci-annotation 06-12, readme + npm-readme 06-13,
+// cli-watch 06-15 05:48Z, blog-fallback 06-15 06:20Z, devto-fallback 06-15
+// 10:23Z, welcome-upgrade campaign 06-15 10:50Z). Pattern admit subtracts
+// per-recipient additions forever.
+const gsHasOutreach = gsSrc.includes("OUTREACH_HERO_FALLBACK") || gsSrc.includes("OUTREACH_REF_RE") || gsSrc.includes("OUTREACH_SOURCE_RE");
+const workerHasOutreach = workerSrc.includes("OUTREACH_REF_RE") || workerSrc.includes("OUTREACH_SOURCE_RE");
+if (gsHasOutreach || workerHasOutreach) {
+  if (!gsSrc.includes("OUTREACH_HERO_FALLBACK"))
+    gaps.push(`MISSING: get-started.astro OUTREACH_HERO_FALLBACK — outreach-<slug> infra present elsewhere but hero IIFE has no fallback variant. Without it, cold-outreach recipients land on the generic "Get your API key" hero after clicking through an email that named specific packages.`);
+  if (!gsSrc.includes("OUTREACH_REF_RE"))
+    gaps.push(`MISSING: get-started.astro OUTREACH_REF_RE — outreach-<slug> infra present elsewhere but form-submit code has no OUTREACH_REF_RE; source attribution will be dropped to source=web on every cold-outreach click-through.`);
+  if (!workerSrc.includes("OUTREACH_REF_RE"))
+    gaps.push(`MISSING: worker.ts OUTREACH_REF_RE — outreach-<slug> infra present elsewhere but /api/keys/create has no OUTREACH_REF_RE admission; backend will coerce source to "web".`);
+  if (!workerSrc.includes("OUTREACH_SOURCE_RE"))
+    gaps.push(`MISSING: worker.ts OUTREACH_SOURCE_RE — outreach-<slug> infra present on landing but welcome-email isDiscoverySource has no OUTREACH_SOURCE_RE branch; step 2 falls through to "Add a CI gate" copy that contradicts the cold-outreach hero.`);
+  if (!gsSrc.includes("OUTREACH_SOURCE_RE"))
+    gaps.push(`MISSING: get-started.astro OUTREACH_SOURCE_RE — outreach-<slug> infra present elsewhere but landing success-note isDiscoverySource has no OUTREACH_SOURCE_RE branch; success-note pivots to "Authorization: Bearer" mid-flow.`);
+}
+
 for (const ref of pricingRefs) {
   if (!inBlock(priceSrc, "CONTEXT_BY_CAMPAIGN", ref))
     gaps.push(`MISSING: pricing.astro CONTEXT_BY_CAMPAIGN['${ref}']`);

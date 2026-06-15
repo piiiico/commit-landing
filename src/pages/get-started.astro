@@ -532,9 +532,37 @@ console.log(data.results[0].score); // 0–100 trust score</code></pre>
           'A free key audits 200 packages/day and emails you when any watched package gets attacked or its score drops. No card.<br />' +
           'Want continuous monitoring across your whole tree? Developer ($15/mo) watches 15 packages with daily scans + push alerts.',
       };
+      // 2026-06-15: outreach-<slug> pattern admit, mirroring BLOG_SOURCE_RE
+      // and DEVTO_SOURCE_RE. Convex E1 (11:15Z today) and e2b E1 (07:12Z) sent
+      // CTAs to /get-started?watch=...&ref=outreach-convex / outreach-e2b
+      // inside cold-email bodies that already named the specific CRITICAL
+      // packages we flagged. Without this fallback the recipient lands on the
+      // generic "Get your API key" hero — pivoting away from the email-body
+      // frame at the highest-intent moment in the funnel. The URL DOES
+      // pre-seed a watchlist (audit-derived ?watch=... list from the email),
+      // so copy assumes packages are already in flight and points to key
+      // creation as the activation step. 9th occurrence of "new ref ships
+      // without HERO_BY_REF entry" pattern; pattern admit subtracts per-
+      // recipient additions forever — every future outreach send only needs
+      // ?ref=outreach-<recipient-slug> in the URL, no code per send.
+      // Matching OUTREACH_REF_RE lives in the form-submit IIFE below and in
+      // worker.ts /api/keys/create. Parity gate enforces both sides via
+      // check-funnel-surface-parity.ts.
+      // NOTE: comment must not contain unescaped apostrophes — deploy.ts
+      // GUARD 3 brace-walker treats them as string delimiters and orphans
+      // every following HERO_BY_REF key. See line-412 + line-336 warnings.
+      const OUTREACH_SOURCE_RE = /^outreach-[a-z0-9-]{1,40}$/;
+      const OUTREACH_HERO_FALLBACK = {
+        eyebrow: 'From our email',
+        title: 'Watch the packages we flagged in your tree',
+        lead:
+          'Your watchlist is pre-seeded from the audit we ran on your direct deps. A free key activates it and emails you the moment any of those packages get attacked or score lower. 200 audits/day, no card.<br />' +
+          'Want continuous monitoring across your whole tree? Developer ($15/mo) watches 15 packages with daily scans + push alerts.',
+      };
       const variant = HERO_BY_REF[ref]
         ?? (BLOG_SOURCE_RE.test(ref) ? BLOG_HERO_FALLBACK : undefined)
-        ?? (DEVTO_SOURCE_RE.test(ref) ? DEVTO_HERO_FALLBACK : undefined);
+        ?? (DEVTO_SOURCE_RE.test(ref) ? DEVTO_HERO_FALLBACK : undefined)
+        ?? (OUTREACH_SOURCE_RE.test(ref) ? OUTREACH_HERO_FALLBACK : undefined);
       if (!variant) return;
       const eyebrow = document.getElementById('gs-hero-eyebrow');
       const title = document.getElementById('gs-hero-title');
@@ -613,7 +641,14 @@ console.log(data.results[0].score); // 0–100 trust score</code></pre>
         // Backend worker.ts /api/keys/create has the matching DEVTO_REF_RE.
         const DEVTO_REF_RE = /^devto-[a-z0-9-]{1,40}$/;
         const devtoSource = DEVTO_REF_RE.test(refParam) ? refParam : undefined;
-        const source = REF_TO_SOURCE[refParam] ?? blogSource ?? devtoSource ?? UTM_TO_SOURCE[utmSource];
+        // 2026-06-15: outreach-<slug> pattern admit. See OUTREACH_HERO_FALLBACK
+        // comment above for rationale. Mirror of BLOG_REF_RE / DEVTO_REF_RE —
+        // passes refParam through as-is so analytics labels stay readable
+        // (api_keys.source = "outreach-convex", "outreach-workos", etc.).
+        // Backend worker.ts /api/keys/create has the matching OUTREACH_REF_RE.
+        const OUTREACH_REF_RE = /^outreach-[a-z0-9-]{1,40}$/;
+        const outreachSource = OUTREACH_REF_RE.test(refParam) ? refParam : undefined;
+        const source = REF_TO_SOURCE[refParam] ?? blogSource ?? devtoSource ?? outreachSource ?? UTM_TO_SOURCE[utmSource];
 
         try {
           const body: { email: string; source?: string; watch?: Array<{ name: string; ecosystem: string }> } = { email };
@@ -736,8 +771,17 @@ console.log(data.results[0].score); // 0–100 trust score</code></pre>
               // through a discovery-pitch hero. Pairs with worker.ts welcome-
               // email step 2 (same fork via isDiscoverySource).
               const DEVTO_SOURCE_RE = /^devto-[a-z0-9-]{1,40}$/;
+              // 2026-06-15: outreach-<slug> sources share intent with blog-* /
+              // devto-* / README sources — the recipient came from a cold
+              // outreach email that already named the CRITICAL packages we
+              // flagged in their tree. Without this branch the success-note
+              // hands them "Authorization: Bearer" right after the hero said
+              // "Watch the packages we flagged" — mid-flow pivot kills
+              // momentum. Pairs with worker.ts welcome-email step 2 (same
+              // fork via isDiscoverySource).
+              const OUTREACH_SOURCE_RE = /^outreach-[a-z0-9-]{1,40}$/;
               const isDiscoverySource = (s: string) =>
-                README_SOURCES.has(s) || BLOG_SOURCE_RE.test(s) || DEVTO_SOURCE_RE.test(s);
+                README_SOURCES.has(s) || BLOG_SOURCE_RE.test(s) || DEVTO_SOURCE_RE.test(s) || OUTREACH_SOURCE_RE.test(s);
               if (source && HOOK_SOURCES.has(source)) {
                 // Hook users have the proof-of-commitment package already (it wrote the hook script).
                 // `poc login <key>` writes to ~/.commit/config which all hook paths read via readApiKey().
