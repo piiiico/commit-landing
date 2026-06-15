@@ -259,6 +259,32 @@ if (blogRefsViaFallback.size > 0) {
     gaps.push(`MISSING: worker.ts BLOG_REF_RE — blog refs emitted (${blogList}) but /api/keys/create has no BLOG_REF_RE admission; backend will coerce source to "web".`);
 }
 
+// 2026-06-15: dev.to fallback infrastructure check — same shape as blog-*
+// but the emitters are external to this repo (dev.to articles published via
+// API). The first native article (devto-npm-audit, 2026-06-15 09:51Z) ships
+// CTAs ?ref=devto-npm-audit; future syndication will reuse devto-<slug>.
+// Since the gate can't scan dev.to itself, we treat the fallback infra as
+// PERMANENT once any devto-* attribution has been wired in (i.e. once the
+// fallback variants exist on either side, the gate insists they exist on
+// BOTH sides). This is the smallest assertion that catches the orphan
+// (one side updated, the other forgotten) without overreaching into "this
+// must always exist" (we keep the option to remove dev.to syndication
+// entirely by removing the fallback from both sides in one commit).
+const gsHasDevto = gsSrc.includes("DEVTO_HERO_FALLBACK") || gsSrc.includes("DEVTO_REF_RE") || gsSrc.includes("DEVTO_SOURCE_RE");
+const workerHasDevto = workerSrc.includes("DEVTO_REF_RE") || workerSrc.includes("DEVTO_SOURCE_RE");
+if (gsHasDevto || workerHasDevto) {
+  if (!gsSrc.includes("DEVTO_HERO_FALLBACK"))
+    gaps.push(`MISSING: get-started.astro DEVTO_HERO_FALLBACK — devto-<slug> infra present elsewhere but hero IIFE has no fallback variant. Without it, dev.to article readers land on the generic "Get your API key" hero.`);
+  if (!gsSrc.includes("DEVTO_REF_RE"))
+    gaps.push(`MISSING: get-started.astro DEVTO_REF_RE — devto-<slug> infra present elsewhere but form-submit code has no DEVTO_REF_RE; source attribution will be dropped to source=web.`);
+  if (!workerSrc.includes("DEVTO_REF_RE"))
+    gaps.push(`MISSING: worker.ts DEVTO_REF_RE — devto-<slug> infra present elsewhere but /api/keys/create has no DEVTO_REF_RE admission; backend will coerce source to "web".`);
+  if (!workerSrc.includes("DEVTO_SOURCE_RE"))
+    gaps.push(`MISSING: worker.ts DEVTO_SOURCE_RE — devto-<slug> infra present on landing but welcome-email isDiscoverySource has no DEVTO_SOURCE_RE branch; step 2 falls through to "Add a CI gate" copy that contradicts the discovery-pitch hero.`);
+  if (!gsSrc.includes("DEVTO_SOURCE_RE"))
+    gaps.push(`MISSING: get-started.astro DEVTO_SOURCE_RE — devto-<slug> infra present elsewhere but landing success-note isDiscoverySource has no DEVTO_SOURCE_RE branch; success-note pivots to "Authorization: Bearer" mid-flow.`);
+}
+
 for (const ref of pricingRefs) {
   if (!inBlock(priceSrc, "CONTEXT_BY_CAMPAIGN", ref))
     gaps.push(`MISSING: pricing.astro CONTEXT_BY_CAMPAIGN['${ref}']`);
