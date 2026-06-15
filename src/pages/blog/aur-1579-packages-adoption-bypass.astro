@@ -157,6 +157,11 @@ import Layout from '../../layouts/Layout.astro';
             successful supply chain attack this year.
           </p>
 
+          <div class="essay-cta">
+            <a href="/audit?packages=chalk,minimatch,glob,cross-spawn,zod,lodash&ref=blog-aur-1579" class="btn-primary">Score the 6 most-concentrated &rarr;</a>
+            <a href="/get-started?watch=chalk,minimatch,glob,cross-spawn&eco=npm&ref=blog-aur-1579" class="btn-ghost">Free key, watchlist pre-seeded &rarr;</a>
+          </div>
+
           <table>
             <thead>
               <tr><th>Incident</th><th>Ecosystem</th><th>Packages</th><th>Common fingerprint</th></tr>
@@ -196,6 +201,10 @@ import Layout from '../../layouts/Layout.astro';
 
           <h2>Check your project</h2>
 
+          <p>
+            Zero install, 30 seconds:
+          </p>
+
           <pre><code>npx proof-of-commitment</code></pre>
 
           <p>
@@ -205,11 +214,23 @@ import Layout from '../../layouts/Layout.astro';
             CRITICAL, you want to know that before the build script runs on your machine.
           </p>
 
+          <p>
+            If you want monitoring &mdash; an email the moment a publisher behind your
+            dependencies changes, or a new CRITICAL gets flagged:
+          </p>
+
+          <pre><code>poc watch chalk lodash glob --email you@company.com</code></pre>
+
+          <div class="essay-cta">
+            <a href="/get-started?watch=chalk,lodash,glob,minimatch&eco=npm&ref=blog-aur-1579" class="btn-primary">Free key, watching 4 hot-targets &rarr;</a>
+            <a href="/pricing?ref=blog-aur-1579" class="btn-ghost">Developer &mdash; 15 packages, daily scans, $15/mo &rarr;</a>
+          </div>
+
         </div>
 
-        <!-- CTA -->
+        <!-- Footer CTA -->
         <footer class="essay-cta animate-in delay-5">
-          <p><a href="/audit" class="cta-button">Score your dependencies &rarr;</a></p>
+          <p><a href="/audit?ref=blog-aur-1579" class="cta-button">Score your dependencies &rarr;</a></p>
           <p class="cta-sub">Free CLI &middot; API &middot; MCP server &middot; No account required</p>
         </footer>
 
