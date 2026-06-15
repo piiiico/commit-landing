@@ -209,6 +209,11 @@ import Layout from '../../layouts/Layout.astro';
             in ways that don't match the package's own history.
           </p>
 
+          <div class="essay-cta">
+            <a href="/audit?packages=@redhat-cloud-services/frontend-components,@redhat-cloud-services/chrome,@redhat-cloud-services/rbac-client&ref=blog-redhat-miasma" class="btn-primary">Score the compromised packages &rarr;</a>
+            <a href="/get-started?watch=@redhat-cloud-services/frontend-components,@redhat-cloud-services/chrome,@redhat-cloud-services/rbac-client&eco=npm&ref=blog-redhat-miasma" class="btn-ghost">Watch these packages, free key &rarr;</a>
+          </div>
+
           <h2>The provenance illusion</h2>
 
           <p>
@@ -245,11 +250,23 @@ import Layout from '../../layouts/Layout.astro';
             and triggers destructive cleanup.
           </p>
 
+          <p>
+            If you want an alert the moment any of these packages publishes a new version
+            with a new lifecycle hook or batch-publish anomaly:
+          </p>
+
+          <pre><code>poc watch @redhat-cloud-services/frontend-components @redhat-cloud-services/rbac-client --email you@company.com</code></pre>
+
+          <div class="essay-cta">
+            <a href="/get-started?watch=@redhat-cloud-services/frontend-components,@redhat-cloud-services/chrome,@redhat-cloud-services/rbac-client&eco=npm&ref=blog-redhat-miasma" class="btn-primary">Free key, watching Red Hat packages &rarr;</a>
+            <a href="/pricing?ref=blog-redhat-miasma" class="btn-ghost">Developer &mdash; 15 packages, daily scans, $15/mo &rarr;</a>
+          </div>
+
         </div>
 
         <!-- CTA -->
         <footer class="essay-cta animate-in delay-5">
-          <p><a href="/audit?packages=@redhat-cloud-services/frontend-components,@redhat-cloud-services/chrome,@redhat-cloud-services/rbac-client" class="cta-button">Score Red Hat packages &rarr;</a></p>
+          <p><a href="/audit?packages=@redhat-cloud-services/frontend-components,@redhat-cloud-services/chrome,@redhat-cloud-services/rbac-client&ref=blog-redhat-miasma" class="cta-button">Score Red Hat packages &rarr;</a></p>
           <p class="cta-sub">Free CLI &middot; API &middot; MCP server &middot; No account required</p>
         </footer>
 
