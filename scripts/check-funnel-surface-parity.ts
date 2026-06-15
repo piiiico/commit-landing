@@ -46,7 +46,7 @@
  *        npm-package/README.md. No AST parsing, no generalising beyond 4 gates.
  */
 
-import { readFileSync } from "fs";
+import { readFileSync, readdirSync } from "fs";
 import { join, resolve } from "path";
 
 // ── Paths ────────────────────────────────────────────────────────────────────
@@ -57,6 +57,7 @@ const GH_README  = join(ROOT, "proof-of-commitment/README.md");
 const GET_STARTED = join(ROOT, "commit-landing-v2/src/pages/get-started.astro");
 const PRICING   = join(ROOT, "commit-landing-v2/src/pages/pricing.astro");
 const WORKER    = join(ROOT, "proof-of-commitment/src/backend/worker.ts");
+const BLOG_DIR  = join(ROOT, "commit-landing-v2/src/pages/blog");
 
 // ── Read sources ─────────────────────────────────────────────────────────────
 const npmSrc    = readFileSync(NPM_PKG, "utf8");
@@ -65,6 +66,23 @@ const ghReadmeSrc  = readFileSync(GH_README, "utf8");
 const gsSrc     = readFileSync(GET_STARTED, "utf8");
 const priceSrc  = readFileSync(PRICING, "utf8");
 const workerSrc = readFileSync(WORKER, "utf8");
+// 2026-06-15: blog posts ship CTAs with ref=blog-<slug> attribution.
+// The CLI-runtime scan above does not see them — they live in .astro
+// files under src/pages/blog/. AUR-1579 hot-news post (deployed
+// 2026-06-13 with CTAs backported 2026-06-15 01:00Z) shipped 5 blog-*
+// refs that all leaked to the generic "Get your API key" hero because
+// HERO_BY_REF only had blog-snyk-comparison. Pre-this-extension, the
+// gate ran green because blog refs were nowhere in scanned sources.
+const blogSrcs: { file: string; content: string }[] = [];
+try {
+  for (const file of readdirSync(BLOG_DIR)) {
+    if (file.endsWith(".astro")) {
+      blogSrcs.push({ file, content: readFileSync(join(BLOG_DIR, file), "utf8") });
+    }
+  }
+} catch {
+  // BLOG_DIR may not exist in some checkouts; gate degrades to pre-2026-06-15 scope.
+}
 
 // ── Extract refs from emitter surfaces ───────────────────────────────────────
 // Refs that route to /get-started?ref=X (URLs may end at quote, paren, space, '#', '<')
@@ -155,7 +173,36 @@ for (const src of [gsSrc]) {
   while ((m = dataAttrRe.exec(src)) !== null) pricingCampaigns.add(m[1]);
 }
 
-const allRefs = new Set([...getStartedRefs, ...pricingRefs]);
+// 2026-06-15: scan blog posts for ref=blog-<slug>. These refs are
+// admitted by BLOG_REF_RE in worker.ts and get-started.astro
+// form-submission code, AND covered by BLOG_HERO_FALLBACK in
+// get-started.astro hero IIFE — so they do NOT need individual
+// HERO_BY_REF / REF_TO_SOURCE / VALID_SOURCES entries. The gate's
+// job for blog refs is to verify the fallback infrastructure
+// (BLOG_HERO_FALLBACK + BLOG_REF_RE in both sides) still exists, not
+// to require per-ref additions. Tracked separately so the per-ref
+// loop below does not flag every blog post that ships a CTA.
+const blogRefsEmitted = new Set<string>();
+const blogPathRefRe = /\/get-started[^'"\s)<>]*[?&]ref=(blog-[a-z0-9-]{1,40})/g;
+for (const { content } of blogSrcs) {
+  blogPathRefRe.lastIndex = 0;
+  while ((m = blogPathRefRe.exec(content)) !== null) blogRefsEmitted.add(m[1]);
+}
+// Blog refs the gate would otherwise per-ref check: split into those
+// with custom HERO_BY_REF (route through pre-existing per-ref logic)
+// and those relying on the fallback (require fallback infrastructure).
+const blogRefsWithCustomHero = new Set<string>();
+const blogRefsViaFallback = new Set<string>();
+for (const ref of blogRefsEmitted) {
+  if (inBlock(gsSrc, "HERO_BY_REF", ref)) blogRefsWithCustomHero.add(ref);
+  else blogRefsViaFallback.add(ref);
+}
+// Per-ref loop below should only check blog refs with custom heroes;
+// fallback-routed refs are checked via the single-fixture assertions
+// at the bottom (BLOG_HERO_FALLBACK + BLOG_REF_RE on both sides).
+const refsForPerRefLoop = new Set([...getStartedRefs, ...blogRefsWithCustomHero]);
+
+const allRefs = new Set([...getStartedRefs, ...pricingRefs, ...blogRefsWithCustomHero]);
 
 // ── Gate check helpers ───────────────────────────────────────────────────────
 /** Check whether a quoted key appears in a named record literal in source. */
@@ -183,12 +230,33 @@ function inValidSources(src: string, key: string): boolean {
 // ── Run checks ───────────────────────────────────────────────────────────────
 const gaps: string[] = [];
 
-for (const ref of getStartedRefs) {
+for (const ref of refsForPerRefLoop) {
   if (!inBlock(gsSrc, "HERO_BY_REF", ref))
     gaps.push(`MISSING: get-started.astro HERO_BY_REF['${ref}']`);
 
   if (!inBlock(gsSrc, "REF_TO_SOURCE", ref))
     gaps.push(`MISSING: get-started.astro REF_TO_SOURCE['${ref}']`);
+}
+
+// 2026-06-15: Blog-ref fallback infrastructure check.
+// When ANY blog-<slug> CTA is emitted from src/pages/blog/*.astro,
+// the fallback chain must be intact end-to-end:
+//   - get-started.astro hero IIFE has BLOG_HERO_FALLBACK
+//   - get-started.astro form-submit IIFE has BLOG_REF_RE (REF_TO_SOURCE pass-through)
+//   - worker.ts /api/keys/create has BLOG_REF_RE (VALID_SOURCES pass-through)
+// Without these, blog refs silently fall through to "Get your API key"
+// hero + source=web attribution. Single-fixture assertion covers all
+// fallback-routed blog refs; per-ref checks above still catch refs that
+// claim a CUSTOM hero entry but forget the matching success-note/welcome
+// chain (e.g. blog-snyk-comparison).
+if (blogRefsViaFallback.size > 0) {
+  const blogList = [...blogRefsViaFallback].join(", ");
+  if (!gsSrc.includes("BLOG_HERO_FALLBACK"))
+    gaps.push(`MISSING: get-started.astro BLOG_HERO_FALLBACK — ${blogRefsViaFallback.size} blog ref(s) emitted via fallback (${blogList}) but hero IIFE has no fallback variant. Without it, all of them fall through to the generic "Get your API key" hero.`);
+  if (!gsSrc.includes("BLOG_REF_RE"))
+    gaps.push(`MISSING: get-started.astro BLOG_REF_RE — blog refs emitted (${blogList}) but form-submit code has no BLOG_REF_RE; REF_TO_SOURCE pass-through is dead and source attribution will be dropped to source=web.`);
+  if (!workerSrc.includes("BLOG_REF_RE"))
+    gaps.push(`MISSING: worker.ts BLOG_REF_RE — blog refs emitted (${blogList}) but /api/keys/create has no BLOG_REF_RE admission; backend will coerce source to "web".`);
 }
 
 for (const ref of pricingRefs) {
@@ -206,6 +274,11 @@ for (const campaign of pricingCampaigns) {
 }
 
 for (const ref of allRefs) {
+  // blog-<slug> refs are admitted by BLOG_REF_RE in worker.ts /api/keys/create
+  // (verified above by the blog-fallback infrastructure check). Skip per-ref
+  // VALID_SOURCES check for them — pre-existing blog-snyk-comparison (custom
+  // hero) passes through BLOG_REF_RE same as fallback-routed blog refs.
+  if (/^blog-[a-z0-9-]{1,40}$/.test(ref)) continue;
   if (!inValidSources(workerSrc, ref))
     gaps.push(`MISSING: worker.ts VALID_SOURCES["${ref}"]`);
 }
@@ -255,9 +328,11 @@ for (const ref of getStartedRefs) {
 
 // ── Report ───────────────────────────────────────────────────────────────────
 console.log(`Funnel surface parity check`);
-console.log(`  npm-package refs → get-started: [${[...getStartedRefs].join(", ")}]`);
-console.log(`  npm-package refs → pricing:     [${[...pricingRefs].join(", ")}]`);
+console.log(`  npm-package refs → get-started:   [${[...getStartedRefs].join(", ")}]`);
+console.log(`  npm-package refs → pricing:       [${[...pricingRefs].join(", ")}]`);
 console.log(`  worker+cli utm_campaign → pricing: [${[...pricingCampaigns].join(", ")}]`);
+console.log(`  blog → get-started (custom hero): [${[...blogRefsWithCustomHero].join(", ")}]`);
+console.log(`  blog → get-started (fallback):    [${[...blogRefsViaFallback].join(", ")}]`);
 console.log();
 
 if (gaps.length === 0) {

@@ -480,7 +480,34 @@ console.log(data.results[0].score); // 0–100 trust score</code></pre>
                 'Want continuous monitoring across your whole tree? Developer ($15/mo) watches 15 packages with daily scans.',
             },
       };
-      const variant = HERO_BY_REF[ref];
+      // 2026-06-15: blog-<slug> fallback hero. Blog posts ship CTAs with
+      // ref=blog-<slug> attribution; per-blog HERO_BY_REF entries (e.g.
+      // blog-snyk-comparison) are kept for posts whose pitch needs custom
+      // copy, but the discovery-watchlist promise is the same across most
+      // hot-news posts. Without this fallback the reader from an AUR-1579
+      // hot-news post (or any other blog-* ref without a specific entry)
+      // lands on the generic "Get your API key" hero with no echo of the
+      // finding the post just walked them through. 4th occurrence of the
+      // "new discovery ref ships without HERO_BY_REF entry" pattern after
+      // ci-annotation (2026-06-12), readme-monitoring + npm-readme-
+      // monitoring (2026-06-13), and cli-watch (2026-06-15 05:48Z) — each
+      // was fixed with a per-ref entry; this generalises to subtract the
+      // gap class instead of adding entries forever. Pairs with the
+      // parity-gate scan in check-funnel-surface-parity.ts that asserts
+      // BLOG_HERO_FALLBACK exists whenever any blog-* ref is emitted from
+      // commit-landing-v2/src/pages/blog/*.astro.
+      // NOTE: comment must not contain unescaped apostrophes — deploy.ts
+      // GUARD 3 brace-walker treats them as string delimiters and orphans
+      // every following HERO_BY_REF key. See line-412 + line-336 warnings.
+      const BLOG_SOURCE_RE = /^blog-[a-z0-9-]{1,40}$/;
+      const BLOG_HERO_FALLBACK = {
+        eyebrow: 'From the Commit blog',
+        title: 'Watch these packages for the next attack',
+        lead:
+          'A free key seeds your watchlist with the packages flagged in this post and emails you the moment any of them get attacked or score lower. 200 audits/day, no card.<br />' +
+          'Want continuous monitoring across your whole tree? Developer ($15/mo) watches 15 packages with daily scans + push alerts.',
+      };
+      const variant = HERO_BY_REF[ref] ?? (BLOG_SOURCE_RE.test(ref) ? BLOG_HERO_FALLBACK : undefined);
       if (!variant) return;
       const eyebrow = document.getElementById('gs-hero-eyebrow');
       const title = document.getElementById('gs-hero-title');
