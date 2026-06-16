@@ -97,6 +97,77 @@ async function checkDistStaleness(): Promise<boolean> {
 }
 
 // ---------------------------------------------------------------------------
+// GUARD 1b: Dist-completeness check
+// ---------------------------------------------------------------------------
+//
+// 2026-06-13 incident + 2026-06-16 recurrence: a wave of concurrent Astro
+// builds produced dist trees missing /pricing/, /quickstart/, /thesis/,
+// /watchlist/, /spec/, /rankings/, /privacy/, /signup/, /windsurf/ — 9 pages
+// that share no obvious build-graph property except being the heavier
+// marketing routes. Wrangler uploaded the incomplete dist; CF Pages took it as
+// authoritative; /pricing (sole paid surface) 404'd silently for days.
+//
+// GUARD 2 (live-tokens) doesn't catch this because it `continues` on local
+// file-not-found ("Skipping path — local file not found"). GUARD 6
+// (post-deploy) catches it after the damage is done.
+//
+// This guard fails BEFORE wrangler upload if any marketing page is missing
+// from dist. Set of pages = SAMPLE_PATHS + the 06-13/06-16 incident list.
+// Adding a page? Add it here too — the cost is one fs.existsSync per page.
+const REQUIRED_DIST_PAGES = [
+  "/index.html",
+  "/audit/index.html",
+  "/get-started/index.html",
+  "/docs/index.html",
+  "/pricing/index.html",
+  "/quickstart/index.html",
+  "/thesis/index.html",
+  "/watchlist/index.html",
+  "/spec/index.html",
+  "/rankings/index.html",
+  "/privacy/index.html",
+  "/signup/index.html",
+  "/windsurf/index.html",
+  "/cursor/index.html",
+  "/claude-code/index.html",
+  "/extension/index.html",
+  "/badges/index.html",
+  "/compare/index.html",
+  "/dashboard/index.html",
+];
+
+async function checkDistCompleteness(): Promise<boolean> {
+  const { existsSync, statSync } = await import("node:fs");
+  const { join } = await import("node:path");
+  const missing: string[] = [];
+  const empty: string[] = [];
+  for (const path of REQUIRED_DIST_PAGES) {
+    const full = join(DIST_DIR, path.slice(1));
+    if (!existsSync(full)) {
+      missing.push(path);
+    } else if (statSync(full).size < 200) {
+      empty.push(`${path} (${statSync(full).size}B — looks truncated)`);
+    }
+  }
+  if (missing.length > 0 || empty.length > 0) {
+    console.error("\n❌ DIST-COMPLETENESS CHECK FAILED");
+    if (missing.length > 0) {
+      console.error(`   ${missing.length} marketing page(s) missing from dist/:`);
+      for (const m of missing) console.error(`     - ${m}`);
+    }
+    if (empty.length > 0) {
+      console.error(`   ${empty.length} page(s) suspiciously small:`);
+      for (const e of empty) console.error(`     - ${e}`);
+    }
+    console.error("   Rerun --rebuild and confirm no concurrent astro processes.");
+    console.error("   See 2026-06-13/06-16 manifest-drift incidents in CLAUDE.md.");
+    return false;
+  }
+  console.log(`✅ Dist-completeness check: all ${REQUIRED_DIST_PAGES.length} marketing pages present.`);
+  return true;
+}
+
+// ---------------------------------------------------------------------------
 // HELPERS: Token extraction (same logic as poc-backend/deploy.ts)
 // ---------------------------------------------------------------------------
 
@@ -615,12 +686,20 @@ if (process.argv.includes("--rebuild")) {
 console.log("🔍 Pre-deploy guard: checking source/production divergence...\n");
 
 const distOk = await checkDistStaleness();
+const distCompleteOk = await checkDistCompleteness();
 const liveOk = await checkLiveTokens();
 const heroOk = await checkHeroRefMapping();
 const emittedRefsOk = await checkEmittedRefs();
 const noStaticCheckoutOk = await checkNoStaticCheckoutLinks();
 
 console.log("");
+
+if (!distCompleteOk) {
+  // Hard-fail: shipping an incomplete dist destroyed the buyer journey for 3 days
+  // (06-13 → 06-16). Override is a misuse — fix the build, don't deploy partial.
+  console.error("Aborting deploy: dist is incomplete.");
+  process.exit(1);
+}
 
 if (!distOk) {
   await handleDivergence("dist/ is older than src/ — build may be stale.");
@@ -650,7 +729,7 @@ if (!noStaticCheckoutOk) {
   console.log("  DEPLOY_FORCE=1 — proceeding despite static-checkout-link findings.\n");
 }
 
-if (distOk && liveOk && heroOk && emittedRefsOk && noStaticCheckoutOk) {
+if (distOk && distCompleteOk && liveOk && heroOk && emittedRefsOk && noStaticCheckoutOk) {
   console.log("✅ Pre-deploy guard: source/production in sync — proceeding.\n");
 }
 
@@ -707,8 +786,11 @@ console.log("\n✅ Deployed!");
 if (!process.argv.includes("--skip-post-verify")) {
   console.log("\nWaiting 8s for edge propagation, then verifying critical pages…");
   await new Promise((r) => setTimeout(r, 8_000));
-  const CRITICAL_PAGES = ["/", "/audit/", "/get-started/", "/pricing/", "/quickstart/", "/docs/"];
-  const failed: { path: string; status: number }[] = [];
+  // Expanded 2026-06-16: every page in REQUIRED_DIST_PAGES — the 06-13 manifest-drift
+  // pattern leaves dist intact on disk but missing on the live edge. Only a live
+  // post-deploy probe catches that the wrangler upload didn't include them.
+  const CRITICAL_PAGES = REQUIRED_DIST_PAGES.map((p) => p.replace(/index\.html$/, ""));
+  const failed: { path: string; status: number; reason?: string }[] = [];
   for (const path of CRITICAL_PAGES) {
     const url = `${PAGES_SUBDOMAIN}${path}?cb=${Date.now()}`;
     try {
@@ -724,14 +806,64 @@ if (!process.argv.includes("--skip-post-verify")) {
       console.error(`  ✗ ${path} → fetch error: ${(err as Error).message}`);
     }
   }
+
+  // GUARD 6b: bare-URL canonicalization for paid-conversion surfaces.
+  // 2026-06-16: /pricing (no trailing slash) silently returned 404 instead of
+  // 308-redirecting to /pricing/ like every other Astro page — every CLI
+  // footer CTA + `/api/checkout` crawler-fallback target was dropping to a
+  // dead end on the SOLE paid-conversion URL. Worker now emits explicit 308.
+  // Lock that in: bare /pricing must be 2xx OR 3xx (redirect counts as healthy).
+  const BARE_CANONICAL_PAGES = ["/pricing", "/audit", "/get-started", "/docs"];
+  for (const bare of BARE_CANONICAL_PAGES) {
+    const url = `${PAGES_SUBDOMAIN}${bare}?cb=${Date.now()}`;
+    try {
+      const res = await fetch(url, { redirect: "manual", signal: AbortSignal.timeout(8_000) });
+      // Accept 2xx (page directly served) or 3xx (canonical redirect).
+      if (res.status >= 400) {
+        failed.push({ path: bare, status: res.status, reason: "bare-url-canonicalization" });
+        console.error(`  ✗ ${bare} (bare) → HTTP ${res.status} — should 308 to ${bare}/`);
+      } else {
+        console.log(`  ✓ ${bare} (bare) → HTTP ${res.status}`);
+      }
+    } catch (err) {
+      failed.push({ path: bare, status: -1, reason: "bare-url-canonicalization" });
+      console.error(`  ✗ ${bare} (bare) → fetch error: ${(err as Error).message}`);
+    }
+  }
+
+  // GUARD 6c: paid-conversion pages must be Google-indexable.
+  // 2026-06-16: /pricing/ served `X-Robots-Tag: noindex` from cached responses
+  // (no such header in HTML, no such code path in worker source — likely a
+  // stale Cloudflare dashboard rule). Worker now strips the header defensively.
+  // Lock that in: indexable pages must not emit `X-Robots-Tag: noindex`.
+  const INDEXABLE_PAGES = ["/", "/audit/", "/get-started/", "/pricing/", "/docs/", "/quickstart/"];
+  for (const path of INDEXABLE_PAGES) {
+    const url = `${PAGES_SUBDOMAIN}${path}?cb=${Date.now()}`;
+    try {
+      const res = await fetch(url, { signal: AbortSignal.timeout(8_000) });
+      const xrt = res.headers.get("X-Robots-Tag") || "";
+      if (xrt.toLowerCase().includes("noindex")) {
+        failed.push({ path, status: res.status, reason: `X-Robots-Tag: ${xrt}` });
+        console.error(`  ✗ ${path} → X-Robots-Tag: ${xrt} (should be indexable)`);
+      } else {
+        console.log(`  ✓ ${path} → no noindex header`);
+      }
+    } catch (err) {
+      // Already counted in pass A above; don't double-fail on fetch errors.
+    }
+  }
+
   if (failed.length > 0) {
     console.error(
-      `\n❌ POST-DEPLOY VERIFICATION FAILED: ${failed.length}/${CRITICAL_PAGES.length} critical pages broken on live.`
+      `\n❌ POST-DEPLOY VERIFICATION FAILED: ${failed.length} surface(s) broken on live.`
     );
+    for (const f of failed) {
+      console.error(`   - ${f.path}: HTTP ${f.status}${f.reason ? ` (${f.reason})` : ""}`);
+    }
     console.error("   Redeploy after diagnosing dist/ + concurrent-build state.");
     process.exit(1);
   }
-  console.log(`✅ Post-deploy verification: all ${CRITICAL_PAGES.length} critical pages return 2xx.`);
+  console.log(`✅ Post-deploy verification passed.`);
 }
 
 // Post-deploy: ping IndexNow so Bing / Yandex / Seznam / Naver re-crawl.

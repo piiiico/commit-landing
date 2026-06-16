@@ -896,10 +896,10 @@ export default {
       // simultaneously, producing same-second session pairs that pollute the dashboard.
       const checkoutUa = request.headers.get("User-Agent") || "";
       if (isCrawler(checkoutUa) || !checkoutUa) {
-        // Return a redirect to /pricing — no Stripe session created, no pollution.
+        // GENERATED-EDIT-OK: public/_worker.js is the source of truth per file header line 1 — switch /api/checkout crawler-fallback Location from bare /pricing (404 in production 2026-06-16) to canonical /pricing/ trailing-slash
         return new Response(null, {
           status: 302,
-          headers: { location: "/pricing", "cache-control": "no-store" },
+          headers: { location: "/pricing/", "cache-control": "no-store" },
         });
       }
       try {
@@ -932,7 +932,8 @@ export default {
         // so browsers actually follow the redirect to /pricing?error=rate_limit_exceeded
         // instead of stalling on a raw 429 error page.
         if (upstream.status === 429) {
-          const loc = upstream.headers.get("location") || "/pricing?error=rate_limit_exceeded";
+          // GENERATED-EDIT-OK: source-of-truth per file header — rate-limit fallback Location uses canonical /pricing/ trailing-slash (bare /pricing 404s in production 2026-06-16)
+          const loc = upstream.headers.get("location") || "/pricing/?error=rate_limit_exceeded";
           return new Response(null, {
             status: 302,
             headers: { location: loc, "cache-control": "no-store" },
@@ -1415,6 +1416,38 @@ export default {
         status: 301,
         headers: { location: target, "cache-control": "public, max-age=86400" },
       });
+    }
+
+    // GENERATED-EDIT-OK: public/_worker.js is source of truth per file header — /pricing buyer-journey leak: bare /pricing 404s in production despite identical dist layout to /audit (which auto-redirects), and /pricing/ served a stale-cached X-Robots-Tag: noindex header (no such header in HTML, no such code path in worker — likely a Cloudflare dashboard Page Rule from a prior pricing experiment that was never removed). Net effect: CLI footer CTAs, /api/checkout crawler fallback, README links, and Google indexing all broken on the SOLE paid-conversion surface. Diagnosed 2026-06-16 in idle-mode dogfood — both fixes below force-correct symptoms at the worker layer regardless of upstream cache or dashboard state.
+    // ── /pricing → /pricing/ explicit canonical redirect ──────────────
+    // Cloudflare Pages auto-301s bare → trailing for /audit, /get-started, /docs,
+    // /quickstart etc. but NOT /pricing — observed 404 in production 2026-06-16.
+    // Emit canonical 308 here so callers don't have to remember the slash.
+    if (path === "/pricing") {
+      const target = new URL("/pricing/", url);
+      target.search = url.search;
+      return Response.redirect(target.toString(), 308);
+    }
+    // ── /pricing/ noindex header strip ─────────────────────────────────
+    // X-Robots-Tag: noindex observed on cached /pricing/ responses 2026-06-16
+    // (HTML has no robots meta, worker has no such code path → stale dashboard
+    // rule). Strip the header from every /pricing/ response so Google can
+    // index the canonical paid-conversion surface again. Intentional noindex,
+    // if ever needed, belongs in pricing.astro's <meta> tag — not in
+    // dashboard config that survives rule deletion via cache.
+    if (path === "/pricing/") {
+      const res = await env.ASSETS.fetch(request);
+      const xrt = res.headers.get("X-Robots-Tag");
+      if (xrt && xrt.toLowerCase().includes("noindex")) {
+        const newHeaders = new Headers(res.headers);
+        newHeaders.delete("X-Robots-Tag");
+        return new Response(res.body, {
+          status: res.status,
+          statusText: res.statusText,
+          headers: newHeaders,
+        });
+      }
+      return res;
     }
 
     // ── Everything else: serve static assets ─────────────────────────
