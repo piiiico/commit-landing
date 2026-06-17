@@ -130,7 +130,7 @@ import Layout from '../../layouts/Layout.astro';
               <strong>IDE hook for AI-assisted installs.</strong> <code>poc hook</code> intercepts <code>npm install</code> commands from Cursor, Claude Code, and Windsurf. If an AI coding assistant resolves a dependency that Commit scores as HIGH or CRITICAL, the install is blocked before it runs. <a href="/extension">Install the hook.</a>
             </li>
             <li>
-              <strong>Publisher lifecycle scoring.</strong> This is what we&rsquo;re building. The data to compute &ldquo;dormant publisher with stale scope access&rdquo; is already public. The model update ships when it&rsquo;s tested.
+              <strong>Publisher lifecycle scoring.</strong> <em>Shipped same day &mdash; see update below.</em> Every audit response now includes a <code>publisherLifecycle</code> field that flags dormant publishers with current scope access. The data to compute &ldquo;dormant publisher with stale scope access&rdquo; was already public; the model now reads it.
             </li>
           </ol>
 
@@ -147,6 +147,40 @@ import Layout from '../../layouts/Layout.astro';
           </p>
           <p>
             Having six publishers didn&rsquo;t prevent this. Having six <em>active</em> publishers would have.
+          </p>
+
+          <hr class="essay-divider" />
+
+          <h2>Update &mdash; June 17, 20:30 UTC</h2>
+
+          <p>
+            Five hours and forty minutes after this post was published, publisher lifecycle scoring shipped. The &ldquo;dimension we don&rsquo;t measure yet&rdquo; section above is now obsolete. Same day.
+          </p>
+          <p>
+            Re-running the audit against <code>@mastra/core</code> now returns a new field, <code>publisherLifecycle</code>, that cross-references per-version <code>_npmUser</code> data with the package&rsquo;s current maintainers list. Two numbers matter: how many publishers went dormant and kept their scope access (<code>dormantWithAccess</code>), and how many went dormant after access was revoked (<code>dormantRevoked</code>). The first is a live attack surface. The second is closed.
+          </p>
+
+          <div class="table-wrapper">
+            <table>
+              <thead>
+                <tr><th>Package</th><th>Active</th><th>Dormant &middot; access</th><th>Dormant &middot; revoked</th><th>Active ratio</th></tr>
+              </thead>
+              <tbody>
+                <tr><td><code>@mastra/core</code></td><td>1</td><td><strong>3</strong></td><td>4</td><td>12.5%</td></tr>
+                <tr><td><code>mastra</code></td><td>1</td><td><strong>4</strong></td><td>3</td><td>12.5%</td></tr>
+                <tr><td><code>create-mastra</code></td><td>1</td><td><strong>1</strong></td><td>0</td><td>50%</td></tr>
+              </tbody>
+            </table>
+          </div>
+
+          <p>
+            <code>ehindero</code>, the account used in this attack, now reads <code>hasCurrentAccess: false</code> &mdash; the Mastra team revoked it during incident response. Good. But three <em>other</em> publishers on <code>@mastra/core</code> still hold scope access despite 16&ndash;20 months of inactivity: <code>calcsam</code> (20mo), <code>smthomas</code> (16mo), <code>abhiaiyer</code> (16mo). Same shape as <code>ehindero</code> a week ago. Same access path. None compromised yet, none verified-safe.
+          </p>
+          <p>
+            The new field is live behind every audit. Score the same package today and the JSON response includes a <code>riskFlags</code> entry: <em>&ldquo;WARN: 3 dormant publishers with current scope access &mdash; calcsam (20mo inactive), smthomas (16mo inactive), abhiaiyer (16mo inactive).&rdquo;</em> No new lockfile required. No setup. The signal was always in the data; the model now reads it.
+          </p>
+          <p>
+            <a href="/audit?packages=@mastra/core,mastra,create-mastra&ecosystem=npm&ref=blog-mastra-update">Re-run the audit &rarr;</a>
           </p>
 
           <hr class="essay-divider" />
