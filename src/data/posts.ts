@@ -15,6 +15,30 @@ export interface Post {
 // Sorted newest first
 export const posts: Post[] = [
   {
+    slug: 'mastra-dormant-publisher-attack',
+    title: 'A Dormant npm Account Just Compromised 141 Mastra Packages in 88 Minutes',
+    description: "The @mastra scope was hijacked through a forgotten contributor account with stale publish access. The injected dependency scored 30 on Commit. The package it cloned scored 90. That 60-point gap was readable before the attack.",
+    date: '2026-06-17',
+    dateLabel: 'June 17, 2026',
+    relatedSlugs: [
+      'axios-attack-prediction',
+      'shai-hulud-claude-code-hook',
+      'two-attacks-one-week',
+    ],
+  },
+  {
+    slug: 'nvidia-skillspector-runtime-trust-gap',
+    title: 'NVIDIA SkillSpector and the Runtime Trust Gap',
+    description: "NVIDIA open-sourced a static security scanner for AI agent skills. We pointed it at 30 production skills and got CRITICAL/100. Then we read the findings. Eight of eleven HIGHs were structural false positives. Static analysis can't see trust context, and that's not a bug.",
+    date: '2026-06-16',
+    dateLabel: 'June 16, 2026',
+    relatedSlugs: [
+      'unit42-80-percent-agent-skills-lie',
+      'declarations-are-gameable',
+      'scoring-methodology',
+    ],
+  },
+  {
     slug: 'atomic-arch-targets-bun',
     title: 'Atomic Arch Targets Bun. The Entry Point Was AUR.',
     description: "1,500 Arch Linux packages hijacked to inject three malicious npm dependencies. Wave 2 adds Bun-specific install paths — the runtime check explicitly branches for Bun. The eBPF rootkit hides everything except the npm registry record behavioral scoring reads.",
