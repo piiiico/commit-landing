@@ -126,6 +126,38 @@ import Layout from '../layouts/Layout.astro';
 
   <hr class="section-divider" />
 
+  <!-- Ecosystem response: PostCSS adopted June 19, preact already shipped — independently detected -->
+  <section style="padding: var(--space-section) 0;">
+    <div class="container">
+      <p class="section-label">Ecosystem response</p>
+      <div class="editorial reveal" style="max-width: var(--max-content);">
+        <h2 style="margin-bottom: 0.75rem;">Maintainers are moving. The detector confirms it live.</h2>
+        <p style="margin-bottom: 1.5rem; font-size: 1rem; color: var(--ink-muted);">
+          PostCSS creator Andrey Sitnik moved nanoid and nanospy to Staged Publishing on June 19. preact shipped the same hardening earlier — without announcement. Two packages, ~892M weekly downloads, both verified by our detector.
+        </p>
+        <blockquote style="border-left: 3px solid var(--ink); margin: 0 0 1.5rem; padding: 0.75rem 0 0.75rem 1.5rem; font-size: 1.05rem; font-style: italic; color: var(--ink); line-height: 1.65;">
+          "I already moved nanoid and nanospy to the new process, we can test them."
+          <cite style="display: block; margin-top: 0.6rem; font-size: 0.82rem; font-style: normal; color: var(--ink-muted); font-weight: 500;">
+            — Andrey Sitnik, PostCSS creator ·
+            <a href="https://github.com/postcss/postcss/issues/2096" target="_blank" rel="noopener" style="color: var(--ink-muted); text-decoration: underline; text-underline-offset: 2px;">postcss/postcss#2096</a>
+            · June 2026
+          </cite>
+        </blockquote>
+        <p style="font-size: 0.9rem; color: var(--ink-muted); line-height: 1.6;">
+          Verify it yourself:
+          <a href="/scan/?pkg=nanoid&utm_source=pricing-ecosystem" style="color: var(--ink); text-decoration: underline; text-underline-offset: 2px;">scan nanoid</a>
+          ·
+          <a href="/scan/?pkg=preact&utm_source=pricing-ecosystem" style="color: var(--ink); text-decoration: underline; text-underline-offset: 2px;">scan preact</a>
+          ·
+          <a href="/scan/?pkg=postcss&utm_source=pricing-ecosystem" style="color: var(--ink); text-decoration: underline; text-underline-offset: 2px;">scan postcss</a>
+          (PostCSS itself is in flight — "in a week or two", per the thread). Monitoring flags when each promotes from <code style="font-size: 0.85em;">stage</code> to <code style="font-size: 0.85em;">latest</code>. The score moves before the install does.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <hr class="section-divider" />
+
   <!-- Pricing tiers -->
   <section class="tiers-section">
     <div class="container">
