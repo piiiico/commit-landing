@@ -107,6 +107,15 @@ import Layout from '../../layouts/Layout.astro';
         </div>
       </div>
 
+      <!-- Watch this package CTA (conversion edge) -->
+      <div class="watch-cta" id="watch-cta" hidden>
+        <div class="watch-cta-text">
+          <h3 class="watch-cta-title">Add <span id="watch-pkg-name">this package</span> to your watchlist</h3>
+          <p class="watch-cta-sub">Get an email or Slack ping when the score drops or a maintainer leaves. From $15/mo.</p>
+        </div>
+        <a href="/pricing" class="watch-cta-btn" id="watch-cta-link">Start monitoring →</a>
+      </div>
+
       <!-- Scan another -->
       <div class="scan-another">
         <div class="scan-input-row">
@@ -529,6 +538,60 @@ import Layout from '../../layouts/Layout.astro';
 
     .btn-scan:hover { background: var(--accent-dim); }
 
+    /* ── Watch CTA (conversion edge) ── */
+    .watch-cta {
+      max-width: 48rem;
+      margin: 0 auto 2rem;
+      padding: 1.5rem 1.75rem;
+      background: var(--paper);
+      border: 1px solid var(--accent);
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      gap: 1.5rem;
+      flex-wrap: wrap;
+      justify-content: space-between;
+    }
+
+    .watch-cta-text {
+      flex: 1 1 20rem;
+      min-width: 0;
+    }
+
+    .watch-cta-title {
+      font-size: 1.1rem;
+      margin: 0 0 0.4rem;
+      color: var(--ink);
+      font-weight: 600;
+    }
+
+    .watch-cta-sub {
+      font-size: 0.9rem;
+      color: var(--ink-muted);
+      margin: 0;
+      line-height: 1.5;
+    }
+
+    .watch-cta-btn {
+      display: inline-block;
+      padding: 0.75rem 1.5rem;
+      background: var(--accent);
+      color: white;
+      text-decoration: none;
+      border-radius: 4px;
+      font-weight: 500;
+      font-size: 0.95rem;
+      white-space: nowrap;
+      transition: background 0.15s;
+    }
+
+    .watch-cta-btn:hover { background: var(--accent-dim); }
+
+    @media (max-width: 540px) {
+      .watch-cta { flex-direction: column; align-items: stretch; }
+      .watch-cta-btn { text-align: center; }
+    }
+
     /* ── MCP CTA ── */
     .mcp-cta {
       max-width: 48rem;
@@ -752,6 +815,14 @@ import Layout from '../../layouts/Layout.astro';
         }).join('');
         document.getElementById('breakdown-section')!.hidden = false;
       }
+
+      // Watch CTA: populate package name + utm-tagged URL
+      const watchCta = document.getElementById('watch-cta')!;
+      const watchPkgName = document.getElementById('watch-pkg-name')!;
+      const watchCtaLink = document.getElementById('watch-cta-link') as HTMLAnchorElement;
+      watchPkgName.textContent = packageName;
+      watchCtaLink.href = `/pricing?utm_source=scan-watch&utm_medium=cta&utm_campaign=watch-cta&utm_content=${encodeURIComponent(packageName)}#developer`;
+      watchCta.hidden = false;
 
       // Risk explanations
       if (result.riskFlags && result.riskFlags.length > 0) {
