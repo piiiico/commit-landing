@@ -616,7 +616,19 @@ console.log(data.results[0].score); // 0–100 trust score</code></pre>
           'cli-watch': 'cli-watch',                    // CRITICAL non-TTY upsell + GH Actions PR-check annotation watchlist auto-seed (npm-package v1.32.0 buildWatchUrl) — 2026-06-15
           'ci-annotation': 'ci-annotation',            // GitHub Actions PR-checks rate-limit annotation (npm-package v1.31.0) — 2026-06-12
           'readme-monitoring': 'readme-monitoring',    // GitHub README CTA (proof-of-commitment/README.md) — 2026-06-13
-          'npm-readme-monitoring': 'npm-readme-monitoring', // npm package-page README CTA (npm-package/README.md) — 2026-06-13
+          'npm-readme-monitoring': 'npm-readme-monitoring', // npm package-page README CTA (worker.ts NPM_README_URL) — 2026-06-13
+          // 2026-06-20: blog-snyk-comparison has a custom HERO_BY_REF entry
+          // (line 464 — snyk-comparison hero references the audited package),
+          // and the parity check (scripts/check-funnel-surface-parity.ts)
+          // requires every CUSTOM-hero ref to have an explicit REF_TO_SOURCE
+          // entry. Pattern-admit via BLOG_REF_RE still works downstream
+          // (worker.ts /api/keys/create accepts ^blog-[a-z0-9-]{1,40}$), but
+          // an explicit entry here gives cleaner attribution and satisfies
+          // the parity gate. Surfaced when the parity-check inBlock window
+          // was tightened to anchor on `const ${blockName}` — pre-fix the
+          // check spuriously passed because the indexOf landed on a comment
+          // and scanned a wider window that picked up unrelated mentions.
+          'blog-snyk-comparison': 'blog-snyk-comparison', // Snyk comparison series (snyk-scores-{chalk,lodash}-*-we-score-it-critical.astro) — 2026-06-14
         };
         const params = new URLSearchParams(window.location.search);
         const refParam = params.get('ref') ?? '';

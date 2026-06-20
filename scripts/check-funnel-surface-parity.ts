@@ -207,12 +207,26 @@ const allRefs = new Set([...getStartedRefs, ...pricingRefs, ...blogRefsWithCusto
 // ── Gate check helpers ───────────────────────────────────────────────────────
 /** Check whether a quoted key appears in a named record literal in source. */
 function inBlock(src: string, blockName: string, key: string): boolean {
-  // Find the block by name, then look for the quoted key within it.
-  const blockStart = src.indexOf(`${blockName}`);
+  // 2026-06-20: prefer the `const ${blockName}` declaration position so
+  // doc-comments referencing the block above its declaration (existing
+  // pricing.astro pattern — comments at lines 867/1101/1160 reference
+  // CONTEXT_BY_CAMPAIGN before the actual declaration at line 1019) do
+  // not eat into the window. Pre-this-fix the first indexOf landed on
+  // a comment, and additions to CONTEXT_BY_CAMPAIGN that pushed late
+  // entries (welcome-upgrade, checkout-recovery) past 20k chars made
+  // the parity check spuriously claim they were MISSING when they were
+  // present but out-of-window. Mirrors the inValidSources anchor
+  // (`const VALID_SOURCES`) pattern above for symmetry. Fall back to
+  // bare indexOf for blocks declared without `const` if any are added
+  // in the future.
+  const declStart = src.indexOf(`const ${blockName}`);
+  const blockStart = declStart !== -1 ? declStart : src.indexOf(`${blockName}`);
   if (blockStart === -1) return false;
-  // Scan forward until we find a balanced closing brace for the block.
-  // Simple heuristic: look for the key within 20k chars of the block start.
-  const window = src.slice(blockStart, blockStart + 20_000);
+  // 2026-06-20: window 20k → 30k. CONTEXT_BY_CAMPAIGN reached 22k chars
+  // when the watch-cta variant + buildWatchCtaMsg helper landed; 30k
+  // leaves ~8k headroom for the next variants without re-touching the
+  // gate.
+  const window = src.slice(blockStart, blockStart + 30_000);
   // Accept both single and double quotes.
   return window.includes(`'${key}'`) || window.includes(`"${key}"`);
 }
