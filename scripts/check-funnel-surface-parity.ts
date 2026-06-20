@@ -42,11 +42,31 @@
  * Bearer". Sites 5-6 added so the next custom-hero ref can't ship that
  * inconsistency unnoticed.
  *
+ * 2026-06-20 (10th+ occurrence): orphan-campaign-from-astro-page. The
+ * 06:30Z /scan/ Watch CTA + 07:21Z /pricing/ banner pair (same author,
+ * same morning) shipped utm_campaign=watch-cta from src/pages/scan/index.astro
+ * — and only the second commit added the CONTEXT_BY_CAMPAIGN variant. The
+ * gate ran green throughout because it only scanned npm-package/index.js +
+ * worker.ts + get-started.astro data-utm-campaign. Astro pages other than
+ * blog (which has its own ref scan) and the gate sites themselves were
+ * invisible. Today's dogfood also surfaced TWO LATENT orphans the gate
+ * had silently allowed for weeks: github-audit-429 (audit.astro:2414,2421
+ * — GitHub repo audit 429-rescue CTA, silent banner since 2026-06-01) and
+ * staged-publishing-blog (blog/staged-publishing-detection.astro:162 —
+ * staged-publishing pitch CTA, silent banner since publish). Extending
+ * the scan to all src/pages/<not pricing,not get-started>.astro catches
+ * the recurrence class at build time. CLAUDE.md skill→code escalation
+ * triggered: pattern has recurred 10+ times since 2026-05-23; the gate
+ * existed for 9 of those but didn't cover astro emitters; moving the
+ * coverage to the default execution path makes bypass require explicit
+ * opt-out (e.g. removing the glob), not accidental file-placement.
+ *
  * SCOPE: literal URL strings in npm-package/index.js + README.md +
- *        npm-package/README.md. No AST parsing, no generalising beyond 4 gates.
+ *        npm-package/README.md + src/pages/<all non-gate-site>.astro. No
+ *        AST parsing, no generalising beyond 4 gates.
  */
 
-import { readFileSync, readdirSync } from "fs";
+import { readFileSync, readdirSync, statSync } from "fs";
 import { join, resolve } from "path";
 
 // ── Paths ────────────────────────────────────────────────────────────────────
@@ -58,6 +78,7 @@ const GET_STARTED = join(ROOT, "commit-landing-v2/src/pages/get-started.astro");
 const PRICING   = join(ROOT, "commit-landing-v2/src/pages/pricing.astro");
 const WORKER    = join(ROOT, "proof-of-commitment/src/backend/worker.ts");
 const BLOG_DIR  = join(ROOT, "commit-landing-v2/src/pages/blog");
+const PAGES_DIR = join(ROOT, "commit-landing-v2/src/pages");
 
 // ── Read sources ─────────────────────────────────────────────────────────────
 const npmSrc    = readFileSync(NPM_PKG, "utf8");
@@ -82,6 +103,45 @@ try {
   }
 } catch {
   // BLOG_DIR may not exist in some checkouts; gate degrades to pre-2026-06-15 scope.
+}
+
+// 2026-06-20: ALL non-gate-site astro pages under src/pages/ get scanned
+// for utm_campaign emitters. Pricing.astro is excluded — it IS the
+// CONTEXT_BY_CAMPAIGN home, and its utm_campaign mentions are exclusively
+// in doc-comments (which would force comment text and CONTEXT_BY_CAMPAIGN
+// keys to stay in sync — fragile). Get-started.astro is excluded for the
+// same reason (it's the HERO_BY_REF / REF_TO_SOURCE / data-utm-campaign
+// home and already scanned by dedicated logic above). Anything else under
+// src/pages/ — scan/, audit.astro, dashboard.astro, blog/, compare/,
+// companions/, forensics/, watchlist/, etc. — must surface its
+// utm_campaign emitters through the CONTEXT_BY_CAMPAIGN gate or the
+// banner stays silent on /pricing for the cohort arriving via that page.
+function walkAstroFiles(dir: string): string[] {
+  const found: string[] = [];
+  try {
+    for (const entry of readdirSync(dir)) {
+      const full = join(dir, entry);
+      const stat = statSync(full);
+      if (stat.isDirectory()) {
+        found.push(...walkAstroFiles(full));
+      } else if (entry.endsWith(".astro")) {
+        found.push(full);
+      }
+    }
+  } catch {
+    // dir may not exist in some checkouts; degrade quietly.
+  }
+  return found;
+}
+
+const PAGE_SCAN_EXCLUDE = new Set<string>([
+  join(PAGES_DIR, "pricing.astro"),     // CONTEXT_BY_CAMPAIGN home — its mentions are comments
+  join(PAGES_DIR, "get-started.astro"), // dedicated data-utm-campaign scan above
+]);
+const pageSrcs: { file: string; content: string }[] = [];
+for (const full of walkAstroFiles(PAGES_DIR)) {
+  if (PAGE_SCAN_EXCLUDE.has(full)) continue;
+  pageSrcs.push({ file: full, content: readFileSync(full, "utf8") });
 }
 
 // ── Extract refs from emitter surfaces ───────────────────────────────────────
@@ -171,6 +231,26 @@ for (const src of [workerSrc]) {
 for (const src of [gsSrc]) {
   dataAttrRe.lastIndex = 0;
   while ((m = dataAttrRe.exec(src)) !== null) pricingCampaigns.add(m[1]);
+}
+
+// 2026-06-20: scan all non-gate-site astro pages (scan/, audit, dashboard,
+// blog/, compare/, companions/, forensics/, watchlist/, etc.) for
+// utm_campaign emitters. The morning's /scan/ Watch CTA orphan was the
+// trigger; the same pass surfaced TWO latent orphans (github-audit-429 from
+// audit.astro and staged-publishing-blog from blog/staged-publishing-detection.astro)
+// the prior gate had silently allowed.
+// We also collect a per-page index so the gap report can name the source
+// file — useful when the same campaign string is correct on one page and
+// missing on another, or when triaging "where did this campaign come from?".
+const pageCampaignSources = new Map<string, Set<string>>(); // campaign → set of files
+for (const { file, content } of pageSrcs) {
+  priceCampaignRe.lastIndex = 0;
+  while ((m = priceCampaignRe.exec(content)) !== null) {
+    const campaign = m[1];
+    pricingCampaigns.add(campaign);
+    if (!pageCampaignSources.has(campaign)) pageCampaignSources.set(campaign, new Set());
+    pageCampaignSources.get(campaign)!.add(file);
+  }
 }
 
 // 2026-06-15: scan blog posts for ref=blog-<slug>. These refs are
@@ -333,12 +413,19 @@ for (const ref of pricingRefs) {
 }
 
 // utm_campaign coverage — every campaign emitted toward /pricing in
-// worker.ts or npm-package/index.js must have a banner variant. Missing
-// = silent banner on highest-intent surfaces. See 2026-06-15 fix for
-// rationale; this check is the recurrence intercept.
+// worker.ts, npm-package/index.js, get-started.astro data-utm-campaign,
+// OR any non-gate-site src/pages/<page>.astro must have a banner variant.
+// Missing = silent banner on highest-intent surfaces. See 2026-06-15 fix
+// (orphan-banner class 9) and 2026-06-20 extension (orphan-banner class 10:
+// astro pages) for rationale; this check is the recurrence intercept.
 for (const campaign of pricingCampaigns) {
-  if (!inBlock(priceSrc, "CONTEXT_BY_CAMPAIGN", campaign))
-    gaps.push(`MISSING: pricing.astro CONTEXT_BY_CAMPAIGN['${campaign}'] (utm_campaign emitted by worker.ts or npm-package/index.js)`);
+  if (!inBlock(priceSrc, "CONTEXT_BY_CAMPAIGN", campaign)) {
+    const astroSources = pageCampaignSources.get(campaign);
+    const src = astroSources
+      ? `astro page(s) ${[...astroSources].map((f) => f.replace(ROOT + "/", "")).join(", ")}`
+      : `worker.ts, npm-package/index.js, or get-started.astro data-utm-campaign`;
+    gaps.push(`MISSING: pricing.astro CONTEXT_BY_CAMPAIGN['${campaign}'] (utm_campaign emitted by ${src})`);
+  }
 }
 
 for (const ref of allRefs) {
@@ -398,7 +485,14 @@ for (const ref of getStartedRefs) {
 console.log(`Funnel surface parity check`);
 console.log(`  npm-package refs → get-started:   [${[...getStartedRefs].join(", ")}]`);
 console.log(`  npm-package refs → pricing:       [${[...pricingRefs].join(", ")}]`);
-console.log(`  worker+cli utm_campaign → pricing: [${[...pricingCampaigns].join(", ")}]`);
+console.log(`  worker+cli+pages utm_campaign → pricing: [${[...pricingCampaigns].join(", ")}]`);
+if (pageCampaignSources.size > 0) {
+  console.log(`  astro page utm_campaign emitters:`);
+  for (const [campaign, files] of pageCampaignSources) {
+    const fileNames = [...files].map((f) => f.replace(ROOT + "/", "")).join(", ");
+    console.log(`    ${campaign} ← ${fileNames}`);
+  }
+}
 console.log(`  blog → get-started (custom hero): [${[...blogRefsWithCustomHero].join(", ")}]`);
 console.log(`  blog → get-started (fallback):    [${[...blogRefsViaFallback].join(", ")}]`);
 console.log();

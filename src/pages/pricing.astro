@@ -1172,6 +1172,32 @@ import Layout from '../layouts/Layout.astro';
           eyebrow: 'From your package scan',
           msg: buildWatchCtaMsg(),
         },
+        // 2026-06-20: github-audit-429 — surfaced as latent orphan banner by
+        // the extended check-funnel-surface-parity.ts astro-page scan. Emitted
+        // by audit.astro:2414,2421 when an anonymous IP hits the 2/day free
+        // GitHub repo audit hard limit and clicks "Unlock GitHub audits". The
+        // rescue CTA has been live since 2026-06-01 — silent banner the whole
+        // time. Visitor has already typed a repo URL, watched the audit start,
+        // hit the wall, AND clicked Upgrade: highest-intent surface in the
+        // GitHub funnel. Pitch Developer ($15/mo, 50 repos/month) explicitly
+        // since the free wall is the entire reason they're here; mention Pro
+        // ($29/mo, 500/month) for visitors who already know they need more.
+        'github-audit-429': {
+          eyebrow: 'From your GitHub repo audit',
+          msg: 'You hit the free-tier limit on GitHub repo audits today (2/day for anonymous). Developer ($15/mo) gives 50 whole-repo audits/month plus 1,000 single-package audits/day, batches up to 5 packages per call, watches 15 packages with daily re-scans, and emails you the moment any score drops a tier. Pro ($29/mo) raises repo audits to 500/month. 30-day money-back guarantee.',
+        },
+        // 2026-06-20: staged-publishing-blog — surfaced as latent orphan banner
+        // by the extended check-funnel-surface-parity.ts astro-page scan.
+        // Emitted by blog/staged-publishing-detection.astro:162 in the
+        // post-body "<a>Developer ($15/mo)</a>" inline CTA. Blog readers who
+        // click through have just absorbed the staged-publishing thesis (the
+        // strongest differentiator vs Snyk/Socket): catch attacks in the
+        // staging window before the version reaches their tree. Banner echoes
+        // that thesis instead of pivoting to generic feature copy.
+        'staged-publishing-blog': {
+          eyebrow: 'From the staged-publishing post',
+          msg: 'You read why staged publishing changes who sees an attack first. Developer ($15/mo) watches 15 packages with daily re-scans, surfaces staging-window detections the same hour they\'re published (not after they reach your install command), and emails you within minutes the moment any score drops a tier. 30-day money-back guarantee.',
+        },
       };
       const variant = CONTEXT_BY_CAMPAIGN[campaign];
       if (!variant) return;
