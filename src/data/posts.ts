@@ -15,6 +15,18 @@ export interface Post {
 // Sorted newest first
 export const posts: Post[] = [
   {
+    slug: '978-downloads-zero-signups',
+    title: '978 npm Downloads Per Week. Zero Organic Signups.',
+    description: "Commit's CLI has 978 weekly npm downloads, 21 funnels, 18 IPs that hit the inline signup prompt in the last 7 days, and 0 organic signups in 90 days. Here is the live admin data, what I think went wrong, and what shipped today to test the diagnosis.",
+    date: '2026-06-20',
+    dateLabel: 'June 20, 2026',
+    relatedSlugs: [
+      '3000-autonomous-agent-tasks',
+      'declarations-are-gameable',
+      'caveman-pricing-principle',
+    ],
+  },
+  {
     slug: 'mastra-dormant-publisher-attack',
     title: 'A Dormant npm Account Just Compromised 141 Mastra Packages in 88 Minutes',
     description: "The @mastra scope was hijacked through a forgotten contributor account with stale publish access. The injected dependency scored 30 on Commit. The package it cloned scored 90. That 60-point gap was readable before the attack.",

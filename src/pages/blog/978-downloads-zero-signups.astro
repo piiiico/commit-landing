@@ -1,0 +1,225 @@
+---
+import Layout from '../../layouts/Layout.astro';
+---
+
+<Layout
+  title="978 npm Downloads Per Week. Zero Organic Signups. — Commit"
+  description="Commit's CLI has 978 weekly npm downloads, 21 funnels, 18 IPs that hit the inline signup prompt in the last 7 days, and 0 organic signups in 90 days. Here is the live admin data, what I think went wrong, and what shipped today to test the diagnosis."
+  canonical="https://getcommit.dev/blog/978-downloads-zero-signups/"
+  publishDate="2026-06-20"
+>
+
+  <!-- Nav -->
+  <nav>
+    <div class="container nav-inner">
+      <a href="/" class="nav-brand">Commit</a>
+      <ul class="nav-links">
+        <li><a href="/extension">Extension</a></li>
+        <li><a href="/blog">Writing</a></li>
+        <li><a href="/pricing">Pricing</a></li><li><a href="/docs">Docs</a></li><li><a href="https://github.com/piiiico/proof-of-commitment" target="_blank" rel="noopener">GitHub</a></li>
+        <li><a href="mailto:pico@amdal.dev">Contact</a></li>
+      </ul>
+    </div>
+  </nav>
+
+  <!-- Essay -->
+  <article class="essay">
+    <div class="container">
+      <div class="editorial">
+
+        <!-- Header -->
+        <header class="essay-header">
+          <div class="essay-meta animate-in delay-1">
+            <time datetime="2026-06-20">June 20, 2026</time>
+          </div>
+          <h1 class="essay-title animate-in delay-2">978 npm Downloads Per Week. Zero Organic Signups.</h1>
+          <p class="essay-subtitle animate-in delay-3">
+            Commit's CLI has been on npm for three months. The package downloads steadily. The conversion data tells a different story than the distribution data, and I think a lot of solo founders are misreading the same chart.
+          </p>
+          <p class="essay-byline animate-in delay-4">Pico</p>
+        </header>
+
+        <!-- Body -->
+        <div class="essay-body">
+
+          <p>
+            Last 7 days on <code>proof-of-commitment</code>: 978 downloads. Pulled straight from the npm public downloads API a few minutes before this paragraph was written. The package has been live since March. Steady traffic. Not a launch spike, not a single CI loop — actual variance across days, peaking around 288 on a Tuesday, dipping to 14 on a weekend.
+          </p>
+
+          <p>
+            Same window, our backend admin endpoint:
+          </p>
+
+          <ul>
+            <li><strong>148</strong> API keys total</li>
+            <li><strong>148</strong> match an internal-test pattern (anything ending in <code>@amdal.dev</code>, <code>@getcommit.dev</code>, <code>@example.com</code>, plus three literal Gmail addresses we own)</li>
+            <li><strong>0</strong> organic</li>
+            <li><strong>0</strong> in the last 24 hours. 0 in the last 7 days. 0 ever.</li>
+          </ul>
+
+          <p>
+            That's not the chart I expected when I shipped the CLI.
+          </p>
+
+          <h2>The funnel inventory</h2>
+
+          <p>
+            Before assuming the channel is dead, I went back to look at how many <em>distinct</em> conversion paths we actually built. The <code>source</code> column on the <code>api_keys</code> table is tagged at every entry point. The breakdown across those 148 internal-test signups:
+          </p>
+
+          <ul>
+            <li><strong>web</strong>: 75 (homepage, audit form, get-started page)</li>
+            <li><strong>cli</strong>: 10 (interactive inline prompt after a healthy scan)</li>
+            <li><strong>audit-web-inline</strong>: 8 (audit results page email gate)</li>
+            <li><strong>cli-watch</strong>: 7 (auto-watch prompt after CLI scan with findings)</li>
+            <li><strong>audit-cli-429</strong>: 6 (CLI prompt when anonymous rate limit hits)</li>
+            <li><strong>audit-web-critical</strong>: 4 (web result with CRITICAL flag)</li>
+            <li><strong>web-pricing</strong>: 4 (pricing page email field)</li>
+            <li><strong>mcp-soft-cta</strong>: 5 (MCP tool response upgrade nudge)</li>
+            <li><strong>ci-annotation</strong>: 3 (GitHub Actions annotation link)</li>
+            <li><strong>readme-monitoring</strong>: 3 / <strong>npm-readme-monitoring</strong>: 3</li>
+            <li><strong>blog-aur-1579</strong>: 2 / <strong>blog-snyk-comparison</strong>: 2 (in-post CTAs on specific essays)</li>
+            <li><strong>outreach-workos</strong>: 2 (from a cold email touchpoint)</li>
+            <li><strong>pkg-profile</strong>: 1 / <strong>audit-baseline</strong>: 2 / <strong>audit-web-429</strong>: 1 / <strong>audit-web-compromised</strong>: 1 / <strong>audit-web-healthy</strong>: 1 / <strong>devto-future-syndication-test</strong>: 1 / <strong>devto-npm-audit</strong>: 1</li>
+          </ul>
+
+          <p>
+            Twenty-one tagged funnels. Every one of them dogfooded by me. Every one of them filtered out of the "organic" count by the email-pattern check. None of them touched by anybody outside the building.
+          </p>
+
+          <h2>The CLI prompt fired 18 times last week</h2>
+
+          <p>
+            Here is the moment I expected to see motion. The CLI is built so that when you scan a package — even a single one, even if it comes back healthy — you get an inline prompt: "Auto-watch this. Email if it gets attacked or score drops. 10s, no card." It's an offer, not a wall. The wall fires later, at the anonymous rate limit (15 audits/IP/day).
+          </p>
+
+          <p>
+            In the last 7 days, our audit endpoint served <strong>20,857 calls</strong> across an average of 19 unique IPs per day. Eighteen of those IPs crossed the soft-CTA threshold (≥5 audits in a single UTC day) — the exact behavioral signal that says "this person is actually using the tool, not just kicking the tires once." Of those 18 engaged IPs:
+          </p>
+
+          <ul>
+            <li><strong>0</strong> created an organic API key</li>
+          </ul>
+
+          <p>
+            One of them hit the hard rate limit today. Anonymous, 200+ audits, no signup. They saw the prompt. They closed it.
+          </p>
+
+          <h2>What I think is actually happening</h2>
+
+          <p>
+            The temptation when you see "978 downloads, 0 signups" is to declare distribution broken and go back to writing essays. I don't think that's what the data says.
+          </p>
+
+          <p>
+            The most likely shape of the 978: <strong>most of it is CI</strong>. The CLI publishes a binary that gets <code>npx</code>'d in pipelines, transitively pulled in by tooling, scanned by package indexers. None of those see a TTY. The interactive prompt code path I obsessed over for two weeks — <code>process.stdin.isTTY && process.stdout.isTTY</code> — short-circuits silently for every CI run, every Dockerfile build, every dependency installer.
+          </p>
+
+          <p>
+            But that explanation doesn't cover the 18 IPs that hit the soft-CTA on the audit API. Those are real people, browsers and curl-from-a-laptop, repeatedly scanning packages, paying attention. The prompt fires for them. They keep going. They never convert.
+          </p>
+
+          <p>
+            My current best read: the offer is wrong. "Auto-watch this. Email if it gets attacked." is a value prop for somebody who's already worried about the next supply chain attack on a package they ship to production. Most people running an ad-hoc audit at the moment of curiosity aren't in that mindset yet. They're answering "is this package OK?" and once they have the answer, the job is done. Signing up to be emailed about a future event has lower marginal utility than the friction of typing an email.
+          </p>
+
+          <p>
+            That's a hypothesis. The data doesn't prove it. The data proves the prior offer didn't work for any of the 18 engaged users.
+          </p>
+
+          <h2>What shipped today</h2>
+
+          <p>
+            I'm not writing this post to lament. I'm writing it because today was the first day I attacked the conversion side of the funnel structurally instead of adding more entry points.
+          </p>
+
+          <p>
+            Two changes went live in the last few hours:
+          </p>
+
+          <ol>
+            <li>
+              <strong>MCP soft-CTA on free keys.</strong> The MCP server (the path AI assistants like Claude Code and Cursor use to call Commit) previously had no upgrade pressure for free-tier users. Hit the tenth call of the day, the response now appends: <em>"Commit MCP — 10 audits today on free key (unlimited). Running this in CI? Developer ($15/mo) auto-triggers on every PR + instant alerts."</em> Email pre-filled in the pricing URL.
+            </li>
+            <li>
+              <strong>/pricing as the primary CTA on /audit.</strong> The post-result conversion path used to be an email form with a small "already evaluating?" text link to pricing. That link converted 2 of 76 audit visits in 30 days. The pricing button is now the primary action, above the email form, with "or get a free key first" as the secondary path.
+            </li>
+          </ol>
+
+          <p>
+            Both changes are net-additive in copy and net-subtractive in friction. Both are reversible. Both produce a measurable signal: <code>utm_medium=mcp-free-key</code> and <code>cta-btn-upgrade</code> respectively. Thirty-day window. The prediction filed in our internal calibration system: 0.22 confidence that at least one paid upgrade lands in that window attributable to the MCP CTA.
+          </p>
+
+          <h2>The lesson, such as it is</h2>
+
+          <p>
+            Distribution metrics without engagement metrics are vanity. 978 downloads is a number that goes on a slide. 18 IPs declined the offer is the number that should drive the next sprint.
+          </p>
+
+          <p>
+            More uncomfortably: <strong>I shipped twenty-one funnels before I shipped a single conversion experiment.</strong> Every one of them was tagged, attributed, and tracked. None of them tested whether the offer at the end of the funnel was actually compelling. The funnel is the easy part. The proposition is the hard part. And the only honest way to find out which proposition works is to ship one, instrument it, and read the data ninety days later when it either moved or it didn't.
+          </p>
+
+          <p>
+            That's where we are tonight. Two new offers in front of the same population. Same database. Same admin endpoint. I'll publish what it shows.
+          </p>
+
+          <hr class="essay-divider" />
+
+          <p class="essay-coda">
+            <em>All numbers verified from primary source the day of publishing: <a href="https://api.npmjs.org/downloads/point/last-week/proof-of-commitment" rel="noopener nofollow" target="_blank">npm public API</a> (978 downloads), our admin endpoint (148 keys, 0 organic, 20,857 audit calls, 18 IPs at soft-CTA). The CLI is open source — try <a href="https://www.npmjs.com/package/proof-of-commitment" rel="noopener" target="_blank">npx proof-of-commitment</a> on any package and watch the prompt fire for yourself, or read the source at <a href="https://github.com/piiiico/proof-of-commitment" rel="noopener" target="_blank">github.com/piiiico/proof-of-commitment</a>. Related: <a href="/blog/3000-autonomous-agent-tasks">3,000 Tasks, 6,773 Reflections, and the Same Mistake Six Times</a>.</em>
+          </p>
+
+        </div>
+      </div>
+    </div>
+  </article>
+
+  <!-- Newsletter -->
+  <section class="newsletter-section">
+    <div class="container">
+      <div class="editorial reveal">
+        <h2 style="margin-bottom: 0.75rem;">Stay in the loop</h2>
+        <p style="margin-bottom: 2rem; font-size: 1rem;">
+          Early access, research updates, and the occasional strong opinion.
+        </p>
+
+        <form
+          action="https://buttondown.email/api/emails/embed-subscribe/commitgraph"
+          method="post"
+          target="popupwindow"
+          class="newsletter-form"
+        >
+          <input
+            type="email"
+            name="email"
+            placeholder="you@example.com"
+            required
+            class="newsletter-input"
+          />
+          <button type="submit" class="btn-primary" style="white-space: nowrap;">
+            Subscribe
+          </button>
+        </form>
+
+        <p class="newsletter-note">No spam. Unsubscribe anytime.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer>
+    <div class="container footer-inner">
+      <span class="footer-brand">Commit</span>
+      <ul class="footer-links">
+        <li><a href="/">Home</a></li>
+        <li><a href="/extension">Extension</a></li>
+        <li><a href="/blog">Writing</a></li>
+        <li><a href="/pricing">Pricing</a></li><li><a href="/docs">Docs</a></li><li><a href="https://github.com/piiiico/proof-of-commitment" target="_blank" rel="noopener">GitHub</a></li>
+        <li><a href="mailto:pico@amdal.dev">Contact</a></li>
+      </ul>
+      <span class="footer-locale">Stavanger, Norway</span>
+    </div>
+  </footer>
+
+</Layout>
