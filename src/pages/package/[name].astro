@@ -19,6 +19,7 @@ const { pkg } = Astro.props;
 interface LiveData {
   score: number;
   maintainers: number;
+  githubContributors?: number;
   weeklyDownloads: number;
   ageYears: number;
   riskFlags: string[];
@@ -26,6 +27,15 @@ interface LiveData {
   scorecardScore: number | null;
   latestVersion: string | null;
   compromised?: { attack: string; date: string; url: string } | null;
+  hasProvenance?: boolean;
+  hasStagedPublishing?: boolean;
+  publisherLifecycle?: {
+    totalHistoricalPublishers: number;
+    activePublishers: number;
+    dormantWithAccess: number;
+    dormantRevoked: number;
+    activeRatio: number;
+  };
 }
 
 let live: LiveData | null = null;
@@ -52,6 +62,10 @@ const riskFlags = live?.riskFlags ?? pkg.riskFlags;
 const trend = live?.trend ?? pkg.trend;
 const scorecardScore = live?.scorecardScore ?? null;
 const compromised = live?.compromised ?? null;
+const hasProvenance = live?.hasProvenance ?? (pkg as any).hasProvenance ?? false;
+const hasStagedPublishing = live?.hasStagedPublishing ?? (pkg as any).hasStagedPublishing ?? false;
+const githubContributors = live?.githubContributors ?? (pkg as any).githubContributors ?? null;
+const dormantWithAccess = live?.publisherLifecycle?.dormantWithAccess ?? (pkg as any).dormantWithAccess ?? 0;
 const isCritical = riskFlags.some((f: string) => f.includes('CRITICAL'));
 const isHigh = riskFlags.some((f: string) => f.includes('HIGH'));
 const hasWarn = riskFlags.some((f: string) => f.includes('WARN'));
@@ -108,9 +122,10 @@ const related = rankingsData.packages
   .slice(0, 6);
 
 const pageTitle = `${pkg.name} npm Security Score: ${score}/100 ${isCritical ? '(CRITICAL)' : ''} — Commit`;
+const protectionsSuffix = hasStagedPublishing ? ' Uses staged publishing.' : hasProvenance ? ' Has build provenance.' : '';
 const pageDesc = isCritical
-  ? `${pkg.name} scores ${score}/100 but is flagged CRITICAL: ${maintainers} npm publisher, ${fmtDownloads(downloads)} weekly downloads. One compromised credential = supply chain attack. See the full behavioral analysis.`
-  : `${pkg.name} scores ${score}/100 on behavioral trust signals. ${maintainers} npm publisher${maintainers > 1 ? 's' : ''}, ${fmtDownloads(downloads)} weekly downloads, ${ageYears.toFixed(1)} years old. Full supply chain risk profile.`;
+  ? `${pkg.name} scores ${score}/100 but is flagged CRITICAL: ${maintainers} npm publisher, ${fmtDownloads(downloads)} weekly downloads. One compromised credential = supply chain attack.${protectionsSuffix} Full behavioral analysis.`
+  : `${pkg.name} scores ${score}/100 on behavioral trust signals. ${maintainers} npm publisher${maintainers > 1 ? 's' : ''}, ${fmtDownloads(downloads)} weekly downloads, ${ageYears.toFixed(1)} years old.${protectionsSuffix} Full supply chain risk profile.`;
 
 const npmUrl = pkg.name.startsWith('@')
   ? `https://www.npmjs.com/package/${pkg.name}`
@@ -289,6 +304,34 @@ const jsonLd = JSON.stringify({
             <div class="metric-note">Week-over-week trajectory</div>
           </div>
         )}
+        {githubContributors !== null && githubContributors > 0 && (
+          <div class="metric-card">
+            <div class="metric-value">{githubContributors}</div>
+            <div class="metric-label">GitHub contributors</div>
+            <div class="metric-note">{maintainers === 1 && githubContributors > 5 ? 'Many contributors, single publisher' : 'Source code contributors'}</div>
+          </div>
+        )}
+      </div>
+
+      {/* Supply chain protections */}
+      <div class="protections-row">
+        <div class={`protection-badge ${hasProvenance ? 'protection-active' : 'protection-missing'}`}>
+          <span class="protection-icon">{hasProvenance ? '🔐' : '—'}</span>
+          <span class="protection-label">Provenance</span>
+          <span class="protection-status">{hasProvenance ? 'Verified' : 'Not enabled'}</span>
+        </div>
+        <div class={`protection-badge ${hasStagedPublishing ? 'protection-active' : 'protection-missing'}`}>
+          <span class="protection-icon">{hasStagedPublishing ? '🛡️' : '—'}</span>
+          <span class="protection-label">Staged Publishing</span>
+          <span class="protection-status">{hasStagedPublishing ? 'Enabled' : 'Not enabled'}</span>
+        </div>
+        {dormantWithAccess > 0 && (
+          <div class="protection-badge protection-warning">
+            <span class="protection-icon">⚠️</span>
+            <span class="protection-label">Dormant Access</span>
+            <span class="protection-status">{dormantWithAccess} inactive publisher{dormantWithAccess > 1 ? 's' : ''} with npm access</span>
+          </div>
+        )}
       </div>
     </div>
   </section>
@@ -317,6 +360,36 @@ const jsonLd = JSON.stringify({
           </div>
         )}
 
+        {isCritical && !hasStagedPublishing && (
+          <div class="analysis-detail">
+            <h3>What would reduce the risk?</h3>
+            <p>
+              <strong>Staged publishing</strong> adds a human approval gate between <code>npm publish</code>
+              and going live. Even with stolen CI credentials, an attacker can't push code without the
+              maintainer's explicit 2FA approval. <a href="/blog/staged-publishing-detection/">nanoid</a> and
+              <a href="https://github.com/postcss/postcss">postcss</a> already use it.
+            </p>
+            {!hasProvenance && (
+              <p>
+                <strong>Build provenance</strong> ties every published version to a specific CI run. It
+                doesn't prevent compromise, but it makes it detectable — the next <code>npm audit signatures</code>
+                catches a version published from outside CI.
+              </p>
+            )}
+          </div>
+        )}
+
+        {hasStagedPublishing && (
+          <div class="analysis-detail" style="border-color: #B8D4BC;">
+            <h3>This package uses staged publishing</h3>
+            <p>
+              Every version goes through a staging area before going live. The maintainer must explicitly
+              approve it with 2FA. This is the strongest protection npm offers against credential theft
+              attacks — even stolen CI tokens can't push code to production.
+            </p>
+          </div>
+        )}
+
         <h3>What the score measures</h3>
         <ul class="score-dimensions">
           <li><strong>Publisher depth</strong> &mdash; How many people can push to npm? Single-publisher packages are the #1 structural risk.</li>
@@ -324,6 +397,8 @@ const jsonLd = JSON.stringify({
           <li><strong>Release consistency</strong> &mdash; Regular releases signal active oversight. Long gaps mean unpatched vulnerabilities.</li>
           <li><strong>Download trend</strong> &mdash; Growing packages attract more scrutiny (and more attacks).</li>
           <li><strong>OpenSSF Scorecard</strong> &mdash; Process security: branch protection, code review, CI/CD safety.</li>
+          <li><strong>Build provenance</strong> &mdash; Published versions linked to specific CI runs via SLSA attestation.</li>
+          <li><strong>Staged publishing</strong> &mdash; Human approval gate between <code>npm publish</code> and going live.</li>
         </ul>
       </div>
     </div>
@@ -616,6 +691,67 @@ const jsonLd = JSON.stringify({
     color: var(--ink-subtle);
     margin-top: 0.35rem;
     line-height: 1.3;
+  }
+
+  /* Protections */
+  .protections-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+    max-width: var(--max-content);
+    margin: 1.5rem auto 0;
+  }
+
+  .protection-badge {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.6rem 1rem;
+    border-radius: 6px;
+    font-size: 0.82rem;
+    border: 1px solid var(--border-light);
+  }
+
+  .protection-active {
+    background: #F1F7F2;
+    border-color: #B8D4BC;
+  }
+
+  .protection-missing {
+    background: var(--paper-dim);
+    color: var(--ink-subtle);
+  }
+
+  .protection-warning {
+    background: #FFF8E1;
+    border-color: #E0CC7A;
+  }
+
+  .protection-icon {
+    font-size: 1rem;
+    flex-shrink: 0;
+  }
+
+  .protection-label {
+    font-weight: 500;
+    color: var(--ink);
+  }
+
+  .protection-missing .protection-label {
+    color: var(--ink-subtle);
+  }
+
+  .protection-status {
+    color: var(--ink-muted);
+    font-size: 0.78rem;
+  }
+
+  .protection-active .protection-status {
+    color: #4A7C59;
+  }
+
+  .protection-warning .protection-status {
+    color: #6B5900;
   }
 
   /* Analysis */

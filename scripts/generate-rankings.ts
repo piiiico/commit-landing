@@ -127,10 +127,13 @@ interface AuditResult {
   ecosystem: string;
   score: number;
   maintainers: number;
+  githubContributors?: number;
   weeklyDownloads: number;
   ageYears: number;
   trend: string;
   daysSinceLastPublish: number;
+  hasProvenance?: boolean;
+  hasStagedPublishing?: boolean;
   riskFlags: string[];
   scoreBreakdown: {
     longevity: number;
@@ -138,6 +141,15 @@ interface AuditResult {
     releaseConsistency: number;
     maintainerDepth: number;
     githubBacking: number;
+    trustedPublishing?: number;
+    stagedPublishing?: number;
+  };
+  publisherLifecycle?: {
+    totalHistoricalPublishers: number;
+    activePublishers: number;
+    dormantWithAccess: number;
+    dormantRevoked: number;
+    activeRatio: number;
   };
 }
 
@@ -273,9 +285,13 @@ async function main() {
       riskLevel: getRiskLevel(pkg.riskFlags),
       riskFlags: pkg.riskFlags,
       maintainers: pkg.maintainers,
+      githubContributors: pkg.githubContributors ?? null,
       ageYears: Math.round(pkg.ageYears * 10) / 10,
       trend: pkg.trend,
       daysSinceLastPublish: pkg.daysSinceLastPublish,
+      hasProvenance: pkg.hasProvenance ?? false,
+      hasStagedPublishing: pkg.hasStagedPublishing ?? false,
+      dormantWithAccess: pkg.publisherLifecycle?.dormantWithAccess ?? 0,
     }));
 
   // Validation: warn if >5% of packages still have 0 downloads after fix
