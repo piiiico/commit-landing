@@ -1,0 +1,219 @@
+---
+import Layout from '../../layouts/Layout.astro';
+---
+
+<Layout
+  title="nanoid Adopted Staged Publishing After a Technical Debate About CI Provenance &mdash; Commit"
+  description="Andrey Sitnik pushed back on CI provenance, argued it increases attack surface, then adopted npm Staged Publishing on nanoid (221M weekly downloads) and nanospy within hours. PostCSS is next."
+  canonical="https://getcommit.dev/blog/postcss-nanoid-staged-publishing/"
+  publishDate="2026-06-24"
+>
+
+  <!-- Nav -->
+  <nav>
+    <div class="container nav-inner">
+      <a href="/" class="nav-brand">Commit</a>
+      <ul class="nav-links">
+        <li><a href="/extension">Extension</a></li>
+        <li><a href="/blog">Writing</a></li>
+        <li><a href="/pricing">Pricing</a></li><li><a href="/docs">Docs</a></li><li><a href="https://github.com/piiiico/proof-of-commitment" target="_blank" rel="noopener">GitHub</a></li>
+        <li><a href="mailto:pico@amdal.dev">Contact</a></li>
+      </ul>
+    </div>
+  </nav>
+
+  <!-- Essay -->
+  <article class="essay">
+    <div class="container">
+      <div class="editorial">
+
+        <!-- Header -->
+        <header class="essay-header">
+          <div class="essay-meta animate-in delay-1">
+            <time datetime="2026-06-24">June 24, 2026</time>
+          </div>
+          <h1 class="essay-title animate-in delay-2">nanoid Adopted Staged Publishing After a Technical Debate About CI Provenance</h1>
+          <p class="essay-subtitle animate-in delay-3">
+            Andrey Sitnik didn&rsquo;t just accept the suggestion. He argued CI provenance makes things worse. Then he shipped the fix&nbsp;anyway.
+          </p>
+          <p class="essay-byline animate-in delay-4">Pico</p>
+        </header>
+
+        <!-- Body -->
+        <div class="essay-body">
+
+          <p>
+            On June&nbsp;18, 2026, I filed <a href="https://github.com/postcss/postcss/issues/2096" target="_blank" rel="noopener">postcss/postcss#2096</a> about OIDC provenance for PostCSS. The <code>ai</code> npm account&mdash;one person, Andrey Sitnik&mdash;publishes PostCSS, nanoid, Autoprefixer, browserslist, and caniuse-lite. Combined: over 900&nbsp;million weekly downloads through a single publish credential.
+          </p>
+
+          <p>
+            Andrey&rsquo;s first reply was not agreement. It was a correction.
+          </p>
+
+          <h2>&ldquo;CI-as-publisher increased the attack risks&rdquo;</h2>
+
+          <p>
+            From <a href="https://github.com/postcss/postcss/issues/2096#issuecomment-2881773698" target="_blank" rel="noopener">his comment</a>:
+          </p>
+
+          <blockquote>
+            <p>Provenance wouldn&rsquo;t save from all of that supply chain attack. The old CI-only based provenance was also a reason of TanStack Shai-Hulud attack.</p>
+            <p>CI-as-publisher <em>increased</em> the attack risks compared to 2FA manual publishing. TanStack was attacked only because they publish by CI and it was a token on CI.</p>
+          </blockquote>
+
+          <p>
+            He is right. TanStack&rsquo;s <a href="/blog/tanstack-mini-shai-hulud-behavioral-analysis">May&nbsp;2026 compromise</a> came through GitHub Actions cache poisoning. The attacker got an OIDC token from the CI runner and used it to publish. The provenance attestation was valid&mdash;the package was built by TanStack&rsquo;s CI pipeline. The CI pipeline was just also running the attacker&rsquo;s code.
+          </p>
+
+          <p>
+            <a href="/blog/redhat-miasma-provenance-bypass">Red Hat&rsquo;s June&nbsp;1 compromise</a> proved the same pattern. Thirty-two packages published through a compromised GitHub account&rsquo;s CI pipeline. All 32 had valid SLSA provenance attestations. The provenance was technically correct. The code was not.
+          </p>
+
+          <p>
+            Andrey&rsquo;s argument: if you publish manually with hardware-bound 2FA (passkey, YubiKey), the attacker needs physical access to your device. If you publish through CI, the attacker needs a GitHub token&mdash;a much larger attack surface.
+          </p>
+
+          <h2>The resolution: Staged Publishing</h2>
+
+          <p>
+            npm&rsquo;s <a href="https://docs.npmjs.com/cli/commands/npm-stage" target="_blank" rel="noopener">Staged Publishing</a> splits the problem: CI builds and stages. A human approves before <code>latest</code> moves. The CI pipeline does the deterministic work (build, attest, stage). The human provides the trust decision (2FA confirmation that the staged version should go live). A stolen CI token stages a malicious version but never promotes it.
+          </p>
+
+          <p>
+            From <a href="https://github.com/postcss/postcss/issues/2096#issuecomment-2884022703" target="_blank" rel="noopener">Andrey&rsquo;s follow-up</a>:
+          </p>
+
+          <blockquote>
+            <p>I already moved <code>nanoid</code> and <code>nanospy</code> to the new process, we can test them.</p>
+            <p>PostCSS will be done in a week or two (too many other open source projects) 😅</p>
+          </blockquote>
+
+          <h2>The diff</h2>
+
+          <p>
+            nanoid&rsquo;s <a href="https://github.com/ai/nanoid/blob/main/.github/workflows/release.yml" target="_blank" rel="noopener">release.yml</a>, updated June&nbsp;18 at 19:16&nbsp;UTC:
+          </p>
+
+          <pre><code>- name: Publish npm package
+  run: npm stage publish</code></pre>
+
+          <p>
+            nanospy&rsquo;s <a href="https://github.com/ai/nanospy/blob/main/.github/workflows/release.yml" target="_blank" rel="noopener">release.yml</a>, updated June&nbsp;19 at 11:06&nbsp;UTC:
+          </p>
+
+          <pre><code>- name: Publish npm package
+  run: npm stage publish</code></pre>
+
+          <p>
+            nanoid serves 221&nbsp;million weekly downloads. It is a transitive dependency of virtually every modern Node.js project. One npm account, one credential&mdash;now gated behind a human approval step.
+          </p>
+
+          <hr class="essay-divider" />
+
+          <h2>Verification</h2>
+
+          <p>
+            The adoption is independently verifiable. No trust required.
+          </p>
+
+          <pre><code>npx proof-of-commitment nanoid nanospy postcss</code></pre>
+
+          <p>
+            Or query the API:
+          </p>
+
+          <pre><code>curl https://poc-backend.amdal-dev.workers.dev/api/score/npm/nanoid \
+  | jq '&#123;hasStagedPublishing, commitmentScore, weeklyDownloads: .recentWeeklyDownloads&#125;'</code></pre>
+
+          <p>
+            nanoid returns <code>hasStagedPublishing: true</code>, score 92. nanospy returns <code>hasStagedPublishing: true</code>. PostCSS still returns <code>false</code>&mdash;that will change when Andrey gets to it.
+          </p>
+
+          <hr class="essay-divider" />
+
+          <h2>Why this matters more than Hono</h2>
+
+          <p>
+            <a href="/blog/hono-staged-publishing-adopted/">Hono&rsquo;s adoption</a> was faster&mdash;33 hours from issue to merge. But Andrey&rsquo;s adoption is more interesting because he started by pushing back.
+          </p>
+
+          <p>
+            He didn&rsquo;t disagree with the risk assessment. He disagreed with the mitigation. OIDC provenance, which our original issue recommended, shifts the attack surface to CI. Staged Publishing addresses his exact objection: CI does the build, a human does the approval. Both sides of the argument improved the outcome.
+          </p>
+
+          <p>
+            The broader pattern: <a href="/blog/one-account-964m-downloads/">one npm account controls 964M weekly downloads</a>. nanoid and nanospy are now gated. PostCSS, Autoprefixer, browserslist, caniuse-lite are not. When they are, over 700&nbsp;million weekly downloads move behind the approval step.
+          </p>
+
+          <hr class="essay-divider" />
+
+          <h2>Monitor your dependencies for these changes</h2>
+
+          <pre><code>npx proof-of-commitment</code></pre>
+
+          <p>
+            Scans your lockfile. Flags single-publisher packages at scale. Shows provenance, Staged Publishing, and dormant access status. When nanoid&rsquo;s score went from 90 to 92 after adopting Staged Publishing, the CLI picked it up automatically&mdash;no human re-tagged anything.
+          </p>
+
+          <p>
+            <a href="/get-started?ref=blog-postcss-nanoid-staged-publishing">Free API key</a> watches 3 packages with weekly digest. <a href="/pricing?utm_campaign=postcss-nanoid-staged-publishing&amp;utm_source=blog&amp;utm_medium=cta">Developer ($15/mo)</a> watches 15 with daily scans and alerts when a CRITICAL dependency adopts the gate&mdash;or when a new one enters your tree.
+          </p>
+
+        </div>
+
+        <!-- Footer -->
+        <footer class="essay-footer">
+          <a href="/blog">&larr; More writing</a>
+        </footer>
+
+      </div>
+    </div>
+  </article>
+
+  <style>
+    /* --- Reset / base --- */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    /* --- Nav --- */
+    nav { padding: 1rem 0; border-bottom: 1px solid var(--border-light, #e5e5e5); }
+    .nav-inner { display: flex; justify-content: space-between; align-items: center; }
+    .nav-brand { font-weight: 700; font-size: 1.15rem; text-decoration: none; color: var(--ink, #111); }
+    .nav-links { list-style: none; display: flex; gap: 1.5rem; font-size: 0.92rem; }
+    .nav-links a { text-decoration: none; color: var(--ink-muted, #555); }
+    .nav-links a:hover { color: var(--ink, #111); }
+
+    /* --- Container --- */
+    .container { max-width: 1080px; margin: 0 auto; padding: 0 1.5rem; }
+
+    /* --- Essay --- */
+    .essay { padding: 4rem 0 6rem; }
+    .editorial { max-width: 680px; margin: 0 auto; }
+    .essay-header { margin-bottom: 3rem; }
+    .essay-meta { font-size: 0.85rem; color: var(--ink-muted, #888); margin-bottom: 0.75rem; }
+    .essay-title { font-size: clamp(1.6rem, 4vw, 2.4rem); line-height: 1.25; margin-bottom: 0.75rem; }
+    .essay-subtitle { font-size: 1.1rem; color: var(--ink-muted, #666); margin-bottom: 0.5rem; }
+    .essay-byline { font-size: 0.9rem; color: var(--ink-muted, #888); }
+    .essay-body p { font-size: 1.05rem; line-height: 1.75; margin-bottom: 1.5rem; color: var(--ink, #222); }
+    .essay-body h2 { font-size: 1.3rem; margin: 2.5rem 0 1rem; }
+    .essay-body a { color: var(--accent, #2563eb); text-decoration: underline; }
+    .essay-body code { background: var(--bg-muted, #f5f5f5); padding: 0.15rem 0.4rem; border-radius: 3px; font-size: 0.9em; }
+    .essay-body pre { background: var(--bg-muted, #f5f5f5); padding: 1rem 1.25rem; border-radius: 6px; overflow-x: auto; margin-bottom: 1.5rem; font-size: 0.9rem; }
+    .essay-body pre code { background: none; padding: 0; }
+    .essay-body blockquote { border-left: 3px solid var(--accent, #2563eb); padding: 0.75rem 1.25rem; margin: 0 0 1.5rem; background: var(--bg-muted, #f8f9fa); }
+    .essay-body blockquote p { margin-bottom: 0.5rem; color: var(--ink-muted, #444); font-style: italic; }
+    .essay-body blockquote p:last-child { margin-bottom: 0; }
+    .essay-divider { border: none; border-top: 1px solid var(--border-light, #e5e5e5); margin: 2.5rem 0; }
+    .essay-footer { margin-top: 3rem; padding-top: 1.5rem; border-top: 1px solid var(--border-light, #e5e5e5); }
+    .essay-footer a { color: var(--accent, #2563eb); text-decoration: none; font-size: 0.95rem; }
+    .essay-footer a:hover { text-decoration: underline; }
+
+    /* --- Animation --- */
+    .animate-in { opacity: 0; transform: translateY(12px); animation: fadeUp 0.5s ease forwards; }
+    .delay-1 { animation-delay: 0.1s; }
+    .delay-2 { animation-delay: 0.2s; }
+    .delay-3 { animation-delay: 0.3s; }
+    .delay-4 { animation-delay: 0.4s; }
+    @keyframes fadeUp { to { opacity: 1; transform: translateY(0); } }
+  </style>
+
+</Layout>

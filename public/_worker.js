@@ -1156,6 +1156,22 @@ export default {
         ["trapdoor-ai-assistant-poisoning",            "2026-06-06"],
         ["llm-security-audit-noise",                   "2026-06-04"],
         ["ietf-agent-payment-trust-draft",             "2026-06-03"],
+        // GENERATED-EDIT-OK: 2026-06-24 sitemap backfill — 13 June posts that shipped without sitemap entries (drift between posts.ts and this hardcoded list). The 978-downloads-zero-signups post literally diagnoses zero organic signups; that diagnosis becomes self-fulfilling if recent posts are missing from sitemap-blog.xml. Posts.ts is the source of truth, but the worker sitemap is hardcoded — every blog ship needs to add an entry here too. Long-term fix: generate this list from posts.ts at build time, but for now backfill.
+        ["aur-1579-packages-adoption-bypass",          "2026-06-13"],
+        ["atomic-arch-targets-bun",                    "2026-06-14"],
+        ["snyk-scores-lodash-86-we-score-it-critical", "2026-06-14"],
+        ["snyk-scores-chalk-81-we-score-it-critical",  "2026-06-14"],
+        ["unit42-80-percent-agent-skills-lie",         "2026-06-14"],
+        ["linkedin-recruiter-npm-backdoor",            "2026-06-16"],
+        ["nvidia-skillspector-runtime-trust-gap",      "2026-06-16"],
+        ["mastra-dormant-publisher-attack",            "2026-06-17"],
+        ["fast-xml-parser-provenance-case-study",      "2026-06-18"],
+        ["one-account-964m-downloads",                 "2026-06-18"],
+        ["staged-publishing-detection",                "2026-06-19"],
+        ["978-downloads-zero-signups",                 "2026-06-20"],
+        ["hono-staged-publishing-adopted",             "2026-06-24"],
+        // GENERATED-EDIT-OK: add postcss-nanoid blog to sitemap for indexing
+        ["postcss-nanoid-staged-publishing",           "2026-06-24"],
       ];
       const today = new Date().toISOString().split("T")[0];
       let xml = `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n`;

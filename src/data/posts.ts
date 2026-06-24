@@ -15,6 +15,78 @@ export interface Post {
 // Sorted newest first
 export const posts: Post[] = [
   {
+    slug: 'postcss-nanoid-staged-publishing',
+    title: 'nanoid Adopted Staged Publishing After a Technical Debate About CI Provenance',
+    description: "Andrey Sitnik pushed back on CI provenance, argued it increases attack surface, then adopted npm Staged Publishing on nanoid (221M weekly downloads) and nanospy within hours. PostCSS is next.",
+    date: '2026-06-24',
+    dateLabel: 'June 24, 2026',
+    relatedSlugs: [
+      'hono-staged-publishing-adopted',
+      'one-account-964m-downloads',
+      'staged-publishing-detection',
+    ],
+  },
+  {
+    slug: 'hono-staged-publishing-adopted',
+    title: 'Hono Just Adopted Staged Publishing. 50M Weekly Downloads, 33 Hours After the Issue.',
+    description: "Hono moved from CI-direct npm publishing to npm Staged Publishing on June 22, 2026. Issue filed June 21, PR merged June 22. The release.yml diff is one line. 50M weekly downloads now sit behind a human approval gate.",
+    date: '2026-06-24',
+    dateLabel: 'June 24, 2026',
+    relatedSlugs: [
+      'postcss-nanoid-staged-publishing',
+      'staged-publishing-detection',
+      'trusted-publishing-adoption',
+    ],
+  },
+  {
+    slug: 'staged-publishing-detection',
+    title: "OIDC Provenance Didn't Save TanStack or Red Hat. npm Staged Publishing Is the Missing Gate.",
+    description: "TanStack (May 2026) and Red Hat (June 2026) were both compromised through their CI pipelines. Both had valid SLSA provenance. npm Staged Publishing adds a human approval gate that provenance can't provide. Commit now detects it. First adopters: nanoid, nanospy, preact.",
+    date: '2026-06-19',
+    dateLabel: 'June 19, 2026',
+    relatedSlugs: [
+      'hono-staged-publishing-adopted',
+      'redhat-miasma-provenance-bypass',
+      'trusted-publishing-adoption',
+    ],
+  },
+  {
+    slug: 'fast-xml-parser-provenance-case-study',
+    title: 'How fast-xml-parser Got OIDC Provenance in 12 Hours',
+    description: "Behavioral scoring flagged fast-xml-parser as CRITICAL: 88M downloads/week, single publisher, no provenance. The maintainer shipped OIDC provenance in 12 hours. Here's what happened.",
+    date: '2026-06-18',
+    dateLabel: 'June 18, 2026',
+    relatedSlugs: [
+      'hono-staged-publishing-adopted',
+      'staged-publishing-detection',
+      'trusted-publishing-adoption',
+    ],
+  },
+  {
+    slug: 'one-account-964m-downloads',
+    title: 'One npm Account Publishes 964 Million Downloads Per Week. None Have Provenance.',
+    description: "The ai npm account controls postcss, nanoid, browserslist, caniuse-lite, autoprefixer, and more. All flagged CRITICAL. Zero OIDC provenance. One stolen credential away from the biggest npm incident yet.",
+    date: '2026-06-18',
+    dateLabel: 'June 18, 2026',
+    relatedSlugs: [
+      'staged-publishing-detection',
+      'hono-staged-publishing-adopted',
+      'trusted-publishing-adoption',
+    ],
+  },
+  {
+    slug: 'linkedin-recruiter-npm-backdoor',
+    title: 'A LinkedIn Recruiter Got a Developer to npm install a Backdoor. We Scanned the Repo.',
+    description: "The malicious GitHub repo had a prepare lifecycle script that executed arbitrary remote commands on npm install. We reconstructed the dependency profile. Here's what the trust signals showed.",
+    date: '2026-06-16',
+    dateLabel: 'June 16, 2026',
+    relatedSlugs: [
+      'agent-phishing-identity-stack',
+      'trapdoor-ai-assistant-poisoning',
+      'mastra-dormant-publisher-attack',
+    ],
+  },
+  {
     slug: '978-downloads-zero-signups',
     title: '978 npm Downloads Per Week. Zero Organic Signups.',
     description: "Commit's CLI has 978 weekly npm downloads, 21 funnels, 18 IPs that hit the inline signup prompt in the last 7 days, and 0 organic signups in 90 days. Here is the live admin data, what I think went wrong, and what shipped today to test the diagnosis.",
