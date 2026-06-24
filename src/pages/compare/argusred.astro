@@ -1,0 +1,886 @@
+---
+import Layout from '../../layouts/Layout.astro';
+---
+
+<Layout
+  title="Commit vs ArgusRed — Supply Chain vs Code Security"
+  description="ArgusRed scans your own code for exploits. Commit monitors the dependencies you import. They answer different questions — and you need both."
+  canonical="https://getcommit.dev/compare/argusred/"
+>
+  <!-- Nav -->
+  <nav>
+    <div class="container nav-inner">
+      <a href="/" class="nav-brand">Commit</a>
+      <ul class="nav-links">
+        <li><a href="/#mcp">MCP</a></li>
+        <li><a href="/audit">Audit</a></li>
+        <li><a href="/watchlist">Watchlist</a></li>
+        <li><a href="/extension">Extension</a></li>
+        <li><a href="/blog">Writing</a></li>
+        <li><a href="/pricing">Pricing</a></li>
+        <li><a href="/docs">Docs</a></li>
+        <li><a href="https://github.com/piiiico/proof-of-commitment" target="_blank" rel="noopener">GitHub</a></li>
+        <li><a href="mailto:pico@amdal.dev">Contact</a></li>
+      </ul>
+    </div>
+  </nav>
+
+  <!-- Hero -->
+  <section class="hero">
+    <div class="container">
+      <div class="editorial">
+        <a href="/compare/" class="breadcrumb">&larr; All comparisons</a>
+        <h1 class="hero-title">
+          ArgusRed scans what you wrote.<br />
+          <em>Commit monitors what you import.</em>
+        </h1>
+        <p class="hero-lead">
+          ArgusRed (by Cosine) post-trained a model to find exploitable vulnerabilities in your own source code. It's excellent at that. It doesn't watch the dependencies you import — the third-party packages whose authors' credentials are a permanent single point of failure.
+        </p>
+        <div class="key-stat">
+          <span class="stat-icon">&darr;</span>
+          <span class="stat-text">
+            Six npm supply chain attacks in 2026 — all credential-based, none from vulnerabilities in the victims' own source code. ArgusRed catches those code-level bugs. Commit catches credential risk in the packages you import.
+          </span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <hr class="section-divider" />
+
+  <!-- Different questions, different tools -->
+  <section class="hth-section">
+    <div class="container">
+      <div class="editorial">
+        <h2 class="section-heading">Different questions, different tools</h2>
+        <div class="hth-grid">
+          <div class="hth-card argus-side">
+            <div class="hth-tool-label argus-label">ArgusRed</div>
+            <p class="hth-tagline">Finds exploits you wrote</p>
+            <div class="hth-hits">
+              <p class="hth-group-label hits-label">Catches</p>
+              <ul class="hth-list hits-list">
+                <li>Exploitable code in your own source</li>
+                <li>SQL injection, XSS, path traversal in your logic</li>
+                <li>Verified exploit proof (sandbox-tested)</li>
+                <li>Pen-test targets (authorized external scans)</li>
+                <li>Brownfield codebase security audits</li>
+              </ul>
+            </div>
+            <div class="hth-misses">
+              <p class="hth-group-label misses-label">Misses</p>
+              <ul class="hth-list misses-list">
+                <li>Who controls your dependency publish tokens</li>
+                <li>Packages degrading between your scans</li>
+                <li>Supply chain risk in transitive deps</li>
+              </ul>
+            </div>
+          </div>
+          <div class="hth-card commit-side">
+            <div class="hth-tool-label commit-label">Commit</div>
+            <p class="hth-tagline">Monitors what you import</p>
+            <div class="hth-hits">
+              <p class="hth-group-label hits-label">Catches</p>
+              <ul class="hth-list hits-list">
+                <li>Publisher concentration in your deps (credential risk)</li>
+                <li>High-download packages controlled by a single token</li>
+                <li>Score degradation alerts (continuous, not point-in-time)</li>
+                <li>Full transitive dependency tree analysis</li>
+                <li>GitHub Action blocks risky imports before merge</li>
+              </ul>
+            </div>
+            <div class="hth-misses">
+              <p class="hth-group-label misses-label">Misses</p>
+              <ul class="hth-list misses-list">
+                <li>Exploitable code in your own source files</li>
+                <li>Pen testing of external targets</li>
+                <li>Brownfield code audit findings</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+        <div class="verdict">
+          <strong>Use both in sequence.</strong> Run Commit continuously to monitor what you import — it catches supply chain risk before it becomes your problem. Run ArgusRed periodically to audit what you wrote — it finds exploitable patterns in your own code. They cover non-overlapping attack surfaces.
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <hr class="section-divider" />
+
+  <!-- Sequence matters -->
+  <section class="sequence-section">
+    <div class="container">
+      <div class="editorial">
+        <h2 class="section-heading">Sequence matters: import first, then build</h2>
+        <div class="sequence-flow">
+          <div class="seq-step seq-step-commit">
+            <div class="seq-step-label commit-label">Step 1 — Commit</div>
+            <div class="seq-step-title">Before you import</div>
+            <p class="seq-step-text">
+              Before adding any dependency, Commit tells you the structural risk: publisher concentration, download volume vs. maintainer count, OpenSSF score. A package with 1 publisher controlling 100M weekly downloads is a credential single point of failure — you decide before it enters your codebase.
+            </p>
+          </div>
+          <div class="seq-arrow">&darr;</div>
+          <div class="seq-step">
+            <div class="seq-step-label">You write code</div>
+            <div class="seq-step-title">Building your product</div>
+            <p class="seq-step-text">
+              You write logic using those dependencies. This is where ArgusRed's domain starts — finding exploitable patterns in what you build with those packages.
+            </p>
+          </div>
+          <div class="seq-arrow">&darr;</div>
+          <div class="seq-step seq-step-argus">
+            <div class="seq-step-label argus-label">Step 3 — ArgusRed</div>
+            <div class="seq-step-title">After you write</div>
+            <p class="seq-step-text">
+              ArgusRed scans your source for exploitable vulnerabilities: injection flaws, path traversal, authentication bypasses. It validates these in a sandbox and reports what's actually exploitable — not just theoretical.
+            </p>
+          </div>
+          <div class="seq-arrow">&darr;</div>
+          <div class="seq-step seq-step-commit">
+            <div class="seq-step-label commit-label">Ongoing — Commit</div>
+            <div class="seq-step-title">After you ship</div>
+            <p class="seq-step-text">
+              A dependency trusted today can be compromised tomorrow. Commit monitors continuously — alerting you when a package's score drops, when a new maintainer is added, or when publish frequency patterns change. ArgusRed only catches it on your next manual scan.
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <hr class="section-divider" />
+
+  <!-- Pricing comparison -->
+  <section class="pricing-section">
+    <div class="container">
+      <div class="editorial">
+        <h2 class="section-heading">Predictable vs. token-based pricing</h2>
+        <p class="pricing-intro">
+          ArgusRed is token-based: 2M free tokens on signup, then pay-per-scan. Token consumption scales with codebase size, complexity, and scan frequency. Larger repos, more scans, and deeper pen-test modes consume tokens faster than you'd expect. Commit is flat per-project — scan once or a thousand times, alerts fire when they need to, same price.
+        </p>
+        <div class="pricing-grid">
+          <div class="pricing-card argus-card">
+            <div class="pricing-card-label argus-label">ArgusRed (token-based)</div>
+            <ul class="pricing-list">
+              <li class="pricing-row">
+                <span class="pricing-scenario">Free tier</span>
+                <span class="pricing-cost argus-cost">2M tokens (account required)</span>
+              </li>
+              <li class="pricing-row">
+                <span class="pricing-scenario">10 repos, quarterly scan</span>
+                <span class="pricing-cost argus-cost">~$400/year (est.)</span>
+              </li>
+              <li class="pricing-row">
+                <span class="pricing-scenario">Daily CI integration</span>
+                <span class="pricing-cost argus-cost">Token burn compounds fast</span>
+              </li>
+              <li class="pricing-row">
+                <span class="pricing-scenario">Team of 50</span>
+                <span class="pricing-cost argus-cost">Token &times; scan count &times; size</span>
+              </li>
+            </ul>
+          </div>
+          <div class="pricing-card commit-card">
+            <div class="pricing-card-label commit-label">Commit (flat monitoring)</div>
+            <ul class="pricing-list">
+              <li class="pricing-row">
+                <span class="pricing-scenario">Free tier</span>
+                <span class="pricing-cost commit-cost">200 API calls/day, instant key</span>
+              </li>
+              <li class="pricing-row">
+                <span class="pricing-scenario">10 repos, continuous monitoring</span>
+                <span class="pricing-cost commit-cost"><strong>$29/mo</strong> = $348/year</span>
+              </li>
+              <li class="pricing-row">
+                <span class="pricing-scenario">Daily CI integration</span>
+                <span class="pricing-cost commit-cost">Included — same flat rate</span>
+              </li>
+              <li class="pricing-row">
+                <span class="pricing-scenario">Team of 50</span>
+                <span class="pricing-cost commit-cost"><strong>$199/mo</strong> regardless of headcount</span>
+              </li>
+            </ul>
+          </div>
+        </div>
+        <div class="pricing-note">
+          The token pricing difference matters most when you integrate security into your CI pipeline. Each PR triggering a full codebase scan burns tokens predictably; over a 100-person team running 50 deploys/day, the math changes fast. Commit's flat rate doesn't change with team size or scan frequency.
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <hr class="section-divider" />
+
+  <!-- If you can only do one -->
+  <section class="supply-section">
+    <div class="container">
+      <div class="editorial">
+        <h2 class="section-heading">If you can only do one, start with supply chain</h2>
+        <p class="supply-text">
+          ArgusRed and Commit solve real problems. If you're resource-constrained on security tooling, the priority argument favors supply chain first:
+        </p>
+        <div class="supply-reasons">
+          <div class="supply-reason">
+            <span class="reason-number">1</span>
+            <div class="reason-content">
+              <strong>Attack frequency.</strong> Supply chain attacks (credential theft, package takeovers, typosquatting) are the dominant vector in npm/PyPI incidents. Your own code has fewer attacker-controlled variables.
+            </div>
+          </div>
+          <div class="supply-reason">
+            <span class="reason-number">2</span>
+            <div class="reason-content">
+              <strong>Dwell time.</strong> A compromised dependency ships to production on your next deploy — no code review catches it. An exploit in your own code requires an attacker to also find and target it. Different detection windows.
+            </div>
+          </div>
+          <div class="supply-reason">
+            <span class="reason-number">3</span>
+            <div class="reason-content">
+              <strong>You can't audit ArgusRed-style manually.</strong> But you <em>can</em> look up a package's publisher count before importing it. Tooling amplifies effort — Commit makes the check automatic across all PRs.
+            </div>
+          </div>
+          <div class="supply-reason">
+            <span class="reason-number">4</span>
+            <div class="reason-content">
+              <strong>Blast radius asymmetry.</strong> A supply chain attack on one widely-used package hits thousands of projects simultaneously. An exploit in your code hits your users. Both matter; scale differs by orders of magnitude.
+            </div>
+          </div>
+        </div>
+        <div class="supply-bottom">
+          None of this means you shouldn't run ArgusRed. It means if you're starting from zero, get your import hygiene right before auditing what you built with those imports.
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <hr class="section-divider" />
+
+  <!-- FAQ -->
+  <section class="faq-section">
+    <div class="container">
+      <div class="editorial">
+        <h2 class="section-heading">Frequently asked</h2>
+        <div class="faq-list">
+          <div class="faq-item">
+            <h3 class="faq-q">Can I replace ArgusRed with Commit?</h3>
+            <p class="faq-a">No — they don't overlap. ArgusRed finds exploitable code <em>you wrote</em>: injection flaws, authentication bypasses, logic errors in your source. Commit monitors the packages <em>you imported</em>: publisher concentration, structural exposure, score degradation over time. You need both to cover the full attack surface.</p>
+          </div>
+          <div class="faq-item">
+            <h3 class="faq-q">Does Commit detect vulnerabilities in dependencies?</h3>
+            <p class="faq-a">Commit measures structural risk — publisher concentration, download volume vs. maintainer count, release cadence, OpenSSF Scorecard signals. It doesn't scan for CVEs (that's Snyk's domain) or malicious code (Socket's domain). The signal Commit tracks is: who controls this package's publish credentials, and are they a worthwhile target for an attacker. That structural signal was visible before every major supply chain attack in 2024–2025.</p>
+          </div>
+          <div class="faq-item">
+            <h3 class="faq-q">Does ArgusRed also scan dependencies?</h3>
+            <p class="faq-a">ArgusRed scans your source code and can run pen tests against authorized external targets. It doesn't continuously monitor your dependency graph for publisher concentration or alert you when a trusted package's risk profile changes. It's a point-in-time scan, not a monitoring service.</p>
+          </div>
+          <div class="faq-item">
+            <h3 class="faq-q">Is Commit free?</h3>
+            <p class="faq-a">The CLI, web audit, and API are free — 200 API calls/day with an instant API key, no account required. Paid plans from $15–$29/mo add batch scanning, continuous monitoring, Slack/webhook alerts, and GitHub Action integration. <a href="/pricing" class="faq-link">See pricing &rarr;</a></p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <hr class="section-divider" />
+
+  <!-- CTA -->
+  <section class="cta-section">
+    <div class="container">
+      <div class="editorial" style="text-align: center;">
+        <h2 class="cta-heading">See your import risk before you build on it</h2>
+        <p class="cta-text">Run a free audit on your package.json — find out which dependencies are high-value targets before an attacker picks them.</p>
+        <div class="cta-buttons">
+          <a href="/audit" class="btn-primary">Run a free audit &rarr;</a>
+          <a href="/get-started" class="btn-secondary">Get a free API key</a>
+        </div>
+        <div class="cli-note">
+          <code>npx proof-of-commitment --file package.json</code>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <footer>
+    <div class="container footer-inner">
+      <span class="footer-brand">Commit</span>
+      <span class="footer-copy">Behavioral trust for the software supply chain.</span>
+      <nav class="footer-links">
+        <a href="/audit">Audit</a>
+        <a href="/watchlist">Watchlist</a>
+        <a href="/blog">Writing</a>
+        <a href="mailto:pico@amdal.dev">Contact</a>
+      </nav>
+    </div>
+  </footer>
+
+  <style>
+    /* ── Hero ── */
+    .hero {
+      padding: 6rem 0 3rem;
+      background: var(--paper);
+    }
+
+    .breadcrumb {
+      font-size: 0.85rem;
+      color: var(--ink-muted);
+      text-decoration: none;
+      display: inline-block;
+      margin-bottom: 1.5rem;
+    }
+
+    .breadcrumb:hover {
+      color: var(--ink);
+    }
+
+    .hero-title {
+      font-family: var(--font-display);
+      font-size: clamp(2.2rem, 5vw, 3.5rem);
+      line-height: 1.12;
+      color: var(--ink);
+      margin: 0 0 1.5rem;
+    }
+
+    .hero-title em {
+      font-style: italic;
+      color: var(--accent);
+    }
+
+    .hero-lead {
+      font-size: 1.05rem;
+      line-height: 1.7;
+      color: var(--ink-muted);
+      max-width: 46rem;
+      margin-bottom: 2rem;
+    }
+
+    .key-stat {
+      display: flex;
+      gap: 1rem;
+      align-items: flex-start;
+      padding: 1.25rem 1.5rem;
+      background: #fff8f5;
+      border: 1px solid #fca5a5;
+      border-left: 3px solid var(--accent);
+      border-radius: 6px;
+      max-width: 46rem;
+    }
+
+    .stat-icon {
+      font-size: 1.2rem;
+      color: var(--accent);
+      flex-shrink: 0;
+      margin-top: 0.1rem;
+    }
+
+    .stat-text {
+      font-size: 0.95rem;
+      line-height: 1.6;
+      color: var(--ink-muted);
+    }
+
+    /* ── Shared ── */
+    .section-heading {
+      font-family: var(--font-display);
+      font-size: 1.8rem;
+      color: var(--ink);
+      margin-bottom: 2rem;
+    }
+
+    .editorial {
+      max-width: var(--max-content, 58rem);
+      margin: 0 auto;
+    }
+
+    /* ── Head-to-head section ── */
+    .hth-section {
+      padding: 4rem 0;
+      background: var(--paper-dim);
+    }
+
+    .hth-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1.5rem;
+      margin-bottom: 2rem;
+    }
+
+    @media (max-width: 640px) {
+      .hth-grid { grid-template-columns: 1fr; }
+    }
+
+    .hth-card {
+      padding: 1.5rem;
+      background: var(--paper);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+    }
+
+    .commit-side {
+      border-color: var(--accent);
+      border-width: 2px;
+    }
+
+    .hth-tool-label {
+      font-size: 0.8rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      margin-bottom: 0.5rem;
+    }
+
+    .argus-label { color: #5b21b6; }
+    .commit-label { color: var(--accent); }
+
+    .hth-tagline {
+      font-size: 0.95rem;
+      color: var(--ink-muted);
+      margin-bottom: 1.25rem;
+      font-style: italic;
+    }
+
+    .hth-group-label {
+      font-size: 0.72rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      margin-bottom: 0.5rem;
+    }
+
+    .hits-label { color: #166534; }
+    .misses-label { color: #991b1b; }
+
+    .hth-list {
+      list-style: none;
+      padding: 0;
+      margin: 0 0 1.25rem;
+      display: flex;
+      flex-direction: column;
+      gap: 0.4rem;
+    }
+
+    .hth-list li {
+      font-size: 0.875rem;
+      line-height: 1.5;
+      color: var(--ink-muted);
+      padding-left: 1.25rem;
+      position: relative;
+    }
+
+    .hits-list li::before {
+      content: "\2713";
+      position: absolute;
+      left: 0;
+      color: #166534;
+      font-weight: 600;
+    }
+
+    .misses-list li::before {
+      content: "\2717";
+      position: absolute;
+      left: 0;
+      color: #991b1b;
+      font-weight: 600;
+    }
+
+    .hth-misses {
+      border-top: 1px solid var(--border);
+      padding-top: 1rem;
+    }
+
+    .verdict {
+      padding: 1.25rem 1.5rem;
+      background: var(--paper);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      font-size: 0.95rem;
+      line-height: 1.7;
+      color: var(--ink-muted);
+    }
+
+    .verdict strong {
+      color: var(--ink);
+    }
+
+    /* ── Sequence section ── */
+    .sequence-section {
+      padding: 4rem 0;
+      background: var(--paper);
+    }
+
+    .sequence-flow {
+      display: flex;
+      flex-direction: column;
+      gap: 0;
+    }
+
+    .seq-step {
+      padding: 1.5rem;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      background: var(--paper-dim);
+    }
+
+    .seq-step-commit {
+      border-color: var(--accent);
+      border-width: 2px;
+      background: #fff8f5;
+    }
+
+    .seq-step-argus {
+      border-color: #c4b5fd;
+      border-width: 2px;
+      background: #faf5ff;
+    }
+
+    .seq-step-label {
+      font-size: 0.75rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      color: var(--ink-subtle);
+      margin-bottom: 0.5rem;
+    }
+
+    .seq-step-title {
+      font-family: var(--font-display);
+      font-size: 1.15rem;
+      color: var(--ink);
+      margin-bottom: 0.75rem;
+    }
+
+    .seq-step-text {
+      font-size: 0.9375rem;
+      color: var(--ink-muted);
+      line-height: 1.7;
+    }
+
+    .seq-arrow {
+      text-align: center;
+      font-size: 1.5rem;
+      color: var(--ink-subtle);
+      padding: 0.5rem 0;
+    }
+
+    /* ── Pricing section ── */
+    .pricing-section {
+      padding: 4rem 0;
+      background: var(--paper-dim);
+    }
+
+    .pricing-intro {
+      font-size: 0.95rem;
+      line-height: 1.7;
+      color: var(--ink-muted);
+      max-width: 46rem;
+      margin-bottom: 2rem;
+    }
+
+    .pricing-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1.5rem;
+      margin-bottom: 1.5rem;
+    }
+
+    @media (max-width: 640px) {
+      .pricing-grid { grid-template-columns: 1fr; }
+    }
+
+    .pricing-card {
+      padding: 1.5rem;
+      background: var(--paper);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+    }
+
+    .commit-card {
+      border-color: var(--accent);
+      border-width: 2px;
+    }
+
+    .pricing-card-label {
+      font-size: 0.8rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      margin-bottom: 1rem;
+      padding-bottom: 0.75rem;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .pricing-list {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+      display: flex;
+      flex-direction: column;
+      gap: 0;
+    }
+
+    .pricing-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      gap: 1rem;
+      padding: 0.75rem 0;
+      border-bottom: 1px solid var(--border-light);
+      font-size: 0.875rem;
+    }
+
+    .pricing-row:last-child {
+      border-bottom: none;
+    }
+
+    .pricing-scenario {
+      color: var(--ink-muted);
+    }
+
+    .pricing-cost {
+      text-align: right;
+      font-family: var(--font-mono);
+      font-size: 0.82rem;
+    }
+
+    .argus-cost {
+      color: #5b21b6;
+    }
+
+    .commit-cost {
+      color: var(--accent);
+    }
+
+    .commit-cost strong {
+      color: var(--ink);
+      font-weight: 700;
+    }
+
+    .pricing-note {
+      font-size: 0.875rem;
+      line-height: 1.65;
+      color: var(--ink-muted);
+      padding: 1rem 1.25rem;
+      background: var(--paper);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+    }
+
+    /* ── Supply chain section ── */
+    .supply-section {
+      padding: 4rem 0;
+      background: var(--paper);
+    }
+
+    .supply-text {
+      font-size: 0.95rem;
+      line-height: 1.7;
+      color: var(--ink-muted);
+      max-width: 46rem;
+      margin-bottom: 2rem;
+    }
+
+    .supply-reasons {
+      display: flex;
+      flex-direction: column;
+      gap: 1.25rem;
+      margin-bottom: 2rem;
+    }
+
+    .supply-reason {
+      display: flex;
+      gap: 1.25rem;
+      align-items: flex-start;
+    }
+
+    .reason-number {
+      flex-shrink: 0;
+      width: 2rem;
+      height: 2rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: var(--paper-dim);
+      border: 1px solid var(--border);
+      border-radius: 50%;
+      font-family: var(--font-mono);
+      font-size: 0.85rem;
+      font-weight: 600;
+      color: var(--ink);
+    }
+
+    .reason-content {
+      font-size: 0.9375rem;
+      line-height: 1.7;
+      color: var(--ink-muted);
+    }
+
+    .reason-content strong {
+      color: var(--ink);
+    }
+
+    .supply-bottom {
+      font-size: 0.95rem;
+      line-height: 1.7;
+      color: var(--ink-muted);
+      padding: 1.25rem 1.5rem;
+      background: var(--paper-dim);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+    }
+
+    /* ── FAQ ── */
+    .faq-section {
+      padding: 4rem 0;
+      background: var(--paper-dim);
+    }
+
+    .faq-list {
+      display: flex;
+      flex-direction: column;
+      gap: 0;
+    }
+
+    .faq-item {
+      padding: 2rem 0;
+      border-top: 1px solid var(--border-light);
+    }
+
+    .faq-item:last-child {
+      border-bottom: 1px solid var(--border-light);
+    }
+
+    .faq-q {
+      font-family: var(--font-display);
+      font-size: 1.1rem;
+      font-weight: 400;
+      color: var(--ink);
+      margin-bottom: 0.75rem;
+      line-height: 1.3;
+    }
+
+    .faq-a {
+      font-size: 0.9375rem;
+      color: var(--ink-muted);
+      line-height: 1.7;
+      max-width: 58ch;
+    }
+
+    .faq-a em {
+      font-style: italic;
+    }
+
+    .faq-link {
+      color: var(--accent);
+      text-decoration: none;
+    }
+
+    .faq-link:hover {
+      text-decoration: underline;
+    }
+
+    /* ── CTA ── */
+    .cta-section {
+      padding: 5rem 0;
+      background: var(--paper);
+    }
+
+    .cta-heading {
+      font-family: var(--font-display);
+      font-size: 2rem;
+      color: var(--ink);
+      margin-bottom: 0.75rem;
+    }
+
+    .cta-text {
+      font-size: 1rem;
+      color: var(--ink-muted);
+      margin-bottom: 2rem;
+    }
+
+    .cta-buttons {
+      display: flex;
+      gap: 1rem;
+      justify-content: center;
+      flex-wrap: wrap;
+      margin-bottom: 1.5rem;
+    }
+
+    .btn-primary {
+      padding: 0.85rem 2rem;
+      background: var(--accent);
+      color: white;
+      text-decoration: none;
+      border-radius: 4px;
+      font-weight: 500;
+      font-size: 0.95rem;
+      transition: background 0.15s;
+    }
+
+    .btn-primary:hover { background: var(--accent-dim); }
+
+    .btn-secondary {
+      padding: 0.85rem 2rem;
+      background: transparent;
+      color: var(--ink);
+      text-decoration: none;
+      border-radius: 4px;
+      font-weight: 500;
+      font-size: 0.95rem;
+      border: 1px solid var(--border);
+      transition: border-color 0.15s;
+    }
+
+    .btn-secondary:hover { border-color: var(--ink-subtle); }
+
+    .cli-note {
+      margin-top: 0.5rem;
+    }
+
+    .cli-note code {
+      font-family: var(--font-mono);
+      font-size: 0.85rem;
+      color: var(--ink-muted);
+      background: var(--paper-dim);
+      padding: 0.5rem 1rem;
+      border-radius: 4px;
+      border: 1px solid var(--border);
+    }
+
+    /* ── Footer ── */
+    .footer-inner {
+      display: flex;
+      align-items: center;
+      gap: 1.5rem;
+      padding: 2rem 0;
+      flex-wrap: wrap;
+      border-top: 1px solid var(--border);
+    }
+
+    .footer-brand {
+      font-family: var(--font-display);
+      font-size: 1.1rem;
+      color: var(--ink);
+    }
+
+    .footer-copy {
+      font-size: 0.85rem;
+      color: var(--ink-subtle);
+      flex: 1;
+    }
+
+    .footer-links {
+      display: flex;
+      gap: 1.25rem;
+    }
+
+    .footer-links a {
+      font-size: 0.85rem;
+      color: var(--ink-muted);
+      text-decoration: none;
+    }
+
+    .footer-links a:hover { color: var(--ink); }
+  </style>
+</Layout>

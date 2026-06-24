@@ -1069,6 +1069,14 @@ uuid</textarea>
       font-size: 0.75rem;
       color: var(--ink-subtle);
     }
+    /* Divider between the primary /pricing button and the secondary free-key
+       email form. Low-prominence text keeps the visual flow clean. */
+    .post-results-cta .cta-or {
+      font-size: 0.75rem;
+      color: var(--ink-subtle);
+      margin: 0.5rem 0 0.25rem;
+      text-align: left;
+    }
 
     /* Inline email-capture form embedded in the post-results CTA.
        Mirrors the CLI inlineSignup() (npm-package v1.16) — collapses the
@@ -1863,14 +1871,23 @@ uuid</textarea>
           : isCompromisedCtx
             ? 'See Developer pricing ($15/mo) for these compromised packages &rarr;'
             : 'See Developer pricing ($15/mo) for these CRITICAL packages &rarr;';
-        const skipAheadBlock = upgradeCtxUrl
-          ? `<div class="cta-skip-ahead" style="width:100%;margin-top:0.4rem;font-size:0.8rem;color:var(--ink-muted);">` +
-            `Already evaluating? ` +
-            `<a href="${upgradeCtxUrl.replace(skipMedium, 'audit-skip-form')}" class="cta-skip-link" data-cta="audit-skip-to-pricing" style="color:var(--accent);font-weight:500;">${skipLabel}</a>` +
-            `</div>`
+        // Pricing button block — shown ABOVE the free-key email form when an
+        // upgrade URL exists (CRITICAL / compromised / healthy branches all pass
+        // developerCtaUrl). This makes /pricing the first visible option;
+        // the email form becomes a secondary "or" path for users who want the
+        // free tier before committing. Prior placement (small "Already
+        // evaluating?" text link BELOW the form) produced ~2 /pricing clicks
+        // per 76 /audit visits over 30 days (first-party analytics 2026-06-20).
+        // utm_medium for the primary button uses skipMedium (critical-cta /
+        // compromised-cta / healthy-cta) — already correct. The form skip-ahead
+        // uses 'audit-skip-form' to distinguish the two entry points.
+        const pricingBtnBlock = upgradeCtxUrl
+          ? `<a href="${upgradeCtxUrl}" class="cta-btn cta-btn-upgrade" data-cta="audit-pricing-primary">${skipLabel}</a>` +
+            `<div class="cta-or">or get a free key first:</div>`
           : '';
         ctaEl.innerHTML = `
           <div class="cta-text">${headline}</div>
+          ${pricingBtnBlock}
           <form class="cta-form" id="${formId}" data-source="audit-web-inline" data-fallback-ref="${refTag}">
             <input type="email" id="${inputId}" class="cta-input"
                    placeholder="you@company.com" required autocomplete="email"
@@ -1879,7 +1896,6 @@ uuid</textarea>
             <noscript><a href="${noScriptHref}" class="cta-btn">${btnLabel} &rarr;</a></noscript>
           </form>
           <span class="cta-hint">${hintText}</span>
-          ${skipAheadBlock}
           <p class="cta-error" id="${errId}" hidden></p>
           <div class="cta-success" id="${successId}" hidden></div>
         `;
@@ -1925,12 +1941,15 @@ uuid</textarea>
               form.hidden = true;
               const hint = ctaEl.querySelector('.cta-hint') as HTMLElement | null;
               if (hint) hint.hidden = true;
-              // Hide the pre-submit skip-ahead link too — the success state
-              // renders the same Developer upgrade CTA prominently below.
-              // Leaving both visible duplicates the same destination and
-              // dilutes the call-to-action.
-              const skipAhead = ctaEl.querySelector('.cta-skip-ahead') as HTMLElement | null;
-              if (skipAhead) skipAhead.hidden = true;
+              // Hide the primary pricing button + "or" divider too — the
+              // success state renders the same Developer upgrade CTA below
+              // with email pre-filled. Leaving both duplicates the destination
+              // and dilutes the call-to-action. .cta-skip-ahead no longer
+              // exists (replaced 2026-06-20 with .cta-btn-upgrade primary btn).
+              const pricingBtn = ctaEl.querySelector('.cta-btn-upgrade') as HTMLElement | null;
+              if (pricingBtn) pricingBtn.hidden = true;
+              const orDivider = ctaEl.querySelector('.cta-or') as HTMLElement | null;
+              if (orDivider) orDivider.hidden = true;
               // If caller passed a CRITICAL-context upgrade URL (audit found
               // ≥1 CRITICAL package), append &email= and render a prominent
               // Developer-tier CTA in the success view. Free tier scores once

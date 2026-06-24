@@ -1,0 +1,270 @@
+---
+import Layout from '../../layouts/Layout.astro';
+---
+
+<Layout
+  title="debug Has 653M Weekly Downloads. One Publisher Hasn't Touched It in 8 Years. They Can Still Push a Release. &mdash; Commit"
+  description="We scanned top npm packages for dormant publishers with active publish access. Accounts inactive 5-8 years can still push code to packages installed 2.6 billion times per week."
+  canonical="https://getcommit.dev/blog/dormant-publishers-active-access/"
+  publishDate="2026-06-22"
+>
+
+  <!-- Nav -->
+  <nav>
+    <div class="container nav-inner">
+      <a href="/" class="nav-brand">Commit</a>
+      <ul class="nav-links">
+        <li><a href="/extension">Extension</a></li>
+        <li><a href="/blog">Writing</a></li>
+        <li><a href="/pricing">Pricing</a></li><li><a href="/docs">Docs</a></li><li><a href="https://github.com/piiiico/proof-of-commitment" target="_blank" rel="noopener">GitHub</a></li>
+        <li><a href="mailto:pico@amdal.dev">Contact</a></li>
+      </ul>
+    </div>
+  </nav>
+
+  <!-- Essay -->
+  <article class="essay">
+    <div class="container">
+      <div class="editorial">
+
+        <!-- Header -->
+        <header class="essay-header">
+          <div class="essay-meta animate-in delay-1">
+            <time datetime="2026-06-22">June 22, 2026</time>
+          </div>
+          <h1 class="essay-title animate-in delay-2">debug Has 653M Weekly Downloads. One Publisher Hasn&rsquo;t Touched It in 8&nbsp;Years. They Can Still Push a&nbsp;Release.</h1>
+          <p class="essay-subtitle animate-in delay-3">
+            We scanned top npm packages for dormant publishers with active publish access. Accounts inactive 5&ndash;8 years can still push code to packages installed 2.6 billion times per week.
+          </p>
+          <p class="essay-byline animate-in delay-4">Pico</p>
+        </header>
+
+        <!-- Body -->
+        <div class="essay-body">
+
+          <p>
+            <code>npm audit</code> checks for known vulnerabilities. It doesn&rsquo;t check whether someone who hasn&rsquo;t published in eight years can still push a release to a package your project installs every build.
+          </p>
+
+          <p>
+            We scanned the publisher lifecycle of top npm packages and flagged every account that (a) has current publish scope and (b) hasn&rsquo;t published to that package in 12+ months. The findings cover 2.6 billion weekly downloads.
+          </p>
+
+          <hr class="essay-divider" />
+
+          <h2>The data</h2>
+
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>Package</th>
+                  <th>Weekly Downloads</th>
+                  <th>Dormant Publisher</th>
+                  <th>Last Published</th>
+                  <th>Inactive</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td><a href="https://getcommit.dev/npm/debug">debug</a></td>
+                  <td>653M</td>
+                  <td>tootallnate</td>
+                  <td>Sep 2017</td>
+                  <td>105 months</td>
+                </tr>
+                <tr>
+                  <td><a href="https://getcommit.dev/npm/cliui">cliui</a></td>
+                  <td>207M</td>
+                  <td>bcoe</td>
+                  <td>Aug 2020</td>
+                  <td>70 months</td>
+                </tr>
+                <tr>
+                  <td><a href="https://getcommit.dev/npm/has-flag">has-flag</a></td>
+                  <td>296M</td>
+                  <td>sindresorhus</td>
+                  <td>Jul 2021</td>
+                  <td>59 months</td>
+                </tr>
+                <tr>
+                  <td><a href="https://getcommit.dev/npm/tslib">tslib</a></td>
+                  <td>389M</td>
+                  <td>typescript-bot</td>
+                  <td>Oct 2024</td>
+                  <td>20 months</td>
+                </tr>
+                <tr>
+                  <td><a href="https://getcommit.dev/npm/cross-spawn">cross-spawn</a></td>
+                  <td>234M</td>
+                  <td>satazor</td>
+                  <td>Nov 2024</td>
+                  <td>19 months</td>
+                </tr>
+                <tr>
+                  <td><a href="https://getcommit.dev/npm/escalade">escalade</a></td>
+                  <td>168M</td>
+                  <td>lukeed</td>
+                  <td>Aug 2024</td>
+                  <td>22 months</td>
+                </tr>
+                <tr>
+                  <td><a href="https://getcommit.dev/npm/yargs">yargs</a></td>
+                  <td>219M</td>
+                  <td>bcoe, oss-bot</td>
+                  <td>Apr/May 2025</td>
+                  <td>14&ndash;15 months</td>
+                </tr>
+                <tr>
+                  <td><a href="https://getcommit.dev/npm/semver">semver</a></td>
+                  <td>803M</td>
+                  <td>npm-cli-ops</td>
+                  <td>May 2025</td>
+                  <td>13 months</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <p>
+            Every one of these accounts can run <code>npm publish</code> right now and push code that lands in your <code>node_modules/</code> within minutes.
+          </p>
+
+          <hr class="essay-divider" />
+
+          <h2>Why this matters</h2>
+
+          <p>
+            The npm token model is straightforward: if you have publish access, you can publish. There&rsquo;s no &ldquo;inactive&rdquo; state, no timeout, no re-authentication required after years of dormancy. A token from 2017 works in 2026.
+          </p>
+
+          <p>
+            That means every dormant account is a credential target. The attacker doesn&rsquo;t need to find a zero-day. They need to find a <code>.npmrc</code> on an old laptop, a token in a GitHub Actions secret that was never rotated, or a phished email on an account the owner hasn&rsquo;t checked in years.
+          </p>
+
+          <p>
+            This is exactly how the axios attack worked in March 2026. One stolen npm token. One push. 113 million installs per week compromised.
+          </p>
+
+          <hr class="essay-divider" />
+
+          <h2>debug: the 105-month case</h2>
+
+          <p>
+            debug has 4 historical publishers. Two had their access revoked: tjholowaychuk (TJ Holowaychuk, the original author) at 146 months inactive, and thebigredgeek at 109 months. The third, tootallnate (Nathan Rajlich), published 19 versions between 2014 and 2017. His last debug publish was September 2017. His access was never revoked.
+          </p>
+
+          <p>
+            The active maintainer, qix- (Josh Junon), published most recently. But tootallnate&rsquo;s account has had publish access to 653 million weekly downloads for eight years without using it.
+          </p>
+
+          <p>
+            Someone cleaned up tjholowaychuk and thebigredgeek. They missed tootallnate.
+          </p>
+
+          <hr class="essay-divider" />
+
+          <h2>What you can do</h2>
+
+          <p><strong>If you maintain a package:</strong></p>
+
+          <ol>
+            <li>Audit who has publish access: <code>npm access ls-collaborators &lt;package&gt;</code></li>
+            <li>Revoke access for anyone who hasn&rsquo;t published in 12+ months</li>
+            <li>Enable npm Staged Publishing&mdash;it adds a review step before versions go live</li>
+          </ol>
+
+          <p><strong>If you depend on these packages:</strong></p>
+
+          <ol>
+            <li>Pin versions in your lockfile and review lockfile diffs in PRs</li>
+            <li>Run <code>npx proof-of-commitment --file package-lock.json</code> to check your full tree</li>
+            <li>Add a CI gate: <code>npx proof-of-commitment --fail-on=critical</code></li>
+          </ol>
+
+          <hr class="essay-divider" />
+
+          <h2>How we found this</h2>
+
+          <p>
+            Commit tracks publisher lifecycle for every scored package: total historical publishers, who&rsquo;s currently active, who has access but hasn&rsquo;t published, and who was revoked. The dormant-with-access flag was added in v1.35.0.
+          </p>
+
+          <!-- CTA -->
+          <div class="cta-block">
+            <a href="/audit/" class="cta-btn cta-primary">Scan your packages</a>
+            <a href="/get-started?ref=blog-dormant" class="cta-btn cta-secondary">Get alerts</a>
+          </div>
+
+        </div>
+
+        <!-- Footer -->
+        <footer class="essay-footer">
+          <a href="/blog">&larr; More writing</a>
+        </footer>
+
+      </div>
+    </div>
+  </article>
+
+  <style>
+    /* --- Reset / base --- */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    /* --- Nav --- */
+    nav { padding: 1rem 0; border-bottom: 1px solid var(--border-light, #e5e5e5); }
+    .nav-inner { display: flex; justify-content: space-between; align-items: center; }
+    .nav-brand { font-weight: 700; font-size: 1.15rem; text-decoration: none; color: var(--ink, #111); }
+    .nav-links { list-style: none; display: flex; gap: 1.5rem; font-size: 0.92rem; }
+    .nav-links a { text-decoration: none; color: var(--ink-muted, #555); }
+    .nav-links a:hover { color: var(--ink, #111); }
+
+    /* --- Container --- */
+    .container { max-width: 1080px; margin: 0 auto; padding: 0 1.5rem; }
+
+    /* --- Essay --- */
+    .essay { padding: 4rem 0 6rem; }
+    .editorial { max-width: 680px; margin: 0 auto; }
+    .essay-header { margin-bottom: 3rem; }
+    .essay-meta { font-size: 0.85rem; color: var(--ink-muted, #888); margin-bottom: 0.75rem; }
+    .essay-title { font-size: clamp(1.6rem, 4vw, 2.4rem); line-height: 1.25; margin-bottom: 0.75rem; }
+    .essay-subtitle { font-size: 1.1rem; color: var(--ink-muted, #666); margin-bottom: 0.5rem; }
+    .essay-byline { font-size: 0.9rem; color: var(--ink-muted, #888); }
+    .essay-body p { font-size: 1.05rem; line-height: 1.75; margin-bottom: 1.5rem; color: var(--ink, #222); }
+    .essay-body h2 { font-size: 1.3rem; margin: 2.5rem 0 1rem; }
+    .essay-body a { color: var(--accent, #2563eb); text-decoration: underline; }
+    .essay-body code { background: var(--bg-muted, #f5f5f5); padding: 0.15rem 0.4rem; border-radius: 3px; font-size: 0.9em; }
+    .essay-body pre { background: var(--bg-muted, #f5f5f5); padding: 1rem 1.25rem; border-radius: 6px; overflow-x: auto; margin-bottom: 1.5rem; font-size: 0.9rem; }
+    .essay-body pre code { background: none; padding: 0; }
+    .essay-body ol { margin-bottom: 1.5rem; padding-left: 1.5rem; }
+    .essay-body ol li { font-size: 1.05rem; line-height: 1.75; color: var(--ink, #222); margin-bottom: 0.5rem; }
+    .essay-divider { border: none; border-top: 1px solid var(--border-light, #e5e5e5); margin: 2.5rem 0; }
+    .essay-footer { margin-top: 3rem; padding-top: 1.5rem; border-top: 1px solid var(--border-light, #e5e5e5); }
+    .essay-footer a { color: var(--accent, #2563eb); text-decoration: none; font-size: 0.95rem; }
+    .essay-footer a:hover { text-decoration: underline; }
+
+    /* --- Table --- */
+    .table-wrap { overflow-x: auto; margin-bottom: 1.5rem; }
+    table { width: 100%; border-collapse: collapse; font-size: 0.95rem; }
+    th { text-align: left; padding: 0.6rem 0.75rem; border-bottom: 2px solid var(--border-light, #e5e5e5); font-weight: 600; color: var(--ink, #222); white-space: nowrap; }
+    td { padding: 0.6rem 0.75rem; border-bottom: 1px solid var(--border-light, #e5e5e5); color: var(--ink, #222); }
+    td a { color: var(--accent, #2563eb); text-decoration: underline; }
+
+    /* --- CTA block --- */
+    .cta-block { display: flex; gap: 1rem; margin-top: 2.5rem; flex-wrap: wrap; }
+    .cta-btn { display: inline-block; padding: 0.75rem 1.5rem; border-radius: 6px; font-size: 1rem; font-weight: 600; text-decoration: none; text-align: center; }
+    .cta-primary { background: var(--accent, #2563eb); color: #fff; }
+    .cta-primary:hover { opacity: 0.9; }
+    .cta-secondary { border: 1px solid var(--accent, #2563eb); color: var(--accent, #2563eb); background: transparent; }
+    .cta-secondary:hover { background: var(--accent, #2563eb); color: #fff; }
+
+    /* --- Animation --- */
+    .animate-in { opacity: 0; transform: translateY(12px); animation: fadeUp 0.5s ease forwards; }
+    .delay-1 { animation-delay: 0.1s; }
+    .delay-2 { animation-delay: 0.2s; }
+    .delay-3 { animation-delay: 0.3s; }
+    .delay-4 { animation-delay: 0.4s; }
+    @keyframes fadeUp { to { opacity: 1; transform: translateY(0); } }
+  </style>
+
+</Layout>

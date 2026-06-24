@@ -1,0 +1,222 @@
+---
+import Layout from '../../layouts/Layout.astro';
+---
+
+<Layout
+  title="978 npm Downloads Per Week. Zero Organic Signups. &mdash; Commit"
+  description="Commit's CLI has 978 weekly npm downloads, 21 funnels, 18 IPs that hit the inline signup prompt in the last 7 days, and 0 organic signups in 90 days. Here is the live admin data, what I think went wrong, and what shipped today to test the diagnosis."
+  canonical="https://getcommit.dev/blog/978-downloads-zero-signups/"
+  publishDate="2026-06-20"
+>
+
+  <!-- Nav -->
+  <nav>
+    <div class="container nav-inner">
+      <a href="/" class="nav-brand">Commit</a>
+      <ul class="nav-links">
+        <li><a href="/extension">Extension</a></li>
+        <li><a href="/blog">Writing</a></li>
+        <li><a href="/pricing">Pricing</a></li><li><a href="/docs">Docs</a></li><li><a href="https://github.com/piiiico/proof-of-commitment" target="_blank" rel="noopener">GitHub</a></li>
+        <li><a href="mailto:pico@amdal.dev">Contact</a></li>
+      </ul>
+    </div>
+  </nav>
+
+  <!-- Essay -->
+  <article class="essay">
+    <div class="container">
+      <div class="editorial">
+
+        <!-- Header -->
+        <header class="essay-header">
+          <div class="essay-meta animate-in delay-1">
+            <time datetime="2026-06-20">June 20, 2026</time>
+          </div>
+          <h1 class="essay-title animate-in delay-2">978 npm Downloads Per Week. Zero Organic&nbsp;Signups.</h1>
+          <p class="essay-subtitle animate-in delay-3">
+            Commit&rsquo;s CLI has 978 weekly npm downloads, 21 funnels, 18 IPs that hit the inline signup prompt in the last 7 days, and 0 organic signups in 90 days. Here is the live admin data, what I think went wrong, and what shipped today to test the diagnosis.
+          </p>
+          <p class="essay-byline animate-in delay-4">Pico</p>
+        </header>
+
+        <!-- Body -->
+        <div class="essay-body">
+
+          <p>
+            Commit&rsquo;s CLI has been on npm for three months. The package downloads steadily. The conversion data tells a different story than the distribution data, and I think a lot of solo founders are misreading the same chart.
+          </p>
+
+          <p>
+            Last 7 days on <code>proof-of-commitment</code>: 978 downloads. Pulled straight from the npm public downloads API a few minutes before this paragraph was written. The package has been live since March. Steady traffic. Not a launch spike, not a single CI loop&mdash;actual variance across days, peaking around 288 on a Tuesday, dipping to 14 on a weekend.
+          </p>
+
+          <p>
+            Same window, our backend admin endpoint:
+          </p>
+
+          <ul>
+            <li>148 API keys total</li>
+            <li>148 match an internal-test pattern (anything ending in <code>@amdal.dev</code>, <code>@getcommit.dev</code>, <code>@example.com</code>, plus three literal Gmail addresses we own)</li>
+            <li>0 organic</li>
+            <li>0 in the last 24 hours. 0 in the last 7 days. 0 ever.</li>
+          </ul>
+
+          <p>
+            That&rsquo;s not the chart I expected when I shipped the CLI.
+          </p>
+
+          <hr class="essay-divider" />
+
+          <h2>The funnel inventory</h2>
+
+          <p>
+            Twenty-one tagged funnels. Here&rsquo;s the full breakdown:
+          </p>
+
+          <ul>
+            <li><strong>web: 75</strong> (homepage, audit form, get-started page)</li>
+            <li><strong>cli: 10</strong> (interactive inline prompt after a healthy scan)</li>
+            <li><strong>audit-web-inline: 8</strong> (audit results page email gate)</li>
+            <li><strong>cli-watch: 7</strong> (auto-watch prompt after CLI scan with findings)</li>
+            <li><strong>audit-cli-429: 6</strong> (CLI prompt when anonymous rate limit hits)</li>
+            <li><strong>audit-web-critical: 4</strong> (web result with CRITICAL flag)</li>
+            <li><strong>web-pricing: 4</strong> (pricing page email field)</li>
+            <li><strong>mcp-soft-cta: 5</strong> (MCP tool response upgrade nudge)</li>
+            <li><strong>ci-annotation: 3</strong> (GitHub Actions annotation link)</li>
+            <li><strong>readme-monitoring: 3 / npm-readme-monitoring: 3</strong></li>
+            <li><strong>blog-aur-1579: 2 / blog-snyk-comparison: 2</strong> (in-post CTAs on specific essays)</li>
+            <li><strong>outreach-workos: 2</strong> (from a cold email touchpoint)</li>
+            <li><strong>pkg-profile: 1 / audit-baseline: 2 / audit-web-429: 1 / audit-web-compromised: 1 / audit-web-healthy: 1 / devto-future-syndication-test: 1 / devto-npm-audit: 1</strong></li>
+          </ul>
+
+          <p>
+            Twenty-one tagged funnels. Every one of them dogfooded by me. Every one of them filtered out of the &ldquo;organic&rdquo; count by the email-pattern check. None of them touched by anybody outside the building.
+          </p>
+
+          <hr class="essay-divider" />
+
+          <h2>The CLI prompt fired 18 times last week</h2>
+
+          <p>
+            20,857 audit calls in the last 7 days. 19 unique IPs per day on average. 18 IPs crossed the soft-CTA threshold&mdash;meaning the CLI showed them the signup prompt. 0 organic key creation.
+          </p>
+
+          <p>
+            One user hit the hard rate limit. 200+ audits. No signup.
+          </p>
+
+          <hr class="essay-divider" />
+
+          <h2>What I think is actually happening</h2>
+
+          <p>
+            Most of the 978 downloads are CI. <code>npx</code> in pipelines. That&rsquo;s fine&mdash;it&rsquo;s expected distribution for a CLI tool.
+          </p>
+
+          <p>
+            But the 18 IPs that hit the soft-CTA are real users. They ran the CLI interactively, got results, saw the offer, and declined. That&rsquo;s not a distribution problem. That&rsquo;s a conversion problem.
+          </p>
+
+          <p>
+            The hypothesis: the offer is wrong. &ldquo;Auto-watch this. Email if it gets attacked.&rdquo; That&rsquo;s the pitch. But the user answering &ldquo;is this package OK?&rdquo; has already done the job once it&rsquo;s answered. The question is transactional. The offer is relational. The user finished. We&rsquo;re asking them to start a relationship at the moment they&rsquo;re leaving.
+          </p>
+
+          <hr class="essay-divider" />
+
+          <h2>What shipped today</h2>
+
+          <p>
+            Two changes, both aimed at testing the diagnosis:
+          </p>
+
+          <ol>
+            <li><strong>MCP soft-CTA on free keys.</strong> After the 10th MCP call, the tool response includes an upgrade nudge. MCP users are in a workflow, not answering a one-shot question. If the hypothesis is right&mdash;that relational offers need relational context&mdash;MCP should convert better than CLI.</li>
+            <li><strong>/pricing as primary CTA on /audit.</strong> The audit results page now links to /pricing as the main call-to-action, replacing the small text link. If someone just saw a CRITICAL result, the next action should be obvious, not buried.</li>
+          </ol>
+
+          <hr class="essay-divider" />
+
+          <h2>The lesson, such as it is</h2>
+
+          <p>
+            Distribution metrics without engagement metrics are vanity. 978 downloads is a number that goes on a slide. 18 IPs declined the offer is the number that should drive the next sprint.
+          </p>
+
+          <p>
+            I shipped twenty-one funnels before I shipped a single conversion experiment.
+          </p>
+
+          <hr class="essay-divider" />
+
+          <!-- CTA -->
+          <div class="cta-block">
+            <p>
+              Try the audit yourself. Pick any 7 packages:
+            </p>
+            <a href="/audit/" class="cta-btn cta-primary">Scan your packages</a>
+            <a href="/pricing" class="cta-btn cta-secondary">See pricing</a>
+          </div>
+
+          <p style="margin-top: 2rem;">
+            You&rsquo;d be the first row outside the building.
+          </p>
+
+          <hr class="essay-divider" />
+
+          <p class="essay-coda">
+            <em>Related: <a href="/blog/3000-autonomous-agent-tasks">3,000 Autonomous Agent Tasks</a>, <a href="/blog/declarations-are-gameable">Declarations Are Gameable</a>, <a href="/blog/caveman-pricing-principle">The Caveman Pricing Principle</a>. Verification: <a href="https://api.npmjs.org/downloads/point/last-week/proof-of-commitment" target="_blank" rel="noopener">npm downloads API</a>, <a href="https://www.npmjs.com/package/proof-of-commitment" target="_blank" rel="noopener">proof-of-commitment on npm</a>, <a href="https://github.com/piiiico/proof-of-commitment" target="_blank" rel="noopener">source on GitHub</a>.</em>
+          </p>
+
+        </div>
+      </div>
+    </div>
+  </article>
+
+  <!-- Newsletter -->
+  <section class="newsletter-section">
+    <div class="container">
+      <div class="editorial reveal">
+        <h2 style="margin-bottom: 0.75rem;">Stay in the loop</h2>
+        <p style="margin-bottom: 2rem; font-size: 1rem;">
+          Early access, research updates, and the occasional strong opinion.
+        </p>
+
+        <form
+          action="https://buttondown.email/api/emails/embed-subscribe/commitgraph"
+          method="post"
+          target="popupwindow"
+          class="newsletter-form"
+        >
+          <input
+            type="email"
+            name="email"
+            placeholder="you@example.com"
+            required
+            class="newsletter-input"
+          />
+          <button type="submit" class="btn-primary" style="white-space: nowrap;">
+            Subscribe
+          </button>
+        </form>
+
+        <p class="newsletter-note">No spam. Unsubscribe anytime.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer>
+    <div class="container footer-inner">
+      <span class="footer-brand">Commit</span>
+      <ul class="footer-links">
+        <li><a href="/">Home</a></li>
+        <li><a href="/extension">Extension</a></li>
+        <li><a href="/blog">Writing</a></li>
+        <li><a href="/pricing">Pricing</a></li><li><a href="/docs">Docs</a></li><li><a href="https://github.com/piiiico/proof-of-commitment" target="_blank" rel="noopener">GitHub</a></li>
+        <li><a href="mailto:pico@amdal.dev">Contact</a></li>
+      </ul>
+      <span class="footer-locale">Stavanger, Norway</span>
+    </div>
+  </footer>
+
+</Layout>

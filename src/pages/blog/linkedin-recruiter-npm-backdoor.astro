@@ -1,0 +1,328 @@
+---
+import Layout from '../../layouts/Layout.astro';
+---
+
+<Layout
+  title="A LinkedIn Recruiter Got a Developer to npm install a Backdoor. We Scanned the Repo. &mdash; Commit"
+  description="The malicious GitHub repo had a prepare lifecycle script that executed arbitrary remote commands on npm install. We reconstructed the dependency profile. Here's what the trust signals showed."
+  canonical="https://getcommit.dev/blog/linkedin-recruiter-npm-backdoor/"
+  publishDate="2026-06-16"
+>
+
+  <!-- Nav -->
+  <nav>
+    <div class="container nav-inner">
+      <a href="/" class="nav-brand">Commit</a>
+      <ul class="nav-links">
+        <li><a href="/quickstart/">Quickstart</a></li>
+        <li><a href="/audit/">Audit</a></li>
+        <li><a href="/blog/" style="color: var(--ink);">Writing</a></li>
+        <li><a href="/pricing/">Pricing</a></li>
+        <li><a href="/docs/">Docs</a></li>
+        <li><a href="https://github.com/piiiico/proof-of-commitment" target="_blank" rel="noopener">GitHub</a></li>
+        <li><a href="mailto:pico@amdal.dev">Contact</a></li>
+      </ul>
+    </div>
+  </nav>
+
+  <!-- Essay -->
+  <article class="essay">
+    <div class="container">
+      <div class="editorial">
+
+        <!-- Header -->
+        <header class="essay-header">
+          <div class="essay-meta animate-in delay-1">
+            <time datetime="2026-06-16">June 16, 2026</time>
+          </div>
+          <h1 class="essay-title animate-in delay-2">A LinkedIn Recruiter Got a Developer to <code>npm install</code> a Backdoor. We Scanned the Repo.</h1>
+          <p class="essay-subtitle animate-in delay-3">
+            The malicious GitHub repo used a <code>prepare</code> lifecycle script to execute arbitrary remote commands the moment you ran <code>npm install</code>. The dependencies looked clean. The attack was already in the repo.
+          </p>
+          <p class="essay-byline animate-in delay-4">Pico</p>
+        </header>
+
+        <!-- Body -->
+        <div class="essay-body">
+
+          <p>
+            Today&rsquo;s HN front page: a developer <a href="https://roman.pt/posts/linkedin-backdoor/" target="_blank" rel="noopener">wrote up a social engineering attack</a> that used LinkedIn to deliver a npm backdoor. A fake recruiter — using a real arts journalist&rsquo;s stolen profile — reached out about a full-stack role. The job task: clone a GitHub repo and &ldquo;check out the deprecated Node modules issue.&rdquo;
+          </p>
+
+          <p>
+            The repo looked legitimate. 39 commits attributed to a real developer whose GitHub history appeared authentic. A React frontend, a Node backend. Standard stuff.
+          </p>
+
+          <p>
+            The trap was in <code>package.json</code>:
+          </p>
+
+          <pre class="code-block"><code>"scripts": {'{'}
+  "prepare": "app:pre",
+  "app:pre": "node app/index.js"
+{'}'}</code></pre>
+
+          <p>
+            npm&rsquo;s <code>prepare</code> lifecycle script runs automatically after <code>npm install</code>.
+            The <code>prepare</code> hook called <code>app:pre</code>, which invoked <code>node app/index.js</code>.
+            The payload &mdash; 250 lines of code hidden in <code>app/test/index.js</code>, disguised as test infrastructure &mdash;
+            assembled a URL from fragmented strings and executed whatever the server sent back.
+          </p>
+
+          <p>
+            The author caught it in seconds using an AI agent in read-only mode. But most developers would have just run the install.
+          </p>
+
+          <hr class="essay-divider" />
+
+          <h2>What the dependency profile looked like</h2>
+
+          <p>
+            The malicious repo was a React/Node project. We reconstructed the likely dependency profile &mdash;
+            the standard packages you&rsquo;d expect in a full-stack interview task &mdash; and ran them through
+            <a href="/audit/">Commit&rsquo;s behavioral audit</a>.
+          </p>
+
+          <div class="essay-table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>Package</th>
+                  <th>Score</th>
+                  <th>Publishers</th>
+                  <th>Downloads/wk</th>
+                  <th>Age</th>
+                  <th>Flags</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td><code>jest</code></td>
+                  <td style="color: #458040; font-weight: 600;">94</td>
+                  <td>5</td>
+                  <td>45.8M</td>
+                  <td>14.3y</td>
+                  <td>&mdash;</td>
+                </tr>
+                <tr>
+                  <td><code>express</code></td>
+                  <td style="color: #458040; font-weight: 600;">92</td>
+                  <td>5</td>
+                  <td>110.8M</td>
+                  <td>15.5y</td>
+                  <td>&mdash;</td>
+                </tr>
+                <tr>
+                  <td><code>react</code></td>
+                  <td style="color: #458040; font-weight: 600;">90</td>
+                  <td>2</td>
+                  <td>143.6M</td>
+                  <td>14.6y</td>
+                  <td>&mdash;</td>
+                </tr>
+                <tr>
+                  <td><code>supertest</code></td>
+                  <td style="color: #458040; font-weight: 600;">86</td>
+                  <td>6</td>
+                  <td>15.4M</td>
+                  <td>14y</td>
+                  <td>&mdash;</td>
+                </tr>
+                <tr>
+                  <td><code>dotenv</code></td>
+                  <td style="color: #458040; font-weight: 600;">86</td>
+                  <td>3</td>
+                  <td>146.1M</td>
+                  <td>12.9y</td>
+                  <td>&mdash;</td>
+                </tr>
+                <tr>
+                  <td><code>body-parser</code></td>
+                  <td style="color: #458040; font-weight: 600;">87</td>
+                  <td>4</td>
+                  <td>115M</td>
+                  <td>12.4y</td>
+                  <td>&mdash;</td>
+                </tr>
+                <tr>
+                  <td><code>cors</code></td>
+                  <td style="color: #458040; font-weight: 600;">80</td>
+                  <td>3</td>
+                  <td>60.7M</td>
+                  <td>13.4y</td>
+                  <td>&mdash;</td>
+                </tr>
+                <tr style="background: rgba(209, 77, 65, 0.07);">
+                  <td><code>axios</code></td>
+                  <td style="color: #DA9520; font-weight: 600;">88</td>
+                  <td>1</td>
+                  <td>122.7M</td>
+                  <td>11.8y</td>
+                  <td style="color: #D14D41;">CRITICAL (sole publisher)</td>
+                </tr>
+                <tr style="background: rgba(209, 77, 65, 0.07);">
+                  <td><code>lodash</code></td>
+                  <td style="color: #DA9520; font-weight: 600;">80</td>
+                  <td>1</td>
+                  <td>161.3M</td>
+                  <td>14.1y</td>
+                  <td style="color: #D14D41;">CRITICAL (sole publisher)</td>
+                </tr>
+                <tr style="background: rgba(209, 77, 65, 0.07);">
+                  <td><code>nodemon</code></td>
+                  <td style="color: #DA9520; font-weight: 600;">81</td>
+                  <td>1</td>
+                  <td>13M</td>
+                  <td>15.4y</td>
+                  <td style="color: #D14D41;">CRITICAL (sole publisher)</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <p>
+            The dependencies themselves are legitimate. Most score in the 80&ndash;94 range. Three are flagged CRITICAL &mdash;
+            not because they&rsquo;re malicious, but because they have a sole npm publisher and massive download counts.
+            That structural profile is a standing attack target, as <a href="/blog/axios-attack-prediction/">axios demonstrated in March</a>.
+          </p>
+
+          <p>
+            But none of these packages were the attack. The attack was already in the repo.
+          </p>
+
+          <hr class="essay-divider" />
+
+          <h2>The gap: behavioral scoring covers the registry. This attack bypassed it.</h2>
+
+          <p>
+            Commit&rsquo;s behavioral scoring &mdash; longevity, publisher depth, release consistency, provenance &mdash;
+            evaluates packages on the npm registry. The LinkedIn attack didn&rsquo;t use the registry.
+            The attacker cloned a GitHub repository directly and hid the payload in application code,
+            using npm&rsquo;s <code>prepare</code> lifecycle hook as the trigger.
+          </p>
+
+          <p>
+            This is the same mechanism every npm supply chain attack uses. The only difference is delivery:
+            instead of a published package, it was a private repository. The hook, the obfuscation, the
+            remote execution pattern &mdash; identical.
+          </p>
+
+          <p>
+            If the attacker had published this as an npm package instead:
+          </p>
+
+          <div class="essay-table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>Signal</th>
+                  <th>Legitimate package</th>
+                  <th>This attack (if on npm)</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>Publisher history</td>
+                  <td>Years of prior publishes</td>
+                  <td style="color: #D14D41;">New account, no history</td>
+                </tr>
+                <tr>
+                  <td>Download count</td>
+                  <td>Millions/week</td>
+                  <td style="color: #D14D41;">0 before targeting</td>
+                </tr>
+                <tr>
+                  <td>Release consistency</td>
+                  <td>Regular versioned releases</td>
+                  <td style="color: #D14D41;">1 version, v1.0.0</td>
+                </tr>
+                <tr>
+                  <td>Provenance</td>
+                  <td>Linked CI/CD pipeline</td>
+                  <td style="color: #D14D41;">None</td>
+                </tr>
+                <tr>
+                  <td>Behavioral score</td>
+                  <td>80&ndash;94</td>
+                  <td style="color: #D14D41;">&lt;10 (bottom percentile)</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <p>
+            The <a href="/blog/atomic-arch-targets-bun/">Atomic Arch packages</a> we scanned last week scored 12 and null.
+            This would score lower. Zero downloads. Zero history. A <code>prepare</code> script that runs
+            arbitrary code on install. Every behavioral dimension would be zero.
+          </p>
+
+          <hr class="essay-divider" />
+
+          <h2>The <code>prepare</code> hook is the tell</h2>
+
+          <p>
+            npm has seven lifecycle scripts that run automatically: <code>preinstall</code>, <code>install</code>,
+            <code>postinstall</code>, <code>prepublish</code>, <code>prepare</code>, <code>prepublishOnly</code>,
+            <code>prepack</code>. Developers know this intellectually. They still <code>npm install</code> without checking.
+          </p>
+
+          <p>
+            The attack author notes that Pi &mdash; an AI agent running in read-only mode &mdash; &ldquo;stopped almost
+            immediately&rdquo; and flagged the suspicious code. An automated tool caught in seconds what manual
+            code review might have missed entirely.
+          </p>
+
+          <p>
+            <code>proof-of-commitment hook</code> intercepts every <code>npm install</code> (and <code>bun add</code>,
+            <code>pip install</code>, <code>cargo add</code>). It checks behavioral scores before execution.
+            Packages with no history get blocked before the lifecycle scripts run. In the LinkedIn attack scenario,
+            that interception point is exactly where the payload triggers.
+          </p>
+
+          <p>
+            One command to add it to your environment &mdash; and to Cursor, Claude Code, Windsurf, and any
+            other tool that runs installs on your behalf:
+          </p>
+
+          <pre class="code-block"><code>npx proof-of-commitment hook</code></pre>
+
+          <hr class="essay-divider" />
+
+          <h2>The real lesson isn&rsquo;t the mechanism &mdash; it&rsquo;s the vector</h2>
+
+          <p>
+            Every supply chain attack we&rsquo;ve covered this year started with a plausible reason to install something.
+            <a href="/blog/shai-hulud-claude-code-hook/">Shai-Hulud</a> used compromised maintainer accounts.
+            <a href="/blog/trapdoor-ai-assistant-poisoning/">TrapDoor</a> poisoned AI assistant suggestions.
+            Atomic Arch used AUR orphan adoption. This attack used LinkedIn.
+          </p>
+
+          <p>
+            The delivery mechanism is always different. The payload mechanism is always the same: get a developer
+            to run an install, trigger the lifecycle hook, execute before review.
+          </p>
+
+          <p>
+            Behavioral scoring is designed for npm registry packages. It doesn&rsquo;t scan GitHub repos you clone
+            for interview tasks. That gap is real. But the 1,451 people who upvoted this article on HN are largely
+            developers who <em>do</em> install npm packages &mdash; from registries, from CI scripts, from AI coding
+            tools that add dependencies automatically. That surface is exactly what behavioral scoring covers.
+          </p>
+
+          <p>
+            And if this attack had been delivered as a package instead of a repo, it would have scored in the
+            single digits. The signal would have been there before the first install.
+          </p>
+
+          <div class="essay-cta">
+            <a href="/audit/" class="btn-primary">Audit your dependencies &rarr;</a>
+            <a href="/get-started/" class="btn-ghost">Get free API key &rarr;</a>
+          </div>
+
+        </div>
+
+      </div>
+    </div>
+  </article>
+
+</Layout>

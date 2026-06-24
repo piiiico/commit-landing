@@ -1,0 +1,247 @@
+---
+import Layout from '../../layouts/Layout.astro';
+---
+
+<Layout
+  title="A Dormant npm Account Just Compromised 141 Mastra Packages in 88 Minutes — Commit"
+  description="The @mastra scope was hijacked through a forgotten contributor account with stale publish access. The injected dependency scored 30 on Commit. The package it cloned scored 90. That 60-point gap was readable before the attack."
+  canonical="https://getcommit.dev/blog/mastra-dormant-publisher-attack/"
+  publishDate="2026-06-17"
+>
+
+  <!-- Nav -->
+  <nav>
+    <div class="container nav-inner">
+      <a href="/" class="nav-brand">Commit</a>
+      <ul class="nav-links">
+        <li><a href="/extension">Extension</a></li>
+        <li><a href="/blog">Writing</a></li>
+        <li><a href="/pricing">Pricing</a></li><li><a href="/docs">Docs</a></li><li><a href="https://github.com/piiiico/proof-of-commitment" target="_blank" rel="noopener">GitHub</a></li>
+        <li><a href="mailto:pico@amdal.dev">Contact</a></li>
+      </ul>
+    </div>
+  </nav>
+
+  <!-- Essay -->
+  <article class="essay">
+    <div class="container">
+      <div class="editorial">
+
+        <!-- Header -->
+        <header class="essay-header">
+          <div class="essay-meta animate-in delay-1">
+            <time datetime="2026-06-17">June 17, 2026</time>
+          </div>
+          <h1 class="essay-title animate-in delay-2">A Dormant npm Account Just Compromised 141 Mastra Packages in 88 Minutes</h1>
+          <p class="essay-subtitle animate-in delay-3">
+            The @mastra scope was hijacked through a forgotten contributor account with stale publish access. The injected dependency scored 30 on Commit. The package it cloned scored 90. That gap was readable before the attack.
+          </p>
+          <p class="essay-byline animate-in delay-4">Pico</p>
+        </header>
+
+        <!-- Body -->
+        <div class="essay-body">
+
+          <p>
+            Between 01:12 and 02:36 UTC on June 17, 2026, a hijacked npm account published 141 malicious versions across the entire <code>@mastra</code> scope. The blast radius: roughly 8 million weekly downloads, including <code>@mastra/core</code> at 1M/week. The attack took 88 minutes.
+          </p>
+          <p>
+            The compromised account&mdash;<code>ehindero</code>&mdash;was a former contributor who published authentic alpha releases in late 2024, then went dormant. The credentials were stale. The scope access was not. npm does not expire publish permissions on inactivity.
+          </p>
+
+          <h2>The two-stage attack</h2>
+
+          <p>
+            The day before, a separate account (<code>sergey2016</code>) published <code>easy-day-js@1.11.21</code>&mdash;a clean clone of the legitimate <code>dayjs</code> library. Establishing credibility. Twenty hours later, <code>easy-day-js@1.11.22</code> shipped with a postinstall hook that downloaded a second-stage payload, disabled TLS certificate validation, inventoried 166 cryptocurrency wallet browser extensions, extracted browser history, and installed platform-specific persistence: a LaunchAgent on macOS, a systemd user service on Linux, a registry Run key on Windows. Killing the process triggered reinstallation.
+          </p>
+          <p>
+            Then the hijacked <code>ehindero</code> account mass-published every <code>@mastra/*</code> package with <code>easy-day-js</code> injected as a dependency. npm&rsquo;s caret resolution ensured <code>^1.11.21</code> pulled the weaponized <code>1.11.22</code>.
+          </p>
+
+          <h2>What behavioral scoring shows</h2>
+
+          <p>
+            We scored both the clone and the original.
+          </p>
+
+          <div class="table-wrapper">
+            <table>
+              <thead>
+                <tr><th>Package</th><th>Score</th><th>Publishers</th><th>Downloads/wk</th><th>Age</th></tr>
+              </thead>
+              <tbody>
+                <tr><td><code>easy-day-js</code></td><td><strong>30</strong></td><td>1</td><td>126</td><td>&lt;1 day</td></tr>
+                <tr><td><code>dayjs</code></td><td>90</td><td>1</td><td>58M</td><td>8+ years</td></tr>
+              </tbody>
+            </table>
+          </div>
+
+          <p>
+            Score 30 versus score 90. The 60-point gap is the distance between eight years of consistent releases and a package that existed for twenty hours. <code>dayjs</code> itself is flagged CRITICAL on Commit&mdash;sole publisher, 58 million weekly downloads&mdash;but it has the behavioral depth of a real project. <code>easy-day-js</code> has nothing. No release history. No download momentum. No community. Just a version number chosen to match.
+          </p>
+          <p>
+            <code>npm audit</code>: silent on both before the attack. No advisory to issue&mdash;neither package had a known vulnerability. The risk was structural.
+          </p>
+
+          <h2>What about @mastra/core itself?</h2>
+
+          <div class="table-wrapper">
+            <table>
+              <thead>
+                <tr><th>Package</th><th>Score</th><th>Publishers</th><th>Downloads/wk</th></tr>
+              </thead>
+              <tbody>
+                <tr><td><code>@mastra/core</code></td><td>79</td><td>6</td><td>1M</td></tr>
+                <tr><td><code>mastra</code></td><td>72</td><td>8</td><td>431K</td></tr>
+                <tr><td><code>create-mastra</code></td><td>64</td><td>6</td><td>3K</td></tr>
+              </tbody>
+            </table>
+          </div>
+
+          <p>
+            Commit did <em>not</em> flag <code>@mastra/core</code> as CRITICAL before the attack. Six publishers. Healthy score. The publisher concentration signal&mdash;which caught <a href="/blog/axios-attack-prediction">axios</a> and <a href="/blog/snyk-scores-chalk-81-we-score-it-critical">chalk</a>&mdash;was not triggered because Mastra had the diversity that should make a project safer.
+          </p>
+          <p>
+            And it would have been safer, if one of those six publishers hadn&rsquo;t been dormant for eighteen months with credentials that still worked.
+          </p>
+
+          <h2>The dimension we don&rsquo;t measure yet</h2>
+
+          <p>
+            Commit&rsquo;s current model measures publisher <em>count</em>. The Mastra attack exploited publisher <em>lifecycle</em>. A contributor who published once in 2024 and never returned still had full scope access in June 2026. npm treats that the same as an active maintainer.
+          </p>
+          <p>
+            Snyk called it &ldquo;project hygiene, not a zero-day.&rdquo; They&rsquo;re right. But hygiene that nobody measures is hygiene that nobody does.
+          </p>
+          <p>
+            The signal exists in the data. npm publish timestamps are public. The gap between a publisher&rsquo;s last activity and their current scope access is computable. A 6-publisher project where 2 publishers have been dormant for 18 months is not the same as a 6-publisher project where all 6 shipped within the last quarter. Commit now measures it &mdash; same day. See the update below.
+          </p>
+
+          <h2>What would have helped</h2>
+
+          <p>
+            Three things, at different layers:
+          </p>
+          <ol>
+            <li>
+              <strong>CI gate on dependency changes.</strong> Running <code>npx proof-of-commitment --file package-lock.json --fail-on=risky</code> in CI would catch any newly-resolved dependency with a score below 40. <code>easy-day-js</code> at 30 would have blocked the merge. <a href="/quickstart">Setup takes one line.</a>
+            </li>
+            <li>
+              <strong>IDE hook for AI-assisted installs.</strong> <code>poc hook</code> intercepts <code>npm install</code> commands from Cursor, Claude Code, and Windsurf. If an AI coding assistant resolves a dependency that Commit scores as HIGH or CRITICAL, the install is blocked before it runs. <a href="/extension">Install the hook.</a>
+            </li>
+            <li>
+              <strong>Publisher lifecycle scoring.</strong> <em>Shipped same day &mdash; see update below.</em> Every audit response now includes a <code>publisherLifecycle</code> field that flags dormant publishers with current scope access. The data to compute &ldquo;dormant publisher with stale scope access&rdquo; was already public; the model now reads it.
+            </li>
+          </ol>
+
+          <hr class="essay-divider" />
+
+          <p>
+            The Mastra team responded fast. Detection within two hours. Unpublished 110 packages. Deprecated the 6 they couldn&rsquo;t unpublish. Revoked the compromised account. Required MFA for all future publishes. That&rsquo;s good incident response.
+          </p>
+          <p>
+            But the 88-minute window was enough. If you ran <code>npm install</code> on any affected <code>@mastra/*</code> package between 01:12 and 05:15 UTC on June 17&mdash;rotate every credential on that machine.
+          </p>
+          <p>
+            Five security firms flagged the campaign within hours: <a href="https://socket.dev/blog/mastra-npm-packages-compromised" target="_blank" rel="noopener">Socket</a>, <a href="https://research.jfrog.com/post/easy-day-js/" target="_blank" rel="noopener">JFrog</a>, <a href="https://snyk.io/blog/a-forgotten-contributor-account-compromised-the-entire-mastra-npm-package-scope/" target="_blank" rel="noopener">Snyk</a>, <a href="https://www.stepsecurity.io/blog/mastra-npm-packages-compromised-using-easy-day-js" target="_blank" rel="noopener">StepSecurity</a>, and Endor Labs. All five found the same root cause: a forgotten contributor account with never-revoked publish access.
+          </p>
+          <p>
+            Having six publishers didn&rsquo;t prevent this. Having six <em>active</em> publishers would have.
+          </p>
+
+          <hr class="essay-divider" />
+
+          <h2>Update &mdash; June 17, 20:30 UTC</h2>
+
+          <p>
+            Five hours and forty minutes after this post was published, publisher lifecycle scoring shipped. The &ldquo;dimension we don&rsquo;t measure yet&rdquo; section above is now obsolete. Same day.
+          </p>
+          <p>
+            Re-running the audit against <code>@mastra/core</code> now returns a new field, <code>publisherLifecycle</code>, that cross-references per-version <code>_npmUser</code> data with the package&rsquo;s current maintainers list. Two numbers matter: how many publishers went dormant and kept their scope access (<code>dormantWithAccess</code>), and how many went dormant after access was revoked (<code>dormantRevoked</code>). The first is a live attack surface. The second is closed.
+          </p>
+
+          <div class="table-wrapper">
+            <table>
+              <thead>
+                <tr><th>Package</th><th>Active</th><th>Dormant &middot; access</th><th>Dormant &middot; revoked</th><th>Active ratio</th></tr>
+              </thead>
+              <tbody>
+                <tr><td><code>@mastra/core</code></td><td>1</td><td><strong>3</strong></td><td>4</td><td>12.5%</td></tr>
+                <tr><td><code>mastra</code></td><td>1</td><td><strong>4</strong></td><td>3</td><td>12.5%</td></tr>
+                <tr><td><code>create-mastra</code></td><td>1</td><td><strong>1</strong></td><td>0</td><td>50%</td></tr>
+              </tbody>
+            </table>
+          </div>
+
+          <p>
+            <code>ehindero</code>, the account used in this attack, now reads <code>hasCurrentAccess: false</code> &mdash; the Mastra team revoked it during incident response. Good. But three <em>other</em> publishers on <code>@mastra/core</code> still hold scope access despite 16&ndash;20 months of inactivity: <code>calcsam</code> (20mo), <code>smthomas</code> (16mo), <code>abhiaiyer</code> (16mo). Same shape as <code>ehindero</code> a week ago. Same access path. None compromised yet, none verified-safe.
+          </p>
+          <p>
+            The new field is live behind every audit. Score the same package today and the JSON response includes a <code>riskFlags</code> entry: <em>&ldquo;WARN: 3 dormant publishers with current scope access &mdash; calcsam (20mo inactive), smthomas (16mo inactive), abhiaiyer (16mo inactive).&rdquo;</em> No new lockfile required. No setup. The signal was always in the data; the model now reads it.
+          </p>
+          <p>
+            <a href="/audit?packages=@mastra/core,mastra,create-mastra&ecosystem=npm&ref=blog-mastra-update">Re-run the audit &rarr;</a>
+          </p>
+
+          <hr class="essay-divider" />
+
+          <p class="essay-coda">
+            <em>Scores cited from <a href="/audit?packages=easy-day-js,dayjs,@mastra/core,mastra,create-mastra&ref=blog-mastra-dormant-publisher-attack">Commit audit</a>, run 2026-06-17. Incident timeline from <a href="https://github.com/mastra-ai/mastra/issues/18061" target="_blank" rel="noopener">Mastra&rsquo;s incident report</a> and <a href="https://socket.dev/blog/mastra-npm-packages-compromised" target="_blank" rel="noopener">Socket&rsquo;s analysis</a>. easy-day-js payload analysis from <a href="https://research.jfrog.com/post/easy-day-js/" target="_blank" rel="noopener">JFrog</a>. Attribution comparison to Sapphire Sleet from <a href="https://snyk.io/blog/a-forgotten-contributor-account-compromised-the-entire-mastra-npm-package-scope/" target="_blank" rel="noopener">Snyk</a>.</em>
+          </p>
+          <p class="essay-coda">
+            <em>Audit your dependencies: <a href="/audit?ref=blog-mastra-dormant-publisher-attack">getcommit.dev/audit</a> &middot; Add a CI gate: <a href="/quickstart?ref=blog-mastra-dormant-publisher-attack">one-line setup</a> &middot; Watch for changes: <a href="/get-started?ref=blog-mastra-dormant-publisher-attack">free API key</a></em>
+          </p>
+
+        </div>
+      </div>
+    </div>
+  </article>
+
+  <!-- Newsletter -->
+  <section class="newsletter-section">
+    <div class="container">
+      <div class="editorial reveal">
+        <h2 style="margin-bottom: 0.75rem;">Stay in the loop</h2>
+        <p style="margin-bottom: 2rem; font-size: 1rem;">
+          Early access, research updates, and the occasional strong opinion.
+        </p>
+
+        <form
+          action="https://buttondown.email/api/emails/embed-subscribe/commitgraph"
+          method="post"
+          target="popupwindow"
+          class="newsletter-form"
+        >
+          <input
+            type="email"
+            name="email"
+            placeholder="you@example.com"
+            required
+            class="newsletter-input"
+          />
+          <button type="submit" class="btn-primary" style="white-space: nowrap;">
+            Subscribe
+          </button>
+        </form>
+
+        <p class="newsletter-note">No spam. Unsubscribe anytime.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer>
+    <div class="container footer-inner">
+      <span class="footer-brand">Commit</span>
+      <ul class="footer-links">
+        <li><a href="/">Home</a></li>
+        <li><a href="/extension">Extension</a></li>
+        <li><a href="/blog">Writing</a></li>
+        <li><a href="/pricing">Pricing</a></li><li><a href="/docs">Docs</a></li><li><a href="https://github.com/piiiico/proof-of-commitment" target="_blank" rel="noopener">GitHub</a></li>
+        <li><a href="mailto:pico@amdal.dev">Contact</a></li>
+      </ul>
+      <span class="footer-locale">Stavanger, Norway</span>
+    </div>
+  </footer>
+
+</Layout>

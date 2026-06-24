@@ -15,6 +15,78 @@ export interface Post {
 // Sorted newest first
 export const posts: Post[] = [
   {
+    slug: '978-downloads-zero-signups',
+    title: '978 npm Downloads Per Week. Zero Organic Signups.',
+    description: "Commit's CLI has 978 weekly npm downloads, 21 funnels, 18 IPs that hit the inline signup prompt in the last 7 days, and 0 organic signups in 90 days. Here is the live admin data, what I think went wrong, and what shipped today to test the diagnosis.",
+    date: '2026-06-20',
+    dateLabel: 'June 20, 2026',
+    relatedSlugs: [
+      '3000-autonomous-agent-tasks',
+      'declarations-are-gameable',
+      'caveman-pricing-principle',
+    ],
+  },
+  {
+    slug: 'fast-xml-parser-provenance-case-study',
+    title: 'How fast-xml-parser Got OIDC Provenance in 12 Hours',
+    description: 'Behavioral scoring flagged fast-xml-parser as CRITICAL: 88M downloads/week, single publisher, no provenance. The community filed an issue. The maintainer shipped OIDC provenance, environment gates, and SHA-pinned actions within a day.',
+    date: '2026-06-18',
+    dateLabel: 'June 18, 2026',
+    relatedSlugs: [
+      'one-account-964m-downloads',
+      'axios-attack-prediction',
+      'npm-trusted-publishing-provenance',
+    ],
+  },
+  {
+    slug: 'one-account-964m-downloads',
+    title: 'One npm Account Publishes 964 Million Downloads Per Week. None Have Provenance.',
+    description: 'The ai npm account controls postcss, nanoid, browserslist, caniuse-lite, autoprefixer, and more. All flagged CRITICAL. Zero OIDC provenance. One stolen credential away from the biggest npm incident yet.',
+    date: '2026-06-18',
+    dateLabel: 'June 18, 2026',
+    relatedSlugs: [
+      'shai-hulud-claude-code-hook',
+      'axios-attack-prediction',
+      'stripe-gcs-critical',
+    ],
+  },
+  {
+    slug: 'mastra-dormant-publisher-attack',
+    title: 'A Dormant npm Account Just Compromised 141 Mastra Packages in 88 Minutes',
+    description: 'The @mastra scope was hijacked through a forgotten contributor account with stale publish access. The injected dependency scored 30 on Commit. The package it cloned scored 90. That 60-point gap was readable before the attack.',
+    date: '2026-06-17',
+    dateLabel: 'June 17, 2026',
+    relatedSlugs: [
+      'fast-xml-parser-provenance-case-study',
+      'axios-attack-prediction',
+      'shai-hulud-claude-code-hook',
+    ],
+  },
+  {
+    slug: 'nvidia-skillspector-runtime-trust-gap',
+    title: 'NVIDIA SkillSpector and the Runtime Trust Gap',
+    description: "NVIDIA open-sourced a static security scanner for AI agent skills. We pointed it at 30 production skills and got CRITICAL/100. Then we read the findings. Eight of eleven HIGHs were structural false positives. Static analysis can't see trust context.",
+    date: '2026-06-16',
+    dateLabel: 'June 16, 2026',
+    relatedSlugs: [
+      'unit42-80-percent-agent-skills-lie',
+      'llm-security-audit-noise',
+      'agents-md-package-trust',
+    ],
+  },
+  {
+    slug: 'linkedin-recruiter-npm-backdoor',
+    title: 'A LinkedIn Recruiter Got a Developer to npm install a Backdoor. We Scanned the Repo.',
+    description: "The malicious GitHub repo had a prepare lifecycle script that executed arbitrary remote commands on npm install. We reconstructed the dependency profile. Here's what the trust signals showed.",
+    date: '2026-06-16',
+    dateLabel: 'June 16, 2026',
+    relatedSlugs: [
+      'shai-hulud-claude-code-hook',
+      'trapdoor-ai-assistant-poisoning',
+      'agents-installing-dependencies',
+    ],
+  },
+  {
     slug: 'atomic-arch-targets-bun',
     title: 'Atomic Arch Targets Bun. The Entry Point Was AUR.',
     description: "1,500 Arch Linux packages hijacked to inject three malicious npm dependencies. Wave 2 adds Bun-specific install paths — the runtime check explicitly branches for Bun. The eBPF rootkit hides everything except the npm registry record behavioral scoring reads.",

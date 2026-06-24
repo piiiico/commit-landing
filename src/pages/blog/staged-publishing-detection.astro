@@ -1,0 +1,195 @@
+---
+import Layout from '../../layouts/Layout.astro';
+---
+
+<Layout
+  title="OIDC Provenance Didn't Save TanStack or Red Hat. npm Staged Publishing Is the Missing Gate. &mdash; Commit"
+  description="TanStack (May 2026) and Red Hat (June 2026) were both compromised through their CI pipelines. Both had valid SLSA provenance. npm Staged Publishing adds a human approval gate that provenance can't provide."
+  canonical="https://getcommit.dev/blog/staged-publishing-detection/"
+  publishDate="2026-06-19"
+>
+
+  <!-- Nav -->
+  <nav>
+    <div class="container nav-inner">
+      <a href="/" class="nav-brand">Commit</a>
+      <ul class="nav-links">
+        <li><a href="/extension">Extension</a></li>
+        <li><a href="/blog">Writing</a></li>
+        <li><a href="/pricing">Pricing</a></li><li><a href="/docs">Docs</a></li><li><a href="https://github.com/piiiico/proof-of-commitment" target="_blank" rel="noopener">GitHub</a></li>
+        <li><a href="mailto:pico@amdal.dev">Contact</a></li>
+      </ul>
+    </div>
+  </nav>
+
+  <!-- Essay -->
+  <article class="essay">
+    <div class="container">
+      <div class="editorial">
+
+        <!-- Header -->
+        <header class="essay-header">
+          <div class="essay-meta animate-in delay-1">
+            <time datetime="2026-06-19">June 19, 2026</time>
+          </div>
+          <h1 class="essay-title animate-in delay-2">OIDC Provenance Didn&rsquo;t Save TanStack or Red&nbsp;Hat. npm Staged Publishing Is the Missing Gate.</h1>
+          <p class="essay-subtitle animate-in delay-3">
+            Two attacks, both with valid SLSA attestations. The gap is between CI and <code>latest</code>.
+          </p>
+          <p class="essay-byline animate-in delay-4">Pico</p>
+        </header>
+
+        <!-- Body -->
+        <div class="essay-body">
+
+          <p>
+            Two major supply chain attacks in six weeks. Both targeted packages with OIDC provenance enabled. Both succeeded.
+          </p>
+
+          <p>
+            <strong>TanStack (May&nbsp;11, 2026):</strong> 42 packages, 84 malicious versions in 6&nbsp;minutes. Attacker exploited GitHub Actions <code>pull_request_target</code> + cache poisoning + OIDC token extraction from runner memory. 16.8M weekly downloads on @tanstack/react-router alone. All published versions had valid SLSA attestations.
+          </p>
+
+          <p>
+            <strong>Red Hat @redhat-cloud-services (June&nbsp;1, 2026):</strong> 32 packages republished with credential-stealing malware. Attacker compromised a GitHub account, pushed orphan commits, triggered the existing CI pipeline. The pipeline built the malware, published it to npm using its own OIDC tokens, and generated valid SLSA provenance. Provenance proved &ldquo;this was built by Red Hat&rsquo;s CI&rdquo;&mdash;which was true. The CI just happened to be building malware.
+          </p>
+
+          <hr class="essay-divider" />
+
+          <h2>Provenance answers the wrong question</h2>
+
+          <p>
+            OIDC provenance answers: &ldquo;Was this built by the expected pipeline?&rdquo;
+          </p>
+
+          <p>
+            When the pipeline is compromised, the answer is yes. The attestation is valid. The malware is signed.
+          </p>
+
+          <p>
+            This is the gap. Provenance proves <em>where</em> a build came from. It doesn&rsquo;t prove the CI pipeline wasn&rsquo;t tampered with.
+          </p>
+
+          <hr class="essay-divider" />
+
+          <h2>npm Staged Publishing closes it</h2>
+
+          <p>
+            npm Staged Publishing (GA May&nbsp;2026) adds a human approval gate between CI publishing a version and that version becoming the default <code>npm install</code> target.
+          </p>
+
+          <p>Without Staged Publishing:</p>
+          <pre><code>CI runs &rarr; npm publish &rarr; version is live immediately</code></pre>
+
+          <p>With Staged Publishing:</p>
+          <pre><code>CI runs &rarr; npm stage &rarr; version sits in holding &rarr; human 2FA approval &rarr; version goes live</code></pre>
+
+          <p>
+            In both the TanStack and Red Hat scenarios, malicious versions would have sat in a staging area. No silent pushes to <code>latest</code>. A human would need to review and approve each one.
+          </p>
+
+          <p>
+            PostCSS maintainer Andrey Sitnik made this point directly in <a href="https://github.com/postcss/postcss/issues/2096" target="_blank" rel="noopener">postcss/postcss#2096</a>: &ldquo;CI-as-publisher increased the attack risks compared to 2FA manual publishing.&rdquo; He was right&mdash;and the incidents proved it.
+          </p>
+
+          <hr class="essay-divider" />
+
+          <h2>Detection</h2>
+
+          <p>
+            npm doesn&rsquo;t surface whether a package uses Staged Publishing. Registry metadata doesn&rsquo;t include it unless a version is actively staged. CI workflow files might reference <code>npm stage</code> commands, but nobody checks those at dependency-install time.
+          </p>
+
+          <p>
+            We added Staged Publishing detection to <a href="/">Commit</a> this week. Two-tier detection:
+          </p>
+
+          <p>
+            <strong>1. dist-tags check</strong>&mdash;if a <code>stage</code> dist-tag exists in the registry, the package is actively using staged publishing. Zero extra API calls&mdash;it&rsquo;s already in the registry response.
+          </p>
+
+          <p>
+            <strong>2. GitHub Actions workflow scan</strong>&mdash;looks for <code>npm stage</code>, <code>@npm/staged-publish</code>, or <code>staged-publish</code> patterns in the package&rsquo;s CI configuration.
+          </p>
+
+          <p>
+            The result shows up in <code>scoreBreakdown.stagedPublishing</code> on the API response and in the CLI output.
+          </p>
+
+          <hr class="essay-divider" />
+
+          <h2>Check your dependencies</h2>
+
+          <pre><code>npx proof-of-commitment</code></pre>
+
+          <p>
+            This scans your lockfile and flags packages where a single npm publisher controls &gt;10M weekly downloads&mdash;the exact attack surface that&rsquo;s been exploited three times since March. The output now includes whether each package uses OIDC provenance, Staged Publishing, or neither.
+          </p>
+
+          <p>
+            If you see CRITICAL with no provenance and no staged publishing&mdash;that package is one stolen credential away from the next incident. And the credential doesn&rsquo;t have to be an npm token anymore. It can be a GitHub account, a CI cache, or an OIDC token extracted from process memory.
+          </p>
+
+          <p>
+            The supply chain moved past &ldquo;just use provenance&rdquo; in May&nbsp;2026. The question now is which packages have caught up.
+          </p>
+
+          <p>
+            <a href="/get-started?ref=blog-staged-publishing">Get a free API key</a> to monitor your dependencies and get alerted when scores degrade.
+          </p>
+
+        </div>
+
+        <!-- Footer -->
+        <footer class="essay-footer">
+          <a href="/blog">&larr; More writing</a>
+        </footer>
+
+      </div>
+    </div>
+  </article>
+
+  <style>
+    /* --- Reset / base --- */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    /* --- Nav --- */
+    nav { padding: 1rem 0; border-bottom: 1px solid var(--border-light, #e5e5e5); }
+    .nav-inner { display: flex; justify-content: space-between; align-items: center; }
+    .nav-brand { font-weight: 700; font-size: 1.15rem; text-decoration: none; color: var(--ink, #111); }
+    .nav-links { list-style: none; display: flex; gap: 1.5rem; font-size: 0.92rem; }
+    .nav-links a { text-decoration: none; color: var(--ink-muted, #555); }
+    .nav-links a:hover { color: var(--ink, #111); }
+
+    /* --- Container --- */
+    .container { max-width: 1080px; margin: 0 auto; padding: 0 1.5rem; }
+
+    /* --- Essay --- */
+    .essay { padding: 4rem 0 6rem; }
+    .editorial { max-width: 680px; margin: 0 auto; }
+    .essay-header { margin-bottom: 3rem; }
+    .essay-meta { font-size: 0.85rem; color: var(--ink-muted, #888); margin-bottom: 0.75rem; }
+    .essay-title { font-size: clamp(1.6rem, 4vw, 2.4rem); line-height: 1.25; margin-bottom: 0.75rem; }
+    .essay-subtitle { font-size: 1.1rem; color: var(--ink-muted, #666); margin-bottom: 0.5rem; }
+    .essay-byline { font-size: 0.9rem; color: var(--ink-muted, #888); }
+    .essay-body p { font-size: 1.05rem; line-height: 1.75; margin-bottom: 1.5rem; color: var(--ink, #222); }
+    .essay-body h2 { font-size: 1.3rem; margin: 2.5rem 0 1rem; }
+    .essay-body a { color: var(--accent, #2563eb); text-decoration: underline; }
+    .essay-body code { background: var(--bg-muted, #f5f5f5); padding: 0.15rem 0.4rem; border-radius: 3px; font-size: 0.9em; }
+    .essay-body pre { background: var(--bg-muted, #f5f5f5); padding: 1rem 1.25rem; border-radius: 6px; overflow-x: auto; margin-bottom: 1.5rem; font-size: 0.9rem; }
+    .essay-body pre code { background: none; padding: 0; }
+    .essay-divider { border: none; border-top: 1px solid var(--border-light, #e5e5e5); margin: 2.5rem 0; }
+    .essay-footer { margin-top: 3rem; padding-top: 1.5rem; border-top: 1px solid var(--border-light, #e5e5e5); }
+    .essay-footer a { color: var(--accent, #2563eb); text-decoration: none; font-size: 0.95rem; }
+    .essay-footer a:hover { text-decoration: underline; }
+
+    /* --- Animation --- */
+    .animate-in { opacity: 0; transform: translateY(12px); animation: fadeUp 0.5s ease forwards; }
+    .delay-1 { animation-delay: 0.1s; }
+    .delay-2 { animation-delay: 0.2s; }
+    .delay-3 { animation-delay: 0.3s; }
+    .delay-4 { animation-delay: 0.4s; }
+    @keyframes fadeUp { to { opacity: 1; transform: translateY(0); } }
+  </style>
+
+</Layout>

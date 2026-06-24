@@ -82,23 +82,12 @@ import Layout from '../layouts/Layout.astro';
     </div>
   </section>
 
-  <!-- Social-proof banner (populated from /api/stats/teams-protected) -->
-  <!-- Visible by default with fallback; JS upgrades to live count if count >= 5. -->
-  <section id="social-proof" class="social-proof-section">
-    <div class="container">
-      <p class="social-proof-line">
-        <span class="social-proof-dot" aria-hidden="true">●</span>
-        <span id="social-proof-text">Teams shipping with Commit this week.</span>
-      </p>
-    </div>
-  </section>
-
   <!-- Attack timeline — real incidents, real data -->
   <section class="attack-timeline-section">
     <div class="container">
       <div class="editorial reveal" style="max-width: var(--max-content); margin: 0 auto;">
         <span class="section-label">Why monitoring matters</span>
-        <h2 class="section-heading" style="margin-bottom: 1.5rem;">Three attacks. Same structural pattern. <em>All flagged beforehand.</em></h2>
+        <h2 class="section-heading" style="margin-bottom: 1.5rem;">Four attacks. Each one readable beforehand &mdash; <em>by a different behavioral signal.</em></h2>
       </div>
       <div class="attack-timeline-grid">
         <div class="attack-card">
@@ -116,11 +105,50 @@ import Layout from '../layouts/Layout.astro';
           <strong class="attack-name">Shai-Hulud</strong>
           <p class="attack-desc">Self-replicating worm. 637 package versions in 39 minutes. Installed Claude Code &amp; VS Code persistence hooks. <a href="/blog/shai-hulud-claude-code-hook/" style="color: var(--accent);">Two OpenAI devices affected.</a></p>
         </div>
+        <div class="attack-card">
+          <time class="attack-date">Jun 17, 2026</time>
+          <strong class="attack-name">Mastra</strong>
+          <p class="attack-desc">Dormant publisher hijack. 141 packages across <code>@mastra/*</code>, ~8M weekly downloads, 88 minutes. The injected typosquat <code>easy-day-js</code> scored 30 &mdash; its target <code>dayjs</code> scored 90. <a href="/blog/mastra-dormant-publisher-attack/" style="color: var(--accent);">Read the analysis.</a></p>
+        </div>
       </div>
       <p class="attack-bottom-line">
         <code>npm audit</code> flagged none of these beforehand. Behavioral signals flagged all of them.
         <strong>Monitoring catches score changes before the next one reaches your tree.</strong>
       </p>
+    </div>
+  </section>
+
+  <hr class="section-divider" />
+
+  <!-- Ecosystem response -->
+  <section style="padding: var(--space-section) 0;">
+    <div class="container">
+      <p class="section-label">Ecosystem response</p>
+      <div class="editorial reveal" style="max-width: var(--max-content);">
+        <h2 style="margin-bottom: 0.75rem;">Maintainers are moving. The detector confirms it live.</h2>
+        <p style="margin-bottom: 1.5rem; font-size: 1rem; color: var(--ink-muted);">
+          PostCSS creator Andrey Sitnik moved nanoid and nanospy to Staged Publishing on June 19. Hono creator Yusuke Wada merged it into Hono on June 22 — four days later. preact shipped the same hardening earlier without announcement. Four packages, ~290M combined weekly downloads, all verified by our detector.
+        </p>
+        <blockquote style="border-left: 3px solid var(--ink); margin: 0 0 1.5rem; padding: 0.75rem 0 0.75rem 1.5rem; font-size: 1.05rem; font-style: italic; color: var(--ink); line-height: 1.65;">
+          "I already moved nanoid and nanospy to the new process, we can test them."
+          <cite style="display: block; margin-top: 0.6rem; font-size: 0.82rem; font-style: normal; color: var(--ink-muted); font-weight: 500;">
+            — Andrey Sitnik, PostCSS creator ·
+            <a href="https://github.com/postcss/postcss/issues/2096" target="_blank" rel="noopener" style="color: var(--ink-muted); text-decoration: underline; text-underline-offset: 2px;">postcss/postcss#2096</a>
+            · June 2026
+          </cite>
+        </blockquote>
+        <p style="font-size: 0.9rem; color: var(--ink-muted); line-height: 1.6;">
+          Verify it yourself:
+          <a href="/scan/?pkg=nanoid&utm_source=pricing-ecosystem" style="color: var(--ink); text-decoration: underline; text-underline-offset: 2px;">scan nanoid</a>
+          ·
+          <a href="/scan/?pkg=hono&utm_source=pricing-ecosystem" style="color: var(--ink); text-decoration: underline; text-underline-offset: 2px;">scan hono</a>
+          ·
+          <a href="/scan/?pkg=preact&utm_source=pricing-ecosystem" style="color: var(--ink); text-decoration: underline; text-underline-offset: 2px;">scan preact</a>
+          ·
+          <a href="/scan/?pkg=postcss&utm_source=pricing-ecosystem" style="color: var(--ink); text-decoration: underline; text-underline-offset: 2px;">scan postcss</a>
+          (PostCSS itself is in flight — "in a week or two", per the thread; see <a href="https://github.com/honojs/hono/pull/5035" target="_blank" rel="noopener" style="color: var(--ink); text-decoration: underline; text-underline-offset: 2px;">hono#5035</a> for Hono's adoption). Monitoring flags when each promotes from <code style="font-size: 0.85em;">stage</code> to <code style="font-size: 0.85em;">latest</code>. The score moves before the install does.
+        </p>
+      </div>
     </div>
   </section>
 
@@ -505,6 +533,39 @@ import Layout from '../layouts/Layout.astro';
         Commit Developer $15/mo for solo builders · Commit Pro flat $29/mo regardless of team size.
         Socket and Snyk are excellent tools — they're just priced for a different model.
       </p>
+
+      <!-- Token-based scanner comparison -->
+      <div class="scanner-compare reveal">
+        <div class="scanner-compare-header">
+          <span class="scanner-compare-label">vs. token-based scanners</span>
+          <span class="scanner-compare-title">ArgusRed &amp; Semgrep scan your code. Commit monitors your imports.</span>
+        </div>
+        <div class="scanner-compare-body">
+          <div class="scanner-col scanner-col-them">
+            <div class="scanner-col-name">ArgusRed / Semgrep (token-based)</div>
+            <ul class="scanner-list">
+              <li>Free tier requires account signup for tokens</li>
+              <li>10 repos quarterly: ~$400/year (estimated)</li>
+              <li>Daily CI: token burn scales with codebase size</li>
+              <li>Scans code <em>you wrote</em> — not supply chain risk</li>
+              <li>Point-in-time — miss changes between scans</li>
+            </ul>
+          </div>
+          <div class="scanner-col scanner-col-commit">
+            <div class="scanner-col-name">Commit (flat monitoring)</div>
+            <ul class="scanner-list">
+              <li>Free tier: 200 API calls/day, instant key, no signup</li>
+              <li>10 repos <em>continuously</em>: $29/mo = $348/year</li>
+              <li>Daily CI: same flat rate regardless of frequency</li>
+              <li>Monitors deps <em>you import</em> — supply chain risk</li>
+              <li>Alerts fire when a trusted package degrades</li>
+            </ul>
+          </div>
+        </div>
+        <p class="scanner-compare-note">
+          Different tools, different attack surfaces. Use ArgusRed/Semgrep for your own code; use Commit for your dependency graph. <a href="/compare/argusred" class="scanner-link">Full comparison &rarr;</a>
+        </p>
+      </div>
     </div>
   </section>
 
@@ -560,6 +621,27 @@ import Layout from '../layouts/Layout.astro';
           </div>
 
           <div class="faq-item reveal">
+            <h3 class="faq-q">How does Commit compare to automated code scanners like Semgrep or ArgusRed?</h3>
+            <p class="faq-a">
+              They answer different questions. Automated code scanners (Semgrep, ArgusRed, CodeQL) search
+              <em>your own source code</em> for exploitable vulnerabilities — they run after you've written the code.
+              Commit audits <em>the packages you depend on</em>, before they enter your codebase.
+            </p>
+            <p class="faq-a" style="margin-top: 0.75rem;">
+              The relevant sequence: Commit flags a dependency as CRITICAL in your PR review →
+              you reject the import → there's nothing for a code scanner to find later.
+              If you skip the supply-chain check, the best a scanner can do is find the exploit after
+              you've already shipped the risky dependency to production.
+            </p>
+            <p class="faq-a" style="margin-top: 0.75rem;">
+              Pricing model also differs. Token-based scanners cost more as you scan more repos more often.
+              Commit is flat per project — continuous monitoring included at every tier, regardless of
+              how frequently packages change. Use both approaches if your budget allows; if you're
+              prioritising, supply-chain exposure is where most real-world package-level incidents originate.
+            </p>
+          </div>
+
+          <div class="faq-item reveal">
             <h3 class="faq-q">What counts as a "project" for Pro monitoring?</h3>
             <p class="faq-a">
               A project is a dependency manifest you want Commit to monitor continuously —
@@ -607,7 +689,7 @@ import Layout from '../layouts/Layout.astro';
         </p>
         <div class="cta-buttons">
           <a href="/audit" class="btn-primary">Run a free audit →</a>
-          <a href="mailto:support@getcommit.dev?subject=Commit Pro" class="btn-secondary">Talk to us about Pro</a>
+          <button type="button" data-tier="pro" class="btn-secondary checkout-btn">Subscribe to Pro — $29/mo →</button>
         </div>
         <p class="cta-feedback">
           Didn't upgrade. Why?
@@ -661,30 +743,6 @@ import Layout from '../layouts/Layout.astro';
   </footer>
 
   <script>
-    // ── Social-proof banner (populated from /api/stats/teams-protected) ──
-    // Suppressed if count < 5 (handled server-side in the endpoint: period="none").
-    (async () => {
-      try {
-        const resp = await fetch('https://poc-backend.amdal-dev.workers.dev/api/stats/teams-protected');
-        if (!resp.ok) return;
-        const data = await resp.json() as { ok?: boolean; count?: number; period?: string };
-        if (!data.ok || !data.count || !data.period || data.period === 'none') return;
-        const banner = document.getElementById('social-proof');
-        const text = document.getElementById('social-proof-text');
-        if (!banner || !text) return;
-        const periodLabel: Record<string, string> = {
-          '7d': 'this week',
-          '30d': 'this month',
-          'total': 'so far',
-        };
-        const label = periodLabel[data.period] ?? 'recently';
-        text.textContent = `${data.count} teams started using Commit ${label}.`;
-        banner.hidden = false;
-      } catch {
-        // Silent fail — social proof is non-critical.
-      }
-    })();
-
     // ── Checkout email modal ──
     const modal = document.getElementById('checkout-modal') as HTMLDivElement | null;
     const modalOverlay = modal?.querySelector('.checkout-modal-overlay');
@@ -1537,27 +1595,95 @@ import Layout from '../layouts/Layout.astro';
       text-decoration: underline;
     }
 
-    /* ── Social proof ── */
-    .social-proof-section {
-      padding: 1.25rem 0 0.25rem;
+    /* ── Scanner comparison (ArgusRed / Semgrep vs Commit) ── */
+    .scanner-compare {
+      margin-top: 3rem;
+      border: 1px solid var(--border-light);
+      border-radius: 8px;
       background: var(--paper);
+      overflow: hidden;
     }
-
-    .social-proof-line {
-      text-align: center;
-      font-size: 0.9rem;
+    .scanner-compare-header {
+      padding: 1.25rem 1.5rem;
+      background: var(--paper-dim);
+      border-bottom: 1px solid var(--border-light);
+    }
+    .scanner-compare-label {
+      display: block;
+      font-size: 0.7rem;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: var(--ink-subtle);
+      margin-bottom: 0.35rem;
+    }
+    .scanner-compare-title {
+      display: block;
+      font-size: 1.05rem;
+      font-weight: 600;
+      color: var(--ink);
+      line-height: 1.4;
+    }
+    .scanner-compare-body {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 0;
+    }
+    .scanner-col {
+      padding: 1.25rem 1.5rem;
+    }
+    .scanner-col-them {
+      border-right: 1px solid var(--border-light);
+    }
+    .scanner-col-name {
+      font-size: 0.8rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
       color: var(--ink-muted);
+      margin-bottom: 0.75rem;
+    }
+    .scanner-list {
+      list-style: none;
+      padding: 0;
       margin: 0;
-      line-height: 1.5;
+    }
+    .scanner-list li {
+      font-size: 0.88rem;
+      line-height: 1.55;
+      color: var(--ink-muted);
+      padding: 0.3rem 0;
+    }
+    .scanner-list li em {
+      font-style: italic;
+      color: var(--ink);
+    }
+    .scanner-col-commit .scanner-list li {
+      color: var(--ink);
+    }
+    .scanner-compare-note {
+      padding: 1rem 1.5rem;
+      font-size: 0.85rem;
+      color: var(--ink-muted);
+      border-top: 1px solid var(--border-light);
+      background: var(--paper-dim);
+    }
+    .scanner-link {
+      color: var(--accent);
+      text-decoration: none;
+      font-weight: 500;
+    }
+    .scanner-link:hover {
+      text-decoration: underline;
     }
 
-    .social-proof-dot {
-      display: inline-block;
-      color: #166534;
-      font-size: 0.65rem;
-      vertical-align: middle;
-      margin-right: 0.4rem;
-      transform: translateY(-1px);
+    @media (max-width: 640px) {
+      .scanner-compare-body {
+        grid-template-columns: 1fr;
+      }
+      .scanner-col-them {
+        border-right: none;
+        border-bottom: 1px solid var(--border-light);
+      }
     }
 
     /* Reassurance line under paid-tier Subscribe buttons */
