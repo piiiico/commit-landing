@@ -47,7 +47,7 @@ import Layout from '../../layouts/Layout.astro';
           </p>
 
           <p>
-            We scanned the publisher lifecycle of top npm packages and flagged every account that (a) has current publish scope and (b) hasn&rsquo;t published to that package in 12+ months. The findings cover 2.6 billion weekly downloads.
+            We scanned the publisher lifecycle of top npm packages and flagged every account that (a) has current publish scope and (b) hasn&rsquo;t published to that package in 12+ months. The findings cover 2.8 billion weekly downloads.
           </p>
 
           <hr class="essay-divider" />
@@ -122,6 +122,13 @@ import Layout from '../../layouts/Layout.astro';
                   <td>May 2025</td>
                   <td>13 months</td>
                 </tr>
+                <tr>
+                  <td><a href="https://getcommit.dev/npm/ws">ws</a></td>
+                  <td>220M</td>
+                  <td>einaros, v1, 3rdeden</td>
+                  <td>Jun 2013 &ndash; Jun 2016</td>
+                  <td>10&ndash;13 years</td>
+                </tr>
               </tbody>
             </table>
           </div>
@@ -160,6 +167,22 @@ import Layout from '../../layouts/Layout.astro';
 
           <p>
             Someone cleaned up tjholowaychuk and thebigredgeek. They missed tootallnate.
+          </p>
+
+          <hr class="essay-divider" />
+
+          <h2>ws: three dormant accounts, one shared email domain</h2>
+
+          <p>
+            ws handles 220 million WebSocket connections per week across Node.js. It has four npm publishers. Only one&mdash;lpinca&mdash;has published since 2016. The other three haven&rsquo;t touched it in a decade or more: einaros (last publish June 2013), v1 (November 2014), 3rdeden (June 2016).
+          </p>
+
+          <p>
+            Worse: two of the dormant accounts (v1 and 3rdeden) share the <code>3rd-Eden.com</code> email domain on npm. A single domain compromise&mdash;lapsed registration, DNS hijack, email provider breach&mdash;would expose both accounts at once.
+          </p>
+
+          <p>
+            Three <code>npm owner rm</code> commands would close this gap in thirty seconds.
           </p>
 
           <hr class="essay-divider" />
