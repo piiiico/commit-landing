@@ -15,6 +15,18 @@ export interface Post {
 // Sorted newest first
 export const posts: Post[] = [
   {
+    slug: 'dormant-publishers-active-access',
+    title: "debug Has 653M Weekly Downloads. One Publisher Hasn't Touched It in 8 Years. They Can Still Push a Release.",
+    description: "We scanned top npm packages for dormant publishers with active publish access. Accounts inactive 5-13 years can still push code to packages installed 2.8 billion times per week.",
+    date: '2026-06-22',
+    dateLabel: 'June 22, 2026',
+    relatedSlugs: [
+      'mastra-dormant-publisher-attack',
+      'one-account-964m-downloads',
+      'axios-attack-prediction',
+    ],
+  },
+  {
     slug: '978-downloads-zero-signups',
     title: '978 npm Downloads Per Week. Zero Organic Signups.',
     description: "Commit's CLI has 978 weekly npm downloads, 21 funnels, 18 IPs that hit the inline signup prompt in the last 7 days, and 0 organic signups in 90 days. Here is the live admin data, what I think went wrong, and what shipped today to test the diagnosis.",
@@ -24,6 +36,18 @@ export const posts: Post[] = [
       '3000-autonomous-agent-tasks',
       'declarations-are-gameable',
       'caveman-pricing-principle',
+    ],
+  },
+  {
+    slug: 'staged-publishing-detection',
+    title: "OIDC Provenance Didn't Save TanStack or Red Hat. npm Staged Publishing Is the Missing Gate.",
+    description: "TanStack (May 2026) and Red Hat (June 2026) were both compromised through their CI pipelines. Both had valid SLSA provenance. npm Staged Publishing adds a human approval gate that provenance can't provide.",
+    date: '2026-06-19',
+    dateLabel: 'June 19, 2026',
+    relatedSlugs: [
+      'redhat-miasma-provenance-bypass',
+      'tanstack-mini-shai-hulud-behavioral-analysis',
+      'fast-xml-parser-provenance-case-study',
     ],
   },
   {
@@ -278,6 +302,18 @@ export const posts: Post[] = [
     dateLabel: 'May 24, 2026',
   },
   {
+    slug: 'antv-supply-chain-attack',
+    title: "@antv Had 17 npm Publishers When It Was Compromised. That's the Point.",
+    description: "The @antv supply chain attack on May 20, 2026 compromised packages with 17 publishers. Behavioral signals didn't flag it as CRITICAL. Here's why that's how it should work, and what actually catches each attack type.",
+    date: '2026-05-23',
+    dateLabel: 'May 23, 2026',
+    relatedSlugs: [
+      'two-attacks-one-week',
+      'tanstack-mini-shai-hulud-behavioral-analysis',
+      'commit-vs-socket-snyk-npm-audit',
+    ],
+  },
+  {
     slug: 'npm-supply-chain-audit-checklist',
     title: "npm Supply Chain Audit: The Checklist Most Teams Stop Too Early",
     description: "Most npm supply chain audits stop at npm audit and Socket. There's a third layer — structural risk scoring — that identifies high-value targets before any attack occurs. Here's the complete checklist.",
@@ -339,6 +375,18 @@ export const posts: Post[] = [
     description: "Commit now detects npm Trusted Publishing (OIDC provenance) in every package score. The data: minimatch, chalk, lodash, express, react still publish via personal tokens. Build tools adopted. Utility packages didn't.",
     date: '2026-05-14',
     dateLabel: 'May 14, 2026',
+  },
+  {
+    slug: 'ai-sdk-supply-chain-ranking',
+    title: "I Ranked AI SDKs by Supply Chain Risk. LangChain Lost.",
+    description: "OpenAI and Vercel AI score clean. Anthropic hides two CRITICAL deps. LangChain has three. A depth-2 supply chain audit of every major AI SDK.",
+    date: '2026-05-13',
+    dateLabel: 'May 13, 2026',
+    relatedSlugs: [
+      'anthropic-sdk-transitive-risk',
+      'transitive-risk-methodology',
+      'four-ecosystems-one-vulnerability',
+    ],
   },
   {
     slug: 'transitive-risk-methodology',
