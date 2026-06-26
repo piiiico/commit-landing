@@ -405,6 +405,55 @@ console.log(data.results[0].score); // 0–100 trust score</code></pre>
                 'A free key audits 200 packages/day — your whole tree, not just the one you searched for.<br />' +
                 'Want push alerts the moment a package you watch drops in score, loses publishers, or stalls? Developer ($15/mo) adds monitoring + email alerts.',
             },
+        'pkg-monitor': pkgName
+          ? {
+              eyebrow: 'Score monitoring',
+              title: `Get alerted when ${pkgName} gets riskier`,
+              lead:
+                `Free: watch up to 3 packages with a weekly email digest. Covers publisher changes, stale releases, and score drops for <code>${pkgName}</code>.<br />` +
+                `Developer ($15/mo): 15 packages, daily scans, instant alerts the moment something degrades.`,
+            }
+          : {
+              eyebrow: 'Score monitoring',
+              title: 'Watch your dependencies for risk changes',
+              lead:
+                'Free: watch up to 3 packages with a weekly digest. Publisher changes, stale releases, score drops — know before they hit your pipeline.<br />' +
+                'Developer ($15/mo): 15 packages, daily scans, instant email alerts.',
+            },
+        'pkg-alert-critical': pkgName
+          ? {
+              eyebrow: 'CRITICAL package',
+              title: `${pkgName} has the attack profile. Watch it.`,
+              lead:
+                `<code>${pkgName}</code> has the same single-publisher structure that axios and LiteLLM had before their supply chain attacks. ` +
+                `A free key watches up to 3 packages and emails you weekly — 200 audits/day, no card.<br />` +
+                `Developer ($15/mo): daily scans, instant alerts, 15 packages.`,
+            }
+          : {
+              eyebrow: 'CRITICAL package',
+              title: 'This package has the attack profile',
+              lead:
+                'Single npm publisher + millions of weekly downloads — the exact pattern behind the axios and LiteLLM attacks. ' +
+                'A free key watches up to 3 packages and emails you weekly.<br />' +
+                'Developer ($15/mo): daily scans, instant alerts.',
+            },
+        'pkg-alert-compromised': pkgName
+          ? {
+              eyebrow: 'Compromised package',
+              title: `${pkgName} was already attacked. Watch for the next one.`,
+              lead:
+                `<code>${pkgName}</code> has a confirmed supply-chain incident in its history. The same maintainer patterns that got exploited once can be exploited again. ` +
+                `A free key re-scans daily and emails you when the risk profile changes — 200 audits/day, no card.<br />` +
+                `Developer ($15/mo): instant alerts + 15-package watchlist.`,
+            }
+          : {
+              eyebrow: 'Compromised package',
+              title: 'This package was already attacked once',
+              lead:
+                'Confirmed supply-chain incident. The patterns that got exploited don\'t disappear — they recur. ' +
+                'A free key re-scans and alerts you weekly.<br />' +
+                'Developer ($15/mo): instant alerts the moment the risk profile changes.',
+            },
         // 2026-06-12: ci-annotation shipped with npm-package v1.31.0 GitHub
         // Actions annotation work. The annotation surfaces in PR checks tab
         // when CI hits the anonymous rate limit; link points here as the
@@ -608,7 +657,10 @@ console.log(data.results[0].score); // 0–100 trust score</code></pre>
           'audit-web-critical': 'audit-web-critical',  // post-result CTA on /audit when ≥1 CRITICAL — 2026-05-23
           'audit-web-healthy': 'audit-web-healthy',    // post-result CTA on /audit when 0 CRITICAL + ≥1 HIGH — 2026-05-23
           'audit-web-compromised': 'audit-web-compromised', // post-result CTA on /audit when ≥1 in compromised registry (Miasma, Mini Shai-Hulud, axios, TrapDoor, IronWorm, etc) — 2026-06-10
-          'pkg-profile': 'pkg-profile',                // package profile pages (/npm/:pkg etc) Monitor CTA — 2026-05-23
+          'pkg-profile': 'pkg-profile',                // package profile pages (/npm/:pkg etc) "Free API key" CTA — 2026-05-23
+          'pkg-monitor': 'pkg-monitor',                // package profile "Watch {pkg}" monitoring CTA — 2026-06-26
+          'pkg-alert-critical': 'pkg-alert-critical',  // CRITICAL alert box "Get alerts" link — 2026-06-26
+          'pkg-alert-compromised': 'pkg-alert-compromised', // COMPROMISED alert box "Get alerts" link — 2026-06-26
           'cursor-hook-429': 'cursor-hook-429',        // Cursor IDE hook 429 deny/ask (npm-package v1.21.0+) — 2026-05-29
           'claude-code-hook-429': 'claude-code-hook-429', // Claude Code PreToolUse hook 429 (npm-package v1.22.0) — 2026-05-29
           'poc-hook': 'poc-hook',                      // Fresh `poc hook` install with no API key configured (npm-package v1.21.0+) — 2026-05-29
