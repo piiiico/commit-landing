@@ -223,6 +223,8 @@ const jsonLd = JSON.stringify({
             <code>npx proof-of-commitment</code>
             <span class="pkg-alert-action-sep">&middot;</span>
             <a href={`/audit/?packages=${encodeURIComponent(pkg.name)}`}>Audit the rest of your tree &rarr;</a>
+            <span class="pkg-alert-action-sep">&middot;</span>
+            <a href={`/get-started/?ref=pkg-alert-critical&pkg=${encodeURIComponent(pkg.name)}&eco=npm`}>Get alerts &rarr;</a>
           </div>
         </div>
       )}
@@ -235,6 +237,8 @@ const jsonLd = JSON.stringify({
             <code>npx proof-of-commitment</code>
             <span class="pkg-alert-action-sep">&middot;</span>
             <a href={`/audit/?packages=${encodeURIComponent(pkg.name)}`}>Check your other deps &rarr;</a>
+            <span class="pkg-alert-action-sep">&middot;</span>
+            <a href={`/get-started/?ref=pkg-alert-compromised&pkg=${encodeURIComponent(pkg.name)}&eco=npm`}>Get alerts &rarr;</a>
           </div>
         </div>
       )}
@@ -329,6 +333,26 @@ const jsonLd = JSON.stringify({
     </div>
   </section>
 
+  <!-- Monitor CTA -->
+  <section class="pkg-monitor-cta">
+    <div class="container">
+      <div class="editorial" style="max-width: var(--max-content); margin: 0 auto;">
+        <h2>Know when {pkg.name} gets riskier</h2>
+        <p>
+          Publisher changes, stale releases, score drops &mdash; get an alert before it hits your pipeline.
+          {isCritical && ` ${pkg.name} already has the single-publisher profile that axios had before it was attacked.`}
+        </p>
+        <div class="cta-buttons">
+          <a href={`/get-started/?ref=pkg-monitor&pkg=${encodeURIComponent(pkg.name)}&eco=npm`} class="btn-primary">Watch {pkg.name} &mdash; free &rarr;</a>
+          <a href="/pricing/" class="btn-ghost">See plans &rarr;</a>
+        </div>
+        <p class="cta-sub">
+          Free: 3 packages, weekly digest. Developer ($15/mo): 15 packages, instant alerts.
+        </p>
+      </div>
+    </div>
+  </section>
+
   <!-- CTA -->
   <section class="pkg-cta">
     <div class="container">
@@ -346,9 +370,9 @@ const jsonLd = JSON.stringify({
           Auto-detects your lockfile. Scores every dependency. Zero install.
         </p>
         <div class="cta-buttons">
-          <a href={`/audit/?packages=${encodeURIComponent(pkg.name)}`} class="btn-primary">Try online audit &rarr;</a>
+          <a href={`/get-started/?ref=pkg-profile&pkg=${encodeURIComponent(pkg.name)}&eco=npm`} class="btn-primary">Free API key &rarr;</a>
+          <a href={`/audit/?packages=${encodeURIComponent(pkg.name)}`} class="btn-ghost">Try online audit &rarr;</a>
           <a href="/quickstart/" class="btn-ghost">Quickstart &rarr;</a>
-          <a href={`/get-started/?ref=pkg-profile&pkg=${encodeURIComponent(pkg.name)}&eco=npm`} class="btn-ghost">Free API key &rarr;</a>
         </div>
       </div>
     </div>
@@ -720,6 +744,24 @@ const jsonLd = JSON.stringify({
   }
 
   /* CTA */
+  .pkg-monitor-cta {
+    padding: 2.5rem 0;
+    border-bottom: 1px solid var(--border-light);
+    background: var(--paper-dim);
+  }
+
+  .pkg-monitor-cta h2 {
+    font-family: var(--font-display);
+    font-size: 1.5rem;
+    margin-bottom: 0.75rem;
+  }
+
+  .pkg-monitor-cta p {
+    font-size: 0.95rem;
+    color: var(--ink-muted);
+    line-height: 1.6;
+  }
+
   .pkg-cta {
     padding: 3rem 0;
     border-bottom: 1px solid var(--border-light);
