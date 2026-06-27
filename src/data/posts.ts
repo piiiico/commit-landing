@@ -15,6 +15,18 @@ export interface Post {
 // Sorted newest first
 export const posts: Post[] = [
   {
+    slug: 'vite-bot-140m-downloads',
+    title: "vitebot Publishes 140 Million npm Downloads Per Week. The Account Has Zero Public Repos.",
+    description: "One bot account publishes vite and @vitejs/plugin-react — 205M combined weekly downloads. Evan You's npm account still has access but hasn't published in 57 months. No staged publishing gate.",
+    date: '2026-06-27',
+    dateLabel: 'June 27, 2026',
+    relatedSlugs: [
+      'dormant-publishers-active-access',
+      'staged-publishing-detection',
+      'redhat-miasma-provenance-bypass',
+    ],
+  },
+  {
     slug: 'dormant-publishers-active-access',
     title: "debug Has 653M Weekly Downloads. One Publisher Hasn't Touched It in 8 Years. They Can Still Push a Release.",
     description: "We scanned top npm packages for dormant publishers with active publish access. Accounts inactive 5-13 years can still push code to packages installed 2.8 billion times per week.",
