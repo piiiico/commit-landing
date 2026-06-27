@@ -1,0 +1,261 @@
+---
+import Layout from '../../layouts/Layout.astro';
+---
+
+<Layout
+  title="NVIDIA SkillSpector and the Runtime Trust Gap — Commit"
+  description="NVIDIA open-sourced a static security scanner for AI agent skills. We pointed it at 30 production skills and got CRITICAL/100. Then we read the findings. Eight of eleven HIGHs were structural false positives. Static analysis can't see trust context, and that's not a bug."
+  canonical="https://getcommit.dev/blog/nvidia-skillspector-runtime-trust-gap/"
+  publishDate="2026-06-16"
+>
+
+  <!-- Nav -->
+  <nav>
+    <div class="container nav-inner">
+      <a href="/" class="nav-brand">Commit</a>
+      <ul class="nav-links">
+        <li><a href="/extension">Extension</a></li>
+        <li><a href="/blog">Writing</a></li>
+        <li><a href="/pricing">Pricing</a></li><li><a href="/docs">Docs</a></li><li><a href="https://github.com/piiiico/proof-of-commitment" target="_blank" rel="noopener">GitHub</a></li>
+        <li><a href="mailto:pico@amdal.dev">Contact</a></li>
+      </ul>
+    </div>
+  </nav>
+
+  <!-- Essay -->
+  <article class="essay">
+    <div class="container">
+      <div class="editorial">
+
+        <!-- Header -->
+        <header class="essay-header">
+          <div class="essay-meta animate-in delay-1">
+            <time datetime="2026-06-16">June 16, 2026</time>
+          </div>
+          <h1 class="essay-title animate-in delay-2">NVIDIA SkillSpector and the Runtime Trust Gap</h1>
+          <p class="essay-subtitle animate-in delay-3">
+            NVIDIA open-sourced a static security scanner for AI agent skills. We pointed it at 30 production skills and got CRITICAL/100. Then we read the findings. Eight of eleven HIGHs were structural false positives. Static analysis can&rsquo;t see trust context, and that&rsquo;s not a bug.
+          </p>
+          <p class="essay-byline animate-in delay-4">Pico</p>
+        </header>
+
+        <!-- Body -->
+        <div class="essay-body">
+
+          <p>
+            Earlier this month, NVIDIA released <a href="https://github.com/NVIDIA/SkillSpector" target="_blank" rel="noopener">SkillSpector</a> to the public. It&rsquo;s a static security scanner for AI agent skills: SKILL.md files, MCP tools, the manifests that AI coding assistants load to extend their behavior. 6.7k GitHub stars in three days. Apache 2.0. The methodology is solid. 64 vulnerability patterns across 16 categories, two-stage analysis (regex and AST first, optional LLM semantic pass second), and a research paper reporting that 26.1% of skills carry at least one vulnerability and 5.2% show likely malicious intent.
+          </p>
+          <p>
+            That research is the right paper at the right time. The agent skill ecosystem expanded faster than security tooling, and there hasn&rsquo;t been a credible open static analyzer until now. NVIDIA stepped in. Good.
+          </p>
+          <p>
+            We pointed it at our 30 production skills.
+          </p>
+          <p>
+            The score: 100. The severity: CRITICAL. 52 findings. 11 HIGH.
+          </p>
+          <p>
+            Then we read the findings.
+          </p>
+
+          <hr class="essay-divider" />
+
+          <h2>What the score saw</h2>
+
+          <p>
+            The 11 HIGH findings clustered into these patterns:
+          </p>
+
+          <div class="essay-table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>Finding</th>
+                  <th>Flagged as</th>
+                  <th>Reality</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr><td>Curl to agentlair.dev</td><td>Data Exfiltration</td><td>Our own API</td></tr>
+                <tr><td>Curl to cloudflare.com</td><td>Supply Chain</td><td>Our infra</td></tr>
+                <tr><td>References to <code>.env</code></td><td>Privilege Escalation</td><td>Documentation</td></tr>
+                <tr><td>HTML comments in markdown</td><td>Prompt Injection</td><td>Renderer metadata</td></tr>
+                <tr><td>String &ldquo;send session&rdquo;</td><td>Data Exfiltration</td><td>Email function</td></tr>
+                <tr><td><code>curl ... | python</code> in docs</td><td>Supply Chain</td><td>Real (doc reference)</td></tr>
+                <tr><td><code>curl ... | bash</code> in docs</td><td>Supply Chain</td><td>Real (doc reference)</td></tr>
+                <tr><td><code>rm -rf dist/</code></td><td>Tool Misuse</td><td>Real (destructive)</td></tr>
+                <tr><td>Autonomous decision logic</td><td>Excessive Agency</td><td>Designed autonomy</td></tr>
+              </tbody>
+            </table>
+          </div>
+
+          <p>
+            Three of eleven are genuine. Eight are structural false positives. The score that emerged from all eleven was CRITICAL/100.
+          </p>
+
+          <hr class="essay-divider" />
+
+          <h2>The information SkillSpector can&rsquo;t see</h2>
+
+          <p>
+            This isn&rsquo;t a bug in NVIDIA&rsquo;s tool. Their own documentation lists the constraints honestly: runtime behavior requires dynamic execution. Static analysis sees code, not context. And almost every false positive above is a context problem.
+          </p>
+          <p>
+            A curl to a domain isn&rsquo;t exfiltration or authorized infrastructure. It&rsquo;s just a curl. The information that distinguishes them lives outside the code, in the operator&rsquo;s head. We trust agentlair.dev because it&rsquo;s ours. We trust cloudflare.com because we authorized them. The <code>.env</code> reference is documentation, not theft, because the file describes how the environment works. SkillSpector can&rsquo;t know any of this. Nothing in the source says so.
+          </p>
+          <p>
+            The optional LLM pass helps. It can sometimes infer intent from surrounding text. But intent inference cannot override authorization. Even if the LLM correctly guesses that agentlair.dev is probably the operator&rsquo;s own service, it has no proof. The right answer is to ask the operator. SkillSpector, by design, doesn&rsquo;t.
+          </p>
+          <p>
+            So the score is structurally noisy. Not because the tool is bad. Because the question &ldquo;is this risky?&rdquo; cannot be answered from code alone.
+          </p>
+
+          <hr class="essay-divider" />
+
+          <h2>What the trust context layer looks like</h2>
+
+          <p>
+            We wrote a small filter that takes SkillSpector&rsquo;s JSON output plus a trust manifest, and re-scores. The manifest is short:
+          </p>
+
+          <pre><code>&#123;
+  "trusted_domains": ["agentlair.dev", "cloudflare.com", "..."],
+  "documentation_patterns": ["*.md", "docs/**"],
+  "authorized_operations": [
+    &#123;
+      "pattern": "send session",
+      "justification": "Email transport, operator-authorized"
+    &#125;
+  ],
+  "accepted_risk_categories": []
+&#125;</code></pre>
+
+          <p>
+            The filter walks each issue from SkillSpector and applies four checks. Is the category in the operator&rsquo;s accepted-risk list? Does the finding reference a trusted domain (for Data Exfiltration and Supply Chain)? Is the file a documentation file (for Privilege Escalation and Prompt Injection categories)? Does the finding match an authorized operation pattern? Anything matched is either suppressed or downgraded. Everything else stays confirmed and counted.
+          </p>
+          <p>
+            Run the filter on the same scan. The numbers move.
+          </p>
+          <ul>
+            <li>Original: 52 issues, score 100, CRITICAL.</li>
+            <li>Filtered: 19 confirmed plus 16 downgraded, 17 suppressed.</li>
+            <li>False positive rate: 63%.</li>
+            <li>Actionable HIGH findings: 11 down to 3.</li>
+          </ul>
+          <p>
+            The three actionable findings are the ones worth fixing. The pipe-to-interpreter patterns in our documentation, and a destructive command example. Nothing about our own API, our infrastructure, our environment documentation, or our agent&rsquo;s authorized autonomy.
+          </p>
+          <p>
+            The filter is 380 lines. It isn&rsquo;t a product. It&rsquo;s a demonstration that the same scan produces wildly different signals depending on whether the layer above it has trust context.
+          </p>
+
+          <hr class="essay-divider" />
+
+          <h2>Why this matters past our own workspace</h2>
+
+          <p>
+            Two things follow.
+          </p>
+          <p>
+            First, the static security layer is now a commodity. NVIDIA has it. It&rsquo;s free, Apache-licensed, well-maintained, good enough to be the default. There is no commercial moat in writing another static scanner. The companies that try will get out-shipped by NVIDIA&rsquo;s release cadence and absorbed into a forked nightly somewhere.
+          </p>
+          <p>
+            Second, the value moves up. A static scanner that produces CRITICAL/100 from 63% false positives is not actually telling an enterprise buyer whether to trust an agent. It&rsquo;s telling them something is statistically unusual in the code. To get from &ldquo;statistically unusual&rdquo; to &ldquo;trustworthy at runtime,&rdquo; you need three things SkillSpector doesn&rsquo;t have:
+          </p>
+          <p>
+            A trust context layer: the manifest above, or something richer that knows what an operator has authorized.
+          </p>
+          <p>
+            A runtime behavioral layer that observes what the agent actually does when it executes, not just what its code looks like at rest.
+          </p>
+          <p>
+            A continuous trust signal that compares observed behavior to declared scope on a rolling basis, so a skill that turns adversarial on day 31 is caught on day 31.
+          </p>
+          <p>
+            The first two haven&rsquo;t shipped at the scale of NVIDIA&rsquo;s static layer. The third is mostly research papers. That&rsquo;s the open territory.
+          </p>
+
+          <hr class="essay-divider" />
+
+          <h2>Where we sit</h2>
+
+          <p>
+            Commit&rsquo;s <a href="/blog/scoring-methodology">behavioral trust scoring</a> lives at a different layer than SkillSpector. Our <code>proof-of-commitment</code> runtime gives skills, MCP servers, and npm packages a behavioral score derived from how their authors actually commit code. Humans leave evidence in version control that AI-generated code cannot fake, and that evidence is independent of what the package&rsquo;s manifest claims about itself. The static layer asks what the code says it does. The behavioral layer asks what the human did to produce it. Both matter. Neither alone is enough.
+          </p>
+          <p>
+            We&rsquo;re not the only ones working at this layer. There will be other entrants. The L4 territory is not won. What&rsquo;s clear: the L3 territory just closed.
+          </p>
+
+          <hr class="essay-divider" />
+
+          <h2>What we&rsquo;d suggest, if you run agent skills today</h2>
+
+          <p>
+            Run SkillSpector against your own workspace first. It&rsquo;s free, it works, and a few of the findings will be real. Don&rsquo;t trust the score; read the findings. About three out of every five HIGHs will be context-blind. If you want to filter by trust context, the manifest schema and four checks above are enough to roll your own in an afternoon. If you want a behavioral layer on top of either, that&rsquo;s <a href="/audit">getcommit.dev/audit</a>, and the first scan on any npm package or MCP server URL is free.
+          </p>
+          <p>
+            NVIDIA did the field a favor by shipping SkillSpector. It commoditized the layer below the one that is still missing. That&rsquo;s how stacks build.
+          </p>
+
+          <hr class="essay-divider" />
+
+          <p class="essay-coda">
+            <em>Source: <a href="https://github.com/NVIDIA/SkillSpector" target="_blank" rel="noopener">NVIDIA/SkillSpector</a> on GitHub, Apache 2.0, 6.7k stars at time of writing. Research stats (26.1% / 5.2%) cited from the project&rsquo;s README; static-analysis limitations (&ldquo;runtime behavior requires dynamic execution&rdquo;) also from project documentation. Findings against 30 skills run locally on 2026-06-15.</em>
+          </p>
+          <p class="essay-coda">
+            <em>Audit any npm package or MCP server: <a href="/audit">getcommit.dev/audit</a> &middot; <a href="/blog/unit42-80-percent-agent-skills-lie">80% of agent skills lie about what they do</a> &middot; <a href="/blog/scoring-methodology">Behavioral trust scoring methodology</a></em>
+          </p>
+
+        </div>
+      </div>
+    </div>
+  </article>
+
+  <!-- Newsletter -->
+  <section class="newsletter-section">
+    <div class="container">
+      <div class="editorial reveal">
+        <h2 style="margin-bottom: 0.75rem;">Stay in the loop</h2>
+        <p style="margin-bottom: 2rem; font-size: 1rem;">
+          Early access, research updates, and the occasional strong opinion.
+        </p>
+
+        <form
+          action="https://buttondown.email/api/emails/embed-subscribe/commitgraph"
+          method="post"
+          target="popupwindow"
+          class="newsletter-form"
+        >
+          <input
+            type="email"
+            name="email"
+            placeholder="you@example.com"
+            required
+            class="newsletter-input"
+          />
+          <button type="submit" class="btn-primary" style="white-space: nowrap;">
+            Subscribe
+          </button>
+        </form>
+
+        <p class="newsletter-note">No spam. Unsubscribe anytime.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer>
+    <div class="container footer-inner">
+      <span class="footer-brand">Commit</span>
+      <ul class="footer-links">
+        <li><a href="/">Home</a></li>
+        <li><a href="/extension">Extension</a></li>
+        <li><a href="/blog">Writing</a></li>
+        <li><a href="/pricing">Pricing</a></li><li><a href="/docs">Docs</a></li><li><a href="https://github.com/piiiico/proof-of-commitment" target="_blank" rel="noopener">GitHub</a></li>
+        <li><a href="mailto:pico@amdal.dev">Contact</a></li>
+      </ul>
+      <span class="footer-locale">Stavanger, Norway</span>
+    </div>
+  </footer>
+
+</Layout>

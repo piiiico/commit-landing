@@ -1,0 +1,203 @@
+---
+import Layout from '../../layouts/Layout.astro';
+---
+
+<Layout
+  title="Hono Just Adopted Staged Publishing. 50M Weekly Downloads, 33 Hours After the Issue. &mdash; Commit"
+  description="Hono moved from CI-direct npm publishing to npm Staged Publishing on June 22, 2026. Issue filed June 21, PR merged June 22. The release.yml diff is one line. 50M weekly downloads now sit behind a human approval gate."
+  canonical="https://getcommit.dev/blog/hono-staged-publishing-adopted/"
+  publishDate="2026-06-24"
+>
+
+  <!-- Nav -->
+  <nav>
+    <div class="container nav-inner">
+      <a href="/" class="nav-brand">Commit</a>
+      <ul class="nav-links">
+        <li><a href="/extension">Extension</a></li>
+        <li><a href="/blog">Writing</a></li>
+        <li><a href="/pricing">Pricing</a></li><li><a href="/docs">Docs</a></li><li><a href="https://github.com/piiiico/proof-of-commitment" target="_blank" rel="noopener">GitHub</a></li>
+        <li><a href="mailto:pico@amdal.dev">Contact</a></li>
+      </ul>
+    </div>
+  </nav>
+
+  <!-- Essay -->
+  <article class="essay">
+    <div class="container">
+      <div class="editorial">
+
+        <!-- Header -->
+        <header class="essay-header">
+          <div class="essay-meta animate-in delay-1">
+            <time datetime="2026-06-24">June 24, 2026</time>
+          </div>
+          <h1 class="essay-title animate-in delay-2">Hono Just Adopted Staged Publishing. 50M Weekly Downloads, 33 Hours After the Issue.</h1>
+          <p class="essay-subtitle animate-in delay-3">
+            Issue filed Saturday. PR merged Monday. The release.yml diff is one&nbsp;line.
+          </p>
+          <p class="essay-byline animate-in delay-4">Pico</p>
+        </header>
+
+        <!-- Body -->
+        <div class="essay-body">
+
+          <p>
+            On <strong>June&nbsp;21, 2026</strong> I filed <a href="https://github.com/honojs/hono/issues/5034" target="_blank" rel="noopener">honojs/hono#5034</a>: a request to enable npm Staged Publishing on Hono. The package serves 50M weekly downloads with a single publisher (Yusuke Wada), so a stolen credential or compromised CI token would push directly to <code>latest</code> with no human in the loop.
+          </p>
+
+          <p>
+            Yusuke replied 12 minutes later: <em>&ldquo;I&rsquo;m considering switching to Staged Publishing just now. I may do it soon.&rdquo;</em>
+          </p>
+
+          <p>
+            On <strong>June&nbsp;22, 2026 at 11:42&nbsp;UTC</strong>, <a href="https://github.com/honojs/hono/pull/5035" target="_blank" rel="noopener">PR&nbsp;#5035 &mdash; &ldquo;ci: use npm Staged publishing&rdquo;</a> merged. Issue closed in the same commit. Total elapsed: <strong>33&nbsp;hours</strong> from issue file to workflow change in <code>main</code>.
+          </p>
+
+          <hr class="essay-divider" />
+
+          <h2>The diff</h2>
+
+          <p>
+            The change to <a href="https://github.com/honojs/hono/blob/main/.github/workflows/release.yml" target="_blank" rel="noopener">.github/workflows/release.yml</a> is exactly what npm&rsquo;s docs prescribe:
+          </p>
+
+          <pre><code>- run: npm publish --provenance --access public
++ run: npm stage publish --provenance --access public</code></pre>
+
+          <p>
+            One word. <code>stage</code>.
+          </p>
+
+          <p>
+            What it does: after CI runs, the new version sits in a staging area on the registry. It is not yet the default install target. A human with 2FA must approve it before <code>latest</code> moves. If an attacker steals an OIDC token from the runner&mdash;the exact mechanism behind <a href="/blog/tanstack-mini-shai-hulud-behavioral-analysis">TanStack&rsquo;s May&nbsp;2026 attack</a> and <a href="/blog/redhat-miasma-provenance-bypass">Red Hat&rsquo;s June&nbsp;1 incident</a>&mdash;the malicious version stages but never goes live. No silent push to <code>latest</code>. No <code>npm install hono</code> pulling the compromise.
+          </p>
+
+          <p>
+            Hono already had OIDC provenance (shipped June&nbsp;18 in <a href="https://github.com/honojs/hono/pull/5028" target="_blank" rel="noopener">PR&nbsp;#5028</a>). Provenance answers the question <em>&ldquo;was this built by the expected pipeline?&rdquo;</em>&mdash;but when the pipeline itself is compromised, the answer is yes and the package still ships. Staged Publishing closes the remaining window between &ldquo;CI ran&rdquo; and &ldquo;users install it.&rdquo;
+          </p>
+
+          <hr class="essay-divider" />
+
+          <h2>Verification, reproducible</h2>
+
+          <p>
+            Two ways to confirm Hono now uses staged publishing without taking my word for it:
+          </p>
+
+          <p><strong>1. Read the workflow file directly.</strong></p>
+
+          <pre><code>gh api repos/honojs/hono/contents/.github/workflows/release.yml \
+  --jq '.content' | base64 -d | grep -E 'npm stage'</code></pre>
+
+          <p>
+            Expected output: <code>run: npm stage publish --provenance --access public</code>
+          </p>
+
+          <p><strong>2. Ask the Commit API.</strong></p>
+
+          <pre><code>curl -s 'https://poc-backend.amdal-dev.workers.dev/api/audit' \
+  -H 'Content-Type: application/json' \
+  -d '&#123;"packages":["hono"],"ecosystem":"npm"&#125;'</code></pre>
+
+          <p>
+            The response now includes <code>hasStagedPublishing: true</code> and <code>scoreBreakdown.stagedPublishing: 2</code> for Hono. Before June&nbsp;22 it was <code>false</code>/<code>0</code>. The scoring picked the change up automatically&mdash;no human re-tagged anything&mdash;because <a href="/blog/staged-publishing-detection">the detector scans CI workflow files for <code>npm stage</code> patterns</a>.
+          </p>
+
+          <hr class="essay-divider" />
+
+          <h2>What this means for the supply chain wave</h2>
+
+          <p>
+            Three weeks ago, &ldquo;use OIDC provenance&rdquo; was the strongest defense most packages had. TanStack proved that wasn&rsquo;t enough. Red Hat proved it again. PostCSS&rsquo;s Andrey Sitnik called the problem in <a href="https://github.com/postcss/postcss/issues/2096" target="_blank" rel="noopener">postcss/postcss#2096</a> and moved nanoid + nanospy in a week. Preact&rsquo;s team shipped it without an announcement. Now Hono.
+          </p>
+
+          <p>
+            That is the curve. Sole-publisher packages at massive scale (nanoid 208M/wk, preact 23M/wk, hono 50M/wk) are adopting the gate that makes the recent attack class survivable. Each adoption removes one of the highest-leverage targets from the &ldquo;one stolen token = global compromise&rdquo; category.
+          </p>
+
+          <p>
+            And the gap between &ldquo;an outside observer asks for it&rdquo; and &ldquo;the maintainer ships it&rdquo; is collapsing. 33&nbsp;hours, in this case. The reason it&rsquo;s fast: the diff is one word. The friction is reading the docs once, not refactoring a pipeline. Once a few high-profile maintainers do it publicly, the rest of the long tail has a working pattern to copy.
+          </p>
+
+          <hr class="essay-divider" />
+
+          <h2>What still needs the gate</h2>
+
+          <p>
+            Today, the same scan API will tell you cross-spawn, chalk, esbuild, lodash, and minimatch all still publish to <code>latest</code> with no human in the loop. Several have shipped provenance; none have shipped the approval gate. Combined weekly downloads: north of 1.5&nbsp;billion.
+          </p>
+
+          <p>
+            That&rsquo;s the next batch. Filing useful issues against them is slow work&mdash;1 per repo per week, only when the implementation steps are concrete and verifiable, only against active maintainers&mdash;but Hono moved in 33 hours, and nanoid moved in less than that. The pattern works when the work is done right.
+          </p>
+
+          <hr class="essay-divider" />
+
+          <h2>Watch your dependencies for the upgrade</h2>
+
+          <pre><code>npx proof-of-commitment</code></pre>
+
+          <p>
+            The CLI scans your lockfile and flags packages where a single publisher controls &gt;10M weekly downloads. The output now includes whether each package uses OIDC provenance, Staged Publishing, both, or neither. When one of your CRITICAL dependencies adopts the gate, the score moves up and the flag clears&mdash;automatically, the moment the CI workflow file changes on <code>main</code>.
+          </p>
+
+          <p>
+            <a href="/get-started?ref=blog-hono-staged-publishing">Free API key</a> watches 3 packages with a weekly digest. <a href="/pricing?utm_campaign=hono-staged-publishing&amp;utm_source=blog&amp;utm_medium=cta">Developer ($15/mo)</a> watches 15 with daily scans and instant alerts &mdash; you find out the moment a CRITICAL becomes safer, or the reverse.
+          </p>
+
+        </div>
+
+        <!-- Footer -->
+        <footer class="essay-footer">
+          <a href="/blog">&larr; More writing</a>
+        </footer>
+
+      </div>
+    </div>
+  </article>
+
+  <style>
+    /* --- Reset / base --- */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    /* --- Nav --- */
+    nav { padding: 1rem 0; border-bottom: 1px solid var(--border-light, #e5e5e5); }
+    .nav-inner { display: flex; justify-content: space-between; align-items: center; }
+    .nav-brand { font-weight: 700; font-size: 1.15rem; text-decoration: none; color: var(--ink, #111); }
+    .nav-links { list-style: none; display: flex; gap: 1.5rem; font-size: 0.92rem; }
+    .nav-links a { text-decoration: none; color: var(--ink-muted, #555); }
+    .nav-links a:hover { color: var(--ink, #111); }
+
+    /* --- Container --- */
+    .container { max-width: 1080px; margin: 0 auto; padding: 0 1.5rem; }
+
+    /* --- Essay --- */
+    .essay { padding: 4rem 0 6rem; }
+    .editorial { max-width: 680px; margin: 0 auto; }
+    .essay-header { margin-bottom: 3rem; }
+    .essay-meta { font-size: 0.85rem; color: var(--ink-muted, #888); margin-bottom: 0.75rem; }
+    .essay-title { font-size: clamp(1.6rem, 4vw, 2.4rem); line-height: 1.25; margin-bottom: 0.75rem; }
+    .essay-subtitle { font-size: 1.1rem; color: var(--ink-muted, #666); margin-bottom: 0.5rem; }
+    .essay-byline { font-size: 0.9rem; color: var(--ink-muted, #888); }
+    .essay-body p { font-size: 1.05rem; line-height: 1.75; margin-bottom: 1.5rem; color: var(--ink, #222); }
+    .essay-body h2 { font-size: 1.3rem; margin: 2.5rem 0 1rem; }
+    .essay-body a { color: var(--accent, #2563eb); text-decoration: underline; }
+    .essay-body code { background: var(--bg-muted, #f5f5f5); padding: 0.15rem 0.4rem; border-radius: 3px; font-size: 0.9em; }
+    .essay-body pre { background: var(--bg-muted, #f5f5f5); padding: 1rem 1.25rem; border-radius: 6px; overflow-x: auto; margin-bottom: 1.5rem; font-size: 0.9rem; }
+    .essay-body pre code { background: none; padding: 0; }
+    .essay-divider { border: none; border-top: 1px solid var(--border-light, #e5e5e5); margin: 2.5rem 0; }
+    .essay-footer { margin-top: 3rem; padding-top: 1.5rem; border-top: 1px solid var(--border-light, #e5e5e5); }
+    .essay-footer a { color: var(--accent, #2563eb); text-decoration: none; font-size: 0.95rem; }
+    .essay-footer a:hover { text-decoration: underline; }
+
+    /* --- Animation --- */
+    .animate-in { opacity: 0; transform: translateY(12px); animation: fadeUp 0.5s ease forwards; }
+    .delay-1 { animation-delay: 0.1s; }
+    .delay-2 { animation-delay: 0.2s; }
+    .delay-3 { animation-delay: 0.3s; }
+    .delay-4 { animation-delay: 0.4s; }
+    @keyframes fadeUp { to { opacity: 1; transform: translateY(0); } }
+  </style>
+
+</Layout>

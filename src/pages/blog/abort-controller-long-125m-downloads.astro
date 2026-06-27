@@ -1,0 +1,231 @@
+---
+import Layout from '../../layouts/Layout.astro';
+---
+
+<Layout
+  title="abort-controller and long: 125M Weekly Downloads Behind Two npm Accounts &mdash; Commit"
+  description="abort-controller (54.8M dl/wk, sole maintainer mysticatea, last release 2019) and long (70.3M dl/wk, sole maintainer dcode) are CRITICAL runtime dependencies in @temporalio/client and protobufjs. Two accounts. 125 million installs per week."
+  canonical="https://getcommit.dev/blog/abort-controller-long-125m-downloads/"
+  publishDate="2026-06-21"
+>
+
+  <!-- Nav -->
+  <nav>
+    <div class="container nav-inner">
+      <a href="/" class="nav-brand">Commit</a>
+      <ul class="nav-links">
+        <li><a href="/extension">Extension</a></li>
+        <li><a href="/blog">Writing</a></li>
+        <li><a href="/pricing">Pricing</a></li><li><a href="/docs">Docs</a></li><li><a href="https://github.com/piiiico/proof-of-commitment" target="_blank" rel="noopener">GitHub</a></li>
+        <li><a href="mailto:pico@amdal.dev">Contact</a></li>
+      </ul>
+    </div>
+  </nav>
+
+  <!-- Essay -->
+  <article class="essay">
+    <div class="container">
+      <div class="editorial">
+
+        <!-- Header -->
+        <header class="essay-header">
+          <div class="essay-meta animate-in delay-1">
+            <time datetime="2026-06-21">June 21, 2026</time>
+          </div>
+          <h1 class="essay-title animate-in delay-2">abort-controller and long: 125&nbsp;Million Weekly Downloads Behind Two npm Accounts</h1>
+          <p class="essay-subtitle animate-in delay-3">
+            One package hasn&rsquo;t released a version since 2019. Both are CRITICAL runtime dependencies in enterprise SDK stacks. Neither has provenance.
+          </p>
+          <p class="essay-byline animate-in delay-4">Pico</p>
+        </header>
+
+        <!-- Body -->
+        <div class="essay-body">
+
+          <p>
+            Two npm accounts. Two packages. 125&nbsp;million installs per week.
+          </p>
+
+          <div class="essay-table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>Package</th>
+                  <th>Weekly downloads</th>
+                  <th>Publisher</th>
+                  <th>Last release</th>
+                  <th>Risk</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td><code>abort-controller</code></td>
+                  <td>54,779,038</td>
+                  <td>mysticatea</td>
+                  <td>March 2019</td>
+                  <td><span class="risk-critical">CRITICAL</span></td>
+                </tr>
+                <tr>
+                  <td><code>long</code></td>
+                  <td>70,322,376</td>
+                  <td>dcode</td>
+                  <td>April 2025</td>
+                  <td><span class="risk-critical">CRITICAL</span></td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <p>
+            Both are direct runtime dependencies in <code>@temporalio/client</code>. <code>long</code> is the sole dependency of <code>protobufjs</code> (71M downloads/week), which means it flows into every gRPC client, every AWS SDK protobuf path, every service that serializes protobufs in Node.js. <code>abort-controller</code> is a polyfill for a browser API that Node.js has natively supported since v15 &mdash; but the package still installs 54&nbsp;million times per week because it&rsquo;s pinned into transitive dependency trees that haven&rsquo;t cleaned up yet.
+          </p>
+
+          <hr class="essay-divider" />
+
+          <h2>abort-controller: a 2019 package running enterprise workloads in 2026</h2>
+
+          <p>
+            The <code>abort-controller</code> npm account belongs to <a href="https://github.com/mysticatea" target="_blank" rel="noopener">mysticatea</a>, a Japanese developer who wrote a polyfill for the browser <code>AbortController</code> API back when Node.js didn&rsquo;t have it. Version 3.0.0 shipped on March&nbsp;30,&nbsp;2019. That is the latest version today.
+          </p>
+
+          <p>
+            Node.js 15 shipped <code>AbortController</code> unflagged in October&nbsp;2020. Every LTS release since has it built in. The polyfill became vestigial within two years of its final release.
+          </p>
+
+          <p>
+            And yet: 54.8&nbsp;million installs last week. The package lives on because it&rsquo;s pinned as a direct dependency in <code>@temporalio/client</code> at <code>^3.0.0</code> &mdash; a constraint that resolves to the only version that exists. Every Temporal workflow client deployed to production carries this unmaintained polyfill as a direct runtime dependency.
+          </p>
+
+          <p>
+            The risk here is the standard sole-maintainer attack surface, made sharper by the account&rsquo;s inactivity. mysticatea last touched the package metadata in July&nbsp;2023 (not a release &mdash; an npm metadata update). The GitHub repository is effectively frozen. If the npm account is compromised &mdash; a stolen token, a phishing email, a credential reuse hit &mdash; there is no response team, no co-owner to rotate credentials, no staged release gate to catch a malicious publish before it hits <code>latest</code>.
+          </p>
+
+          <p>
+            The blast radius is every project running <code>@temporalio/client</code>.
+          </p>
+
+          <hr class="essay-divider" />
+
+          <h2>long: protobuf&rsquo;s single dependency</h2>
+
+          <p>
+            <code>long</code> is a 64-bit integer implementation for JavaScript, maintained by <a href="https://github.com/dcodeIO" target="_blank" rel="noopener">dcode</a> (Daniel Wirtz). It is the <em>only</em> dependency that <code>protobufjs</code> lists. That relationship makes it structurally critical: compromise <code>long</code>, and you corrupt the protobuf serialization layer for 71&nbsp;million weekly installs.
+          </p>
+
+          <p>
+            dcode is an active maintainer &mdash; version 5.3.2 shipped in April&nbsp;2025, and the GitHub repository shows recent commits. The concentration risk is still real: one npm account between a motivated attacker and protobuf deserialization across the entire Node.js gRPC ecosystem. No co-publisher. No provenance attestation on any version.
+          </p>
+
+          <hr class="essay-divider" />
+
+          <h2>Why these two together</h2>
+
+          <p>
+            Neither package is famous. <code>abort-controller</code> doesn&rsquo;t appear in the top-50 npm downloads list because it&rsquo;s pulled in transitively, not directly. <code>long</code> is infrastructure-of-infrastructure: you don&rsquo;t import it, protobufjs imports it, and you import protobufjs.
+          </p>
+
+          <p>
+            That invisibility is the point. Most supply chain analysis starts with the packages you can name. These are the packages you&rsquo;d never think to audit unless you walked the full transitive tree. Together they account for 125&nbsp;million installs per week across two unmultiplied accounts. If you run <code>@temporalio/client</code>, you have both.
+          </p>
+
+          <p>
+            Commit flags both as <span class="risk-critical">CRITICAL</span>: single publisher, no provenance, over 10&nbsp;million weekly downloads. The threshold exists precisely because this combination &mdash; sole maintainer plus scale &mdash; is the recurring pattern in every npm compromise of the last two years. It&rsquo;s the pattern behind the axios token theft in March&nbsp;2026. It&rsquo;s the pattern behind the LiteLLM incident. It&rsquo;s the pattern the <a href="/blog/shai-hulud-claude-code-hook/">Shai-Hulud worm</a> weaponized.
+          </p>
+
+          <hr class="essay-divider" />
+
+          <h2>What would fix this</h2>
+
+          <p>
+            For <code>abort-controller</code>, the cleanest fix is at the consumer level. <code>@temporalio/client</code> could replace the dependency with a shim that falls back to the native <code>AbortController</code> class for Node.js 15+ and keeps the polyfill only for environments that genuinely lack it. That would shrink the blast radius to projects running Node.js 14 and below &mdash; a population that is, at this point, effectively zero in production.
+          </p>
+
+          <p>
+            For <code>long</code>, the path is adding npm provenance to the publishing workflow. dcode publishes from a personal token today. Switching to GitHub Actions OIDC would mean a stolen token can no longer produce a silent malicious publish &mdash; it would need to also compromise the repository and its CI pipeline. That&rsquo;s a materially higher bar.
+          </p>
+
+          <p>
+            Both are solvable. Neither requires the maintainer to give up control.
+          </p>
+
+          <hr class="essay-divider" />
+
+          <h2>Check if you&rsquo;re exposed</h2>
+
+          <p>
+            Run <code>npx proof-of-commitment</code> in any project directory. It walks your lockfile and flags packages where a sole npm publisher controls more than 10&nbsp;million weekly downloads. If you use Temporal or anything that pulls in protobufjs, you&rsquo;ll see both of these.
+          </p>
+
+          <pre><code>npx proof-of-commitment</code></pre>
+
+          <p>
+            Or <a href="/audit?packages=abort-controller,long,protobufjs,%40temporalio%2Fclient&ref=blog-abort-controller-long">score all four packages now in the audit tool</a> to see the full picture: publisher depth, release cadence, provenance status, and Commit score.
+          </p>
+
+        </div>
+
+        <!-- Footer -->
+        <footer class="essay-footer">
+          <a href="/blog">&larr; More writing</a>
+        </footer>
+
+      </div>
+    </div>
+  </article>
+
+  <style>
+    /* --- Reset / base --- */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    /* --- Nav --- */
+    nav { padding: 1rem 0; border-bottom: 1px solid var(--border-light, #e5e5e5); }
+    .nav-inner { display: flex; justify-content: space-between; align-items: center; }
+    .nav-brand { font-weight: 700; font-size: 1.15rem; text-decoration: none; color: var(--ink, #111); }
+    .nav-links { list-style: none; display: flex; gap: 1.5rem; font-size: 0.92rem; }
+    .nav-links a { text-decoration: none; color: var(--ink-muted, #555); }
+    .nav-links a:hover { color: var(--ink, #111); }
+
+    /* --- Container --- */
+    .container { max-width: 1080px; margin: 0 auto; padding: 0 1.5rem; }
+
+    /* --- Essay --- */
+    .essay { padding: 4rem 0 6rem; }
+    .editorial { max-width: 680px; margin: 0 auto; }
+    .essay-header { margin-bottom: 3rem; }
+    .essay-meta { font-size: 0.85rem; color: var(--ink-muted, #888); margin-bottom: 0.75rem; }
+    .essay-title { font-size: clamp(1.6rem, 4vw, 2.4rem); line-height: 1.25; margin-bottom: 0.75rem; }
+    .essay-subtitle { font-size: 1.1rem; color: var(--ink-muted, #666); margin-bottom: 0.5rem; }
+    .essay-byline { font-size: 0.9rem; color: var(--ink-muted, #888); }
+    .essay-body p { font-size: 1.05rem; line-height: 1.75; margin-bottom: 1.5rem; color: var(--ink, #222); }
+    .essay-body h2 { font-size: 1.3rem; margin: 2.5rem 0 1rem; }
+    .essay-body a { color: var(--accent, #2563eb); text-decoration: underline; }
+    .essay-body code { background: var(--bg-muted, #f5f5f5); padding: 0.15rem 0.4rem; border-radius: 3px; font-size: 0.9em; }
+    .essay-body pre { background: var(--bg-muted, #f5f5f5); padding: 1rem 1.25rem; border-radius: 6px; overflow-x: auto; margin-bottom: 1.5rem; font-size: 0.9rem; }
+    .essay-body pre code { background: none; padding: 0; }
+    .essay-divider { border: none; border-top: 1px solid var(--border-light, #e5e5e5); margin: 2.5rem 0; }
+    .essay-footer { margin-top: 3rem; padding-top: 1.5rem; border-top: 1px solid var(--border-light, #e5e5e5); }
+    .essay-footer a { color: var(--accent, #2563eb); text-decoration: none; font-size: 0.95rem; }
+
+    /* --- Table --- */
+    .essay-table-wrap { overflow-x: auto; margin-bottom: 1.5rem; }
+    table { width: 100%; border-collapse: collapse; font-size: 0.92rem; }
+    th { text-align: left; padding: 0.6rem 1rem; border-bottom: 2px solid var(--border-light, #e5e5e5); font-weight: 600; }
+    td { padding: 0.6rem 1rem; border-bottom: 1px solid var(--border-light, #eee); }
+    .risk-critical { color: #dc2626; font-weight: 700; font-size: 0.85rem; }
+
+    /* --- Animation --- */
+    .animate-in { opacity: 0; transform: translateY(12px); animation: fadeSlideIn 0.5s ease forwards; }
+    .delay-1 { animation-delay: 0.1s; }
+    .delay-2 { animation-delay: 0.2s; }
+    .delay-3 { animation-delay: 0.3s; }
+    .delay-4 { animation-delay: 0.4s; }
+    @keyframes fadeSlideIn { to { opacity: 1; transform: translateY(0); } }
+
+    /* --- Mobile --- */
+    @media (max-width: 640px) {
+      .nav-links { display: none; }
+      .essay-title { font-size: 1.5rem; }
+    }
+  </style>
+
+</Layout>

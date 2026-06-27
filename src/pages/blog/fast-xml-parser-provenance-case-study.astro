@@ -1,0 +1,252 @@
+---
+import Layout from '../../layouts/Layout.astro';
+---
+
+<Layout
+  title="How fast-xml-parser Got OIDC Provenance in 12 Hours &mdash; Commit"
+  description="Behavioral scoring flagged fast-xml-parser as CRITICAL: 88M downloads/week, single publisher, no provenance. The maintainer shipped OIDC provenance in 12 hours. Here's what happened."
+  canonical="https://getcommit.dev/blog/fast-xml-parser-provenance-case-study/"
+  publishDate="2026-06-18"
+>
+
+  <!-- Nav -->
+  <nav>
+    <div class="container nav-inner">
+      <a href="/" class="nav-brand">Commit</a>
+      <ul class="nav-links">
+        <li><a href="/extension">Extension</a></li>
+        <li><a href="/blog">Writing</a></li>
+        <li><a href="/pricing">Pricing</a></li><li><a href="/docs">Docs</a></li><li><a href="https://github.com/piiiico/proof-of-commitment" target="_blank" rel="noopener">GitHub</a></li>
+        <li><a href="mailto:pico@amdal.dev">Contact</a></li>
+      </ul>
+    </div>
+  </nav>
+
+  <!-- Essay -->
+  <article class="essay">
+    <div class="container">
+      <div class="editorial">
+
+        <!-- Header -->
+        <header class="essay-header">
+          <div class="essay-meta animate-in delay-1">
+            <time datetime="2026-06-18">June 18, 2026</time>
+          </div>
+          <h1 class="essay-title animate-in delay-2">How fast-xml-parser Got OIDC Provenance in 12 Hours</h1>
+          <p class="essay-subtitle animate-in delay-3">
+            88M downloads/week. One publisher. No provenance. Then a 12-hour turnaround.
+          </p>
+          <p class="essay-byline animate-in delay-4">Pico</p>
+        </header>
+
+        <!-- Body -->
+        <div class="essay-body">
+
+          <p>
+            <a href="https://www.npmjs.com/package/fast-xml-parser" target="_blank" rel="noopener">fast-xml-parser</a> has 88 million weekly downloads. It is used by AWS SDK, Cloudflare Workers tooling, and thousands of downstream packages. It has one publisher: Naturalintelligence (Amit Gupta). Before June&nbsp;18, that publisher had no OIDC provenance on any release.
+          </p>
+
+          <p>
+            The Commit behavioral scanner flags this combination&mdash;sole publisher, massive scale, no provenance&mdash;as CRITICAL. A stolen npm token would be enough to push a malicious version to <code>latest</code> with no verifiable link to the source repository. No attestation. No supply chain transparency. Just a <code>npm publish</code> from anywhere.
+          </p>
+
+          <p>
+            On June&nbsp;18, 2026 at 09:14 UTC, I filed a GitHub issue requesting OIDC provenance. Twelve hours later, the maintainer had shipped it.
+          </p>
+
+          <hr class="essay-divider" />
+
+          <h2>The flag</h2>
+
+          <p>
+            The Commit score for fast-xml-parser before June&nbsp;18:
+          </p>
+
+          <ul>
+            <li>Publisher concentration: single npm account controls all releases</li>
+            <li>Weekly downloads: 88M (top 0.01% by volume)</li>
+            <li>OIDC provenance: absent on all versions</li>
+            <li>Staged publishing: absent</li>
+            <li>Overall risk tier: <strong>CRITICAL</strong></li>
+          </ul>
+
+          <p>
+            That combination puts fast-xml-parser in the same category as the packages compromised in the TanStack CI attack and the Red Hat Miasma incident&mdash;not because it was attacked, but because the structural prerequisites for those attacks were present. High download volume, single point of failure, no attestation trail.
+          </p>
+
+          <hr class="essay-divider" />
+
+          <h2>The outreach</h2>
+
+          <p>
+            The issue was direct: here is what the scanner found, here is why it matters, here is the exact change needed. The npm provenance docs make this a two-line CI change for GitHub Actions workflows&mdash;add <code>id-token: write</code> to permissions and <code>--provenance</code> to the publish command.
+          </p>
+
+          <p>
+            Amit replied within the hour. He was already aware of the provenance feature and had been planning to add it. The issue gave him the concrete context to prioritize it immediately.
+          </p>
+
+          <p>
+            By 21:30 UTC on June&nbsp;18, fast-xml-parser@4.5.3 was on the registry with a valid OIDC provenance attestation linking the release to its GitHub Actions build.
+          </p>
+
+          <hr class="essay-divider" />
+
+          <h2>What provenance actually does</h2>
+
+          <p>
+            npm OIDC provenance creates a verifiable link between a published package and the CI run that produced it. The link is a Sigstore attestation&mdash;a signed statement from the OIDC provider (GitHub Actions, in this case) asserting that <em>this package at this version was built by this workflow from this commit</em>.
+          </p>
+
+          <p>
+            What you can verify:
+          </p>
+
+          <ul>
+            <li>The exact repository and commit that triggered the publish</li>
+            <li>The workflow file path that ran the publish step</li>
+            <li>The GitHub Actions runner environment (not a personal machine or unknown CI)</li>
+          </ul>
+
+          <p>
+            What provenance does not cover: a compromised CI pipeline. If an attacker can modify the workflow file or inject environment variables, they can still publish malicious code that passes provenance checks. That is the scenario that <a href="/blog/staged-publishing-detection">Staged Publishing</a> addresses&mdash;a human approval gate between &ldquo;CI ran&rdquo; and &ldquo;users install it.&rdquo;
+          </p>
+
+          <p>
+            Provenance is a necessary step. It removes the &ldquo;publish from anywhere, no audit trail&rdquo; attack surface. Staged Publishing extends the defense to compromised pipeline attacks. The two stack.
+          </p>
+
+          <hr class="essay-divider" />
+
+          <h2>Verification</h2>
+
+          <p>
+            You can confirm fast-xml-parser now ships provenance without taking my word for it:
+          </p>
+
+          <pre><code>npm pack fast-xml-parser@latest --dry-run
+# Then check the attestation:
+npm audit signatures</code></pre>
+
+          <p>
+            Or ask the registry directly:
+          </p>
+
+          <pre><code>curl -s https://registry.npmjs.org/fast-xml-parser/latest \
+  | jq '._attestations'</code></pre>
+
+          <p>
+            The <code>_attestations</code> field will be non-null for versions published after June&nbsp;18.
+          </p>
+
+          <p>
+            The Commit API also reflects the change:
+          </p>
+
+          <pre><code>curl -s 'https://poc-backend.amdal-dev.workers.dev/api/audit' \
+  -H 'Content-Type: application/json' \
+  -d '&#123;"packages":["fast-xml-parser"],"ecosystem":"npm"&#125;'</code></pre>
+
+          <p>
+            The response now includes <code>hasProvenance: true</code> for fast-xml-parser. Before June&nbsp;18 it was <code>false</code>. The score moved up automatically&mdash;no human re-tagged anything&mdash;because the behavioral scanner reads attestation metadata from the registry directly.
+          </p>
+
+          <hr class="essay-divider" />
+
+          <h2>The pattern</h2>
+
+          <p>
+            This is the third case this month where a high-volume package with a sole publisher adopted provenance within days of being flagged. <a href="/blog/postcss-nanoid-staged-publishing">Andrey Sitnik moved nanoid and nanospy to Staged Publishing</a> after PostCSS raised the issue. <a href="/blog/hono-staged-publishing-adopted">Hono shipped Staged Publishing in 33 hours</a>.
+          </p>
+
+          <p>
+            The pattern: maintainers are not unaware of these risks. They are busy. The friction is not the 2-line CI change&mdash;the friction is prioritization. A concrete, verifiable issue that names the exact risk, the exact fix, and the exact command gives a busy maintainer everything they need to act in the same session they read the issue.
+          </p>
+
+          <p>
+            fast-xml-parser shipped provenance in 12 hours. The CRITICAL flag on the Commit scanner cleared automatically. 88M weekly download slots now have an attestation chain that didn&rsquo;t exist the morning before.
+          </p>
+
+          <hr class="essay-divider" />
+
+          <h2>What&rsquo;s still exposed</h2>
+
+          <p>
+            Provenance without Staged Publishing means the build pipeline is still a single point of failure. An attacker who can modify the CI workflow file or inject a secret into the runner can still publish malicious code that passes provenance checks&mdash;the attestation would say &ldquo;yes, this came from the expected workflow,&rdquo; because technically it did.
+          </p>
+
+          <p>
+            Staged Publishing puts a human in the loop between &ldquo;CI completed&rdquo; and &ldquo;users see the new version as <code>latest</code>.&rdquo; fast-xml-parser has not yet adopted it. Given the 12-hour provenance turnaround, the next conversation is already obvious.
+          </p>
+
+          <hr class="essay-divider" />
+
+          <h2>Scan your own dependencies</h2>
+
+          <pre><code>npx proof-of-commitment</code></pre>
+
+          <p>
+            The CLI scans your lockfile and flags packages where a single publisher controls significant weekly download volume. The output now shows whether each CRITICAL package has provenance, Staged Publishing, both, or neither&mdash;and when the status last changed.
+          </p>
+
+          <p>
+            <a href="/get-started?ref=blog-fast-xml-parser">Free API key</a> watches 3 packages with weekly digests. <a href="/pricing?utm_campaign=fast-xml-parser&amp;utm_source=blog&amp;utm_medium=cta">Developer ($15/mo)</a> watches 15 with daily scans and instant alerts&mdash;you find out the moment a CRITICAL dependency adopts provenance, or the reverse.
+          </p>
+
+        </div>
+
+        <!-- Footer -->
+        <footer class="essay-footer">
+          <a href="/blog">&larr; More writing</a>
+        </footer>
+
+      </div>
+    </div>
+  </article>
+
+  <style>
+    /* --- Reset / base --- */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    /* --- Nav --- */
+    nav { padding: 1rem 0; border-bottom: 1px solid var(--border-light, #e5e5e5); }
+    .nav-inner { display: flex; justify-content: space-between; align-items: center; }
+    .nav-brand { font-weight: 700; font-size: 1.15rem; text-decoration: none; color: var(--ink, #111); }
+    .nav-links { list-style: none; display: flex; gap: 1.5rem; font-size: 0.92rem; }
+    .nav-links a { text-decoration: none; color: var(--ink-muted, #555); }
+    .nav-links a:hover { color: var(--ink, #111); }
+
+    /* --- Container --- */
+    .container { max-width: 1080px; margin: 0 auto; padding: 0 1.5rem; }
+
+    /* --- Essay --- */
+    .essay { padding: 4rem 0 6rem; }
+    .editorial { max-width: 680px; margin: 0 auto; }
+    .essay-header { margin-bottom: 3rem; }
+    .essay-meta { font-size: 0.85rem; color: var(--ink-muted, #888); margin-bottom: 0.75rem; }
+    .essay-title { font-size: clamp(1.6rem, 4vw, 2.4rem); line-height: 1.25; margin-bottom: 0.75rem; }
+    .essay-subtitle { font-size: 1.1rem; color: var(--ink-muted, #666); margin-bottom: 0.5rem; }
+    .essay-byline { font-size: 0.9rem; color: var(--ink-muted, #888); }
+    .essay-body p { font-size: 1.05rem; line-height: 1.75; margin-bottom: 1.5rem; color: var(--ink, #222); }
+    .essay-body h2 { font-size: 1.3rem; margin: 2.5rem 0 1rem; }
+    .essay-body ul { margin: 0 0 1.5rem 1.5rem; }
+    .essay-body ul li { font-size: 1.05rem; line-height: 1.75; color: var(--ink, #222); margin-bottom: 0.4rem; }
+    .essay-body a { color: var(--accent, #2563eb); text-decoration: underline; }
+    .essay-body code { background: var(--bg-muted, #f5f5f5); padding: 0.15rem 0.4rem; border-radius: 3px; font-size: 0.9em; }
+    .essay-body pre { background: var(--bg-muted, #f5f5f5); padding: 1rem 1.25rem; border-radius: 6px; overflow-x: auto; margin-bottom: 1.5rem; font-size: 0.9rem; }
+    .essay-body pre code { background: none; padding: 0; }
+    .essay-divider { border: none; border-top: 1px solid var(--border-light, #e5e5e5); margin: 2.5rem 0; }
+    .essay-footer { margin-top: 3rem; padding-top: 1.5rem; border-top: 1px solid var(--border-light, #e5e5e5); }
+    .essay-footer a { color: var(--accent, #2563eb); text-decoration: none; font-size: 0.95rem; }
+    .essay-footer a:hover { text-decoration: underline; }
+
+    /* --- Animation --- */
+    .animate-in { opacity: 0; transform: translateY(12px); animation: fadeUp 0.5s ease forwards; }
+    .delay-1 { animation-delay: 0.1s; }
+    .delay-2 { animation-delay: 0.2s; }
+    .delay-3 { animation-delay: 0.3s; }
+    .delay-4 { animation-delay: 0.4s; }
+    @keyframes fadeUp { to { opacity: 1; transform: translateY(0); } }
+  </style>
+
+</Layout>

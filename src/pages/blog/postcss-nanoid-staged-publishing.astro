@@ -3,10 +3,10 @@ import Layout from '../../layouts/Layout.astro';
 ---
 
 <Layout
-  title="nanoid Adopted Staged Publishing After a Technical Debate About CI Provenance &mdash; Commit"
-  description="Andrey Sitnik pushed back on CI provenance, argued it increases attack surface, then adopted npm Staged Publishing on nanoid (221M weekly downloads) and nanospy within hours. PostCSS is next."
+  title="PostCSS Adopted Staged Publishing. 685M Weekly Downloads Now Gated. &mdash; Commit"
+  description="Andrey Sitnik pushed back on CI provenance, shipped Staged Publishing on nanoid within hours, then followed through on PostCSS, browserslist, and autoprefixer. 685M weekly downloads secured in 9 days."
   canonical="https://getcommit.dev/blog/postcss-nanoid-staged-publishing/"
-  publishDate="2026-06-24"
+  publishDate="2026-06-27"
 >
 
   <!-- Nav -->
@@ -30,11 +30,11 @@ import Layout from '../../layouts/Layout.astro';
         <!-- Header -->
         <header class="essay-header">
           <div class="essay-meta animate-in delay-1">
-            <time datetime="2026-06-24">June 24, 2026</time>
+            <time datetime="2026-06-27">June 27, 2026</time>
           </div>
-          <h1 class="essay-title animate-in delay-2">nanoid Adopted Staged Publishing After a Technical Debate About CI Provenance</h1>
+          <h1 class="essay-title animate-in delay-2">PostCSS Adopted Staged Publishing. 685M Weekly Downloads Now&nbsp;Gated.</h1>
           <p class="essay-subtitle animate-in delay-3">
-            Andrey Sitnik didn&rsquo;t just accept the suggestion. He argued CI provenance makes things worse. Then he shipped the fix&nbsp;anyway.
+            Andrey Sitnik argued CI provenance makes things worse. Then he shipped a better fix across four packages in nine&nbsp;days.
           </p>
           <p class="essay-byline animate-in delay-4">Pico</p>
         </header>
@@ -126,7 +126,32 @@ import Layout from '../../layouts/Layout.astro';
   | jq '&#123;hasStagedPublishing, commitmentScore, weeklyDownloads: .recentWeeklyDownloads&#125;'</code></pre>
 
           <p>
-            nanoid returns <code>hasStagedPublishing: true</code>, score 92. nanospy returns <code>hasStagedPublishing: true</code>. PostCSS still returns <code>false</code>&mdash;that will change when Andrey gets to it.
+            nanoid returns <code>hasStagedPublishing: true</code>, score 92. nanospy returns <code>hasStagedPublishing: true</code>.
+          </p>
+
+          <hr class="essay-divider" />
+
+          <h2>Update: PostCSS followed through</h2>
+
+          <p>
+            Andrey said &ldquo;a week or two.&rdquo; It took nine days. As of June&nbsp;27, four of the seven packages under the <code>ai</code> npm account have Staged Publishing enabled:
+          </p>
+
+          <table>
+            <thead><tr><th>Package</th><th>Weekly downloads</th><th>Staged Publishing</th><th>Score</th></tr></thead>
+            <tbody>
+              <tr><td>postcss</td><td>251M</td><td>&#x2705;</td><td>85</td></tr>
+              <tr><td>nanoid</td><td>207M</td><td>&#x2705;</td><td>92</td></tr>
+              <tr><td>browserslist</td><td>166M</td><td>&#x2705;</td><td>89</td></tr>
+              <tr><td>autoprefixer</td><td>61M</td><td>&#x2705;</td><td>89</td></tr>
+              <tr><td>caniuse-lite</td><td>171M</td><td>&mdash;</td><td>81</td></tr>
+              <tr><td>postcss-nested</td><td>54M</td><td>&mdash;</td><td>72</td></tr>
+              <tr><td>postcss-js</td><td>53M</td><td>&mdash;</td><td>70</td></tr>
+            </tbody>
+          </table>
+
+          <p>
+            That&rsquo;s 685&nbsp;million weekly downloads now behind a human approval gate. One GitHub issue, nine days, no drama.
           </p>
 
           <hr class="essay-divider" />
@@ -142,7 +167,7 @@ import Layout from '../../layouts/Layout.astro';
           </p>
 
           <p>
-            The broader pattern: <a href="/blog/one-account-964m-downloads/">one npm account controls 964M weekly downloads</a>. nanoid and nanospy are now gated. PostCSS, Autoprefixer, browserslist, caniuse-lite are not. When they are, over 700&nbsp;million weekly downloads move behind the approval step.
+            Three more packages remain. When caniuse-lite, postcss-nested, and postcss-js adopt, the entire PostCSS ecosystem&mdash;963&nbsp;million weekly downloads&mdash;will be gated. Based on the pace so far, that&rsquo;s weeks, not months.
           </p>
 
           <hr class="essay-divider" />
@@ -202,6 +227,9 @@ import Layout from '../../layouts/Layout.astro';
     .essay-body blockquote { border-left: 3px solid var(--accent, #2563eb); padding: 0.75rem 1.25rem; margin: 0 0 1.5rem; background: var(--bg-muted, #f8f9fa); }
     .essay-body blockquote p { margin-bottom: 0.5rem; color: var(--ink-muted, #444); font-style: italic; }
     .essay-body blockquote p:last-child { margin-bottom: 0; }
+    .essay-body table { width: 100%; border-collapse: collapse; margin-bottom: 1.5rem; font-size: 0.95rem; }
+    .essay-body th, .essay-body td { padding: 0.5rem 0.75rem; text-align: left; border-bottom: 1px solid var(--border-light, #e5e5e5); }
+    .essay-body th { font-weight: 600; font-size: 0.85rem; text-transform: uppercase; letter-spacing: 0.03em; color: var(--ink-muted, #666); }
     .essay-divider { border: none; border-top: 1px solid var(--border-light, #e5e5e5); margin: 2.5rem 0; }
     .essay-footer { margin-top: 3rem; padding-top: 1.5rem; border-top: 1px solid var(--border-light, #e5e5e5); }
     .essay-footer a { color: var(--accent, #2563eb); text-decoration: none; font-size: 0.95rem; }

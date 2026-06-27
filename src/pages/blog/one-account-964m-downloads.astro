@@ -1,0 +1,223 @@
+---
+import Layout from '../../layouts/Layout.astro';
+---
+
+<Layout
+  title="One npm Account Publishes 964 Million Downloads Per Week. None Have Provenance. &mdash; Commit"
+  description="The ai npm account controls postcss, nanoid, browserslist, caniuse-lite, autoprefixer, and more. All flagged CRITICAL. Zero OIDC provenance. One stolen credential away from the biggest npm incident yet."
+  canonical="https://getcommit.dev/blog/one-account-964m-downloads/"
+  publishDate="2026-06-18"
+>
+
+  <!-- Nav -->
+  <nav>
+    <div class="container nav-inner">
+      <a href="/" class="nav-brand">Commit</a>
+      <ul class="nav-links">
+        <li><a href="/extension">Extension</a></li>
+        <li><a href="/blog">Writing</a></li>
+        <li><a href="/pricing">Pricing</a></li><li><a href="/docs">Docs</a></li><li><a href="https://github.com/piiiico/proof-of-commitment" target="_blank" rel="noopener">GitHub</a></li>
+        <li><a href="mailto:pico@amdal.dev">Contact</a></li>
+      </ul>
+    </div>
+  </nav>
+
+  <!-- Essay -->
+  <article class="essay">
+    <div class="container">
+      <div class="editorial">
+
+        <!-- Header -->
+        <header class="essay-header">
+          <div class="essay-meta animate-in delay-1">
+            <time datetime="2026-06-18">June 18, 2026</time>
+          </div>
+          <h1 class="essay-title animate-in delay-2">One npm Account Publishes 964&nbsp;Million Downloads Per Week. None Have Provenance.</h1>
+          <p class="essay-subtitle animate-in delay-3">
+            Seven packages, one set of credentials, zero OIDC attestations.
+          </p>
+          <p class="essay-byline animate-in delay-4">Pico</p>
+        </header>
+
+        <!-- Body -->
+        <div class="essay-body">
+
+          <p>
+            The npm account <code>ai</code> publishes seven packages. Combined, they install 964&nbsp;million times per week:
+          </p>
+
+          <div class="essay-table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>Package</th>
+                  <th>Weekly downloads</th>
+                  <th>Publishers</th>
+                  <th>Risk</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr><td>postcss</td><td>245,612,332</td><td>1</td><td><span class="risk-critical">CRITICAL</span></td></tr>
+                <tr><td>nanoid</td><td>206,588,788</td><td>1</td><td><span class="risk-critical">CRITICAL</span></td></tr>
+                <tr><td>caniuse-lite</td><td>173,435,668</td><td>1</td><td><span class="risk-critical">CRITICAL</span></td></tr>
+                <tr><td>browserslist</td><td>167,746,012</td><td>1</td><td><span class="risk-critical">CRITICAL</span></td></tr>
+                <tr><td>autoprefixer</td><td>63,517,741</td><td>1</td><td><span class="risk-critical">CRITICAL</span></td></tr>
+                <tr><td>postcss-nested</td><td>54,486,292</td><td>1</td><td><span class="risk-critical">CRITICAL</span></td></tr>
+                <tr><td>postcss-js</td><td>52,771,544</td><td>1</td><td><span class="risk-critical">CRITICAL</span></td></tr>
+              </tbody>
+            </table>
+          </div>
+
+          <p>
+            That&rsquo;s 50&nbsp;billion installs per year behind a single set of npm credentials. None of them have npm provenance attestations.
+          </p>
+
+          <hr class="essay-divider" />
+
+          <h2>Why this matters</h2>
+
+          <p>
+            npm provenance uses OIDC tokens from GitHub Actions instead of long-lived npm tokens. If a package has provenance, you can verify that the published code came from a specific commit in a specific repository&mdash;not from someone&rsquo;s compromised laptop.
+          </p>
+
+          <p>
+            Without provenance, there&rsquo;s no way to distinguish a legitimate release from one pushed by a stolen token. The blast radius here is nearly a billion installs per week.
+          </p>
+
+          <p>
+            This isn&rsquo;t theoretical. <a href="/blog/axios-attack-prediction/">axios was attacked on March&nbsp;30, 2026</a> through a stolen npm token&mdash;same single-publisher, no-provenance pattern. LiteLLM was hit the same way a month earlier. The <a href="/blog/shai-hulud-claude-code-hook/">Shai-Hulud worm</a> in May&nbsp;2026 exploited stolen tokens to republish 637 package versions in 39&nbsp;minutes.
+          </p>
+
+          <hr class="essay-divider" />
+
+          <h2>What makes this different from chalk or lodash</h2>
+
+          <p>
+            PostCSS is interesting because it&rsquo;s not just one critical package. It&rsquo;s an entire ecosystem of critical packages, all behind the same account. chalk is one package, one publisher, 432M downloads/week. Bad enough. But <code>ai</code> controls seven independent packages that each cross the 10M threshold.
+          </p>
+
+          <p>
+            A compromised <code>ai</code> token doesn&rsquo;t just hit postcss. It hits the CSS build pipeline (postcss + autoprefixer + postcss-nested + postcss-js), the browser compatibility layer (browserslist + caniuse-lite), and one of the most popular ID generators in the ecosystem (nanoid).
+          </p>
+
+          <p>
+            And <code>caniuse-lite</code> was flagged with a dormant publisher warning&mdash;61&nbsp;months of inactivity on the publishing account. <code>postcss-nested</code> hasn&rsquo;t had a release in over 12&nbsp;months.
+          </p>
+
+          <hr class="essay-divider" />
+
+          <h2>This has been fixed before</h2>
+
+          <p>
+            fast-xml-parser (88M downloads/week, single publisher) had the same problem. After the community raised <a href="https://github.com/NaturalIntelligence/fast-xml-parser/issues/814" target="_blank" rel="noopener">the issue</a>, the maintainer set up GitHub Actions OIDC publishing. Within days, version 5.9.1 shipped with SLSA provenance attestations. Then 5.9.2 added environment gates and SHA-pinned actions. The structural gap closed in under a week.
+          </p>
+
+          <p>
+            I <a href="https://github.com/postcss/postcss/issues/2096" target="_blank" rel="noopener">filed an issue on PostCSS</a> proposing the same approach.
+          </p>
+
+          <hr class="essay-divider" />
+
+          <h2>The PostCSS maintainer disagrees&mdash;and he&rsquo;s partially right</h2>
+
+          <p>
+            Andrey Sitnik (<code>ai</code>) responded within hours. His argument: OIDC provenance from CI is itself an attack surface. TanStack was compromised precisely because they published from CI&mdash;the stolen token came from the CI system. His words: &ldquo;CI-as-publisher increased the attack risks compared to 2FA manual publishing.&rdquo;
+          </p>
+
+          <p>
+            He&rsquo;s right that CI-as-sole-publisher shifts the attack surface rather than eliminating it. The Shai-Hulud worm exchanged OIDC tokens for publish credentials. TanStack was hit through GitHub Actions cache poisoning. Provenance proves <em>where</em> a build came from; it doesn&rsquo;t prove the CI pipeline wasn&rsquo;t tampered with.
+          </p>
+
+          <p>
+            His proposed alternative: <strong>Staged Releases</strong>&mdash;a newer npm feature where CI creates the release, but a human must manually approve it before it becomes the default install target. Even if an attacker compromises the CI pipeline, the malicious version sits in a holding period. No silent pushes to <code>latest</code>.
+          </p>
+
+          <p>
+            The honest answer is: both are better than the current state. Right now there&rsquo;s no provenance, no staged releases, no second factor between a stolen credential and 964&nbsp;million weekly installs. Staged Releases would address the blast-radius problem directly. Provenance would at least make attacks auditable after the fact. The worst option is what we have now: nothing.
+          </p>
+
+          <hr class="essay-divider" />
+
+          <h2>Check your own dependencies</h2>
+
+          <p>
+            If you want to see which packages in your project have this concentration risk:
+          </p>
+
+          <pre><code>npx proof-of-commitment</code></pre>
+
+          <p>
+            Run it in any project directory. It auto-detects your lockfile and flags packages where a single npm publisher controls more than 10M weekly downloads. That&rsquo;s the exact attack surface that&rsquo;s been exploited three times in four months.
+          </p>
+
+          <p>
+            <a href="/get-started?ref=blog-one-account-964m">Get a free API key</a> to monitor these packages and get alerted when any score degrades.
+          </p>
+
+        </div>
+
+        <!-- Footer -->
+        <footer class="essay-footer">
+          <a href="/blog">&larr; More writing</a>
+        </footer>
+
+      </div>
+    </div>
+  </article>
+
+  <style>
+    /* --- Reset / base --- */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    /* --- Nav --- */
+    nav { padding: 1rem 0; border-bottom: 1px solid var(--border-light, #e5e5e5); }
+    .nav-inner { display: flex; justify-content: space-between; align-items: center; }
+    .nav-brand { font-weight: 700; font-size: 1.15rem; text-decoration: none; color: var(--ink, #111); }
+    .nav-links { list-style: none; display: flex; gap: 1.5rem; font-size: 0.92rem; }
+    .nav-links a { text-decoration: none; color: var(--ink-muted, #555); }
+    .nav-links a:hover { color: var(--ink, #111); }
+
+    /* --- Container --- */
+    .container { max-width: 1080px; margin: 0 auto; padding: 0 1.5rem; }
+
+    /* --- Essay --- */
+    .essay { padding: 4rem 0 6rem; }
+    .editorial { max-width: 680px; margin: 0 auto; }
+    .essay-header { margin-bottom: 3rem; }
+    .essay-meta { font-size: 0.85rem; color: var(--ink-muted, #888); margin-bottom: 0.75rem; }
+    .essay-title { font-size: clamp(1.6rem, 4vw, 2.4rem); line-height: 1.25; margin-bottom: 0.75rem; }
+    .essay-subtitle { font-size: 1.1rem; color: var(--ink-muted, #666); margin-bottom: 0.5rem; }
+    .essay-byline { font-size: 0.9rem; color: var(--ink-muted, #888); }
+    .essay-body p { font-size: 1.05rem; line-height: 1.75; margin-bottom: 1.5rem; color: var(--ink, #222); }
+    .essay-body h2 { font-size: 1.3rem; margin: 2.5rem 0 1rem; }
+    .essay-body a { color: var(--accent, #2563eb); text-decoration: underline; }
+    .essay-body code { background: var(--bg-muted, #f5f5f5); padding: 0.15rem 0.4rem; border-radius: 3px; font-size: 0.9em; }
+    .essay-body pre { background: var(--bg-muted, #f5f5f5); padding: 1rem 1.25rem; border-radius: 6px; overflow-x: auto; margin-bottom: 1.5rem; font-size: 0.9rem; }
+    .essay-body pre code { background: none; padding: 0; }
+    .essay-divider { border: none; border-top: 1px solid var(--border-light, #e5e5e5); margin: 2.5rem 0; }
+    .essay-footer { margin-top: 3rem; padding-top: 1.5rem; border-top: 1px solid var(--border-light, #e5e5e5); }
+    .essay-footer a { color: var(--accent, #2563eb); text-decoration: none; font-size: 0.95rem; }
+
+    /* --- Table --- */
+    .essay-table-wrap { overflow-x: auto; margin-bottom: 1.5rem; }
+    table { width: 100%; border-collapse: collapse; font-size: 0.92rem; }
+    th { text-align: left; padding: 0.6rem 1rem; border-bottom: 2px solid var(--border-light, #e5e5e5); font-weight: 600; }
+    td { padding: 0.6rem 1rem; border-bottom: 1px solid var(--border-light, #eee); }
+    .risk-critical { color: #dc2626; font-weight: 700; font-size: 0.85rem; }
+
+    /* --- Animation --- */
+    .animate-in { opacity: 0; transform: translateY(12px); animation: fadeSlideIn 0.5s ease forwards; }
+    .delay-1 { animation-delay: 0.1s; }
+    .delay-2 { animation-delay: 0.2s; }
+    .delay-3 { animation-delay: 0.3s; }
+    .delay-4 { animation-delay: 0.4s; }
+    @keyframes fadeSlideIn { to { opacity: 1; transform: translateY(0); } }
+
+    /* --- Mobile --- */
+    @media (max-width: 640px) {
+      .nav-links { display: none; }
+      .essay-title { font-size: 1.5rem; }
+    }
+  </style>
+
+</Layout>
