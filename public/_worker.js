@@ -1155,6 +1155,22 @@ export default {
         ["trapdoor-ai-assistant-poisoning",            "2026-06-06"],
         ["llm-security-audit-noise",                   "2026-06-04"],
         ["ietf-agent-payment-trust-draft",             "2026-06-03"],
+        // GENERATED-EDIT-OK: syncing 15 blog posts deployed-but-never-committed (2026-06-13 to 2026-06-27) into sitemap source of truth
+        ["aur-1579-packages-adoption-bypass",          "2026-06-13"],
+        ["atomic-arch-targets-bun",                    "2026-06-14"],
+        ["snyk-scores-lodash-86-we-score-it-critical", "2026-06-14"],
+        ["snyk-scores-chalk-81-we-score-it-critical",  "2026-06-14"],
+        ["unit42-80-percent-agent-skills-lie",          "2026-06-14"],
+        ["linkedin-recruiter-npm-backdoor",            "2026-06-16"],
+        ["nvidia-skillspector-runtime-trust-gap",       "2026-06-16"],
+        ["mastra-dormant-publisher-attack",             "2026-06-17"],
+        ["fast-xml-parser-provenance-case-study",       "2026-06-18"],
+        ["one-account-964m-downloads",                  "2026-06-18"],
+        ["staged-publishing-detection",                 "2026-06-19"],
+        ["978-downloads-zero-signups",                  "2026-06-20"],
+        ["hono-staged-publishing-adopted",              "2026-06-24"],
+        ["postcss-nanoid-staged-publishing",            "2026-06-24"],
+        ["vite-bot-140m-downloads",                     "2026-06-27"],
       ];
       const today = new Date().toISOString().split("T")[0];
       let xml = `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n`;
