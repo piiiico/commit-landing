@@ -1,0 +1,237 @@
+---
+import Layout from '../../layouts/Layout.astro';
+---
+
+<Layout
+  title="vitebot Publishes 140 Million npm Downloads Per Week. The Account Has Zero Public Repos. — Commit"
+  description="One bot account publishes vite and @vitejs/plugin-react — 205M combined weekly downloads. Evan You's npm account still has access but hasn't published in 57 months. No staged publishing gate."
+  canonical="https://getcommit.dev/blog/vite-bot-140m-downloads/"
+  publishDate="2026-06-27"
+>
+
+  <!-- Nav -->
+  <nav>
+    <div class="container nav-inner">
+      <a href="/" class="nav-brand">Commit</a>
+      <ul class="nav-links">
+        <li><a href="/extension">Extension</a></li>
+        <li><a href="/blog">Writing</a></li>
+        <li><a href="/pricing">Pricing</a></li><li><a href="/docs">Docs</a></li><li><a href="https://github.com/piiiico/proof-of-commitment" target="_blank" rel="noopener">GitHub</a></li>
+        <li><a href="mailto:pico@amdal.dev">Contact</a></li>
+      </ul>
+    </div>
+  </nav>
+
+  <!-- Essay -->
+  <article class="essay">
+    <div class="container">
+      <div class="editorial">
+
+        <!-- Header -->
+        <header class="essay-header">
+          <div class="essay-meta animate-in delay-1">
+            <time datetime="2026-06-27">June 27, 2026</time>
+          </div>
+          <h1 class="essay-title animate-in delay-2">vitebot Publishes 140 Million npm Downloads Per Week. The Account Has Zero Public&nbsp;Repos.</h1>
+          <p class="essay-subtitle animate-in delay-3">
+            One bot account publishes vite and @vitejs/plugin-react&mdash;205M combined weekly downloads. Evan You&rsquo;s npm account still has access but hasn&rsquo;t published in 57&nbsp;months. No staged publishing gate.
+          </p>
+          <p class="essay-byline animate-in delay-4">Pico</p>
+        </header>
+
+        <!-- Body -->
+        <div class="essay-body">
+
+          <p>
+            Vite is the build tool behind most of the modern JavaScript ecosystem. React, Vue, Svelte, Astro, Nuxt, SolidStart&mdash;all default to Vite. The package gets 140 million npm installs per week. It shipped 740 versions.
+          </p>
+
+          <p>
+            Every one of those versions published in the last five years came from a single npm account: <code>vitebot</code>.
+          </p>
+
+          <hr class="essay-divider">
+
+          <h2>The publisher lifecycle</h2>
+
+          <p>
+            Vite has had four npm publishers over its lifetime. Two had their access revoked: <code>antfu</code> (53 months inactive, 22 versions) and <code>patak</code> (32 months inactive, 72 versions). The third, <code>yyx990803</code>&mdash;Evan You, who created Vite&mdash;published 195 versions. His last publish was October 7, 2021. That was 57 months ago. His access was never revoked.
+          </p>
+
+          <p>
+            The fourth, <code>vitebot</code>, is the sole active publisher.
+          </p>
+
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>Package</th>
+                  <th>Weekly Downloads</th>
+                  <th>Active Publisher</th>
+                  <th>Risk</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td><a href="https://getcommit.dev/npm/vite">vite</a></td>
+                  <td>140M</td>
+                  <td>vitebot</td>
+                  <td>CRITICAL</td>
+                </tr>
+                <tr>
+                  <td><a href="https://getcommit.dev/npm/vitest">vitest</a></td>
+                  <td>70M</td>
+                  <td>1 active, 2 dormant</td>
+                  <td>CRITICAL</td>
+                </tr>
+                <tr>
+                  <td><a href="https://getcommit.dev/npm/@vitejs/plugin-react">@vitejs/plugin-react</a></td>
+                  <td>65M</td>
+                  <td>vitebot</td>
+                  <td>CRITICAL</td>
+                </tr>
+                <tr>
+                  <td><a href="https://getcommit.dev/npm/@vitejs/plugin-vue">@vitejs/plugin-vue</a></td>
+                  <td>7.3M</td>
+                  <td>vitebot</td>
+                  <td>HIGH</td>
+                </tr>
+                <tr>
+                  <td><a href="https://getcommit.dev/npm/@vitejs/plugin-legacy">@vitejs/plugin-legacy</a></td>
+                  <td>0.7M</td>
+                  <td>vitebot</td>
+                  <td>WARN</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <p>
+            283 million weekly downloads across the Vite ecosystem, published by one bot account with zero public GitHub repos.
+          </p>
+
+          <hr class="essay-divider">
+
+          <h2>Bot publishers are better. Until they aren&rsquo;t.</h2>
+
+          <p>
+            Publishing from a CI bot is actually a better practice than publishing from a human account. Bot tokens live in CI secrets, not in someone&rsquo;s <code>.npmrc</code> on a personal laptop. They can be scoped, rotated, and audited. The Vite team gets credit for this.
+          </p>
+
+          <p>
+            The problem isn&rsquo;t that <code>vitebot</code> exists. The problem is that <code>vitebot</code> is the <em>only</em> gate. If the CI pipeline is compromised&mdash;a GitHub Actions workflow injection, a stolen repo secret, a forked workflow with a poisoned build step&mdash;one push reaches 140 million weekly installs.
+          </p>
+
+          <p>
+            This is what happened to Red Hat in June 2026. A compromised GitHub account pushed code to @redhat-cloud-services packages. The CI pipeline published the malware. The packages had valid SLSA provenance. Provenance just signed the attack.
+          </p>
+
+          <p>
+            Vite publishes with OIDC provenance too. That&rsquo;s a plus. But provenance proves the build came from a pipeline. It does not prove a human reviewed the release.
+          </p>
+
+          <hr class="essay-divider">
+
+          <h2>Evan You&rsquo;s dormant access</h2>
+
+          <p>
+            <code>yyx990803</code> published 195 versions of Vite. His last publish was October 2021&mdash;57 months ago. He still has publish access to both <code>vite</code> and <code>@vitejs/plugin-react</code>.
+          </p>
+
+          <p>
+            The Vite team already revoked access for <code>antfu</code> and <code>patak</code>. Whoever did that cleanup missed the creator&rsquo;s own account. Revoking one dormant account while leaving another is the exact pattern we found in <a href="/blog/dormant-publishers-active-access/">debug, ws, and cliui</a>.
+          </p>
+
+          <p>
+            One <code>npm owner rm yyx990803 vite</code> closes this gap in two seconds. Evan You can be re-added if he ever needs to publish an emergency patch directly.
+          </p>
+
+          <hr class="essay-divider">
+
+          <h2>The missing gate: staged publishing</h2>
+
+          <p>
+            npm&rsquo;s Staged Publishing feature adds a waiting period between <code>npm publish</code> and the version going live. During that window, any npm owner can review the tarball and cancel the release.
+          </p>
+
+          <p>
+            <a href="/blog/staged-publishing-detection/">Hono adopted it</a> after we flagged them as CRITICAL. PostCSS is in progress. Vite hasn&rsquo;t.
+          </p>
+
+          <p>
+            With staged publishing enabled, a compromised <code>vitebot</code> push would still trigger a staging period. A human on the team would see it. They&rsquo;d have time to cancel before 140 million weekly installs pull the poisoned version.
+          </p>
+
+          <p>
+            Without it, the path from compromised token to production is a single <code>npm publish</code>.
+          </p>
+
+          <hr class="essay-divider">
+
+          <h2>What frameworks ship through vitebot</h2>
+
+          <p>
+            Vite isn&rsquo;t just one package in one project. It&rsquo;s the build layer for the frameworks that most new projects start with:
+          </p>
+
+          <ul>
+            <li><strong>Next.js</strong> uses Vite for its Turbopack-compatible dev server path</li>
+            <li><strong>Nuxt</strong> bundles @vitejs/plugin-vue</li>
+            <li><strong>SvelteKit</strong> uses @sveltejs/vite-plugin</li>
+            <li><strong>Astro</strong> depends on Vite at its core</li>
+            <li><strong>SolidStart</strong>, <strong>Remix</strong>, <strong>Qwik</strong>&mdash;all Vite-based</li>
+          </ul>
+
+          <p>
+            A single compromise reaches not just Vite users, but every framework that depends on Vite transitively. That&rsquo;s most of the modern frontend.
+          </p>
+
+          <hr class="essay-divider">
+
+          <h2>What you can do</h2>
+
+          <p><strong>If you&rsquo;re on the Vite team:</strong></p>
+          <ol>
+            <li>Revoke <code>yyx990803</code>&rsquo;s dormant publish access (<code>npm owner rm yyx990803 vite</code>)</li>
+            <li>Enable staged publishing on <code>vite</code> and <code>@vitejs/plugin-react</code></li>
+            <li>Consider adding a second active human publisher for emergency review</li>
+          </ol>
+
+          <p><strong>If you depend on Vite:</strong></p>
+          <ol>
+            <li>Pin versions in your lockfile and review lockfile diffs in PRs</li>
+            <li>Run <code>npx proof-of-commitment --file package-lock.json</code> to check your full dependency tree</li>
+            <li>Add a CI gate: <code>npx proof-of-commitment --fail-on=critical</code></li>
+          </ol>
+
+          <hr class="essay-divider">
+
+          <h2>How we found this</h2>
+
+          <p>
+            Commit scores every npm package on behavioral signals&mdash;publisher depth, dormant access, release patterns, and provenance status. The publisher lifecycle analysis was added in v1.35.0 and flagged <code>vitebot</code> as the sole active publisher across the Vite ecosystem.
+          </p>
+
+          <p>
+            Data pulled June 27, 2026 from the npm registry and Commit API.
+          </p>
+
+          <!-- CTA -->
+          <div class="cta-block">
+            <a href="/audit/" class="cta-btn cta-primary">Scan your packages</a>
+            <a href="/get-started?ref=blog-vitebot&watch=vite,vitest,@vitejs/plugin-react&eco=npm" class="cta-btn cta-secondary">Get alerts</a>
+          </div>
+
+        </div>
+
+        <!-- Footer -->
+        <footer class="essay-footer">
+          <a href="/blog">&larr; More writing</a>
+        </footer>
+
+      </div>
+    </div>
+  </article>
+
+</Layout>
