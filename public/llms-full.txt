@@ -221,10 +221,9 @@ Risk flag thresholds:
 
 ## Real-World Validation
 
-These packages scored CRITICAL *before* their supply chain attacks:
-  - axios: attacked March 30, 2026 (score 88, 1 publisher, 92M/wk)
-  - LiteLLM: attacked March 2026 (score 74, 1 publisher)
-  - node-ipc: attacked March 2022 (protestware)
+These attacked packages flag CRITICAL today on the signal their attacks used. The scores were computed after the attacks, not before:
+  - axios: attacked March 30, 2026 (sole active npm publisher)
+  - LiteLLM (PyPI): attacked March 2026 (sole maintainer)
 
 ## Pricing
 

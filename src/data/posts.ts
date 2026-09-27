@@ -16,10 +16,10 @@ export interface Post {
 export const posts: Post[] = [
   {
     slug: 'postcss-nanoid-staged-publishing',
-    title: 'nanoid Adopted Staged Publishing After a Technical Debate About CI Provenance',
-    description: "Andrey Sitnik pushed back on CI provenance, argued it increases attack surface, then adopted npm Staged Publishing on nanoid (221M weekly downloads) and nanospy within hours. PostCSS is next.",
-    date: '2026-06-24',
-    dateLabel: 'June 24, 2026',
+    title: 'PostCSS Adopted Staged Publishing. 685M Weekly Downloads Now Gated.',
+    description: "Andrey Sitnik pushed back on CI provenance, shipped Staged Publishing on nanoid within hours, then followed through on PostCSS, browserslist, and autoprefixer. 685M weekly downloads secured in 9 days.",
+    date: '2026-06-27',
+    dateLabel: 'June 27, 2026',
     relatedSlugs: [
       'hono-staged-publishing-adopted',
       'one-account-964m-downloads',
@@ -238,7 +238,7 @@ export const posts: Post[] = [
   {
     slug: 'trapdoor-ai-assistant-poisoning',
     title: "TrapDoor Hit npm, PyPI, and Crates.io at Once. Then It Poisoned Your AI Assistant.",
-    description: "34 malicious packages across three ecosystems. Every one scored 15 or lower. The new part: zero-width Unicode instructions hidden in .cursorrules and CLAUDE.md, designed to turn your coding assistant into an exfiltration tool.",
+    description: "34 malicious packages across three ecosystems. Every one we could still score came back between 15 and 18. The rest were pulled before we scanned, so they have no record left to score. The new part: zero-width Unicode instructions hidden in .cursorrules and CLAUDE.md, designed to turn your coding assistant into an exfiltration tool.",
     date: '2026-06-06',
     dateLabel: 'June 6, 2026',
   },
@@ -322,7 +322,7 @@ export const posts: Post[] = [
   },
   {
     slug: 'two-attacks-one-week',
-    title: "node-ipc Had a 69 Trust Score Before It Got Hacked. TanStack Had 91.",
+    title: "node-ipc's Pre-Attack Record Scores 69. TanStack's Scores 91.",
     description: "Two npm supply chain attacks hit the same week in May 2026. One was predictable from behavioral signals. One wasn't. That difference is the entire point of behavioral supply chain scoring.",
     date: '2026-05-21',
     dateLabel: 'May 21, 2026',
@@ -518,8 +518,8 @@ export const posts: Post[] = [
   },
   {
     slug: 'axios-attack-prediction',
-    title: 'Why I Think axios Is the Next Supply Chain Attack Target',
-    description: 'I built a behavioral scoring system that flags single-maintainer packages with massive download volumes as CRITICAL. axios scores 86/100 but has one maintainer and 82M weekly downloads. Here is the structural case.',
+    title: 'axios: The Structural Case, Scored After the March 2026 Compromise',
+    description: 'axios was compromised on March 30-31, 2026. Commit, scored afterwards, flags it CRITICAL: one npm publisher over a huge install base. A retrodiction, not a prediction.',
     date: '2026-04-24',
     dateLabel: 'April 24, 2026',
   },

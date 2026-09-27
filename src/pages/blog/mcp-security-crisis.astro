@@ -195,7 +195,7 @@ import Layout from '../../layouts/Layout.astro';
             <strong>2021: ua-parser-js.</strong> A maintainer&rsquo;s npm account was compromised. Cryptominer and credential stealer injected into a package with 7.9 million weekly downloads. The compromise was in the <em>published artifact</em>, not the source repo &mdash; <code>npm audit</code> showed nothing.
           </p>
           <p>
-            <strong>2026: axios.</strong> 101 million weekly downloads. <a href="/blog/the-axios-signal">Compromised</a>. npm audit reported zero issues. Behavioral scoring had flagged it CRITICAL weeks earlier &mdash; not because the code was malicious, but because the structural risk indicators (maintainer concentration, dependency tree instability, publishing patterns) crossed every threshold.
+            <strong>2026: axios.</strong> 101 million weekly downloads. <a href="/blog/the-axios-signal">Compromised</a>. npm audit reported zero issues. Behavioral scoring flags it CRITICAL today, scored after the attack &mdash; not because the code was malicious, but because one account held publish rights for the whole install base, the condition the attacker used.
           </p>
           <p>
             The pattern is identical every time:

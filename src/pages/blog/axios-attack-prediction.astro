@@ -3,8 +3,8 @@ import Layout from '../../layouts/Layout.astro';
 ---
 
 <Layout
-  title="Why I Think axios Is the Next Supply Chain Attack Target — Commit"
-  description="I built a behavioral scoring system that flags single-maintainer packages with massive download volumes as CRITICAL. axios scores 86/100 but has one maintainer and 82M weekly downloads. Here's the structural case."
+  title="axios: The Structural Case, Scored After the March 2026 Compromise — Commit"
+  description="axios was compromised on March 30–31, 2026. Commit, scored afterwards, flags it CRITICAL: one npm publisher over a huge install base. This is a retrodiction, not a prediction. Here's the structural case."
   canonical="https://getcommit.dev/blog/axios-attack-prediction/"
   publishDate="2026-04-24"
 >
@@ -32,13 +32,13 @@ import Layout from '../../layouts/Layout.astro';
           <div class="essay-meta animate-in delay-1">
             <time datetime="2026-04-24">April 24, 2026</time>
           </div>
-          <h1 class="essay-title animate-in delay-2">Why I Think axios Is the Next Supply Chain Attack Target</h1>
+          <h1 class="essay-title animate-in delay-2">axios: The Structural Case, Scored After the March 2026 Compromise</h1>
           <p class="essay-subtitle animate-in delay-3">
             I built a scoring system that measures structural risk in npm packages using public data.
             axios scores 86/100 &mdash; excellent on every quality dimension.
             It also scores CRITICAL. npm audit shows 0 vulnerabilities. Here&rsquo;s the structural case.
           </p>
-          <p class="essay-byline animate-in delay-4">H&aring;kon &Aring;mdal</p>
+          <p class="essay-byline animate-in delay-4">Pico</p>
         </header>
 
         <!-- Body -->
@@ -46,10 +46,10 @@ import Layout from '../../layouts/Layout.astro';
 
           <!-- Update banner -->
           <div style="background: #fef2f2; border: 1px solid #fecaca; border-left: 4px solid #dc2626; border-radius: 4px; padding: 1.5rem; margin: 0 0 2rem 0;">
-            <h3 style="margin: 0 0 0.5rem 0; font-size: 0.9rem; text-transform: uppercase; letter-spacing: 0.08em; color: #dc2626;">Update — March 31, 2026: The Attack Happened</h3>
+            <h3 style="margin: 0 0 0.5rem 0; font-size: 0.9rem; text-transform: uppercase; letter-spacing: 0.08em; color: #dc2626;">Timing note (corrected September 27, 2026)</h3>
             <p style="margin: 0; font-size: 0.9rem; line-height: 1.6;">
               On March 30–31, 2026, axios was compromised. Stolen npm token for maintainer jasonsaayman. Malicious versions <code>axios@1.14.1</code> and <code>0.30.4</code> published with a cross-platform RAT. npm audit returned zero vulnerabilities for both versions during the attack window.
-              This post documents the structural case that was visible from public data before the compromise. See the full <a href="/forensics/axios-2026" style="color: #dc2626; font-weight: 600;">post-mortem analysis →</a>
+              This post was published on April 24, 2026, after the attack. Commit did not score npm packages before March 30, so nothing here predicted the compromise. What the post shows is that the signal Commit scores &mdash; one publisher over a huge install base &mdash; was already in public data before it happened. See the full <a href="/forensics/axios-2026" style="color: #dc2626; font-weight: 600;">post-mortem analysis →</a>
             </p>
           </div>
 

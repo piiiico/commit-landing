@@ -163,7 +163,7 @@ const ECOSYSTEM_CONFIG = {
 // GENERATED-EDIT-OK: source-of-truth file — adding node-ipc + tanstack related articles for two-attacks post
 const PACKAGE_ARTICLES = {
   // npm packages with dedicated articles
-  "node-ipc": { slug: "two-attacks-one-week", title: "node-ipc Had a 69 Trust Score Before It Got Hacked. TanStack Had 91." },
+  "node-ipc": { slug: "two-attacks-one-week", title: "node-ipc's Pre-Attack Record Scores 69. TanStack's Scores 91." },
   "hono": { slug: "hono-critical", title: "Hono Has 35M Weekly Downloads and One npm Publisher" },
   "axios": { slug: "the-axios-signal", title: "Why I Think axios Is the Next Supply Chain Attack Target" },
   "chalk": { slug: "invisible-critical-packages", title: "The Critical Packages Hiding in Your Lock File" },
@@ -811,6 +811,17 @@ export default {
   async fetch(request, env) {
     const url = new URL(request.url);
     const path = url.pathname;
+
+    // GENERATED-EDIT-OK: public/_worker.js IS the source of truth per file header — adding /health serve-check endpoint with __SOURCE_STAMP__ to prove edge propagation after deploy
+    // Serve-check: proves this build is serving at the edge, not just stored.
+    // Deploy stamps __SOURCE_STAMP__ → sha256(dist/_worker.js)[0:12] before upload.
+    // Pattern from sjekk-worker — a deploy-200 + CF script-GET both report stored
+    // code, not what the edge actually runs (measured 2026-08-06).
+    if (path === "/health") {
+      return new Response(JSON.stringify({ ok: true, service: "getcommit.dev", stamp: "__SOURCE_STAMP__", ts: Date.now() }), {
+        headers: { "content-type": "application/json" },
+      });
+    }
 
     // ── IndexNow key verification ────────────────────────────────────
     if (path === `/${INDEXNOW_KEY}.txt`) {

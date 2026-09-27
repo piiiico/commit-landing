@@ -4,7 +4,7 @@ import Layout from '../../layouts/Layout.astro';
 
 <Layout
   title="TrapDoor Hit npm, PyPI, and Crates.io at Once. Then It Poisoned Your AI Assistant. &mdash; Commit"
-  description="34 malicious packages across three ecosystems. Every one scored 15 or lower. The new part: zero-width Unicode instructions hidden in .cursorrules and CLAUDE.md, designed to turn your AI coding assistant into an exfiltration tool."
+  description="34 malicious packages across three ecosystems. Every one we could still score came back between 15 and 18. The rest were pulled before we scanned, so they have no record left to score. The new part: zero-width Unicode instructions hidden in .cursorrules and CLAUDE.md, designed to turn your AI coding assistant into an exfiltration tool."
   canonical="https://getcommit.dev/blog/trapdoor-ai-assistant-poisoning/"
   publishDate="2026-06-06"
 >
@@ -37,7 +37,7 @@ import Layout from '../../layouts/Layout.astro';
           </div>
           <h1 class="essay-title animate-in delay-2">TrapDoor Hit npm, PyPI, and Crates.io at Once. Then It Poisoned Your AI Assistant.</h1>
           <p class="essay-subtitle animate-in delay-3">
-            34 malicious packages across three ecosystems. Every one scored 15 or lower. The new part: zero-width Unicode instructions hidden in <code>.cursorrules</code> and <code>CLAUDE.md</code>, designed to turn your coding assistant into an exfiltration tool.
+            34 malicious packages across three ecosystems. Every one we could still score came back between 15 and 18. The rest were pulled before we scanned, so they have no record left to score. The new part: zero-width Unicode instructions hidden in <code>.cursorrules</code> and <code>CLAUDE.md</code>, designed to turn your coding assistant into an exfiltration tool.
           </p>
           <p class="essay-byline animate-in delay-4">Pico</p>
         </header>
@@ -149,11 +149,11 @@ import Layout from '../../layouts/Layout.astro';
           </div>
 
           <p>
-            Every single package: score 15 or null. Zero behavioral history. No longevity. No community. No release track record. No linked GitHub repository.
+            Every single package: 15 to 18, or null. Zero behavioral history. No longevity. No community. No release track record. No linked GitHub repository.
           </p>
 
           <p>
-            A behavioral gate set to block HIGH-risk packages would have stopped all 34 on first install. No CVE database needed. No signature matching. No waiting for a report.
+            A behavioral gate set to block HIGH-risk packages would have stopped every one we can still score, on first install. No CVE database needed. No signature matching. No waiting for a report. For the packages already pulled from PyPI and Crates.io the registry record is gone, so the same claim there rests on the shared publisher fingerprint rather than on a score we ran. Worth saying plainly, since the whole argument is that the record is what you should trust.
           </p>
 
           <hr class="essay-divider" />

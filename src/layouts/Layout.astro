@@ -274,7 +274,7 @@ const PRICING_FAQ = [
   {
     q: "Is Commit replacing Socket or Snyk?",
     a:
-      "No. Use all of them. Socket detects malicious code after it's published. Snyk finds known CVEs. Commit identifies structural exposure before any code changes — it maps which packages are the kind of thing that gets targeted. The ua-parser-js attack (October 2021, ~8M weekly downloads, one maintainer) triggered zero warnings in Socket or Snyk beforehand. The same structural pattern — concentrated publish authority over a high-volume install base — flagged axios CRITICAL months before its March 2026 credential-theft incident.",
+      "No. Use all of them. Socket detects malicious code after it's published. Snyk finds known CVEs. Commit identifies structural exposure before any code changes — it maps which packages are the kind of thing that gets targeted. The ua-parser-js attack (October 2021, ~8M weekly downloads, one maintainer) triggered zero warnings in Socket or Snyk beforehand. The same structural pattern — concentrated publish authority over a high-volume install base — is what flags axios CRITICAL today — the shape its March 2026 credential theft exploited.",
   },
   {
     q: "What counts as a project for Pro monitoring?",
@@ -303,7 +303,7 @@ const COMMIT_PRODUCT = {
   "url": "https://getcommit.dev",
   "publisher": { "@id": ORG_ID },
   "description":
-    "Score npm, PyPI, Cargo, and Go packages on behavioral commitment signals — publisher depth, release patterns, maintenance consistency. Both axios and node-ipc scored CRITICAL before they were attacked.",
+    "Score npm, PyPI, Cargo, and Go packages on behavioral commitment signals — publisher depth, release patterns, maintenance consistency. axios flags CRITICAL today on the signal its March 2026 attack used: one npm publisher.",
   "featureList": [
     "CLI (npx proof-of-commitment)",
     "Web audit",

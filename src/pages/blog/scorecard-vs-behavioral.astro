@@ -126,7 +126,7 @@ import Layout from '../../layouts/Layout.astro';
             How? Stolen npm credentials. The Scorecard-measured process security was intact. The attack didn&rsquo;t go through the CI pipeline &mdash; it bypassed it by publishing directly to npm with a stolen publisher key.
           </p>
           <p>
-            Behavioral signals flagged axios as CRITICAL <em>before</em> the attack. Not because the CI was weak. Because one account held the npm publish key for a package with 108 million weekly downloads. That&rsquo;s the attack surface.
+            Behavioral signals flag axios CRITICAL, and the signal they flag existed <em>before</em> the attack (we scored it afterwards). Not because the CI was weak. Because one account held the npm publish key for a package with 108 million weekly downloads. That&rsquo;s the attack surface.
           </p>
           <p>
             Since the attack, axios has adopted Trusted Publishing (OIDC provenance) &mdash; a meaningful step. But the publisher concentration hasn&rsquo;t changed.

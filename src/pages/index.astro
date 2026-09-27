@@ -4,7 +4,7 @@ import Layout from '../layouts/Layout.astro';
 
 <Layout
   title="Commit — Supply chain trust scoring for npm, PyPI, Cargo, and Go"
-  description="Score your dependencies on behavioral signals — publisher depth, release patterns, maintenance consistency. Both axios and node-ipc scored CRITICAL before they got attacked. Free CLI, CI gate, API, MCP server, and IDE hooks for Cursor, Claude Code, and Windsurf."
+  description="Score your dependencies on behavioral signals — publisher depth, release patterns, maintenance consistency. axios flags CRITICAL today on the signal its March 2026 attack used: one npm publisher. Free CLI, CI gate, API, MCP server, and IDE hooks for Cursor, Claude Code, and Windsurf."
 >
   <!-- Supply-chain blog visitor banner (hidden by default, shown via JS) -->
   <div id="sc-banner" style="display:none; background: var(--ink); color: var(--paper); padding: 0.75rem 1rem; text-align: center; font-size: 0.875rem; position: relative;">
@@ -93,15 +93,15 @@ import Layout from '../layouts/Layout.astro';
 
   <hr class="section-divider" />
 
-  <!-- Predicted before they got hacked: real packages, real attack dates -->
+  <!-- Attacked packages vs. packages with the same shape. Scores for the attacked two were computed AFTER their attacks (corrected 2026-09-27). -->
   <section style="padding: var(--space-section) 0;">
     <div class="container">
-      <p class="section-label">Predicted, then attacked</p>
+      <p class="section-label">Attacked, and the same shape</p>
       <div class="editorial reveal" style="max-width: var(--max-content);">
         <h2 style="margin-bottom: 0.5rem;">Two attacked. Three match the same pattern.</h2>
         <p style="margin-bottom: 1.5rem; font-size: 1rem; color: var(--ink-muted);">
           Live scores from the same API that ships in the CLI, IDE hook, and CI gate.
-          Single-publisher packages with massive weekly downloads are the recurring shape — axios and node-ipc both scored CRITICAL/HIGH <em>before</em> their compromises. Click any row to verify the current score.
+          Single-publisher packages with massive weekly downloads are the recurring shape — axios and node-ipc were both taken over through a single publisher account. We scored them after the attacks, not before. Click any row to verify the current score.
         </p>
 
         <div style="background: var(--paper-dim); border: 1px solid var(--border); border-radius: 8px; padding: 1.5rem; font-family: var(--font-mono, 'JetBrains Mono', monospace); font-size: 0.8rem; color: var(--ink); overflow-x: auto; margin-bottom: 1.25rem;">
@@ -127,7 +127,7 @@ import Layout from '../layouts/Layout.astro';
             </a>
           </div>
           <div style="margin-top: 0.85rem; padding-top: 0.65rem; border-top: 1px solid var(--border); font-size: 0.72rem; color: var(--ink-subtle); font-family: var(--font-body); letter-spacing: 0.02em;">
-            2 attacks predicted in advance · 3 still vulnerable · score updates daily
+            2 already attacked · 3 with the same shape · score updates daily
           </div>
         </div>
 
@@ -155,6 +155,33 @@ import Layout from '../layouts/Layout.astro';
         text-decoration: underline;
       }
     </style>
+  </section>
+
+  <hr class="section-divider" />
+
+  <!-- Ecosystem signal: PostCSS adopting Staged Releases -->
+  <section style="padding: var(--space-section) 0;">
+    <div class="container">
+      <p class="section-label">Ecosystem adoption</p>
+      <div class="editorial reveal" style="max-width: var(--max-content);">
+        <h2 style="margin-bottom: 0.75rem;">PostCSS is adding Staged Releases.</h2>
+        <p style="margin-bottom: 1.5rem; font-size: 1rem; color: var(--ink-muted);">
+          869M weekly downloads. One publisher. When the creator of PostCSS saw the behavioral risk pattern, the response was direct.
+        </p>
+        <blockquote style="border-left: 3px solid var(--ink); margin: 0 0 1.5rem; padding: 0.75rem 0 0.75rem 1.5rem; font-size: 1.05rem; font-style: italic; color: var(--ink); line-height: 1.65;">
+          "We are going to add Staged Releases soon since it is better than old CI-only based provenance."
+          <cite style="display: block; margin-top: 0.6rem; font-size: 0.82rem; font-style: normal; color: var(--ink-muted); font-weight: 500;">
+            — Andrey Sitnik, PostCSS creator ·
+            <a href="https://github.com/postcss/postcss/issues/2096" target="_blank" rel="noopener" style="color: var(--ink-muted); text-decoration: underline; text-underline-offset: 2px;">postcss/postcss#2096</a>
+            · June 2026
+          </cite>
+        </blockquote>
+        <p style="font-size: 0.9rem; color: var(--ink-muted); line-height: 1.6;">
+          Staged Releases — publishing to a pre-release tag before promoting to <code style="font-size: 0.85em;">latest</code> — let Commit verify a release's behavioral fingerprint before it reaches production installs.
+          PostCSS adopting this pattern means 869M weekly downloads gain an auditable release window. The single-publisher risk stays visible; the attack surface shrinks.
+        </p>
+      </div>
+    </div>
   </section>
 
   <hr class="section-divider" />

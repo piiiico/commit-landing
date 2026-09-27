@@ -93,7 +93,7 @@ import Layout from '../layouts/Layout.astro';
         <div class="attack-card">
           <time class="attack-date">Mar 2026</time>
           <strong class="attack-name">LiteLLM</strong>
-          <p class="attack-desc">Backdoored CI pipeline. 1 npm publisher, 4M+ weekly downloads. Commit score: CRITICAL before the incident.</p>
+          <p class="attack-desc">Backdoored CI pipeline. 1 npm publisher, 4M+ weekly downloads.</p>
         </div>
         <div class="attack-card">
           <time class="attack-date">Mar 30, 2026</time>
@@ -112,7 +112,7 @@ import Layout from '../layouts/Layout.astro';
         </div>
       </div>
       <p class="attack-bottom-line">
-        <code>npm audit</code> flagged none of these beforehand. Behavioral signals flagged all of them.
+        <code>npm audit</code> flagged none of these beforehand. Each one matches a signal Commit scores today.
         <strong>Monitoring catches score changes before the next one reaches your tree.</strong>
       </p>
     </div>
@@ -616,7 +616,7 @@ import Layout from '../layouts/Layout.astro';
               it maps which packages are the kind of thing that gets targeted.
               The ua-parser-js attack (October 2021, ~8M weekly downloads, one maintainer) triggered zero warnings in Socket or Snyk beforehand.
               The same structural pattern — concentrated publish authority over a high-volume install base —
-              flagged axios CRITICAL months before its March 2026 credential-theft incident.
+              is what flags axios CRITICAL today &mdash; the shape its March 2026 credential theft exploited.
             </p>
           </div>
 
@@ -1265,6 +1265,15 @@ import Layout from '../layouts/Layout.astro';
         'postcss-nanoid-staged-publishing': {
           eyebrow: 'From the nanoid adoption post',
           msg: 'You just read how nanoid\'s maintainer debated CI provenance, then shipped the fix anyway. Developer ($15/mo) watches 15 packages with daily re-scans, detects CI-workflow changes the same hour, and emails you the moment a CRITICAL clears — like when nanoid went from 90 to 92. 30-day money-back guarantee.',
+        },
+        // 2026-09-04: fast-xml-parser — emitted by
+        // blog/fast-xml-parser-provenance-case-study.astro's closing CTA
+        // (utm_campaign=fast-xml-parser). Surfaced as an orphan banner by
+        // check-funnel-surface-parity, which failed the BUILD, not just the
+        // page — same class as postcss-nanoid-staged-publishing (2026-06-24).
+        'fast-xml-parser': {
+          eyebrow: 'From the provenance case study',
+          msg: 'You just read how an 88M/wk package went from CRITICAL to OIDC-signed in 12 hours. Developer ($15/mo) watches 15 packages with daily re-scans, detects CI-workflow changes the same hour, and emails you the moment a score moves — the clear as well as the drop. 30-day money-back guarantee.',
         },
       };
       const variant = CONTEXT_BY_CAMPAIGN[campaign];
