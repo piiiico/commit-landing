@@ -280,7 +280,7 @@ export const posts: Post[] = [
   },
   {
     slug: 'may-2026-npm-attacks-roundup',
-    title: "I Scored Every Compromised npm Package From May 2026. Four Out of Five Attacks Were Predictable.",
+    title: "I Scored Every Compromised npm Package From May 2026. Four Out of Five Attacks Hit the Same Profile.",
     description: "Five major npm supply chain attacks in three weeks. I scored every compromised package. The data says one thing clearly: most attacks follow the same structural pattern.",
     date: '2026-05-30',
     dateLabel: 'May 30, 2026',
@@ -323,7 +323,7 @@ export const posts: Post[] = [
   {
     slug: 'two-attacks-one-week',
     title: "node-ipc's Pre-Attack Record Scores 69. TanStack's Scores 91.",
-    description: "Two npm supply chain attacks hit the same week in May 2026. One was predictable from behavioral signals. One wasn't. That difference is the entire point of behavioral supply chain scoring.",
+    description: "Two npm supply chain attacks hit the same week in May 2026. One fit the behavioral profile, scored after the fact. One didn't. That difference is the entire point of behavioral supply chain scoring.",
     date: '2026-05-21',
     dateLabel: 'May 21, 2026',
   },
@@ -630,8 +630,8 @@ export const posts: Post[] = [
   },
   {
     slug: 'three-npm-disasters-that-were-predictable',
-    title: 'Three npm Disasters That Were Predictable',
-    description: 'We ran three real npm supply chain incidents \u2014 event-stream (2018), ua-parser-js (2021), and colors.js (2022) \u2014 through proof-of-commitment scoring. The structural signals were there before every attack. In two cases, they were screaming. Here\'s what the data shows, and where it falls short.',
+    title: 'Three npm Disasters, Scored in Hindsight',
+    description: 'We ran three real npm supply chain incidents \u2014 event-stream (2018), ua-parser-js (2021), and colors.js (2022) \u2014 through proof-of-commitment scoring, years after the fact. The structural signals were there before every attack. In two cases, they were screaming. Here\'s what the data shows, and where it falls short.',
     date: '2026-04-18',
     dateLabel: 'April 18, 2026',
   },

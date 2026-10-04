@@ -3,7 +3,7 @@ import Layout from '../../layouts/Layout.astro';
 ---
 
 <Layout
-  title="I Scored Every Compromised npm Package From May 2026. Four Out of Five Attacks Were Predictable. &mdash; Commit"
+  title="I Scored Every Compromised npm Package From May 2026. Four Out of Five Attacks Hit the Same Profile. &mdash; Commit"
   description="Five major npm supply chain attacks in three weeks. I scored every compromised package. The data says one thing clearly: most attacks follow the same structural pattern."
   canonical="https://getcommit.dev/blog/may-2026-npm-attacks-roundup/"
   publishDate="2026-05-30"
@@ -32,7 +32,7 @@ import Layout from '../../layouts/Layout.astro';
           <div class="essay-meta animate-in delay-1">
             <time datetime="2026-05-30">May 30, 2026</time>
           </div>
-          <h1 class="essay-title animate-in delay-2">I Scored Every Compromised npm Package From May 2026. Four Out of Five Attacks Were Predictable.</h1>
+          <h1 class="essay-title animate-in delay-2">I Scored Every Compromised npm Package From May 2026. Four Out of Five Attacks Hit the Same Profile.</h1>
           <p class="essay-subtitle animate-in delay-3">
             Five major npm supply chain attacks in three weeks. Over 1,100 malicious package versions published.
             The data says one thing clearly: most attacks follow the same structural pattern.
@@ -54,7 +54,7 @@ import Layout from '../../layouts/Layout.astro';
           </p>
 
           <p>
-            Six out of seven packages scored below 75 <em>before</em> they were attacked.
+            Six out of seven packages score below 75 on their pre-attack record. We scored them after the attacks, so this is a retrodiction, not a prediction.
             The only one that scored healthy was attacked through a completely different vector.
           </p>
 
@@ -78,7 +78,7 @@ import Layout from '../../layouts/Layout.astro';
           <h2>The scores</h2>
 
           <p>
-            Every package scored through Commit&rsquo;s behavioral audit, using data available <em>before</em> each attack:
+            Every package scored through Commit&rsquo;s behavioral audit after its attack, on its pre-attack record:
           </p>
 
           <table>
@@ -161,7 +161,7 @@ import Layout from '../../layouts/Layout.astro';
 
           <p>
             No single signal catches both. But the common attack &mdash; the one that keeps repeating,
-            month after month &mdash; has a structural signature that&rsquo;s visible before it happens.
+            month after month &mdash; has a structural signature that exists before it happens. Whether that signature picks the next target is something only a score published before an attack can show.
           </p>
 
           <h2>The uncomfortable count</h2>
@@ -201,7 +201,7 @@ zod          &mdash; 181M/wk, 1 publisher  &#x26A0; CRITICAL</code></pre>
             Data sources: <a href="https://socket.dev/blog" target="_blank" rel="noopener">Socket.dev</a> incident reports,
             npm registry,
             <a href="/">getcommit.dev</a> behavioral scoring.
-            All scores use data available prior to each incident.
+            All scores were computed after the incidents, from each package&rsquo;s pre-attack record.
           </p>
 
           <hr />

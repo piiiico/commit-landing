@@ -165,7 +165,7 @@ const PACKAGE_ARTICLES = {
   // npm packages with dedicated articles
   "node-ipc": { slug: "two-attacks-one-week", title: "node-ipc's Pre-Attack Record Scores 69. TanStack's Scores 91." },
   "hono": { slug: "hono-critical", title: "Hono Has 35M Weekly Downloads and One npm Publisher" },
-  "axios": { slug: "the-axios-signal", title: "Why I Think axios Is the Next Supply Chain Attack Target" },
+  "axios": { slug: "the-axios-signal", title: "The Axios Signal" },
   "chalk": { slug: "invisible-critical-packages", title: "The Critical Packages Hiding in Your Lock File" },
   "zod": { slug: "invisible-critical-packages", title: "The Critical Packages Hiding in Your Lock File" },
   "express": { slug: "express-supply-chain", title: "Express Has 5 npm Publishers. Most Frameworks Have 1." },
