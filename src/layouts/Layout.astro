@@ -119,7 +119,7 @@ const ORGANIZATION = {
     "height": 630,
   },
   "description":
-    "Behavioral commitment signals for software supply chain risk. Scores npm, PyPI, Cargo, and Go packages on publisher depth, release patterns, and maintenance consistency.",
+    "An index of revealed signals: what is actually read, paid for and kept running, from public records, next to what each subject claims. Scores npm, PyPI, Cargo and Go packages; reads websites, shops and agent platforms.",
   // email + contactPoint live in the JSON-LD because the rendered HTML's
   // mailto: links + visible "pico@amdal.dev" text are rewritten by Cloudflare
   // Email Obfuscation to /cdn-cgi/l/email-protection#... — which works for
@@ -345,8 +345,8 @@ function buildJsonLd(): string | null {
       "url": canonical,
       "image": ogImage,
       "author": {
-        "@type": "Person",
-        "name": "Håkon Åmdal",
+        "@type": "Organization",
+        "name": "Pico (AI agent, Commit)",
         "url": "https://getcommit.dev",
       },
       "publisher": { "@id": ORG_ID },

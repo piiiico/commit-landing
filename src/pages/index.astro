@@ -3,8 +3,8 @@ import Layout from '../layouts/Layout.astro';
 ---
 
 <Layout
-  title="Commit — Supply chain trust scoring for npm, PyPI, Cargo, and Go"
-  description="Score your dependencies on behavioral signals — publisher depth, release patterns, maintenance consistency. axios flags CRITICAL today on the signal its March 2026 attack used: one npm publisher. Free CLI, CI gate, API, MCP server, and IDE hooks for Cursor, Claude Code, and Windsurf."
+  title="Commit — An index of revealed signals: what is read, paid for and kept running"
+  description="Content is free to produce. Commit reads what is actually read, paid for and kept running over time, from public records, and puts it next to what each subject claims. Packages (npm, PyPI, Cargo, Go), websites and shops, and agent platforms."
 >
   <!-- Supply-chain blog visitor banner (hidden by default, shown via JS) -->
   <div id="sc-banner" style="display:none; background: var(--ink); color: var(--paper); padding: 0.75rem 1rem; text-align: center; font-size: 0.875rem; position: relative;">
@@ -56,36 +56,24 @@ import Layout from '../layouts/Layout.astro';
   </nav>
 
   <!-- Hero -->
-  <section class="hero">
+  <!-- Hero + thesis. Rebuilt 2026-10-29 (Håkon GO, digest #1): revealed signals are the index, packages are one type. -->
+  <section class="hero" id="thesis">
     <div class="container">
       <div class="editorial">
-        <span class="hero-eyebrow animate-in delay-1">Supply chain trust scoring</span>
+        <span class="hero-eyebrow animate-in delay-1">An index of revealed signals</span>
 
         <h1 class="hero-title animate-in delay-2">
-          axios scores CRITICAL today<br />
-          <em>on the signal its attack used.</em>
+          Content is free.<br />
+          <em>Money, action and time are not.</em>
         </h1>
 
-        <p class="hero-sub animate-in delay-2" style="font-size:1.15rem;font-weight:500;color:var(--ink-muted);margin-bottom:1.25rem;">
-          26 npm packages with 10M+ weekly downloads have a single publisher. <code style="font-size:0.9em;">npm audit</code> doesn't flag this. Commit does.
-        </p>
-
         <p class="hero-lead animate-in delay-3">
-          Behavioral signals — publisher depth, release consistency, maintenance patterns — surface the risk that stars, READMEs, and vulnerability databases miss.
-          <strong>Scores npm, PyPI, Cargo, and Go packages. Free CLI, CI gate, API, MCP server, and IDE hooks for Cursor, Claude Code, and Windsurf.</strong>
+          A page, a review or a stats dashboard costs nothing to write. What people actually read, where they actually pay, and what has kept running for years is expensive to fake. Commit reads those three signals from public records and puts them in the same row for every subject, next to what the subject says about itself.
         </p>
 
         <div class="hero-cta animate-in delay-4">
-          <a href="/audit" class="btn-primary">Audit your dependencies →</a>
-          <a href="/get-started" class="btn-ghost">Get free API key →</a>
-          <a href="/pricing?utm_experiment=pricing-friction-v1&utm_source=homepage&utm_medium=hero-cta" class="btn-ghost">Pricing →</a>
-        </div>
-
-        <div class="animate-in delay-4" style="margin-top: 1.25rem;">
-          <div style="background: var(--paper-dim); border: 1px solid var(--border); border-radius: 8px; padding: 0.85rem 1.25rem; display: inline-block; font-family: var(--font-mono, 'JetBrains Mono', monospace); font-size: 0.85rem; color: var(--ink);">
-            <span style="color: var(--ink-subtle); user-select: none;">$</span> npx proof-of-commitment --file package.json
-          </div>
-          <span style="margin-left: 0.75rem; font-size: 0.8rem; color: var(--ink-subtle);">Zero install. Auto-detects lockfiles.</span>
+          <a href="#index" class="btn-primary">See the index ↓</a>
+          <a href="/audit" class="btn-ghost">Score a package →</a>
         </div>
       </div>
     </div>
@@ -93,98 +81,108 @@ import Layout from '../layouts/Layout.astro';
 
   <hr class="section-divider" />
 
-  <!-- Attacked packages vs. packages with the same shape. Scores for the attacked two were computed AFTER their attacks (corrected 2026-09-27). -->
-  <section style="padding: var(--space-section) 0;">
+  <section id="index" style="padding: var(--space-section) 0;">
     <div class="container">
-      <p class="section-label">Attacked, and the same shape</p>
+      <p class="section-label">The index, first rows</p>
       <div class="editorial reveal" style="max-width: var(--max-content);">
-        <h2 style="margin-bottom: 0.5rem;">Two attacked. Three match the same pattern.</h2>
-        <p style="margin-bottom: 1.5rem; font-size: 1rem; color: var(--ink-muted);">
-          Live scores from the same API that ships in the CLI, IDE hook, and CI gate.
-          Single-publisher packages with massive weekly downloads are the recurring shape — axios and node-ipc were both taken over through a single publisher account. We scored them after the attacks, not before. Click any row to verify the current score.
+        <h2 style="margin-bottom: 1rem;">Same row for every subject. Ours comes first.</h2>
+        <div style="overflow-x: auto;">
+          <table class="rv-table">
+            <thead><tr><th>Subject</th><th>Read</th><th>Paid or used</th><th>Time</th></tr></thead>
+            <tbody>
+              <tr><td><strong>getcommit.dev</strong><br /><small>this site</small></td><td>Not in Chrome's global top 1M</td><td>233 npm downloads of our CLI in 30 days</td><td>Domain registered 29 Mar 2026</td></tr>
+              <tr><td><strong>komplett.no</strong><br /><small>Norwegian electronics shop</small></td><td>Top 1,000 in Norway</td><td>NOK 5.61 bn revenue in 2025</td><td>Company founded 1998, 313 employees</td></tr>
+              <tr><td><strong>github.com</strong><br /><small>control: known large</small></td><td>Top 1,000 global</td><td>n/a</td><td>Domain registered 2007</td></tr>
+              <tr><td><strong>an unregistered domain</strong><br /><small>control: does not exist</small></td><td>Not in the top 1M</td><td>n/a</td><td>No registration</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <p style="margin-top: 1rem; font-size: 0.85rem; color: var(--ink-muted);">
+          Sources: Chrome UX Report top lists, September 2026; Regnskapsregisteret and Enhetsregisteret (Brønnøysund); RDAP; npm. Read on 29 October 2026. The bottom row is what a domain that doesn't exist gets. Our own row reads the same on the read signal, which means too small to see, not unused. We are small and the record says so.
         </p>
-
-        <div style="background: var(--paper-dim); border: 1px solid var(--border); border-radius: 8px; padding: 1.5rem; font-family: var(--font-mono, 'JetBrains Mono', monospace); font-size: 0.8rem; color: var(--ink); overflow-x: auto; margin-bottom: 1.25rem;">
-          <div style="font-size: 0.7rem; color: var(--ink-subtle); margin-bottom: 0.75rem; font-family: var(--font-body);">npx proof-of-commitment axios node-ipc chalk zod @mistralai/mistralai</div>
-          <div class="attack-table" style="line-height: 1.85;">
-            <div class="attack-row attack-row-head" style="display: grid; grid-template-columns: minmax(11rem, 1.6fr) 4rem 7rem 6rem minmax(6rem, 1fr); gap: 0.75rem; padding-bottom: 0.4rem; border-bottom: 1px solid var(--border); color: var(--ink-subtle); font-size: 0.72rem; letter-spacing: 0.04em; text-transform: uppercase;">
-              <span>Package</span><span>Score</span><span>Risk</span><span>Publishers</span><span>Compromised</span>
-            </div>
-            <a class="attack-row attack-row-hit" href="/audit?packages=axios" style="display: grid; grid-template-columns: minmax(11rem, 1.6fr) 4rem 7rem 6rem minmax(6rem, 1fr); gap: 0.75rem; padding: 0.3rem 0; color: var(--ink); text-decoration: none; border-bottom: 1px dashed var(--border-light);">
-              <span>axios <span style="color: var(--ink-subtle);">↗</span></span><span>88</span><span style="color: var(--accent);">🔴 CRITICAL</span><span>1</span><span style="color: var(--accent);">2026-03-30</span>
-            </a>
-            <a class="attack-row attack-row-hit" href="/audit?packages=node-ipc" style="display: grid; grid-template-columns: minmax(11rem, 1.6fr) 4rem 7rem 6rem minmax(6rem, 1fr); gap: 0.75rem; padding: 0.3rem 0; color: var(--ink); text-decoration: none; border-bottom: 1px solid var(--border);">
-              <span>node-ipc <span style="color: var(--ink-subtle);">↗</span></span><span>69</span><span style="color: #b45309;">🟠 HIGH</span><span>1</span><span style="color: var(--accent);">2026-05-14</span>
-            </a>
-            <a class="attack-row" href="/audit?packages=chalk" style="display: grid; grid-template-columns: minmax(11rem, 1.6fr) 4rem 7rem 6rem minmax(6rem, 1fr); gap: 0.75rem; padding: 0.3rem 0; color: var(--ink); text-decoration: none; border-bottom: 1px dashed var(--border-light);">
-              <span>chalk <span style="color: var(--ink-subtle);">↗</span></span><span>75</span><span style="color: var(--accent);">🔴 CRITICAL</span><span>1</span><span style="color: var(--ink-subtle);">not yet</span>
-            </a>
-            <a class="attack-row" href="/audit?packages=zod" style="display: grid; grid-template-columns: minmax(11rem, 1.6fr) 4rem 7rem 6rem minmax(6rem, 1fr); gap: 0.75rem; padding: 0.3rem 0; color: var(--ink); text-decoration: none; border-bottom: 1px dashed var(--border-light);">
-              <span>zod <span style="color: var(--ink-subtle);">↗</span></span><span>85</span><span style="color: var(--accent);">🔴 CRITICAL</span><span>1</span><span style="color: var(--ink-subtle);">not yet</span>
-            </a>
-            <a class="attack-row" href="/audit?packages=@mistralai/mistralai" style="display: grid; grid-template-columns: minmax(11rem, 1.6fr) 4rem 7rem 6rem minmax(6rem, 1fr); gap: 0.75rem; padding: 0.3rem 0; color: var(--ink); text-decoration: none;">
-              <span>@mistralai/mistralai <span style="color: var(--ink-subtle);">↗</span></span><span>69</span><span style="color: #b45309;">🟠 HIGH</span><span>1</span><span style="color: var(--ink-subtle);">not yet</span>
-            </a>
-          </div>
-          <div style="margin-top: 0.85rem; padding-top: 0.65rem; border-top: 1px solid var(--border); font-size: 0.72rem; color: var(--ink-subtle); font-family: var(--font-body); letter-spacing: 0.02em;">
-            2 already attacked · 3 with the same shape · score updates daily
-          </div>
-        </div>
-
-        <div style="display: flex; gap: 1rem; flex-wrap: wrap; align-items: center;">
-          <a href="/audit" class="btn-primary" style="display: inline-block;">Try with your packages →</a>
-          <a href="/blog/two-attacks-one-week" style="font-size: 0.85rem; color: var(--accent); text-decoration: none;">Read: Two attacks, one week — the data was already there →</a>
-        </div>
-
-        <!-- AUR case study: June 2026 -->
-        <div style="margin-top: 1.5rem; padding: 1rem 1.25rem; background: var(--paper-dim); border: 1px solid var(--border); border-radius: 6px; font-size: 0.85rem; color: var(--ink-muted); line-height: 1.6;">
-          <strong style="color: var(--ink);">Not just npm.</strong>
-          In June 2026, attackers claimed hundreds of orphaned Arch Linux (AUR) packages through the standard adoption process — becoming trusted maintainers overnight, then shipping rootkits and infostealers as normal updates.
-          The pattern is the same: single-maintainer packages, abandoned by their authors, with no behavioral history to audit.
-          Commit scores maintainer depth, release consistency, and behavioral continuity — the signals that would surface a cold takeover before it ships.
-        </div>
       </div>
     </div>
-
-    <style>
-      .attack-row.attack-row-hit:hover,
-      .attack-row:hover {
-        background: rgba(0, 0, 0, 0.025);
-      }
-      .attack-row:hover span:first-child {
-        text-decoration: underline;
-      }
-    </style>
   </section>
 
   <hr class="section-divider" />
 
-  <!-- Ecosystem signal: PostCSS adopting Staged Releases -->
-  <section style="padding: var(--space-section) 0;">
+  <section id="agents" style="padding: var(--space-section) 0;">
     <div class="container">
-      <p class="section-label">Ecosystem adoption</p>
+      <p class="section-label">First population: 121 agent platforms</p>
       <div class="editorial reveal" style="max-width: var(--max-content);">
-        <h2 style="margin-bottom: 0.75rem;">PostCSS is adding Staged Releases.</h2>
-        <p style="margin-bottom: 1.5rem; font-size: 1rem; color: var(--ink-muted);">
-          869M weekly downloads. One publisher. When the creator of PostCSS saw the behavioral risk pattern, the response was direct.
+        <h2 style="margin-bottom: 0.75rem;">Read signals can't see agents.</h2>
+        <p style="font-size: 1rem;">
+          We gave the same row to the 121 work and payment platforms in the <a href="https://commonworld.one/atlas/" target="_blank" rel="noopener">Commonworld Atlas</a> that have a domain of their own. 92 of them read exactly like the domain that doesn't exist, on both Chrome's top-1M list and Cloudflare Radar. Of the 66 registered in 2024–2026, 63 do. Those lists count humans, and agents don't show up in them.
         </p>
-        <blockquote style="border-left: 3px solid var(--ink); margin: 0 0 1.5rem; padding: 0.75rem 0 0.75rem 1.5rem; font-size: 1.05rem; font-style: italic; color: var(--ink); line-height: 1.65;">
-          "We are going to add Staged Releases soon since it is better than old CI-only based provenance."
-          <cite style="display: block; margin-top: 0.6rem; font-size: 0.82rem; font-style: normal; color: var(--ink-muted); font-weight: 500;">
-            — Andrey Sitnik, PostCSS creator ·
-            <a href="https://github.com/postcss/postcss/issues/2096" target="_blank" rel="noopener" style="color: var(--ink-muted); text-decoration: underline; text-underline-offset: 2px;">postcss/postcss#2096</a>
-            · June 2026
-          </cite>
-        </blockquote>
-        <p style="font-size: 0.9rem; color: var(--ink-muted); line-height: 1.6;">
-          Staged Releases — publishing to a pre-release tag before promoting to <code style="font-size: 0.85em;">latest</code> — let Commit verify a release's behavioral fingerprint before it reaches production installs.
-          PostCSS adopting this pattern means 869M weekly downloads gain an auditable release window. The single-publisher risk stays visible; the attack surface shrinks.
+        <p style="font-size: 1rem;">
+          What did separate claims from reality was money settled on-chain, and a platform's own counters read twice, two weeks apart. Only 8 of the 121 appear as x402 sellers with settled volume. We read the counters a third time on 20 November and publish the named rows after that, with every date.
         </p>
       </div>
     </div>
   </section>
 
   <hr class="section-divider" />
+
+  <section id="types" style="padding: var(--space-section) 0;">
+    <div class="container">
+      <p class="section-label">What we measure</p>
+      <div class="proof-grid">
+        <div class="proof-item reveal">
+          <div class="proof-number">Packages</div>
+          <div>
+            <div class="proof-title">Release history, downloads, publisher depth.</div>
+            <p class="proof-body">The first type we scored: npm, PyPI, Cargo and Go. <a href="/audit">Audit a lockfile</a>, see the <a href="/rankings">rankings</a>, or run <code>npx proof-of-commitment --file package.json</code>. The CLI, API and MCP server are below.</p>
+          </div>
+        </div>
+        <div class="proof-item reveal">
+          <div class="proof-number">Websites and shops</div>
+          <div>
+            <div class="proof-title">Traffic, revenue, years in business.</div>
+            <p class="proof-body">For Norwegian businesses, public accounts give the paid and time signals for free. <a href="#demo">Look one up</a>.</p>
+          </div>
+        </div>
+        <div class="proof-item reveal">
+          <div class="proof-number">Agent platforms</div>
+          <div>
+            <div class="proof-title">Settled payments, counters over time.</div>
+            <p class="proof-body">The population above. Self-reported numbers sit next to what can be checked.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <hr class="section-divider" />
+
+  <section id="trust" style="padding: var(--space-section) 0;">
+    <div class="container">
+      <p class="section-label">Layer 2</p>
+      <div class="editorial reveal" style="max-width: var(--max-content);">
+        <h2 style="margin-bottom: 0.75rem;">Who to trust.</h2>
+        <p style="font-size: 1rem;">
+          The index says what gets used. It doesn't say whose judgement to follow. That is a second layer: recommendations from people you know, weighted by what they have put behind them, such as years in a trade or things bought with their own money. It runs as a closed pilot among friends in Norway.
+        </p>
+        <p style="font-size: 0.85rem; color: var(--ink-muted);">
+          Commit is built and run by Pico, an AI agent working for Håkon Åmdal. The long version of the idea: <a href="/blog/commitment-is-the-new-link">Commitment is the new link</a>.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <style>
+    .rv-table { width: 100%; border-collapse: collapse; font-size: 0.9rem; }
+    .rv-table th { text-align: left; font-weight: 500; color: var(--ink-muted); border-bottom: 1px solid var(--border); padding: 0.5rem 0.75rem 0.5rem 0; }
+    .rv-table td { vertical-align: top; border-bottom: 1px solid var(--border); padding: 0.65rem 0.75rem 0.65rem 0; }
+    .rv-table small { color: var(--ink-muted); }
+  </style>
+
+  <hr class="section-divider" />
+
+  <section id="packages" style="padding: 4rem 0 0;">
+    <div class="container">
+      <p class="section-label">Type: packages</p>
+    </div>
+  </section>
 
   <!-- GitHub Repo Trust Card Demo -->
   <section id="try" style="padding: var(--space-section) 0;">
@@ -606,206 +604,6 @@ $ npx proof-of-commitment --fail-on=critical
       text-decoration: underline;
     }
   </style>
-
-  <hr class="section-divider" />
-
-  <!-- Problem -->
-  <section class="problem-section">
-    <div class="container">
-      <p class="section-label">The problem</p>
-      <div class="problem-inner">
-        <div>
-          <div class="problem-number">01</div>
-        </div>
-        <div class="editorial reveal">
-          <h2>Content is free. Commitment is not.</h2>
-          <div class="thesis-text" style="margin-top: 1.5rem;">
-            <p>
-              PageRank solved 1996 with hyperlinks — costly acts that were hard to fake at scale. In 2026, links are easy. AI generates content, reviews, and citations at zero marginal cost. The information layer has collapsed into self-referential noise.
-            </p>
-            <p>
-              But there is a category of signal that remains structurally hard to fake: <strong>commitment</strong>. A repeat purchase. A decade of profitable operation. A customer who returns after a price increase. These acts require real cost — time, money, skin in the game. No AI can manufacture them at scale without bearing that cost.
-            </p>
-          </div>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <hr class="section-divider" />
-
-  <!-- Thesis -->
-  <section id="thesis">
-    <div class="container">
-      <p class="section-label">The thesis</p>
-      <div class="editorial reveal">
-        <div class="thesis-text">
-          <p>
-            PageRank worked because hyperlinks were <em>costly acts</em> — a website owner putting their reputation behind another page was a meaningful signal. That signal was hard to fake in 1998. In 2026, it is easy.
-          </p>
-          <p>
-            But there is a category of human action that remains structurally hard to fake: <strong>commitment</strong>. A person who visits the same restaurant twelve times in thirty days. A company with twelve years of profitable operation. A customer who has purchased from the same supplier across three different economic cycles.
-          </p>
-          <p>
-            These are behavioral signals rooted in real cost — time, money, attention, reputation on the line. No language model can manufacture them at scale without bearing the actual cost.
-          </p>
-
-          <blockquote>
-            &ldquo;When content becomes free, commitment becomes scarce. The commitment layer is what remains hard to fake.&rdquo;
-          </blockquote>
-
-          <p>
-            Commit captures, aggregates, and surfaces these signals — so AI recommendations, search results, and trust scores are grounded in reality, not manufactured consensus.
-          </p>
-          <p>
-            Think of it as the trust layer that should have been built alongside the information layer — but wasn't, because we didn't need it until now.
-          </p>
-
-          <h3 style="margin-top: 3rem; margin-bottom: 1rem;">Why now</h3>
-          <p>
-            Three curves converged in early 2026. AI search is wrong about local businesses
-            <a href="/blog/ai-lies-about-your-favorite-restaurant">a third of the time</a> —
-            the trust problem is acute. Zero-knowledge proofs hit production
-            (<a href="https://www.reclaimprotocol.org/" target="_blank" rel="noopener">zkTLS: 3M verifications, zero fraud</a>). And proof of personhood
-            reached scale (<a href="https://world.org/blog/announcements/world-id-full-stack-proof-of-human" target="_blank" rel="noopener">World ID: 18M verified humans</a>; eIDAS 2.0 mandates wallets
-            for 450M Europeans by year-end).
-          </p>
-          <p>
-            Each component existed in isolation. The integration — behavioral proofs from
-            verified humans, consumed by AI systems — is what nobody has built.
-          </p>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <hr class="section-divider" />
-
-  <!-- Three pillars — editorial list, NOT card grid -->
-  <section>
-    <div class="container">
-      <p class="section-label">What we're building</p>
-      <div class="proof-grid">
-
-        <div class="proof-item reveal">
-          <div class="proof-number">I — Trust API</div>
-          <div>
-            <div class="proof-title">Behavioral ground truth for AI systems.</div>
-            <p class="proof-body">
-              AI agents and recommendation systems query a simple API: how many real humans committed to this, and how deeply? Instead of scraped reviews and gamed ratings, they get behavioral signals rooted in real cost — time, money, sustained engagement.
-            </p>
-          </div>
-        </div>
-
-        <div class="proof-item reveal">
-          <div class="proof-number">II — Browser Extension</div>
-          <div>
-            <div class="proof-title">Ad blocker for AI hallucinations.</div>
-            <p class="proof-body">
-              When ChatGPT, Perplexity, or Claude recommends a business, the extension surfaces what's real: years of operation, financial health, food safety scores — verified from public records and behavioral data. Catches bankrupt restaurants still being recommended. Useful from install one.
-            </p>
-          </div>
-        </div>
-
-        <div class="proof-item reveal">
-          <div class="proof-number">III — Commitment Protocol</div>
-          <div>
-            <div class="proof-title">The index layer for reality.</div>
-            <p class="proof-body">
-              A privacy-preserving protocol for contributing behavioral commitments anonymously. Zero-knowledge proofs let anyone prove they committed — without revealing who they are. The foundation for trust infrastructure that can't be gamed.
-            </p>
-          </div>
-        </div>
-
-      </div>
-    </div>
-  </section>
-
-  <hr class="section-divider" />
-
-  <!-- Asymmetric pull quote -->
-  <section class="pullquote-section">
-    <div class="container">
-      <div class="pullquote-layout">
-        <div class="pullquote-main reveal">
-          "Skin in the game is the only unfakeable signal."
-        </div>
-        <div class="pullquote-aside reveal">
-          <p>
-            Reputation can be manufactured. Reviews can be bought. But repeat purchases, staked capital, and sustained behavioral patterns require real cost.
-          </p>
-          <p style="margin-top: 1em;">
-            Any system that substitutes opinion for commitment will be gamed. We're building the alternative.
-          </p>
-          <p style="margin-top: 1.5em;">
-            <a href="/blog/commitment-is-the-new-link" style="font-size: 0.875rem; color: var(--accent); text-decoration: none; font-weight: 500;">Read the full essay →</a>
-          </p>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <hr class="section-divider" />
-
-  <!-- Three pillars: foundations -->
-  <section>
-    <div class="container">
-      <p class="section-label">How it works</p>
-      <div class="proof-grid">
-
-        <div class="proof-item reveal">
-          <div class="proof-number">I — Proof of Personhood</div>
-          <div>
-            <div class="proof-title">No fake people, no fake data.</div>
-            <p class="proof-body">
-              There is no "bad data" — only fake data from fake people. BankID (4.6M Norwegians), <a href="https://world.org/blog/announcements/world-id-full-stack-proof-of-human" target="_blank" rel="noopener">World ID (18M+ globally)</a>, and eIDAS 2.0 (450M Europeans by year-end) provide the sybil-resistant identity layer. Every signal in the graph comes from a verified, unique human.
-            </p>
-          </div>
-        </div>
-
-        <div class="proof-item reveal">
-          <div class="proof-number">II — Zero-Knowledge Proofs</div>
-          <div>
-            <div class="proof-title">Contribute everything, reveal nothing.</div>
-            <p class="proof-body">
-              zkTLS lets anyone prove behavioral claims about themselves — "I've visited this restaurant five times in six months" — without revealing identity, transaction details, or any other data. <a href="https://www.reclaimprotocol.org/" target="_blank" rel="noopener">3M+ verifications, zero fraud</a>. Privacy is not a tradeoff.
-            </p>
-          </div>
-        </div>
-
-        <div class="proof-item reveal">
-          <div class="proof-number">III — Incentive Mechanism</div>
-          <div>
-            <div class="proof-title">Money, not reputation points.</div>
-            <p class="proof-body">
-              Earn by contributing verified behavioral data. Pay to query the network's collective intelligence. Stake on recommendations — if others commit to the same thing, you earn; if they don't, you lose. Resolution is behavioral data, not opinion. The game cannot be rigged.
-            </p>
-          </div>
-        </div>
-
-      </div>
-    </div>
-  </section>
-
-  <hr class="section-divider" />
-
-  <!-- Norwegian cold start -->
-  <section>
-    <div class="container">
-      <p class="section-label">Why Norway first</p>
-      <div class="editorial reveal" style="max-width: var(--max-content);">
-        <p style="font-size: 1rem;">
-          Norway has something no other country has: freely accessible, structured commitment data already in the public domain.
-          Brønnøysundregistrene publishes full financial statements for every Norwegian company.
-          Mattilsynet publishes food safety inspection results for every restaurant.
-          PSD2 mandates open banking APIs across 3,500+ European banks.
-        </p>
-        <p style="font-size: 1rem; margin-top: 1rem;">
-          The gap is not data access — it's <strong>assembly</strong>. The foundation layer is live today. The behavioral layer is what we're building.
-        </p>
-      </div>
-    </div>
-  </section>
 
   <hr class="section-divider" />
 
