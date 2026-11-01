@@ -522,11 +522,11 @@ $ npx proof-of-commitment --fail-on=critical
           <p class="gs-desc">Batch audit up to 20 packages in one call. Add the MCP server to Claude Desktop or Cursor — ask it to audit your project.</p>
           <div class="gs-code">
             <div class="gs-code-path">curl</div>
-            <pre style="margin: 0; line-height: 1.7; padding: 1rem; padding-top: 2rem; overflow-x: auto;" set:html={`curl -X POST getcommit.dev/api/audit \\
-  -d '&#123;"packages":["axios","zod"]&#125;'
+            <pre style="margin: 0; line-height: 1.7; padding: 1rem; padding-top: 2rem; overflow-x: auto;" set:html={`curl -X POST poc-backend.amdal-dev.workers.dev/api/audit \\
+  -d '&#123;"packages":["axios@1.14.1","zod"]&#125;'
 
-# &#8594; &#123;"results":[&#123;"name":"axios",
-#    "score":86,"riskFlags":["CRITICAL"]&#125;,...]&#125;`}></pre>
+# &#8594; &#123;"results":[...,&#123;"name":"axios",
+#    "compromised":&#123;"ids":["MAL-2026-2307"],...&#125;&#125;]&#125;`}></pre>
           </div>
           <a href="/get-started" class="gs-cta">Get free API key →</a>
         </div>
