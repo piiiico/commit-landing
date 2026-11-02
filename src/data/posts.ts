@@ -15,6 +15,13 @@ export interface Post {
 // Sorted newest first
 export const posts: Post[] = [
   {
+    slug: 'hn-rising',
+    title: 'Rising: Hacker News Video Picks, Called Before They Catch On',
+    description: 'A dated forecast: 1,310 YouTube videos first linked on HN in 2024–2026 by people whose earlier first picks caught on at 10%+, against a control of 1,310. Re-read on 2027-05-01.',
+    date: '2026-11-02',
+    dateLabel: 'November 2, 2026',
+  },
+  {
     slug: 'hn-track-record-vs-tenure',
     title: "Does a Recommender's Track Record Matter? 19 Years of Hacker News",
     description: 'Account age and karma did not predict which YouTube picks caught on among 113,483 first recommended on HN in 2010–2023. An earlier hit rate of 10%+ did: 6.6% vs 4.6%, 1.44×.',
