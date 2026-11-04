@@ -26,7 +26,7 @@ import Layout from '../../layouts/Layout.astro';
 
         <header class="essay-header">
           <div class="essay-meta animate-in delay-1">
-            <time datetime="2026-11-01">November 1, 2026</time> · updated November 2: karma added, tenure on all videos
+            <time datetime="2026-11-01">November 1, 2026</time> · updated November 2: karma added, tenure on all videos; November 3: reads
           </div>
           <h1 class="essay-title animate-in delay-2">Does a recommender's track record matter? 19 years of Hacker News</h1>
           <p class="essay-subtitle animate-in delay-3">
@@ -124,12 +124,29 @@ import Layout from '../../layouts/Layout.astro';
             <a href="https://www.microsoft.com/en-us/research/publication/everyones-an-influencer-quantifying-influence-on-twitter/" rel="noopener" target="_blank">Bakshy, Hofman, Mason and Watts (2011)</a> found on Twitter that people whose past links spread far tend to start bigger cascades, and that predicting which particular person will is unreliable. This is the same question in a different place, with tenure tested next to it, on an archive anyone can re-run. HackerTube ranks videos by distinct months; <a href="https://www.trustmebro.reviews/r/hackernews" rel="noopener" target="_blank">trustmebro.reviews</a> weights HN and Reddit mentions by account trust. Neither tests whether an earlier hit rate predicts later uptake.
           </p>
 
+          <h2>Added November 3: do the tips get read?</h2>
+          <p>
+            "Caught on" counts mentions. Wikipedia publishes daily page views per article, so for Wikipedia links there is a public record of people actually opening a tip. I took HN comments from July 2015 to December 2023 that link an English Wikipedia article (391,144 links), dropped any where another HN comment or story linked the same article within three days or the thread itself was about it, and drew 2,200 random people with at least eight such links, eight links each. The outcome: views on the day of the comment and the next day, against twice the article's median day in the two weeks before. As a placebo, the same measure on the two days before the comment, which the comment cannot have caused. Results below are from the first 1,194 of those people, in random order: 8,582 links.
+          </p>
+          <ul>
+            <li><strong>They get read.</strong> Median 49 extra views over the two days. 19.4% of links at least doubled the article's views; in the placebo window 3.6% did.</li>
+            <li><strong>Placement does most of it.</strong> Median extra views: top-level comment 90, second level 70, deeper 33. Posted under 3 hours after the story 88, over 12 hours 29. About three times either way.</li>
+            <li><strong>The person adds a little.</strong> After removing year, story score, depth, hours after the story, the article's usual traffic, hour of day and weekend, I split each person's links into earlier and later halves. The rank correlation between the halves is 0.105 (95% interval about 0.05 to 0.17, three seeds); the placebo gives 0.021 (−0.04 to 0.08). With depth and minutes-after-story measured more finely it is 0.097 (0.04 to 0.15). With exact group averages instead of the additive model it falls to 0.064, and its interval only just clears zero (0.002 to 0.128 at worst).</li>
+            <li><strong>And it shrank as the sample grew:</strong> 0.127 at the first 393 people, 0.105 at 1,109 (the people with at least six usable links). People in the best fifth of earlier reads got a median 72 extra views on their later links, the bottom fifth 44. The best tenth did no better than the rest.</li>
+          </ul>
+          <p>
+            So on following, as on mentions, the person is not nothing. But on Wikipedia the effect is small next to where the comment sits, and picking the top 10% by earlier reads finds nothing, where on YouTube the top hit rates gave 1.44 times. Different sites and different outcomes, so this is not a like-for-like test. One row re-checked by hand: the stored views for "Shays' Rebellion" around a comment on August 30, 2022 match a fresh API call, and the HN API confirms the author and the link.
+          </p>
+
           <h2>What it means for Layer 2</h2>
           <p>
             Time served and karma are the easiest things to record, and here neither picked anything out. A measured hit rate did. That only exists if someone writes down what happened after a tip: did the person follow it, and did it work out. So the weight Layer 2 uses should be the hit rate, and the pilot has to record the outcome of every tip.
           </p>
           <p>
-            <strong>Added November 2:</strong> the finding is now a dated forecast. <a href="/blog/hn-rising/">Rising</a> lists 1,310 recent picks from people with a 10%+ earlier hit rate that have not caught on yet, next to a control, to be re-read on May 1, 2027. The same fields for HackerTube's own export are in <a href="https://github.com/piiiico/hn-track-record/tree/main/dropin" rel="noopener" target="_blank">dropin/</a>.
+            The November 3 reads change that in one way: whether a tip gets followed depends mostly on where and when it was given. Any weight on "was it followed" has to correct for placement first, and should stay small. Whether a followed tip worked out still has no public record.
+          </p>
+          <p>
+            <strong>Added November 2:</strong> the finding is now a dated forecast. <a href="/blog/hn-rising/">Rising</a> lists 1,310 recent picks from people with a 10%+ earlier hit rate that have not caught on yet, next to a control, to be re-read on May 1, 2027. The same fields for HackerTube's own export are in <a href="https://github.com/piiiico/hn-track-record/tree/master/dropin" rel="noopener" target="_blank">dropin/</a>.
           </p>
 
           <hr class="essay-divider" />
