@@ -4,7 +4,7 @@ import Layout from '../layouts/Layout.astro';
 
 <Layout
   title="Commit vs Socket, OpenSSF Scorecard, Snyk — What's different?"
-  description="Socket finds malicious code. Scorecard checks repo hygiene. Snyk tracks CVEs. Commit measures something none of them do: behavioral commitment signals. They're complementary."
+  description="Socket finds malicious code. Scorecard checks repo hygiene. Snyk tracks CVEs. Commit flags one npm publisher behind a large install base. Competitor facts re-read Nov 5, 2026."
   canonical="https://getcommit.dev/compare/"
 >
   <!-- Nav -->
@@ -33,15 +33,15 @@ import Layout from '../layouts/Layout.astro';
           <em>Different questions.</em>
         </h1>
         <p class="compare-lead">
-          Socket, OpenSSF Scorecard, Snyk, and npm audit are excellent tools.
-          None of them measure <strong>behavioral commitment signals</strong> —
-          the structural conditions that make a package a high-value target
-          <em>before</em> any attack code is published.
+          Socket, OpenSSF Scorecard, Snyk, and npm audit are excellent tools, and Socket and Snyk
+          already score maintenance and maintainer count. What Commit does differently is weight it
+          by reach: <strong>one publisher account behind a very large install base</strong> is flagged
+          CRITICAL, <em>before</em> any attack code is published.
         </p>
         <div class="key-insight">
           <span class="insight-icon">↓</span>
           <span class="insight-text">
-            The ua-parser-js supply chain attack (October 2021) triggered <strong>zero warnings</strong> in Socket, Snyk, or npm audit beforehand.
+            Before the ua-parser-js hijack (October 2021) there was no CVE and no malicious code to find.
             The structural signal — 1 maintainer, 7M+ downloads/week — was visible for years.
           </span>
         </div>
@@ -72,11 +72,11 @@ import Layout from '../layouts/Layout.astro';
               </td>
               <td class="tool-desc-cell">
                 Behavioral commitment signals — publish frequency, maintainer count,
-                download/maintainer ratio, lock file hygiene, deprecation handling
+                download/maintainer ratio, dormant publishers with access, npm provenance
               </td>
               <td class="center-cell"><span class="check-yes">✅ Core focus</span></td>
               <td class="center-cell"><span class="check-yes">✅ Full tree</span></td>
-              <td class="center-cell"><span class="check-yes">✅ Unlimited</span></td>
+              <td class="center-cell"><span class="check-yes">✅ CLI free</span></td>
             </tr>
             <tr>
               <td class="tool-name">
@@ -141,13 +141,14 @@ import Layout from '../layouts/Layout.astro';
               <li>✓ Typosquatting detection</li>
               <li>✓ Known malware in published versions</li>
               <li>✓ Install scripts, permission escalation</li>
-              <li class="miss">✗ Who controls the publish credentials</li>
-              <li class="miss">✗ Credential concentration vs download volume</li>
-              <li class="miss">✗ Structural conditions before any code is written</li>
+              <li>✓ Maintainer count in its maintenance score; alerts on new or unstable npm owners</li>
+              <li class="miss">✗ Weighting by reach: its docs say popular packages get a <em>smaller</em> penalty for negative metrics</li>
+              <li class="miss">✗ Dormant publishers who still hold access (not in its <a href="https://socket.dev/alerts">alert list</a>)</li>
             </ul>
             <p class="method-note">
               Best for: detecting active attacks after malicious code is published.
             </p>
+            <a href="/compare/socket/" class="method-deepdive">Commit vs Socket deep dive →</a>
           </div>
           <div class="method-card">
             <div class="method-tool scorecard-tool">OpenSSF Scorecard</div>
@@ -156,13 +157,14 @@ import Layout from '../layouts/Layout.astro';
               <li>✓ CI/CD configuration and SAST</li>
               <li>✓ Signed releases and token permissions</li>
               <li>✓ Fuzzing participation</li>
-              <li class="miss">✗ Requires a GitHub repo (npm-only packages = no data)</li>
+              <li class="miss">✗ Scores the GitHub/GitLab repo, not who can publish to npm</li>
               <li class="miss">✗ Transitive dependency risk</li>
               <li class="miss">✗ Download volume vs maintainer ratio</li>
             </ul>
             <p class="method-note">
               Best for: auditing whether a project follows security best practices.
             </p>
+            <a href="/compare/scorecard/" class="method-deepdive">Commit vs Scorecard deep dive →</a>
           </div>
           <div class="method-card">
             <div class="method-tool snyk-tool">Snyk / npm audit</div>
@@ -171,13 +173,14 @@ import Layout from '../layouts/Layout.astro';
               <li>✓ Exploit availability and severity scoring</li>
               <li>✓ Fix guidance and upgrade paths</li>
               <li>✓ License compliance</li>
-              <li class="miss">✗ Who maintains the package</li>
-              <li class="miss">✗ Whether the project is actively maintained</li>
+              <li>✓ Package health score with maintenance and maintainer data (<a href="https://security.snyk.io/package/npm/chalk">example</a>)</li>
+              <li class="miss">✗ Publisher count weighted by install base</li>
               <li class="miss">✗ Structural conditions for the <em>next</em> attack</li>
             </ul>
             <p class="method-note">
               Best for: finding known vulnerabilities with published fixes.
             </p>
+            <a href="/compare/snyk/" class="method-deepdive">Commit vs Snyk deep dive →</a>
           </div>
           <div class="method-card method-card-commit">
             <div class="method-tool commit-tool">Commit</div>
@@ -186,8 +189,8 @@ import Layout from '../layouts/Layout.astro';
               <li>✓ Download volume vs maintainer ratio</li>
               <li>✓ Release consistency and cadence</li>
               <li>✓ Package age and momentum</li>
-              <li>✓ CI/CD presence and process signals</li>
-              <li>✓ Full transitive dependency tree</li>
+              <li>✓ Dormant publishers who still hold publish access</li>
+              <li>✓ Full tree when you give it a lockfile</li>
               <li class="miss">✗ Malicious code detection (use Socket for that)</li>
               <li class="miss">✗ Known CVEs (use Snyk for that)</li>
             </ul>
@@ -196,6 +199,7 @@ import Layout from '../layouts/Layout.astro';
             </p>
           </div>
         </div>
+        <p class="method-note">Competitor columns re-read on Nov 5, 2026 from their own pages: <a href="https://docs.socket.dev/docs/package-scores">Socket package scores</a>, <a href="https://socket.dev/pricing">Socket pricing</a>, <a href="https://github.com/ossf/scorecard#scorecard-checks">Scorecard checks</a>, <a href="https://security.snyk.io/package/npm/chalk">Snyk package page</a>. Tell us if one has changed.</p>
       </div>
     </div>
   </section>
@@ -273,7 +277,7 @@ import Layout from '../layouts/Layout.astro';
             <p class="faq-a">
               Scorecard checks whether a project <em>follows security practices</em> — branch protection, signed commits, fuzzing.
               A project can score 9/10 on Scorecard and still have one person controlling the npm publish token for 100M weekly installs.
-              Scorecard also requires a GitHub repo; it can't assess npm-only packages or walk your full transitive tree.
+              Scorecard scores the source repo (GitHub or GitLab), so it cannot see who holds publish rights on npm, and it does not walk your lockfile.
               Commit focuses specifically on credential concentration at scale.
             </p>
           </div>
@@ -282,8 +286,8 @@ import Layout from '../layouts/Layout.astro';
             <h3 class="faq-q">Snyk already does dependency scanning. Why isn't that enough?</h3>
             <p class="faq-a">
               Snyk is excellent at finding <em>known</em> vulnerabilities — CVEs with published exploits.
-              But supply chain attacks are not exploits of known CVEs. The ua-parser-js attack in October 2021
-              had zero Snyk warnings beforehand. The attacker didn't exploit a CVE — they compromised
+              But supply chain attacks are not exploits of known CVEs. Before the ua-parser-js attack in October 2021
+              there was no CVE to report. The attacker didn't exploit a CVE — they compromised
               a single maintainer's credentials. Snyk can't warn you about a vulnerability that doesn't exist yet.
               Commit flags the structural conditions that make that attack possible.
             </p>
@@ -602,8 +606,18 @@ import Layout from '../layouts/Layout.astro';
       color: var(--ink-muted);
       border-top: 1px solid var(--border);
       padding-top: 0.75rem;
-      margin: 0;
+      margin: 0 0 0.75rem;
     }
+
+    .method-deepdive {
+      display: inline-block;
+      font-size: 0.8rem;
+      color: var(--accent);
+      text-decoration: none;
+      font-weight: 500;
+    }
+
+    .method-deepdive:hover { text-decoration: underline; }
 
     /* ── Compare section ── */
     .compare-section {

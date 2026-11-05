@@ -1,0 +1,1370 @@
+---
+import Layout from '../../layouts/Layout.astro';
+---
+
+<Layout
+  title="Commit vs OpenSSF Scorecard — Process Security vs Publisher Risk"
+  description="Scorecard scores repo practices: branch protection, CI, signed releases. Commit scores publisher concentration. A project can score 9/10 on Scorecard and still have one person controlling 100M weekly installs."
+  canonical="https://getcommit.dev/compare/scorecard/"
+>
+  <!-- Nav -->
+  <nav>
+    <div class="container nav-inner">
+      <a href="/" class="nav-brand">Commit</a>
+      <ul class="nav-links">
+        <li><a href="/#mcp">MCP</a></li>
+        <li><a href="/audit">Audit</a></li>
+        <li><a href="/watchlist">Watchlist</a></li>
+        <li><a href="/extension">Extension</a></li>
+        <li><a href="/blog">Writing</a></li>
+        <li><a href="/pricing">Pricing</a></li>
+        <li><a href="/docs">Docs</a></li>
+        <li><a href="https://github.com/piiiico/proof-of-commitment" target="_blank" rel="noopener">GitHub</a></li>
+        <li><a href="mailto:pico@amdal.dev">Contact</a></li>
+      </ul>
+    </div>
+  </nav>
+
+  <!-- Hero -->
+  <section class="hero">
+    <div class="container">
+      <div class="editorial">
+        <a href="/compare/" class="breadcrumb">&larr; All comparisons</a>
+        <h1 class="hero-title">
+          Scorecard scores the process.<br /><em>Commit scores the risk.</em>
+        </h1>
+        <p class="hero-lead">
+          OpenSSF Scorecard evaluates whether a project follows secure development practices — branch protection, CI/CD, signed releases, fuzzing. It's the best tool for measuring process security. It doesn't measure who controls the npm publish token or what happens if they're compromised.
+        </p>
+        <div class="key-stat">
+          <span class="stat-icon">↓</span>
+          <span class="stat-text">
+            Scorecard scores a source repository (GitHub or GitLab), not the npm package. Its checks cannot see who holds publish rights on the registry. Commit reads that from npm. <a href="https://github.com/ossf/scorecard#scorecard-checks">Scorecard's check list</a>, re-read Nov 5, 2026.
+          </span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <hr class="section-divider" />
+
+  <!-- Head-to-head -->
+  <section class="hth-section">
+    <div class="container">
+      <div class="editorial">
+        <h2 class="section-heading">Different security layers</h2>
+        <div class="hth-grid">
+          <div class="hth-card scorecard-side">
+            <div class="hth-tool-label scorecard-label">OpenSSF Scorecard</div>
+            <p class="hth-tagline">Measures process security</p>
+            <div class="hth-hits">
+              <p class="hth-group-label hits-label">Catches</p>
+              <ul class="hth-list hits-list">
+                <li>Branch protection and code review requirements</li>
+                <li>CI/CD configuration and SAST</li>
+                <li>Signed releases and SLSA provenance</li>
+                <li>Fuzzing and token permissions</li>
+                <li>Dangerous workflow detection</li>
+              </ul>
+            </div>
+            <div class="hth-misses">
+              <p class="hth-group-label misses-label">Misses</p>
+              <ul class="hth-list misses-list">
+                <li>Who controls the npm publish token</li>
+                <li>Download volume vs maintainer count</li>
+                <li>Packages with no linked source repo</li>
+                <li>Transitive dependency risk</li>
+              </ul>
+            </div>
+          </div>
+
+          <div class="hth-card commit-side">
+            <div class="hth-tool-label commit-label">Commit</div>
+            <p class="hth-tagline">Measures structural risk</p>
+            <div class="hth-hits">
+              <p class="hth-group-label hits-label">Catches</p>
+              <ul class="hth-list hits-list">
+                <li>Publisher concentration (credential risk)</li>
+                <li>Download volume vs maintainer ratio</li>
+                <li>All ecosystems (npm, PyPI, Cargo, Go)</li>
+                <li>Full transitive dependency tree</li>
+                <li>Packages with no linked source repo</li>
+              </ul>
+            </div>
+            <div class="hth-misses">
+              <p class="hth-group-label misses-label">Misses</p>
+              <ul class="hth-list misses-list">
+                <li>Repository security practices</li>
+                <li>Whether CI/CD is configured correctly</li>
+                <li>Code review enforcement</li>
+                <li>SLSA provenance tracking</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+        <div class="verdict">
+          Scorecard tells you "this project follows security best practices." Commit tells you "if those practices fail, how bad is the blast radius?" Both questions matter.
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <hr class="section-divider" />
+
+  <!-- Case study: esbuild -->
+  <section class="case-study-section">
+    <div class="container">
+      <div class="editorial">
+        <h2 class="section-heading">Case study: esbuild</h2>
+        <p class="case-intro">
+          esbuild is a model of disciplined open source. Single author, rigorous engineering, excellent documentation. Scorecard reflects this: good CI, consistent releases, careful dependency management. Commit flags it CRITICAL for a completely orthogonal reason.
+        </p>
+        <div class="case-grid">
+          <div class="case-card case-scorecard">
+            <div class="case-tool-label scorecard-label">Scorecard says</div>
+            <div class="case-score-row">
+              <span class="case-score">8.2</span>
+              <span class="case-verdict case-good">Good practices</span>
+            </div>
+            <ul class="case-reasons">
+              <li>CI/CD configured</li>
+              <li>Consistent release cadence</li>
+              <li>Branch protection active</li>
+              <li>No dangerous workflows</li>
+            </ul>
+          </div>
+          <div class="case-card case-commit">
+            <div class="case-tool-label commit-label">Commit says</div>
+            <div class="case-score-row">
+              <span class="case-score">88</span>
+              <span class="case-verdict case-critical">CRITICAL</span>
+            </div>
+            <ul class="case-reasons">
+              <li class="reason-danger"><strong>1 npm publisher</strong></li>
+              <li>194M downloads/week</li>
+              <li>8.4 years old</li>
+              <li>No provenance attestation</li>
+            </ul>
+          </div>
+        </div>
+        <p class="case-explanation">
+          The CRITICAL flag isn't a judgment on Evan Wallace's engineering discipline — it's a measurement of ecosystem structure. One compromised account reaches 194 million weekly installs. That's not a process problem; it's a concentration problem. Scorecard can tell you the processes are good. It can't tell you what happens when those processes are bypassed.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <hr class="section-divider" />
+
+  <!-- The blind spot -->
+  <section class="blindspot-section">
+    <div class="container">
+      <div class="editorial">
+        <h2 class="section-heading">The two blind spots</h2>
+        <div class="blindspot-grid">
+          <div class="blindspot-card">
+            <h3 class="blindspot-title">The repo is not the registry</h3>
+            <p class="blindspot-text">
+              Scorecard runs against GitHub and GitLab repositories. Its <code>--npm</code> flag only looks up the repo; the checks are the same. If a package has no linked repo, there is nothing to score. Commit scores from registry metadata: publisher count, release history, download trends. Where Scorecard has a result, Commit's API returns it as <code>scorecardScore</code> next to its own score.
+            </p>
+          </div>
+          <div class="blindspot-card">
+            <h3 class="blindspot-title">Publisher concentration at scale</h3>
+            <p class="blindspot-text">
+              A package can have exemplary Scorecard results — branch protection, signed commits, SLSA Level 2 — and still have a single person controlling the npm publish token for 400M weekly downloads. Scorecard doesn't measure that. Commit does. It is a measure of exposure, not a forecast: we have not shown that it predicts which packages get attacked.
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <hr class="section-divider" />
+
+  <!-- Evidence -->
+  <section class="evidence-section">
+    <div class="container">
+      <div class="editorial">
+        <h2 class="section-heading">Six attacks in 2026. Good Scorecard scores didn't help.</h2>
+        <div class="attack-list">
+          <div class="attack-row">
+            <div class="attack-date">Mar 30</div>
+            <div class="attack-info">
+              <strong class="attack-pkg">axios</strong>
+              <span class="attack-method">Token theft.</span>
+              <span class="attack-detail">1 publisher, 119M downloads/week. Repository had reasonable practices. Attack bypassed all process controls via stolen credentials.</span>
+            </div>
+          </div>
+          <div class="attack-row">
+            <div class="attack-date">May 11</div>
+            <div class="attack-info">
+              <strong class="attack-pkg">TanStack</strong>
+              <span class="attack-method">CI/CD hijacking.</span>
+              <span class="attack-detail">Compromised GitHub Actions. CI was configured — but the configuration itself became the attack vector.</span>
+            </div>
+          </div>
+          <div class="attack-row">
+            <div class="attack-date">May 22</div>
+            <div class="attack-info">
+              <strong class="attack-pkg">TrapDoor</strong>
+              <span class="attack-method">21 packages.</span>
+              <span class="attack-detail">Planted persistence hooks in IDE configs. Targeted AI coding assistants. Novel enough to evade process-based detection.</span>
+            </div>
+          </div>
+          <div class="attack-row">
+            <div class="attack-date">Jun 1</div>
+            <div class="attack-info">
+              <strong class="attack-pkg">Red Hat / Miasma</strong>
+              <span class="attack-method">32 packages via compromised GitHub account.</span>
+              <span class="attack-detail"><strong>Valid SLSA provenance on every malicious version.</strong> Perfect Scorecard attestation. The process worked exactly as designed — on malicious code.</span>
+            </div>
+          </div>
+          <div class="attack-row">
+            <div class="attack-date">Jun 3</div>
+            <div class="attack-info">
+              <strong class="attack-pkg">Phantom Gyp</strong>
+              <span class="attack-method">57 packages using binding.gyp bypass.</span>
+              <span class="attack-detail">Self-propagating worm in the Shai-Hulud lineage. Scorecard checks didn't catch the binding.gyp vector.</span>
+            </div>
+          </div>
+          <div class="attack-row">
+            <div class="attack-date">Jun 4</div>
+            <div class="attack-info">
+              <strong class="attack-pkg">IronWorm</strong>
+              <span class="attack-method">37 packages with eBPF rootkit.</span>
+              <span class="attack-detail">First npm supply chain attack with kernel-level persistence. Process integrity checks had no visibility into post-install behavior.</span>
+            </div>
+          </div>
+        </div>
+        <div class="evidence-punchline">
+          The Red Hat / Miasma attack is the clearest example: every malicious version had valid SLSA provenance. Scorecard would have rated the project highly throughout the attack. Structural signals — concentrated publish authority — were the only pre-attack indicators available.
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <hr class="section-divider" />
+
+  <!-- Live compare -->
+  <section class="live-section">
+    <div class="container">
+      <div class="editorial" style="max-width: var(--max-content); margin: 0 auto 2rem;">
+        <h2 class="section-heading">Audit your full supply chain</h2>
+        <p class="live-intro">Five packages. Scorecard scores shown where available. Commit: live behavioral risk data.</p>
+      </div>
+
+      <div class="compare-header-row">
+        <div class="compare-pkg-label">Package</div>
+        <div class="compare-col-header">
+          <span class="tool-badge scorecard-badge">Scorecard</span>
+          <span class="tool-desc">Process security (0–10)</span>
+        </div>
+        <div class="compare-col-header">
+          <span class="tool-badge commit-badge">Commit</span>
+          <span class="tool-desc">Structural risk score</span>
+        </div>
+      </div>
+
+      <div id="loading-state" class="loading-state">
+        <div class="loading-spinner"></div>
+        <p>Loading live Commit data&hellip;</p>
+      </div>
+      <div id="error-state" class="error-state" hidden>
+        <p id="error-msg">Failed to load data.</p>
+      </div>
+      <div id="compare-rows" class="compare-rows" hidden></div>
+
+      <div class="legend">
+        <span class="legend-item"><span class="risk-badge risk-critical">CRITICAL</span> single publisher + &gt;10M downloads/week</span>
+        <span class="legend-sep">&middot;</span>
+        <span class="legend-item"><span class="risk-badge risk-ok">OK</span> healthy structural signals</span>
+      </div>
+    </div>
+  </section>
+
+  <hr class="section-divider" />
+
+  <!-- FAQ -->
+  <section class="faq-section">
+    <div class="container">
+      <div class="editorial">
+        <h2 class="section-heading">Frequently asked</h2>
+        <div class="faq-list">
+          <div class="faq-item">
+            <h3 class="faq-q">Does a high Scorecard score mean a package is safe?</h3>
+            <p class="faq-a">No. Scorecard measures process. The Red Hat / Miasma attack (Jun 1, 2026) had valid SLSA provenance on every malicious version — Scorecard would have rated those packages highly throughout the attack. Process integrity is necessary but not sufficient. Structural concentration is a separate risk axis that Scorecard doesn't cover.</p>
+          </div>
+          <div class="faq-item">
+            <h3 class="faq-q">Can I use Commit instead of running Scorecard?</h3>
+            <p class="faq-a">No. They measure orthogonal things. Scorecard tells you whether a project enforces code review, uses signed commits, and has CI configured. Commit tells you how many people control the publish credentials and whether that's proportionate to the download volume. A complete supply chain security posture needs both: Scorecard for process integrity, Commit for structural exposure.</p>
+          </div>
+          <div class="faq-item">
+            <h3 class="faq-q">Why doesn't Scorecard catch publisher concentration?</h3>
+            <p class="faq-a">It's not in scope. Scorecard was designed to measure repository security practices — things a project team controls. Publisher concentration is an ecosystem-level observation: how many people have the credentials to push to npm, and does that number make sense relative to the install volume? Scorecard answers "does this project have good security hygiene?" Commit answers "is this package's attack surface proportionate to its blast radius?"</p>
+          </div>
+          <div class="faq-item">
+            <h3 class="faq-q">Is Commit free?</h3>
+            <p class="faq-a">The CLI, web audit, and API are free. Paid plans from $15–$29/mo add batch scanning, continuous monitoring, Slack/webhook alerts, and GitHub Action integration. <a href="/pricing" class="faq-link">See pricing &rarr;</a></p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <hr class="section-divider" />
+
+  <!-- CTA -->
+  <section class="cta-section">
+    <div class="container">
+      <div class="editorial" style="text-align: center;">
+        <h2 class="cta-heading">Audit your full supply chain</h2>
+        <p class="cta-text">Scorecard checks the repo. Commit checks who can publish to the registry. Run both.</p>
+        <div class="cta-buttons">
+          <a href="/audit" class="btn-primary">Run a free audit &rarr;</a>
+          <a href="/get-started" class="btn-secondary">Get a free API key</a>
+        </div>
+        <div class="cli-note">
+          <code>npx proof-of-commitment --file package.json</code>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <footer>
+    <div class="container footer-inner">
+      <span class="footer-brand">Commit</span>
+      <span class="footer-copy">Behavioral trust for the software supply chain.</span>
+      <nav class="footer-links">
+        <a href="/audit">Audit</a>
+        <a href="/watchlist">Watchlist</a>
+        <a href="/blog">Writing</a>
+        <a href="mailto:pico@amdal.dev">Contact</a>
+      </nav>
+    </div>
+  </footer>
+
+  <style>
+    /* ── Layout ── */
+    .container {
+      max-width: 64rem;
+      margin: 0 auto;
+      padding: 0 2rem;
+    }
+
+    .editorial {
+      max-width: var(--max-content);
+      margin: 0 auto;
+    }
+
+    /* ── Nav ── */
+    nav {
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      background: var(--paper);
+      border-bottom: 1px solid var(--border-light);
+    }
+
+    .nav-inner {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 1rem 2rem;
+    }
+
+    .nav-brand {
+      font-family: var(--font-display);
+      font-size: 1.2rem;
+      color: var(--ink);
+      text-decoration: none;
+    }
+
+    .nav-links {
+      list-style: none;
+      display: flex;
+      gap: 1.5rem;
+      flex-wrap: wrap;
+    }
+
+    .nav-links a {
+      font-size: 0.85rem;
+      color: var(--ink-muted);
+      text-decoration: none;
+    }
+
+    .nav-links a:hover { color: var(--ink); }
+
+    /* ── Hero ── */
+    .hero {
+      padding: 5rem 0 3.5rem;
+      background: var(--paper);
+    }
+
+    .breadcrumb {
+      display: inline-block;
+      font-size: 0.875rem;
+      color: var(--ink-muted);
+      text-decoration: none;
+      margin-bottom: 1.5rem;
+    }
+
+    .breadcrumb:hover { color: var(--ink); }
+
+    .hero-title {
+      font-family: var(--font-display);
+      font-size: clamp(2rem, 5vw, 3.2rem);
+      line-height: 1.15;
+      color: var(--ink);
+      margin-bottom: 1.5rem;
+    }
+
+    .hero-title em {
+      font-style: italic;
+      color: var(--accent);
+    }
+
+    .hero-lead {
+      font-size: 1.05rem;
+      line-height: 1.7;
+      color: var(--ink-muted);
+      margin-bottom: 2rem;
+      max-width: 46rem;
+    }
+
+    .key-stat {
+      display: flex;
+      gap: 1rem;
+      align-items: flex-start;
+      padding: 1.25rem 1.5rem;
+      background: #fff8f5;
+      border: 1px solid #fca5a5;
+      border-left: 3px solid var(--accent);
+      border-radius: 6px;
+      max-width: 46rem;
+    }
+
+    .stat-icon {
+      font-size: 1.2rem;
+      color: var(--accent);
+      flex-shrink: 0;
+    }
+
+    .stat-text {
+      font-size: 0.95rem;
+      line-height: 1.6;
+      color: var(--ink-muted);
+    }
+
+    /* ── Divider ── */
+    .section-divider {
+      border: none;
+      border-top: 1px solid var(--border-light);
+      margin: 0;
+    }
+
+    /* ── Section heading ── */
+    .section-heading {
+      font-family: var(--font-display);
+      font-size: 1.8rem;
+      font-weight: 400;
+      color: var(--ink);
+      margin-bottom: 2rem;
+    }
+
+    /* ── Head-to-head ── */
+    .hth-section {
+      padding: 4rem 0;
+      background: var(--paper-dim);
+    }
+
+    .hth-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1.5rem;
+      margin-bottom: 1.5rem;
+    }
+
+    @media (max-width: 600px) {
+      .hth-grid { grid-template-columns: 1fr; }
+    }
+
+    .hth-card {
+      padding: 1.5rem;
+      border-radius: 8px;
+      border: 1px solid var(--border);
+      background: var(--paper);
+    }
+
+    .commit-side {
+      border-color: var(--accent);
+      border-width: 2px;
+    }
+
+    .hth-tool-label {
+      font-size: 0.75rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      margin-bottom: 0.5rem;
+    }
+
+    .scorecard-label { color: #1e40af; }
+    .commit-label { color: var(--accent); }
+
+    .hth-tagline {
+      font-size: 1rem;
+      font-weight: 500;
+      color: var(--ink);
+      margin-bottom: 1.25rem;
+      padding-bottom: 1rem;
+      border-bottom: 1px solid var(--border-light);
+    }
+
+    .hth-group-label {
+      font-size: 0.7rem;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      margin-bottom: 0.5rem;
+      font-weight: 500;
+    }
+
+    .hits-label { color: #166534; }
+    .misses-label { color: var(--ink-subtle); }
+
+    .hth-list {
+      list-style: none;
+      padding: 0;
+      margin: 0 0 1.25rem;
+      display: flex;
+      flex-direction: column;
+      gap: 0.4rem;
+    }
+
+    .hits-list li {
+      font-size: 0.875rem;
+      color: var(--ink-muted);
+      padding-left: 1rem;
+      position: relative;
+    }
+
+    .hits-list li::before {
+      content: '✓';
+      position: absolute;
+      left: 0;
+      color: #166534;
+      font-size: 0.8rem;
+    }
+
+    .misses-list li {
+      font-size: 0.875rem;
+      color: var(--ink-subtle);
+      padding-left: 1rem;
+      position: relative;
+    }
+
+    .misses-list li::before {
+      content: '✗';
+      position: absolute;
+      left: 0;
+      color: var(--ink-subtle);
+      font-size: 0.8rem;
+    }
+
+    .verdict {
+      padding: 1.25rem 1.5rem;
+      background: var(--paper);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      font-size: 0.9375rem;
+      color: var(--ink-muted);
+      line-height: 1.6;
+    }
+
+    /* ── Case study ── */
+    .case-study-section {
+      padding: 4rem 0;
+      background: var(--paper);
+    }
+
+    .case-intro {
+      font-size: 0.9375rem;
+      color: var(--ink-muted);
+      line-height: 1.7;
+      margin-bottom: 2rem;
+      max-width: 46rem;
+    }
+
+    .case-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1.5rem;
+      margin-bottom: 1.5rem;
+    }
+
+    @media (max-width: 600px) {
+      .case-grid { grid-template-columns: 1fr; }
+    }
+
+    .case-card {
+      padding: 1.5rem;
+      border-radius: 8px;
+      border: 1px solid var(--border);
+    }
+
+    .case-scorecard { background: #eff6ff; border-color: #bfdbfe; }
+    .case-commit { background: #fff5f5; border-color: #fca5a5; }
+
+    .case-tool-label {
+      font-size: 0.75rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      margin-bottom: 0.75rem;
+    }
+
+    .case-score-row {
+      display: flex;
+      align-items: baseline;
+      gap: 0.75rem;
+      margin-bottom: 1rem;
+    }
+
+    .case-score {
+      font-family: var(--font-display);
+      font-size: 2.5rem;
+      font-weight: 400;
+      color: var(--ink);
+      line-height: 1;
+    }
+
+    .case-verdict {
+      font-size: 0.85rem;
+      font-weight: 700;
+      padding: 0.2rem 0.6rem;
+      border-radius: 3px;
+      letter-spacing: 0.04em;
+    }
+
+    .case-good {
+      background: #dbeafe;
+      color: #1e40af;
+    }
+
+    .case-critical {
+      background: #fee2e2;
+      color: #991b1b;
+    }
+
+    .case-reasons {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+      display: flex;
+      flex-direction: column;
+      gap: 0.4rem;
+    }
+
+    .case-reasons li {
+      font-size: 0.875rem;
+      color: var(--ink-muted);
+      padding-left: 1rem;
+      position: relative;
+    }
+
+    .case-reasons li::before {
+      content: '·';
+      position: absolute;
+      left: 0.25rem;
+      color: var(--ink-subtle);
+    }
+
+    .reason-danger {
+      color: #991b1b !important;
+    }
+
+    .case-explanation {
+      font-size: 0.9375rem;
+      line-height: 1.7;
+      color: var(--ink-muted);
+      padding: 1.25rem 1.5rem;
+      background: var(--paper-dim);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+    }
+
+    /* ── Blind spot ── */
+    .blindspot-section {
+      padding: 4rem 0;
+      background: var(--paper-dim);
+    }
+
+    .blindspot-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1.5rem;
+    }
+
+    @media (max-width: 600px) {
+      .blindspot-grid { grid-template-columns: 1fr; }
+    }
+
+    .blindspot-card {
+      padding: 1.5rem;
+      background: var(--paper);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+    }
+
+    .blindspot-title {
+      font-family: var(--font-display);
+      font-size: 1.1rem;
+      font-weight: 400;
+      color: var(--ink);
+      margin-bottom: 0.75rem;
+    }
+
+    .blindspot-text {
+      font-size: 0.875rem;
+      color: var(--ink-muted);
+      line-height: 1.65;
+    }
+
+    /* ── Evidence ── */
+    .evidence-section {
+      padding: 4rem 0;
+      background: var(--paper);
+    }
+
+    .attack-list {
+      display: flex;
+      flex-direction: column;
+      gap: 0;
+      margin-bottom: 1.5rem;
+    }
+
+    .attack-row {
+      display: grid;
+      grid-template-columns: 4.5rem 1fr;
+      gap: 1.25rem;
+      padding: 1.1rem 0;
+      border-top: 1px solid var(--border-light);
+      align-items: baseline;
+    }
+
+    .attack-row:last-child {
+      border-bottom: 1px solid var(--border-light);
+    }
+
+    .attack-date {
+      font-family: var(--font-mono);
+      font-size: 0.8rem;
+      color: var(--ink-subtle);
+      padding-top: 0.1rem;
+    }
+
+    .attack-info {
+      font-size: 0.9rem;
+      line-height: 1.6;
+      color: var(--ink-muted);
+    }
+
+    .attack-pkg {
+      color: var(--ink);
+      margin-right: 0.35rem;
+    }
+
+    .attack-method {
+      color: var(--ink);
+      margin-right: 0.35rem;
+    }
+
+    .attack-detail { color: var(--ink-muted); }
+
+    .evidence-punchline {
+      padding: 1.1rem 1.5rem;
+      background: #fff8f5;
+      border: 1px solid #fca5a5;
+      border-left: 3px solid var(--accent);
+      border-radius: 6px;
+      font-size: 0.9375rem;
+      color: var(--ink-muted);
+      line-height: 1.6;
+    }
+
+    /* ── Live compare ── */
+    .live-section {
+      padding: 3rem 0 4rem;
+      background: var(--paper-dim);
+    }
+
+    .live-intro {
+      font-size: 0.95rem;
+      color: var(--ink-muted);
+      margin-bottom: 0;
+    }
+
+    .compare-header-row {
+      display: grid;
+      grid-template-columns: 10rem 1fr 1fr;
+      gap: 1rem;
+      padding: 0 0 1rem;
+      border-bottom: 2px solid var(--border);
+      max-width: 56rem;
+      margin: 0 auto;
+      align-items: end;
+    }
+
+    .compare-pkg-label {
+      font-size: 0.75rem;
+      font-weight: 500;
+      color: var(--ink-subtle);
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+    }
+
+    .compare-col-header {
+      display: flex;
+      flex-direction: column;
+      gap: 0.25rem;
+    }
+
+    .tool-badge {
+      display: inline-block;
+      padding: 0.25rem 0.75rem;
+      border-radius: 4px;
+      font-size: 0.8rem;
+      font-weight: 600;
+      font-family: var(--font-mono);
+    }
+
+    .scorecard-badge {
+      background: #dbeafe;
+      color: #1e40af;
+      border: 1px solid #93c5fd;
+    }
+
+    .commit-badge {
+      background: #fee2e2;
+      color: #991b1b;
+      border: 1px solid var(--accent);
+    }
+
+    .tool-desc {
+      font-size: 0.75rem;
+      color: var(--ink-subtle);
+    }
+
+    .compare-rows {
+      max-width: 56rem;
+      margin: 0 auto;
+    }
+
+    .compare-row {
+      display: grid;
+      grid-template-columns: 10rem 1fr 1fr;
+      gap: 1rem;
+      padding: 1.25rem 0;
+      border-bottom: 1px solid var(--border-light);
+      align-items: start;
+    }
+
+    .compare-row:last-child { border-bottom: none; }
+
+    .pkg-info {
+      display: flex;
+      flex-direction: column;
+      gap: 0.25rem;
+      padding-top: 0.5rem;
+    }
+
+    .pkg-name {
+      font-family: var(--font-mono);
+      font-size: 0.95rem;
+      font-weight: 600;
+      color: var(--ink);
+    }
+
+    .pkg-downloads {
+      font-size: 0.75rem;
+      color: var(--ink-subtle);
+    }
+
+    .compare-cell {
+      padding: 0.75rem 1rem;
+      border-radius: 6px;
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+    }
+
+    .sc-cell {
+      background: #eff6ff;
+      border: 1px solid #bfdbfe;
+    }
+
+    .sc-score-row {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .sc-score-num {
+      font-family: var(--font-mono);
+      font-size: 1.2rem;
+      font-weight: 700;
+      color: #1e40af;
+    }
+
+    .sc-no-data {
+      font-size: 0.82rem;
+      color: var(--ink-subtle);
+      font-style: italic;
+    }
+
+    .commit-cell {
+      border: 1px solid var(--border);
+    }
+
+    .commit-cell.is-critical {
+      background: #fff5f5;
+      border-color: #fca5a5;
+    }
+
+    .commit-cell.is-ok {
+      background: #f0fdf4;
+      border-color: #bbf7d0;
+    }
+
+    .commit-score-row {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+    }
+
+    .commit-score {
+      font-family: var(--font-mono);
+      font-size: 1.2rem;
+      font-weight: 700;
+    }
+
+    .score-high { color: #3d8b3d; }
+    .score-mid { color: #c47a0a; }
+    .score-low { color: var(--accent); }
+
+    .risk-badge {
+      display: inline-block;
+      padding: 0.2rem 0.5rem;
+      border-radius: 3px;
+      font-size: 0.75rem;
+      font-weight: 700;
+      letter-spacing: 0.04em;
+    }
+
+    .risk-critical {
+      background: #fee2e2;
+      color: #991b1b;
+    }
+
+    .risk-ok {
+      background: #dcfce7;
+      color: #166534;
+    }
+
+    .commit-signals {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.4rem;
+    }
+
+    .signal-chip {
+      font-size: 0.72rem;
+      padding: 0.15rem 0.5rem;
+      background: var(--paper-dim);
+      border: 1px solid var(--border);
+      border-radius: 3px;
+      color: var(--ink-muted);
+      font-family: var(--font-mono);
+      white-space: nowrap;
+    }
+
+    .signal-chip.danger {
+      background: #fee2e2;
+      border-color: #fca5a5;
+      color: #991b1b;
+    }
+
+    .signal-chip.warn {
+      background: #fef3c7;
+      border-color: #fde68a;
+      color: #92400e;
+    }
+
+    .signal-chip.good {
+      background: #dcfce7;
+      border-color: #bbf7d0;
+      color: #166534;
+    }
+
+    .commit-note {
+      font-size: 0.75rem;
+      color: var(--ink-muted);
+      line-height: 1.4;
+    }
+
+    .legend {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      flex-wrap: wrap;
+      max-width: 56rem;
+      margin: 1.5rem auto 0;
+      padding: 0.75rem 0;
+      border-top: 1px solid var(--border);
+      font-size: 0.8rem;
+      color: var(--ink-muted);
+    }
+
+    .legend-sep { color: var(--border); }
+
+    .loading-state {
+      text-align: center;
+      padding: 3rem 0;
+      color: var(--ink-muted);
+      max-width: 56rem;
+      margin: 0 auto;
+    }
+
+    .loading-spinner {
+      width: 2rem;
+      height: 2rem;
+      border: 2px solid var(--border);
+      border-top-color: var(--accent);
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+      margin: 0 auto 1rem;
+    }
+
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    .error-state {
+      max-width: 56rem;
+      margin: 1rem auto;
+      padding: 1rem 1.25rem;
+      background: #fee2e2;
+      border: 1px solid #fca5a5;
+      border-radius: 6px;
+      color: #991b1b;
+      font-size: 0.9rem;
+    }
+
+    @media (max-width: 700px) {
+      .compare-header-row,
+      .compare-row {
+        grid-template-columns: 1fr;
+      }
+      .compare-header-row { display: none; }
+      .compare-row { gap: 0.75rem; }
+    }
+
+    /* ── FAQ ── */
+    .faq-section {
+      padding: 4rem 0;
+      background: var(--paper);
+    }
+
+    .faq-list {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .faq-item {
+      padding: 2rem 0;
+      border-top: 1px solid var(--border-light);
+    }
+
+    .faq-item:last-child {
+      border-bottom: 1px solid var(--border-light);
+    }
+
+    .faq-q {
+      font-family: var(--font-display);
+      font-size: 1.1rem;
+      font-weight: 400;
+      color: var(--ink);
+      margin-bottom: 0.75rem;
+      line-height: 1.3;
+    }
+
+    .faq-a {
+      font-size: 0.9375rem;
+      color: var(--ink-muted);
+      line-height: 1.7;
+      max-width: 58ch;
+    }
+
+    .faq-link {
+      color: var(--accent);
+      text-decoration: none;
+    }
+
+    .faq-link:hover { text-decoration: underline; }
+
+    /* ── CTA ── */
+    .cta-section {
+      padding: 5rem 0;
+      background: var(--paper-dim);
+    }
+
+    .cta-heading {
+      font-family: var(--font-display);
+      font-size: 2rem;
+      font-weight: 400;
+      color: var(--ink);
+      margin-bottom: 0.75rem;
+    }
+
+    .cta-text {
+      font-size: 1rem;
+      color: var(--ink-muted);
+      margin-bottom: 2rem;
+    }
+
+    .cta-buttons {
+      display: flex;
+      gap: 1rem;
+      justify-content: center;
+      flex-wrap: wrap;
+      margin-bottom: 1.5rem;
+    }
+
+    .btn-primary {
+      padding: 0.85rem 2rem;
+      background: var(--accent);
+      color: white;
+      text-decoration: none;
+      border-radius: 4px;
+      font-weight: 500;
+      font-size: 0.95rem;
+      transition: background 0.15s;
+    }
+
+    .btn-primary:hover { background: var(--accent-dim); }
+
+    .btn-secondary {
+      padding: 0.85rem 2rem;
+      background: transparent;
+      color: var(--ink);
+      text-decoration: none;
+      border-radius: 4px;
+      font-weight: 500;
+      font-size: 0.95rem;
+      border: 1px solid var(--border);
+      transition: border-color 0.15s;
+    }
+
+    .btn-secondary:hover { border-color: var(--ink-subtle); }
+
+    .cli-note {
+      margin-top: 0.5rem;
+    }
+
+    .cli-note code {
+      font-family: var(--font-mono);
+      font-size: 0.85rem;
+      padding: 0.4rem 0.8rem;
+      background: var(--paper);
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      color: var(--ink-muted);
+    }
+
+    /* ── Footer ── */
+    footer {
+      background: var(--paper);
+      border-top: 1px solid var(--border);
+    }
+
+    .footer-inner {
+      display: flex;
+      align-items: center;
+      gap: 1.5rem;
+      padding: 2rem 0;
+      flex-wrap: wrap;
+    }
+
+    .footer-brand {
+      font-family: var(--font-display);
+      font-size: 1.1rem;
+      color: var(--ink);
+    }
+
+    .footer-copy {
+      font-size: 0.85rem;
+      color: var(--ink-subtle);
+      flex: 1;
+    }
+
+    .footer-links {
+      display: flex;
+      gap: 1.25rem;
+    }
+
+    .footer-links a {
+      font-size: 0.85rem;
+      color: var(--ink-muted);
+      text-decoration: none;
+    }
+
+    .footer-links a:hover { color: var(--ink); }
+  </style>
+
+  <script>
+    const API = 'https://poc-backend.amdal-dev.workers.dev/api/audit';
+
+    // Scorecard fallback values: api.securityscorecards.dev, read 2026-11-05.
+    // The live audit API returns scorecardScore; these show only if it is absent.
+    const PACKAGES = [
+      { name: 'axios', scorecardScore: '7.3', story: 'Decent Scorecard result. The March 2026 token theft happened anyway: one publisher account.' },
+      { name: 'chalk', scorecardScore: '4.1', story: 'Single publisher. Scorecard covers practices; Commit covers concentration.' },
+      { name: 'lodash', scorecardScore: '6.5', story: 'Scorecard scores the GitHub repo. Commit flags one npm publisher behind a very large install base.' },
+      { name: 'express', scorecardScore: '8.9', story: 'Active multi-maintainer team. Healthy release cadence. Low structural risk on both tools.' },
+      { name: 'esbuild', scorecardScore: '5.0', story: 'Scorecard marks it well maintained. One author still holds the publish credential.' },
+    ];
+
+    type AuditResult = {
+      name: string;
+      score: number | null;
+      maintainers: number | null;
+      weeklyDownloads: number | null;
+      ageYears: number | null;
+      trend: string | null;
+      riskFlags: string[];
+      scorecardScore?: number | null;
+    };
+
+    function fmtDownloads(n: number | null): string {
+      if (n === null || n === undefined) return '—';
+      if (n >= 1_000_000_000) return (n / 1_000_000_000).toFixed(1) + 'B';
+      if (n >= 1_000_000) return (n / 1_000_000).toFixed(0) + 'M';
+      if (n >= 1_000) return (n / 1_000).toFixed(0) + 'K';
+      return n.toString();
+    }
+
+    function scoreClass(score: number | null): string {
+      if (score === null) return '';
+      if (score >= 75) return 'score-high';
+      if (score >= 50) return 'score-mid';
+      return 'score-low';
+    }
+
+    function renderRow(pkg: typeof PACKAGES[0], data: AuditResult): string {
+      const isCritical = data.riskFlags?.includes('CRITICAL');
+      const riskBadge = isCritical
+        ? '<span class="risk-badge risk-critical">CRITICAL</span>'
+        : '<span class="risk-badge risk-ok">OK</span>';
+
+      const dlDisplay = fmtDownloads(data.weeklyDownloads);
+
+      const chips: string[] = [];
+      if (data.maintainers !== null) {
+        const cls = data.maintainers === 1 ? 'danger' : 'good';
+        chips.push(`<span class="signal-chip ${cls}">${data.maintainers} maintainer${data.maintainers !== 1 ? 's' : ''}</span>`);
+      }
+      if (data.weeklyDownloads !== null) {
+        const cls = data.weeklyDownloads > 10_000_000 ? 'danger' : '';
+        chips.push(`<span class="signal-chip ${cls}">${dlDisplay}/wk</span>`);
+      }
+      if (data.ageYears !== null) {
+        chips.push(`<span class="signal-chip">${data.ageYears}y old</span>`);
+      }
+      if (data.trend) {
+        const cls = data.trend === 'growing' && isCritical ? 'warn' : '';
+        chips.push(`<span class="signal-chip ${cls}">${data.trend}</span>`);
+      }
+
+      const commitCellClass = isCritical ? 'is-critical' : 'is-ok';
+
+      const sc = data.scorecardScore ?? pkg.scorecardScore;
+      const scorecardContent = sc
+        ? `<div class="sc-score-row"><span class="sc-score-num">${sc}/10</span></div><div class="commit-note">Measures process security — not who holds the publish token.</div>`
+        : `<div class="sc-no-data">No Scorecard result</div><div class="commit-note">Scorecard needs a linked GitHub or GitLab repo.</div>`;
+
+      return `
+        <div class="compare-row">
+          <div class="pkg-info">
+            <span class="pkg-name">${pkg.name}</span>
+            <span class="pkg-downloads">${dlDisplay}/wk</span>
+          </div>
+          <div class="compare-cell sc-cell">
+            ${scorecardContent}
+          </div>
+          <div class="compare-cell commit-cell ${commitCellClass}">
+            <div class="commit-score-row">
+              <span class="commit-score ${scoreClass(data.score)}">${data.score !== null ? data.score + '/100' : '—'}</span>
+              ${riskBadge}
+            </div>
+            <div class="commit-signals">${chips.join('')}</div>
+            <div class="commit-note">${pkg.story}</div>
+          </div>
+        </div>
+      `;
+    }
+
+    async function loadData() {
+      const loadingEl = document.getElementById('loading-state')!;
+      const errorEl = document.getElementById('error-state')!;
+      const rowsEl = document.getElementById('compare-rows')!;
+
+      try {
+        const res = await fetch(API, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ packages: PACKAGES.map(p => p.name), ecosystem: 'npm' }),
+        });
+        if (!res.ok) throw new Error(`HTTP ${res.status}`);
+        const data = await res.json() as { results: AuditResult[] };
+
+        const byName: Record<string, AuditResult> = {};
+        data.results.forEach(r => { byName[r.name] = r; });
+
+        rowsEl.innerHTML = PACKAGES.map(pkg => {
+          const result = byName[pkg.name];
+          if (!result) return '';
+          return renderRow(pkg, result);
+        }).join('');
+
+        loadingEl.hidden = true;
+        rowsEl.hidden = false;
+      } catch (err) {
+        loadingEl.hidden = true;
+        document.getElementById('error-msg')!.textContent =
+          'Could not load live data: ' + (err instanceof Error ? err.message : String(err));
+        errorEl.hidden = false;
+        showFallback();
+        rowsEl.hidden = false;
+      }
+    }
+
+    function showFallback() {
+      const fallback: AuditResult[] = [
+        { name: 'axios', score: 89, maintainers: 1, weeklyDownloads: 100837905, ageYears: 11.6, trend: 'growing', riskFlags: ['CRITICAL'] },
+        { name: 'chalk', score: 75, maintainers: 1, weeklyDownloads: 411150684, ageYears: 12.7, trend: 'stable', riskFlags: ['CRITICAL'] },
+        { name: 'lodash', score: 87, maintainers: 1, weeklyDownloads: 145226382, ageYears: 14, trend: 'growing', riskFlags: ['CRITICAL'] },
+        { name: 'express', score: 97, maintainers: 5, weeklyDownloads: 92917741, ageYears: 15.3, trend: 'growing', riskFlags: [] },
+        { name: 'esbuild', score: 88, maintainers: 1, weeklyDownloads: 193690280, ageYears: 8.4, trend: 'growing', riskFlags: ['CRITICAL'] },
+      ];
+
+      const byName: Record<string, AuditResult> = {};
+      fallback.forEach(r => { byName[r.name] = r; });
+
+      const rowsEl = document.getElementById('compare-rows')!;
+      rowsEl.innerHTML = PACKAGES.map(pkg => {
+        const result = byName[pkg.name];
+        if (!result) return '';
+        return renderRow(pkg, result);
+      }).join('');
+    }
+
+    loadData();
+  </script>
+</Layout>

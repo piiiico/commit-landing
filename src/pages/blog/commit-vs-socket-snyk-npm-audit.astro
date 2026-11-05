@@ -145,22 +145,22 @@ import Layout from '../../layouts/Layout.astro';
                 <tr style="border-bottom: 1px solid var(--border-light);">
                   <td style="padding: 0.75rem 1rem 0.75rem 0; font-weight: 500;">Bus factor / single-maintainer risk</td>
                   <td style="text-align: center; padding: 0.75rem 0.5rem;">&#x274C;</td>
-                  <td style="text-align: center; padding: 0.75rem 0.5rem;">&#x274C;</td>
+                  <td style="text-align: center; padding: 0.75rem 0.5rem;">&#x26A0;&#xFE0F; lists count</td>
                   <td style="text-align: center; padding: 0.75rem 0.5rem;">&#x26A0;&#xFE0F; partial</td>
                   <td style="text-align: center; padding: 0.75rem 0 0.75rem 0.5rem;">&#x2705; core focus</td>
                 </tr>
                 <tr style="border-bottom: 1px solid var(--border-light);">
                   <td style="padding: 0.75rem 1rem 0.75rem 0; font-weight: 500;">Release consistency over time</td>
                   <td style="text-align: center; padding: 0.75rem 0.5rem;">&#x274C;</td>
-                  <td style="text-align: center; padding: 0.75rem 0.5rem;">&#x274C;</td>
-                  <td style="text-align: center; padding: 0.75rem 0.5rem;">&#x274C;</td>
+                  <td style="text-align: center; padding: 0.75rem 0.5rem;">&#x26A0;&#xFE0F; partial</td>
+                  <td style="text-align: center; padding: 0.75rem 0.5rem;">&#x26A0;&#xFE0F; partial</td>
                   <td style="text-align: center; padding: 0.75rem 0 0.75rem 0.5rem;">&#x2705;</td>
                 </tr>
                 <tr style="border-bottom: 1px solid var(--border-light);">
                   <td style="padding: 0.75rem 1rem 0.75rem 0; font-weight: 500;">Contributor depth and longevity</td>
                   <td style="text-align: center; padding: 0.75rem 0.5rem;">&#x274C;</td>
                   <td style="text-align: center; padding: 0.75rem 0.5rem;">&#x274C;</td>
-                  <td style="text-align: center; padding: 0.75rem 0.5rem;">&#x274C;</td>
+                  <td style="text-align: center; padding: 0.75rem 0.5rem;">&#x26A0;&#xFE0F; partial</td>
                   <td style="text-align: center; padding: 0.75rem 0 0.75rem 0.5rem;">&#x2705;</td>
                 </tr>
                 <tr style="border-bottom: 1px solid var(--border-light);">
@@ -201,13 +201,15 @@ import Layout from '../../layouts/Layout.astro';
                 <tr>
                   <td style="padding: 0.75rem 1rem 0.75rem 0; font-weight: 500;">Paid tier starts at</td>
                   <td style="text-align: center; padding: 0.75rem 0.5rem;">Free</td>
+                  <td style="text-align: center; padding: 0.75rem 0.5rem;">$25/mo (Team)</td>
                   <td style="text-align: center; padding: 0.75rem 0.5rem;">$25/dev/mo</td>
-                  <td style="text-align: center; padding: 0.75rem 0.5rem;">$25/dev/mo</td>
-                  <td style="text-align: center; padding: 0.75rem 0 0.75rem 0.5rem;">$15/dev/mo</td>
+                  <td style="text-align: center; padding: 0.75rem 0 0.75rem 0.5rem;">$15/mo</td>
                 </tr>
               </tbody>
             </table>
           </div>
+
+          <p><small>Snyk and Socket cells re-checked Nov 5, 2026 against <a href="https://snyk.io/plans/">Snyk plans</a>, <a href="https://security.snyk.io/package/npm/chalk">a Snyk package page</a> (it lists maintainer count and bases its maintenance label on release cadence), <a href="https://socket.dev/pricing">Socket pricing</a> and <a href="https://docs.socket.dev/docs/package-scores">Socket&rsquo;s score docs</a> (maintainer count and versions per year feed its maintenance score). Snyk Team starts at $25/month for up to 10 developers.</small></p>
 
           <hr class="essay-divider" />
 
@@ -253,7 +255,7 @@ import Layout from '../../layouts/Layout.astro';
                 </tr>
                 <tr>
                   <td style="padding: 0.75rem 1rem 0.75rem 0; font-weight: 500;">Commit</td>
-                  <td style="padding: 0.75rem 1rem;">&#x1F534; CRITICAL &mdash; flagged for months: 1 maintainer, 7M weekly downloads</td>
+                  <td style="padding: 0.75rem 1rem;">&#x1F534; CRITICAL when scored today on the 2021 profile (1 maintainer, 7M weekly downloads). Commit did not exist in 2021</td>
                   <td style="padding: 0.75rem 0 0.75rem 1rem;">Still CRITICAL (structural risk unchanged) &mdash; no code-level detection</td>
                 </tr>
               </tbody>
