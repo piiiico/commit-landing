@@ -117,38 +117,41 @@ import Layout from '../../layouts/Layout.astro';
       <div class="editorial">
         <h2 class="section-heading">Case study: esbuild</h2>
         <p class="case-intro">
-          esbuild is a model of disciplined open source. Single author, rigorous engineering, excellent documentation. Scorecard reflects this: good CI, consistent releases, careful dependency management. Commit flags it CRITICAL for a completely orthogonal reason.
+          esbuild is a model of disciplined open source: single author, rigorous engineering, excellent documentation. Scorecard gives it a middling 5.0, mostly because one author merges nearly every change without review. Commit flags it CRITICAL for a related reason it reads from npm.
         </p>
         <div class="case-grid">
           <div class="case-card case-scorecard">
             <div class="case-tool-label scorecard-label">Scorecard says</div>
             <div class="case-score-row">
-              <span class="case-score">8.2</span>
-              <span class="case-verdict case-good">Good practices</span>
+              <span class="case-score">5.0</span>
+              <span class="case-verdict case-good">Mixed</span>
             </div>
             <ul class="case-reasons">
-              <li>CI/CD configured</li>
-              <li>Consistent release cadence</li>
-              <li>Branch protection active</li>
-              <li>No dangerous workflows</li>
+              <li>Maintained: 10/10</li>
+              <li>No dangerous workflows: 10/10</li>
+              <li class="reason-danger">Code review: 1/10 (3 of 30 changesets approved)</li>
+              <li>Branch protection: inconclusive</li>
             </ul>
           </div>
           <div class="case-card case-commit">
             <div class="case-tool-label commit-label">Commit says</div>
             <div class="case-score-row">
-              <span class="case-score">88</span>
+              <span class="case-score">79</span>
               <span class="case-verdict case-critical">CRITICAL</span>
             </div>
             <ul class="case-reasons">
-              <li class="reason-danger"><strong>1 npm publisher</strong></li>
-              <li>194M downloads/week</li>
-              <li>8.4 years old</li>
-              <li>No provenance attestation</li>
+              <li class="reason-danger"><strong>1 npm maintainer account</strong></li>
+              <li>409M downloads/week</li>
+              <li>8.9 years old</li>
+              <li>Provenance: yes (trusted publishing)</li>
             </ul>
           </div>
         </div>
         <p class="case-explanation">
-          The CRITICAL flag isn't a judgment on Evan Wallace's engineering discipline — it's a measurement of ecosystem structure. One compromised account reaches 194 million weekly installs. That's not a process problem; it's a concentration problem. Scorecard can tell you the processes are good. It can't tell you what happens when those processes are bypassed.
+          The CRITICAL flag isn't a judgment on Evan Wallace's engineering discipline. It measures structure. Releases now ship from GitHub Actions with SLSA provenance, which proves where a build came from, not who approved it. One maintainer account on npm, and one person merging into the repo that publishes, sit behind 409 million weekly installs. Scorecard can see the review gap in the repo. It can't see who holds the registry account.
+        </p>
+        <p class="case-explanation">
+          Sources, re-read Nov 6, 2026: <a href="https://api.securityscorecards.dev/projects/github.com/evanw/esbuild">Scorecard API for evanw/esbuild</a> (scan dated Oct 19, 2026); npm registry metadata for esbuild@0.28.2; Commit audit API.
         </p>
       </div>
     </div>
@@ -216,7 +219,7 @@ import Layout from '../../layouts/Layout.astro';
             <div class="attack-info">
               <strong class="attack-pkg">Red Hat / Miasma</strong>
               <span class="attack-method">32 packages via compromised GitHub account.</span>
-              <span class="attack-detail"><strong>Valid SLSA provenance on every malicious version.</strong> Perfect Scorecard attestation. The process worked exactly as designed — on malicious code.</span>
+              <span class="attack-detail"><strong>Valid SLSA provenance on every malicious version.</strong> The process worked exactly as designed — on malicious code.</span>
             </div>
           </div>
           <div class="attack-row">
