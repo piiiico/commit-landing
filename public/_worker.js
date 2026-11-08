@@ -301,7 +301,7 @@ function buildNpmPage(pkg, r, depth2Summary) {
 
   const title = `${pkg} npm trust score: ${score}/100 — Commit`;
   const description = isCritical
-    ? `${pkg} scores ${score}/100 on supply chain trust. CRITICAL: sole npm publisher with ${dl} weekly downloads. Behavioral commitment analysis by Commit.`
+    ? `${pkg} scores ${score}/100 on supply chain trust. CRITICAL: sole active npm publisher with ${dl} weekly downloads. Behavioral commitment analysis by Commit.`
     : `${pkg} scores ${score}/100 on supply chain trust (Grade ${grade}). ${maintainers} publisher${maintainers !== 1 ? "s" : ""}, ${dl} weekly downloads. Behavioral commitment analysis.`;
 
   const ogImage = `${API_BASE}/og/npm/${encodeURIComponent(pkg)}`;
@@ -1086,6 +1086,15 @@ export default {
       // GENERATED-EDIT-OK: switched from blogSlugs[] to blogPosts[] with actual publishDate per entry; added 7 missing posts (2026-06-11)
       // slug → publishDate (actual post date, NOT today — lets crawlers know what's actually new)
       const blogPosts = [
+        ["how-ai-agent-decides-which-recommendations-to-trust", "2026-11-05"],
+        ["is-npm-package-abandoned", "2026-11-04"],
+        ["npm-single-maintainer-dependencies", "2026-11-04"],
+        ["npm-package-bus-factor", "2026-11-04"],
+        ["dependency-risk-scoring-tools", "2026-11-04"],
+        ["pypi-supply-chain-audit-before-install", "2026-11-04"],
+        ["mcp-server-package-risk-claude-code-cursor", "2026-11-04"],
+        ["hn-rising",                                  "2026-11-02"],
+        ["hn-track-record-vs-tenure",                  "2026-11-01"],
         ["redhat-miasma-provenance-bypass",            "2026-06-01"],
         ["microsoft-14-typosquatted-packages",         "2026-06-01"],
         ["osv-157-false-positives",                    "2026-05-31"],
