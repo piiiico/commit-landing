@@ -15,6 +15,55 @@ export interface Post {
 // Sorted newest first
 export const posts: Post[] = [
   {
+    slug: 'how-ai-agent-decides-which-recommendations-to-trust',
+    title: "How Should an AI Agent Decide Which Websites and Recommendations to Trust?",
+    description: "Weight what is expensive to fake: whether people read the site, whether the business shows paid revenue, how long it has run, and a recommender's past hits over karma.",
+    date: '2026-11-05',
+    dateLabel: 'November 5, 2026',
+  },
+  {
+    slug: 'is-npm-package-abandoned',
+    title: "How to Tell If an npm Package Is Abandoned",
+    description: "Four checks, in order: the npm deprecated flag, the last publish date, whether the repo is archived, and whether the people who can still publish are active. Commands included.",
+    date: '2026-11-04',
+    dateLabel: 'November 4, 2026',
+  },
+  {
+    slug: 'npm-single-maintainer-dependencies',
+    title: "Which of My npm Dependencies Have Only One Maintainer? A Free Way to Check",
+    description: "npm view lists maintainers one package at a time. To check a whole lockfile for single-publisher dependencies, run a free CLI over it. Commands and caveats.",
+    date: '2026-11-04',
+    dateLabel: 'November 4, 2026',
+  },
+  {
+    slug: 'npm-package-bus-factor',
+    title: "What Is the Bus Factor of an npm Package, and How Do You Check It?",
+    description: "The bus factor is how many people would have to disappear before a package stops being maintained. For npm, the number that matters is who can publish. How to check both.",
+    date: '2026-11-04',
+    dateLabel: 'November 4, 2026',
+  },
+  {
+    slug: 'dependency-risk-scoring-tools',
+    title: "Tools That Score Open Source Dependency Risk by Maintainers and Activity",
+    description: "OpenSSF Scorecard, deps.dev, LFX Insights, Socket and Commit each score packages on maintainer and activity signals. What each one measures, and where to start.",
+    date: '2026-11-04',
+    dateLabel: 'November 4, 2026',
+  },
+  {
+    slug: 'pypi-supply-chain-audit-before-install',
+    title: "How to Audit PyPI Packages for Supply Chain Risk Before Installing Them",
+    description: "Known vulnerabilities, who publishes the package, and whether it uses Trusted Publishing. Free commands for each, run before pip install.",
+    date: '2026-11-04',
+    dateLabel: 'November 4, 2026',
+  },
+  {
+    slug: 'mcp-server-package-risk-claude-code-cursor',
+    title: "Checking Package Risk Before Claude Code or Cursor Installs It",
+    description: "Socket runs a remote MCP server for package checks. Commit installs a hook that runs before npm, pip or cargo install in Claude Code, Cursor and Windsurf. How each works.",
+    date: '2026-11-04',
+    dateLabel: 'November 4, 2026',
+  },
+  {
     slug: 'hn-rising',
     title: 'Rising: Hacker News Video Picks, Called Before They Catch On',
     description: 'A dated forecast: 1,310 YouTube videos first linked on HN in 2024–2026 by people whose earlier first picks caught on at 10%+, against a control of 1,310. Re-read on 2027-05-01.',
@@ -163,7 +212,7 @@ export const posts: Post[] = [
   {
     slug: 'snyk-scores-chalk-81-we-score-it-critical',
     title: 'Snyk Scores Chalk 81. We Score It CRITICAL.',
-    description: "Snyk's Package Health Score gives chalk 81/100. Commit flags it CRITICAL. Same package, opposite conclusions. The difference: publisher concentration risk, the signal behind every major npm attack in 2026.",
+    description: "Snyk's Package Health Score gave chalk 81/100 when this was written (83 on Nov 6, 2026). Commit flags it CRITICAL. Same package, opposite conclusions. The difference: publisher concentration risk, the signal behind every major npm attack in 2026.",
     date: '2026-06-14',
     dateLabel: 'June 14, 2026',
     relatedSlugs: [

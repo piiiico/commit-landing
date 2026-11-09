@@ -548,7 +548,137 @@ async function checkEmittedRefs(): Promise<boolean> {
 }
 
 // ---------------------------------------------------------------------------
-// GUARD 5: No crawler-followable /api/checkout in static HTML
+// GUARD 5: Sitemap-blog drift check (posts.ts ⊆ worker.js blogPosts)
+// ---------------------------------------------------------------------------
+//
+// 2026-06-24 incident: 13 blog posts published June 13-24 were ALL missing
+// from worker.js sitemap-blog.xml hardcoded list. The post that diagnosed
+// zero organic signups (978-downloads-zero-signups) was itself suppressed.
+// The drift between src/data/posts.ts (Post[] with slug+date) and the
+// hardcoded const blogPosts = [...] in public/_worker.js (runtime sitemap
+// generator) is now gated pre-deploy.
+//
+// Fails hard when any posts.ts slug is absent from worker sitemap.
+// Warns (no fail) when worker has slugs absent from posts.ts — those are
+// typically agentlair-redirect posts (antv, ai-sdk, llm-security-audit-noise)
+// that intentionally redirect out and don't need posts.ts entries.
+//
+// Bypass: --skip-sitemap-gate (emergency deploys only)
+async function checkSitemapBlogDrift(): Promise<boolean> {
+  if (process.argv.includes("--skip-sitemap-gate")) {
+    console.log("⚠️  Sitemap-blog drift check: SKIPPED (--skip-sitemap-gate passed)");
+    return true;
+  }
+
+  const postsPath = join(SRC_DIR, "data", "posts.ts");
+  const workerPath = join(new URL(".", import.meta.url).pathname, "public", "_worker.js");
+
+  let postsSource: string;
+  let workerSource: string;
+  try {
+    postsSource = await Bun.file(postsPath).text();
+  } catch {
+    console.warn(`⚠️  Sitemap-blog drift check: could not read ${postsPath} — skipping.`);
+    return true;
+  }
+  try {
+    workerSource = await Bun.file(workerPath).text();
+  } catch {
+    console.warn(`⚠️  Sitemap-blog drift check: could not read ${workerPath} — skipping.`);
+    return true;
+  }
+
+  // Extract slugs from posts.ts Post[] array.
+  // Pattern: slug: 'some-slug' (skip "slug: string" from the interface definition)
+  const postsSlugs = new Set<string>();
+  const postsSlugRe = /slug:\s*'([a-z0-9][a-z0-9-]+)'/g;
+  let m: RegExpExecArray | null;
+  while ((m = postsSlugRe.exec(postsSource)) !== null) {
+    postsSlugs.add(m[1]);
+  }
+
+  if (postsSlugs.size === 0) {
+    console.warn("⚠️  Sitemap-blog drift check: no slugs found in posts.ts — skipping.");
+    return true;
+  }
+
+  // Extract slugs from worker.js blogPosts array.
+  // Anchor on `const blogPosts = [` then brace-walk to `];`, extract first
+  // element of each tuple: ["slug", "date"]
+  const blogPostsStart = workerSource.indexOf("const blogPosts = [");
+  if (blogPostsStart === -1) {
+    console.warn("⚠️  Sitemap-blog drift check: could not find blogPosts array in _worker.js — skipping.");
+    return true;
+  }
+  const openBracket = workerSource.indexOf("[", blogPostsStart);
+  if (openBracket === -1) {
+    console.warn("⚠️  Sitemap-blog drift check: malformed blogPosts in _worker.js — skipping.");
+    return true;
+  }
+  // Walk brackets to find the closing ] of the blogPosts array
+  let depth = 0;
+  let closeBracket = -1;
+  for (let i = openBracket; i < workerSource.length; i++) {
+    if (workerSource[i] === "[") depth++;
+    else if (workerSource[i] === "]") {
+      depth--;
+      if (depth === 0) { closeBracket = i; break; }
+    }
+  }
+  if (closeBracket === -1) {
+    console.warn("⚠️  Sitemap-blog drift check: could not find end of blogPosts array — skipping.");
+    return true;
+  }
+  const blogPostsBody = workerSource.slice(openBracket + 1, closeBracket);
+  const workerSlugs = new Set<string>();
+  const workerSlugRe = /\[\s*"([a-z0-9][a-z0-9-]+)"\s*,\s*"20\d\d-\d\d-\d\d"\s*\]/g;
+  while ((m = workerSlugRe.exec(blogPostsBody)) !== null) {
+    workerSlugs.add(m[1]);
+  }
+
+  if (workerSlugs.size === 0) {
+    console.warn("⚠️  Sitemap-blog drift check: no slugs extracted from blogPosts in _worker.js — skipping.");
+    return true;
+  }
+
+  // Forward drift: posts.ts has slugs missing from worker sitemap (HARD FAIL)
+  const missingFromWorker: string[] = [];
+  for (const slug of postsSlugs) {
+    if (!workerSlugs.has(slug)) missingFromWorker.push(slug);
+  }
+
+  // Reverse drift: worker has slugs not in posts.ts (WARN ONLY — agentlair redirects)
+  const missingFromPosts: string[] = [];
+  for (const slug of workerSlugs) {
+    if (!postsSlugs.has(slug)) missingFromPosts.push(slug);
+  }
+
+  if (missingFromPosts.length > 0) {
+    console.log(`⚠️  Sitemap-blog drift check: ${missingFromPosts.length} worker slug(s) not in posts.ts (likely agentlair redirects — OK):`);
+    for (const s of missingFromPosts) console.log(`     - ${s}`);
+  }
+
+  if (missingFromWorker.length > 0) {
+    console.log("");
+    console.log("┌─────────────────────────────────────────────────────────────────┐");
+    console.log("│  ❌ SITEMAP-BLOG DRIFT: posts.ts slugs missing from _worker.js  │");
+    console.log("└─────────────────────────────────────────────────────────────────┘");
+    for (const s of missingFromWorker) console.log(`  - ${s}`);
+    console.log("");
+    console.log("  Add each missing slug to the blogPosts array in:");
+    console.log("    public/_worker.js  (search: const blogPosts = [)");
+    console.log("  Each entry format: [\"slug\", \"YYYY-MM-DD\"],");
+    console.log("  Use --skip-sitemap-gate to bypass in an emergency.");
+    console.log("");
+    return false;
+  }
+
+  console.log(`✅ Sitemap-blog drift check: ${postsSlugs.size} posts.ts slugs all present in _worker.js sitemap`);
+  return true;
+}
+
+// ---------------------------------------------------------------------------
+// GUARD 6: No crawler-followable /api/checkout in static HTML
 // ---------------------------------------------------------------------------
 //
 // Shipped 2026-06-07 alongside get-started.astro upgrade-button refactor.
@@ -690,6 +820,7 @@ const distCompleteOk = await checkDistCompleteness();
 const liveOk = await checkLiveTokens();
 const heroOk = await checkHeroRefMapping();
 const emittedRefsOk = await checkEmittedRefs();
+const sitemapBlogOk = await checkSitemapBlogDrift();
 const noStaticCheckoutOk = await checkNoStaticCheckoutLinks();
 
 console.log("");
@@ -717,6 +848,18 @@ if (!emittedRefsOk) {
   await handleDivergence("audit.astro emits refs not present in get-started.astro REF_TO_SOURCE (attribution leak).");
 }
 
+if (!sitemapBlogOk) {
+  // Hard-fail: posts missing from sitemap get zero organic discovery — the
+  // 2026-06-24 incident showed 13 posts invisible to crawlers for 12 days.
+  // Bypass: --skip-sitemap-gate for emergency deploys where sitemap update
+  // is in a follow-on deploy.
+  if (process.env.DEPLOY_FORCE !== "1") {
+    console.error("Aborting deploy: posts.ts slugs missing from _worker.js sitemap. Add them or pass --skip-sitemap-gate.");
+    process.exit(1);
+  }
+  console.log("  DEPLOY_FORCE=1 — proceeding despite sitemap-blog drift.\n");
+}
+
 if (!noStaticCheckoutOk) {
   // Hard-fail: this is a measurement-pollution + Stripe-resource bug class,
   // not a stylistic concern. handleDivergence allows CONFIRM-override, which
@@ -729,7 +872,7 @@ if (!noStaticCheckoutOk) {
   console.log("  DEPLOY_FORCE=1 — proceeding despite static-checkout-link findings.\n");
 }
 
-if (distOk && distCompleteOk && liveOk && heroOk && emittedRefsOk && noStaticCheckoutOk) {
+if (distOk && distCompleteOk && liveOk && heroOk && emittedRefsOk && sitemapBlogOk && noStaticCheckoutOk) {
   console.log("✅ Pre-deploy guard: source/production in sync — proceeding.\n");
 }
 
@@ -743,6 +886,39 @@ if (!process.argv.includes("--skip-voice")) {
     process.exit(1);
   }
 }
+
+// ---------------------------------------------------------------------------
+// SERVE-CHECK STAMP — stamp dist/_worker.js before upload
+// ---------------------------------------------------------------------------
+//
+// 2026-08-06: a deploy returned 200, CF's script-GET read back the new code, and
+// the very next live request still ran the OLD code for ~2 minutes. Both checks
+// were upstream narration about the STORED script, not what the edge executes.
+// The only surface that can answer "is my build live?" is a live request to /health.
+//
+// Flow: hash dist/_worker.js → replace __SOURCE_STAMP__ in place → upload →
+//       poll getcommit.dev/health until it reports the same hash.
+// Pattern copied from sjekk-worker/deploy.ts (verified in production).
+const SOURCE_STAMP = await (async (): Promise<string> => {
+  const workerJsPath = join(DIST_DIR, "_worker.js");
+  let rawWorkerJs: string;
+  try {
+    rawWorkerJs = await Bun.file(workerJsPath).text();
+  } catch (e) {
+    console.error(`\n[DEPLOY BLOCKED] Could not read dist/_worker.js: ${(e as Error).message}`);
+    process.exit(1);
+  }
+  if (!rawWorkerJs.includes("__SOURCE_STAMP__")) {
+    console.error("FAIL: dist/_worker.js has no __SOURCE_STAMP__ placeholder — /health cannot prove what the edge serves.");
+    console.error("Fix: add the /health route to public/_worker.js (source of truth) and run with --rebuild.");
+    process.exit(1);
+  }
+  // Stamp computed from raw content (before replacement) — stable and reproducible.
+  const stamp = new Bun.CryptoHasher("sha256").update(rawWorkerJs).digest("hex").slice(0, 12);
+  await Bun.write(workerJsPath, rawWorkerJs.replaceAll("__SOURCE_STAMP__", stamp));
+  console.log(`Source stamp: ${stamp}`);
+  return stamp;
+})();
 
 console.log(`Deploying ${DIST_DIR} → "${PROJECT_NAME}" via wrangler\n`);
 
@@ -760,6 +936,37 @@ if (result.exitCode !== 0) {
 }
 
 console.log("\n✅ Deployed!");
+
+// ---------------------------------------------------------------------------
+// SERVE-CHECK: poll customer hostname until /health reports our stamp
+// ---------------------------------------------------------------------------
+//
+// Wrangler "Deployed!" above is the platform narrating about the STORED asset.
+// This poll is the only check that proves the edge is RUNNING our code.
+// Observed propagation time: ~50s. Deadline: 240s.
+{
+  const LIVE_ORIGIN = "https://getcommit.dev";
+  let served: string | null = null;
+  const deadline = Date.now() + 240_000;
+  process.stdout.write("Waiting for edge to serve this build");
+  while (Date.now() < deadline) {
+    try {
+      const h = await fetch(`${LIVE_ORIGIN}/health?cb=${Date.now()}`, { cache: "no-store" });
+      if (h.ok) served = ((await h.json()) as any).stamp ?? null;
+      if (served === SOURCE_STAMP) break;
+    } catch { /* transient — keep polling */ }
+    process.stdout.write(".");
+    await new Promise(r => setTimeout(r, 5000));
+  }
+  console.log();
+  if (served === SOURCE_STAMP) {
+    console.log(`✅ LIVE at ${LIVE_ORIGIN} — serving ${served}`);
+  } else {
+    console.error(`❌ NOT LIVE: ${LIVE_ORIGIN}/health reports stamp=${served ?? "none"}, expected ${SOURCE_STAMP}.`);
+    console.error("   Upload succeeded; edge still serving other code. Do NOT dogfood yet.");
+    process.exit(1);
+  }
+}
 
 // ---------------------------------------------------------------------------
 // GUARD 6: Post-deploy critical-pages liveness check

@@ -93,6 +93,12 @@ import Layout from '../../layouts/Layout.astro';
           <div class="breakdown-bars" id="breakdown-bars"></div>
         </div>
 
+        <!-- Publishing pipeline -->
+        <div class="pipeline-section" id="pipeline-section" hidden>
+          <h3 class="breakdown-title">Publishing pipeline</h3>
+          <div class="pipeline-grid" id="pipeline-grid"></div>
+        </div>
+
         <!-- Risk explanation -->
         <div class="risk-explain" id="risk-explain" hidden>
           <h3 class="risk-explain-title">Why this matters</h3>
@@ -427,6 +433,52 @@ import Layout from '../../layouts/Layout.astro';
       flex-shrink: 0;
     }
 
+    /* ── Publishing Pipeline ── */
+    .pipeline-section {
+      margin-bottom: 1.5rem;
+      padding-top: 1.5rem;
+      border-top: 1px solid var(--border);
+    }
+
+    .pipeline-grid {
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+    }
+
+    .pipeline-item {
+      display: flex;
+      align-items: baseline;
+      gap: 0.5rem;
+      font-size: 0.875rem;
+      line-height: 1.5;
+    }
+
+    .pipeline-icon {
+      flex-shrink: 0;
+      font-size: 0.85rem;
+    }
+
+    .pipeline-label {
+      color: var(--ink-muted);
+      min-width: 7rem;
+      flex-shrink: 0;
+    }
+
+    .pipeline-value {
+      color: var(--ink);
+    }
+
+    .pipeline-value.pipeline-ok { color: #166534; }
+    .pipeline-value.pipeline-warn { color: #92400e; }
+
+    .dormant-detail {
+      font-size: 0.8rem;
+      color: var(--ink-muted);
+      padding-left: 7.5rem;
+      margin-top: 0.15rem;
+    }
+
     /* ── Risk Explanation ── */
     .risk-explain {
       margin-top: 1.5rem;
@@ -643,6 +695,21 @@ import Layout from '../../layouts/Layout.astro';
       releaseConsistency: number;
       maintainerDepth: number;
       githubBacking: number;
+      trustedPublishing: number;
+      stagedPublishing: number;
+    };
+
+    type DormantPublisher = {
+      name: string;
+      lastPublish: string;
+      monthsInactive: number;
+      hasCurrentAccess: boolean;
+    };
+
+    type PublisherLifecycle = {
+      activePublishers: number;
+      dormantWithAccess: number;
+      dormantDetails: DormantPublisher[];
     };
 
     type AuditResult = {
@@ -655,6 +722,9 @@ import Layout from '../../layouts/Layout.astro';
       trend: string | null;
       riskFlags: string[];
       scoreBreakdown?: ScoreBreakdown;
+      hasProvenance?: boolean;
+      hasStagedPublishing?: boolean;
+      publisherLifecycle?: PublisherLifecycle;
       error?: string;
     };
 
@@ -664,6 +734,8 @@ import Layout from '../../layouts/Layout.astro';
       releaseConsistency: 20,
       maintainerDepth: 15,
       githubBacking: 15,
+      trustedPublishing: 2,
+      stagedPublishing: 2,
     };
 
     const BREAKDOWN_LABELS: Record<keyof ScoreBreakdown, string> = {
@@ -672,6 +744,8 @@ import Layout from '../../layouts/Layout.astro';
       releaseConsistency: 'Releases',
       maintainerDepth: 'Maintainers',
       githubBacking: 'GitHub',
+      trustedPublishing: 'Provenance',
+      stagedPublishing: 'Staged Pub',
     };
 
     const RISK_EXPLANATIONS: Record<string, string> = {
@@ -768,8 +842,8 @@ import Layout from '../../layouts/Layout.astro';
         riskRow.innerHTML = '<span class="risk-badge risk-ok">✓ No critical risk flags</span>';
       } else {
         riskRow.innerHTML = result.riskFlags.map(f => {
-          const cls = f === 'CRITICAL' ? 'risk-critical' : f === 'HIGH' ? 'risk-high' : 'risk-warn';
-          return `<span class="risk-badge ${cls}">${f}</span>`;
+          const level = f.startsWith('CRITICAL') ? 'risk-critical' : f.startsWith('HIGH') ? 'risk-high' : 'risk-warn';
+          return `<span class="risk-badge ${level}">${f}</span>`;
         }).join('');
       }
 
@@ -816,6 +890,53 @@ import Layout from '../../layouts/Layout.astro';
         document.getElementById('breakdown-section')!.hidden = false;
       }
 
+      // Publishing pipeline section
+      const pipelineGrid = document.getElementById('pipeline-grid')!;
+      const pipelineItems: string[] = [];
+
+      if (result.hasProvenance !== undefined) {
+        const ok = result.hasProvenance;
+        pipelineItems.push(`
+          <div class="pipeline-item">
+            <span class="pipeline-icon">${ok ? '✅' : '⚠️'}</span>
+            <span class="pipeline-label">Provenance</span>
+            <span class="pipeline-value ${ok ? 'pipeline-ok' : 'pipeline-warn'}">${ok ? 'SLSA provenance verified' : 'Not detected'}</span>
+          </div>
+        `);
+      }
+
+      if (result.hasStagedPublishing !== undefined) {
+        const ok = result.hasStagedPublishing;
+        pipelineItems.push(`
+          <div class="pipeline-item">
+            <span class="pipeline-icon">${ok ? '✅' : '⚠️'}</span>
+            <span class="pipeline-label">Staged Publishing</span>
+            <span class="pipeline-value ${ok ? 'pipeline-ok' : 'pipeline-warn'}">${ok ? 'Enabled — human 2FA gate before release' : 'Not enabled — CI publishes directly to latest'}</span>
+          </div>
+        `);
+      }
+
+      if (result.publisherLifecycle && result.publisherLifecycle.dormantWithAccess > 0) {
+        const lc = result.publisherLifecycle;
+        const dormantHtml = lc.dormantDetails
+          .filter((d: DormantPublisher) => d.hasCurrentAccess)
+          .map((d: DormantPublisher) => `<div class="dormant-detail">↳ <strong>${d.name}</strong> — last published ${d.lastPublish}, ${d.monthsInactive} months inactive</div>`)
+          .join('');
+        pipelineItems.push(`
+          <div class="pipeline-item">
+            <span class="pipeline-icon">⚠️</span>
+            <span class="pipeline-label">Dormant access</span>
+            <span class="pipeline-value pipeline-warn">${lc.dormantWithAccess} dormant publisher${lc.dormantWithAccess > 1 ? 's' : ''} with active npm scope</span>
+          </div>
+          ${dormantHtml}
+        `);
+      }
+
+      if (pipelineItems.length > 0) {
+        pipelineGrid.innerHTML = pipelineItems.join('');
+        document.getElementById('pipeline-section')!.hidden = false;
+      }
+
       // Watch CTA: populate package name + utm-tagged URL
       const watchCta = document.getElementById('watch-cta')!;
       const watchPkgName = document.getElementById('watch-pkg-name')!;
@@ -828,9 +949,9 @@ import Layout from '../../layouts/Layout.astro';
       if (result.riskFlags && result.riskFlags.length > 0) {
         const explainBody = document.getElementById('risk-explain-body')!;
         explainBody.innerHTML = result.riskFlags.map(f => {
-          const cls = f === 'CRITICAL' ? 'risk-item-critical' : f === 'HIGH' ? 'risk-item-high' : 'risk-item-warn';
-          const text = RISK_EXPLANATIONS[f] ?? f;
-          return `<div class="risk-item ${cls}"><strong>${f}:</strong> ${text}</div>`;
+          const level = f.startsWith('CRITICAL') ? 'critical' : f.startsWith('HIGH') ? 'high' : 'warn';
+          // Use API-provided text directly — it's more specific than generic explanations
+          return `<div class="risk-item risk-item-${level}">${f}</div>`;
         }).join('');
         document.getElementById('risk-explain')!.hidden = false;
       }

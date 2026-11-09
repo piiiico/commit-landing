@@ -69,7 +69,11 @@ import Layout from '../layouts/Layout.astro';
         to getcommit.dev, together with your Anbefal code. Nothing about the request is stored.
         Shop pages send nothing: the badge there is read from what the results page already returned.
         You see recommendations from your own network only.</p>
-        <p>Visit-time sharing from earlier versions is now off by default. Turning the overlay off
+        <p>Two lookups do not wait for that switch: on a GitHub repository page the extension asks for that
+        repository's trust card (owner and repository name only), and opening the toolbar popup looks up the
+        domain of the current tab. Both go to Commit's servers and carry no code or account.</p>
+        <p>Visit-time sharing from earlier versions is now off by default; if you turn it on in the popup, visited
+        domains and time spent are sent every five minutes. Turning the overlay off
         («Slå av» on your Anbefal page) deletes the code and the cached results from the browser.</p>
       </div>
     </div>
