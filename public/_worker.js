@@ -1065,7 +1065,7 @@ export default {
         "/","/audit","/pricing","/docs","/get-started","/quickstart",
         "/extension","/badges","/compare","/dashboard","/rankings",
         "/thesis","/spec","/watchlist","/privacy",
-        "/scan","/scan/repo",
+        "/scan","/scan/repo","/x402",
       ];
       const today = new Date().toISOString().split("T")[0];
       let xml = `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n`;

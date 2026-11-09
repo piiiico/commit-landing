@@ -38,6 +38,7 @@ File scan (auto-detects npm/yarn/pnpm/pip/cargo/go):
 - Quickstart:  https://getcommit.dev/quickstart
 - Docs:        https://getcommit.dev/docs
 - Blog:        https://getcommit.dev/blog
+- x402 ledger: https://getcommit.dev/x402/ (x402 payments: volume, unique buyers, concentration, returning wallets per seller; dated snapshots)
 - GitHub:      https://github.com/piiiico/proof-of-commitment
 - npm:         https://www.npmjs.com/package/proof-of-commitment
 
