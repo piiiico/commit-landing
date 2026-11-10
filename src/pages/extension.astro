@@ -3,8 +3,8 @@ import Layout from '../layouts/Layout.astro';
 ---
 
 <Layout
-  title="Commit Extension — what people you know recommend, in Google results"
-  description="Recommendations from people you know, shown under matching Google results. Domain age on every result. Trust card on GitHub repos. Opt-in, open source, sideload for now."
+  title="Commit Extension — who runs the shop you're on, and where your friends shop"
+  description="Reads the org.nr a Norwegian shop prints and shows years in operation, employees and revenue from Brønnøysundregistrene. Friends can share a shop card made from their own browsing. Nothing to type. Open source."
   canonical="https://getcommit.dev/extension/"
 >
 
@@ -24,19 +24,20 @@ import Layout from '../layouts/Layout.astro';
   <section class="hero">
     <div class="container">
       <div class="editorial">
-        <span class="hero-eyebrow">Browser extension · Free · Open source · v0.4.1</span>
+        <span class="hero-eyebrow">Browser extension · Free · Open source · v0.5.0</span>
         <h1 class="hero-title" style="font-size: clamp(2rem, 5vw, 3.5rem);">
-          Ask your friends,<br /><em>right where you search.</em>
+          Who runs this shop,<br /><em>and who you know shops there.</em>
         </h1>
         <p class="hero-lead">
-          Search «lys Audi» and the shop your mechanic friend buys from carries his own words under
-          the result: what he bought there, whether he would buy it again, how long he has done the work.
-          When nobody you know has said anything about a shop, the extension shows nothing.
+          Norwegian shops print their organisation number in the footer. The extension reads it and puts one line
+          in the corner: how long the company has existed, how many people work there, what it sold last year.
+          Nobody types anything, and you don't need an account or friends to get it.
         </p>
         <div class="hero-cta">
-          <a href="https://github.com/piiiico/proof-of-commitment/releases/download/v0.4.1/commit-extension-v0.4.1.zip" class="btn-primary">Download v0.4.1 →</a>
+          <a href="https://github.com/piiiico/proof-of-commitment/releases/download/v0.5.0/commit-extension-v0.5.0.zip" class="btn-primary">Download v0.5.0 →</a>
           <a href="https://github.com/piiiico/proof-of-commitment/releases" class="btn-ghost" target="_blank" rel="noopener">All releases →</a>
         </div>
+        <p id="kort"><small>Got a card link from someone? Install the extension, then open the link again and click «Importer».</small></p>
       </div>
     </div>
   </section>
@@ -47,12 +48,16 @@ import Layout from '../layouts/Layout.astro';
     <div class="container">
       <div class="editorial">
         <h2>What it shows</h2>
-        <p><strong>Fra nettverket ditt.</strong> Confirmed recommendations from people in your own
-        <a href="/anbefal/kort">Anbefal</a> network, matched to the shops in your Google results, and again on the
-        shop page if you click through. Each one is dated, names the person and why they trust it.
-        Anbefal is a closed pilot for now, so this part only works if you have been invited.</p>
-        <p><strong>Domain age.</strong> The registration date from the domain registry (RDAP) under each result.
-        A shop registered last month is not the same as one registered in 1997.</p>
+        <p><strong>On the shop.</strong> «Biltema Norge AS · i drift siden 2000 · 1 845 ansatte · omsetning 2025: 5,6 mrd kr».
+        The figures come from Brønnøysundregistrene. The line turns red only on hard facts: bankruptcy or liquidation,
+        a company registered less than a year ago with no accounts, or an org.nr belonging to a company whose name
+        doesn't resemble the domain (a rough check, and the line says so). If the page has no org.nr, you get nothing.
+        The extension never guesses an org.nr from a name.</p>
+        <p><strong>Under search results.</strong> The same line on Google and Bing, for shops whose org.nr you've already seen on an earlier visit.</p>
+        <p><strong>Mitt kort.</strong> Your browser keeps its own list of shops you come back to over several months and the
+        order confirmations you reach. You can see the list in the extension menu, remove any row, and send it as a link.
+        A friend who imports it sees «Håkon: handlet her 3× (2025–26)» on that shop and under its results.
+        Health, pharmacy, gambling, dating, adult sites, religion, politics, banks and loans are never counted.</p>
         <p><strong>GitHub.</strong> A trust card on repository pages: age, recent activity, contributors, releases.</p>
       </div>
     </div>
@@ -64,17 +69,14 @@ import Layout from '../layouts/Layout.astro';
     <div class="container">
       <div class="editorial">
         <h2>Privacy</h2>
-        <p>The recommendation overlay is off until you open your own Anbefal link and press «Slå på».
-        After that, on a Google results page, the extension sends only the domains of the visible results
-        to getcommit.dev, together with your Anbefal code. Nothing about the request is stored.
-        Shop pages send nothing: the badge there is read from what the results page already returned.
-        You see recommendations from your own network only.</p>
-        <p>Two lookups do not wait for that switch: on a GitHub repository page the extension asks for that
-        repository's trust card (owner and repository name only), and opening the toolbar popup looks up the
-        domain of the current tab. Both go to Commit's servers and carry no code or account.</p>
-        <p>Visit-time sharing from earlier versions is now off by default; if you turn it on in the popup, visited
-        domains and time spent are sent every five minutes. Turning the overlay off
-        («Slå av» on your Anbefal page) deletes the code and the cached results from the browser.</p>
+        <p>The org.nr that a shop page prints goes to data.brreg.no, the public registry, and nothing is sent with it.
+        Your shop list stays in your browser. It leaves only when you copy the link and send it yourself. The card data sits
+        after the <code>#</code> in that link, so even getcommit.dev's server doesn't see it when your friend opens it.
+        No Commit server stores anyone's browsing or purchases.</p>
+        <p>Two lookups do go to Commit's servers, without any account attached. On a GitHub repository page the
+        extension sends the owner and repository name to fetch the trust card, and opening the toolbar popup
+        looks up the current tab's domain.
+        Visit-time sharing is off by default; if you turn it on in the popup, visited domains and time spent are sent every five minutes.</p>
       </div>
     </div>
   </section>
@@ -88,7 +90,7 @@ import Layout from '../layouts/Layout.astro';
         <p>The extension is not in the Chrome Web Store or Firefox Add-ons yet. Until it is, install it by hand
         in Chrome, Brave or Edge:</p>
         <ol>
-          <li>Download <a href="https://github.com/piiiico/proof-of-commitment/releases/download/v0.4.1/commit-extension-v0.4.1.zip">commit-extension-v0.4.1.zip</a> and unzip it.</li>
+          <li>Download <a href="https://github.com/piiiico/proof-of-commitment/releases/download/v0.5.0/commit-extension-v0.5.0.zip">commit-extension-v0.5.0.zip</a> and unzip it.</li>
           <li>Open <code>chrome://extensions</code> and turn on <em>Developer mode</em>.</li>
           <li>Click <em>Load unpacked</em> and pick the unzipped folder.</li>
         </ol>
