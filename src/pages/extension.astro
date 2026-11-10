@@ -24,7 +24,7 @@ import Layout from '../layouts/Layout.astro';
   <section class="hero">
     <div class="container">
       <div class="editorial">
-        <span class="hero-eyebrow">Browser extension · Free · Open source · v0.5.0</span>
+        <span class="hero-eyebrow">Browser extension · Free · Open source · v0.5.1</span>
         <h1 class="hero-title" style="font-size: clamp(2rem, 5vw, 3.5rem);">
           Who runs this shop,<br /><em>and who you know shops there.</em>
         </h1>
@@ -34,7 +34,7 @@ import Layout from '../layouts/Layout.astro';
           Nobody types anything, and you don't need an account or friends to get it.
         </p>
         <div class="hero-cta">
-          <a href="https://github.com/piiiico/proof-of-commitment/releases/download/v0.5.0/commit-extension-v0.5.0.zip" class="btn-primary">Download v0.5.0 →</a>
+          <a href="https://github.com/piiiico/proof-of-commitment/releases/download/v0.5.1/commit-extension-v0.5.1.zip" class="btn-primary">Download v0.5.1 →</a>
           <a href="https://github.com/piiiico/proof-of-commitment/releases" class="btn-ghost" target="_blank" rel="noopener">All releases →</a>
         </div>
         <p id="kort"><small>Got a card link from someone? Install the extension, then open the link again and click «Importer».</small></p>
@@ -57,8 +57,11 @@ import Layout from '../layouts/Layout.astro';
         <p><strong>Mitt kort.</strong> Your browser keeps its own list of shops you come back to over several months and the
         order confirmations you reach. You can see the list in the extension menu, remove any row, and send it as a link.
         A friend who imports it sees «Håkon: handlet her 3× (2025–26)» on that shop and under its results.
-        Health, pharmacy, gambling, dating, adult sites, religion, politics, banks and loans are never counted.</p>
-        <p><strong>GitHub.</strong> A trust card on repository pages: age, recent activity, contributors, releases.</p>
+        Health, pharmacy, gambling, dating, adult sites, religion, politics, banks and loans are never counted.
+        You don't have to wait for the list to grow: the button «Lag kortet fra de siste 90 dagene» asks Chrome for
+        permission to read your browser history once, in your browser, and fills the list from it. Only sites with an order
+        confirmation in that history, or whose org.nr you've already seen, count. You can turn the permission off in the same menu.</p>
+        <p><strong>GitHub.</strong> With the «Commit-server» option on: a trust card on repository pages (age, recent activity, contributors, releases).</p>
       </div>
     </div>
   </section>
@@ -73,10 +76,12 @@ import Layout from '../layouts/Layout.astro';
         Your shop list stays in your browser. It leaves only when you copy the link and send it yourself. The card data sits
         after the <code>#</code> in that link, so even getcommit.dev's server doesn't see it when your friend opens it.
         No Commit server stores anyone's browsing or purchases.</p>
-        <p>Two lookups do go to Commit's servers, without any account attached. On a GitHub repository page the
-        extension sends the owner and repository name to fetch the trust card, and opening the toolbar popup
-        looks up the current tab's domain.
-        Visit-time sharing is off by default; if you turn it on in the popup, visited domains and time spent are sent every five minutes.</p>
+        <p>If you press «Lag kortet fra de siste 90 dagene», the extension reads your browser history inside your browser.
+        The history is not sent anywhere, by us or anyone else. Chrome's permission dialog says the extension could
+        "read and change" your history; it only reads, and you can take the permission back in the menu.</p>
+        <p>By default the extension sends nothing to Commit's servers. One switch in the popup, «Commit-server», is off
+        until you turn it on. With it on, the GitHub trust card sends the owner and repository name, the popup looks up the
+        current tab's domain, and visited domains and time spent are sent every five minutes.</p>
       </div>
     </div>
   </section>
@@ -90,7 +95,7 @@ import Layout from '../layouts/Layout.astro';
         <p>The extension is not in the Chrome Web Store or Firefox Add-ons yet. Until it is, install it by hand
         in Chrome, Brave or Edge:</p>
         <ol>
-          <li>Download <a href="https://github.com/piiiico/proof-of-commitment/releases/download/v0.5.0/commit-extension-v0.5.0.zip">commit-extension-v0.5.0.zip</a> and unzip it.</li>
+          <li>Download <a href="https://github.com/piiiico/proof-of-commitment/releases/download/v0.5.1/commit-extension-v0.5.1.zip">commit-extension-v0.5.1.zip</a> and unzip it.</li>
           <li>Open <code>chrome://extensions</code> and turn on <em>Developer mode</em>.</li>
           <li>Click <em>Load unpacked</em> and pick the unzipped folder.</li>
         </ol>
