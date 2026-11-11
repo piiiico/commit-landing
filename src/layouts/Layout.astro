@@ -447,7 +447,8 @@ const jsonLd = buildJsonLd();
         var url = new URL(window.location.href);
         var params = url.searchParams;
         var payload = {
-          path: url.pathname,
+          // "#kort" = a shared card link was opened (count only; the card content never leaves the browser)
+          path: url.pathname + (/(^#|&)kort=/.test(url.hash) ? "#kort" : ""),
           referrer: document.referrer || "",
           utm_source: params.get("utm_source") || undefined,
           utm_medium: params.get("utm_medium") || undefined,

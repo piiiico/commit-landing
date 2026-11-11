@@ -21,6 +21,8 @@ import Layout from '../layouts/Layout.astro';
     </div>
   </nav>
 
+  <section id="kort-visning" hidden></section>
+
   <section class="hero">
     <div class="container">
       <div class="editorial">
@@ -104,6 +106,24 @@ import Layout from '../layouts/Layout.astro';
       </div>
     </div>
   </section>
+
+  <script>
+    // A card link (#kort=…) renders here read-only, on any device, no install. The fragment never
+    // leaves the browser: the visit beacon in Layout sends only the flag "#kort", never the content.
+    import { decodeCard, friendLine, esc } from '../../../proof-of-commitment/src/extension/shop.ts';
+    const m = location.hash.match(/kort=([A-Za-z0-9_-]+)/);
+    const card = m ? decodeCard(m[1]!) : null;
+    const box = document.getElementById('kort-visning');
+    if (card && card.rader.length && box) {
+      const rows = card.rader.map((r) => `<li><strong>${esc(r.d)}</strong>: ${esc(friendLine(card.fra, r))}</li>`).join('');
+      box.innerHTML = `<div class="container"><div class="editorial" style="padding:2rem 0 0">
+        <p class="hero-eyebrow">Kortet til ${esc(card.fra)}${card.laget ? ` · laget ${esc(card.laget)}` : ''}</p>
+        <ul style="margin:0.75rem 0;padding-left:1.2rem;line-height:1.7">${rows}</ul>
+        <p><small><a href="#install">På PC: installer Commit for å se dette under søkene dine</a>.
+        Vi teller at et kort ble åpnet, aldri hva det inneholder.</small></p></div></div>`;
+      box.hidden = false;
+    }
+  </script>
 
   <!-- Footer -->
   <footer>
