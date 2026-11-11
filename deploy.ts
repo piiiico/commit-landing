@@ -961,6 +961,11 @@ console.log("\n✅ Deployed!");
   console.log();
   if (served === SOURCE_STAMP) {
     console.log(`✅ LIVE at ${LIVE_ORIGIN} — serving ${served}`);
+    // Deployed code must reach the public remote (deep scans 11-04, 11-11: 22 then 9 commits live but unpushed). Ff-only; never fails the deploy.
+    const br = (await $`git rev-parse --abbrev-ref HEAD`.quiet().nothrow()).stdout.toString().trim();
+    const push = await $`git push origin HEAD:refs/heads/${br}`.quiet().nothrow();
+    if (push.exitCode === 0) console.log(`✅ pushed HEAD to origin/${br}`);
+    else console.warn(`⚠️  push to origin/${br} FAILED (deploy stands): ${push.stderr.toString().trim().split("\n").pop()}`);
   } else {
     console.error(`❌ NOT LIVE: ${LIVE_ORIGIN}/health reports stamp=${served ?? "none"}, expected ${SOURCE_STAMP}.`);
     console.error("   Upload succeeded; edge still serving other code. Do NOT dogfood yet.");
