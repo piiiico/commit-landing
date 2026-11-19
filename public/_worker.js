@@ -1086,6 +1086,7 @@ export default {
       // GENERATED-EDIT-OK: switched from blogSlugs[] to blogPosts[] with actual publishDate per entry; added 7 missing posts (2026-06-11)
       // slug → publishDate (actual post date, NOT today — lets crawlers know what's actually new)
       const blogPosts = [
+        ["agent-framework-pypi-maintainer-score", "2026-11-19"],
         ["how-ai-agent-decides-which-recommendations-to-trust", "2026-11-05"],
         ["is-npm-package-abandoned", "2026-11-04"],
         ["npm-single-maintainer-dependencies", "2026-11-04"],

@@ -15,6 +15,13 @@ export interface Post {
 // Sorted newest first
 export const posts: Post[] = [
   {
+    slug: 'agent-framework-pypi-maintainer-score',
+    title: "Would a Maintainer-Based Risk Score Have Caught the agent-framework PyPI Compromise?",
+    description: "No. agent-framework had two publishing accounts, weekly releases and about 40,000 downloads a week. What caught the stolen-upload releases was release monitoring; what would have kept them out was a release-age delay.",
+    date: '2026-11-19',
+    dateLabel: 'November 19, 2026',
+  },
+  {
     slug: 'how-ai-agent-decides-which-recommendations-to-trust',
     title: "How Should an AI Agent Decide Which Websites and Recommendations to Trust?",
     description: "Weight what is expensive to fake: whether people read the site, whether the business shows paid revenue, how long it has run, and a recommender's past hits over karma.",
