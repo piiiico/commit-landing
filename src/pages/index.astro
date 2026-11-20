@@ -115,7 +115,26 @@ import Layout from '../layouts/Layout.astro';
           We gave the same row to the 121 work and payment platforms in the <a href="https://commonworld.one/atlas/" target="_blank" rel="noopener">Commonworld Atlas</a> that have a domain of their own. 92 of them read exactly like the domain that doesn't exist, on both Chrome's top-1M list and Cloudflare Radar. Of the 66 registered in 2024–2026, 63 do. Those lists count humans, and agents don't show up in them.
         </p>
         <p style="font-size: 1rem;">
-          What did separate claims from reality was money settled on-chain, and a platform's own counters read twice, two weeks apart. Only 8 of the 121 appear as x402 sellers with settled volume. We read the counters a third time on 20 November and publish the named rows after that, with every date.
+          What did separate claims from reality was money settled on-chain, and a platform's own counters read twice, two weeks apart. Only 8 of the 121 appear as x402 sellers with settled volume. We read the counters a third time on 20 November. The rows that held:
+        </p>
+        <div style="overflow-x: auto;">
+          <table class="rv-table">
+            <thead><tr><th>Platform, counter</th><th>15 Oct</th><th>29 Oct</th><th>20 Nov</th></tr></thead>
+            <tbody>
+              <tr><td><strong>TermiX</strong>, verified agents</td><td>524,203</td><td>1,288,648</td><td>1,328,354</td></tr>
+              <tr><td><strong>TermiX</strong>, jobs</td><td>541,046</td><td>579,562</td><td>649,067</td></tr>
+              <tr><td><strong>Execution Market</strong>, completed tasks</td><td>3,341</td><td>3,413</td><td>3,502</td></tr>
+              <tr><td><strong>Execution Market</strong>, total payment volume</td><td>not read</td><td>$938.07</td><td>$956.74</td></tr>
+              <tr><td><strong>OpenWork</strong>, completed jobs</td><td>3,629</td><td>3,655</td><td>3,692</td></tr>
+              <tr><td><strong>OpenWork</strong>, rewards paid ($OPENWORK)</td><td>not read</td><td>497,275,993</td><td>497,275,993</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <p style="font-size: 1rem;">
+          TermiX's agent count grew 2.5&times; in two weeks while jobs grew 7%; over the next three weeks agents grew 3% and jobs 12%. It reports $33.1 million in volume; on 29 October it sat below both read lists. Execution Market's payments come to $0.27 per completed task. OpenWork completed 37 more jobs after 29 October and its rewards-paid counter did not move; every job posted in its activity feed on both dates was posted for 0 $OPENWORK (5 of 5, then 6 of 6).
+        </p>
+        <p style="font-size: 0.85rem; color: var(--ink-muted);">
+          Sources: each operator's own stats endpoint (termix.ai/api/stats, api.execution.market/api/v1/public/metrics, openwork.bot/api/dashboard), read by Pico on 29 October and 20 November 2026; the 15 October values are from the Commonworld Atlas snapshot. Two rows didn't hold and are out: RentAHuman's all-time bounty count fell once (17,501 to 17,462) and then rose to 17,641, and FluxA's wallet concentration has been read on-chain only once. Operators who think a row is wrong can write to pico@amdal.dev.
         </p>
         <p style="font-size: 1rem;">
           The same reading for the whole x402 market, volume next to how many wallets paid and how many came back: <a href="/x402/">x402: how much moved, and how many paid</a>.
