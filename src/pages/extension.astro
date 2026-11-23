@@ -26,7 +26,7 @@ import Layout from '../layouts/Layout.astro';
   <section class="hero">
     <div class="container">
       <div class="editorial">
-        <span class="hero-eyebrow">Browser extension · Free · Open source · v0.5.1</span>
+        <span class="hero-eyebrow">Browser extension · Free · Open source · v0.5.2</span>
         <h1 class="hero-title" style="font-size: clamp(2rem, 5vw, 3.5rem);">
           Who runs this shop,<br /><em>and who you know shops there.</em>
         </h1>
@@ -36,7 +36,7 @@ import Layout from '../layouts/Layout.astro';
           Nobody types anything, and you don't need an account or friends to get it.
         </p>
         <div class="hero-cta">
-          <a href="https://github.com/piiiico/proof-of-commitment/releases/download/v0.5.1/commit-extension-v0.5.1.zip" class="btn-primary">Download v0.5.1 →</a>
+          <a href="https://github.com/piiiico/proof-of-commitment/releases/download/v0.5.2/commit-extension-v0.5.2.zip" class="btn-primary">Download v0.5.2 →</a>
           <a href="https://github.com/piiiico/proof-of-commitment/releases" class="btn-ghost" target="_blank" rel="noopener">All releases →</a>
         </div>
         <p id="kort"><small>Got a card link from someone? Install the extension, then open the link again and click «Importer».</small></p>
@@ -50,11 +50,17 @@ import Layout from '../layouts/Layout.astro';
     <div class="container">
       <div class="editorial">
         <h2>What it shows</h2>
-        <p><strong>On the shop.</strong> «Biltema Norge AS · i drift siden 2000 · 1 845 ansatte · omsetning 2025: 5,6 mrd kr».
-        The figures come from Brønnøysundregistrene. The line turns red only on hard facts: bankruptcy or liquidation,
-        a company registered less than a year ago with no accounts, or an org.nr belonging to a company whose name
-        doesn't resemble the domain (a rough check, and the line says so). If the page has no org.nr, you get nothing.
-        The extension never guesses an org.nr from a name.</p>
+        <p><strong>On the shop.</strong> «Biltema Norge AS · i drift siden 2000 · domenet registrert 2015 · 1 816 ansatte · omsetning 2025: 5,6 mrd kr».
+        The company figures come from Brønnøysundregistrene, the domain's registration year from its registry (RDAP).
+        The line turns red only on hard facts: bankruptcy or liquidation, a company registered less than a year ago with
+        no accounts, or a domain under a year old printing the org.nr of a company at least three years older than the domain.
+        That last one is what a copy of a known shop looks like: a clone puts the brand in its address and copies the
+        footer, but it can't copy the domain's age. A real company that just moved to a new domain trips it too (4 of
+        319 Norwegian sites we measured), so the red line gives both dates and leaves the judgment to you.
+        When the company's name doesn't look like the domain, the line just says «drives av …» in grey. Until v0.5.2 that
+        was red, and it was wrong on 75 of 341 legitimate sites.
+        If the page has no org.nr, you get nothing, and the clone shops we checked print none (drmartensie.com shows only
+        «Dr. Martens Ireland ©»), so on those the extension stays silent. It never guesses an org.nr from a name.</p>
         <p><strong>Under search results.</strong> The same line on Google and Bing, for shops whose org.nr you've already seen on an earlier visit.</p>
         <p><strong>Mitt kort.</strong> Your browser keeps its own list of shops you come back to over several months and the
         order confirmations you reach. You can see the list in the extension menu, remove any row, and send it as a link.
@@ -75,6 +81,8 @@ import Layout from '../layouts/Layout.astro';
       <div class="editorial">
         <h2>Privacy</h2>
         <p>The org.nr that a shop page prints goes to data.brreg.no, the public registry, and nothing is sent with it.
+        On the same pages, the shop's domain name goes to its domain registry's public RDAP server (for .no that is rdap.norid.no),
+        at most once a month per domain.
         Your shop list stays in your browser. It leaves only when you copy the link and send it yourself. The card data sits
         after the <code>#</code> in that link, so even getcommit.dev's server doesn't see it when your friend opens it.
         No Commit server stores anyone's browsing or purchases.</p>
@@ -97,7 +105,7 @@ import Layout from '../layouts/Layout.astro';
         <p>The extension is not in the Chrome Web Store or Firefox Add-ons yet. Until it is, install it by hand
         in Chrome, Brave or Edge:</p>
         <ol>
-          <li>Download <a href="https://github.com/piiiico/proof-of-commitment/releases/download/v0.5.1/commit-extension-v0.5.1.zip">commit-extension-v0.5.1.zip</a> and unzip it.</li>
+          <li>Download <a href="https://github.com/piiiico/proof-of-commitment/releases/download/v0.5.2/commit-extension-v0.5.2.zip">commit-extension-v0.5.2.zip</a> and unzip it.</li>
           <li>Open <code>chrome://extensions</code> and turn on <em>Developer mode</em>.</li>
           <li>Click <em>Load unpacked</em> and pick the unzipped folder.</li>
         </ol>
