@@ -1,0 +1,2019 @@
+{
+ "generated_at": "2026-11-24T16:31:04.224Z",
+ "source": "https://www.x402scan.com/api/trpc (public.stats.overall, public.stats.bucketed, public.buyers.all.list, public.sellers.all.list, public.transfers.list)",
+ "latest_block": "2026-11-24T16:05:43.000Z",
+ "procedures_seen": [
+  "public.sellers.bazaar.featured",
+  "public.stats.overall",
+  "public.stats.bucketed"
+ ],
+ "overall": {
+  "d1": {
+   "total_transactions": 416203,
+   "total_amount": 108577070711,
+   "unique_buyers": 6870,
+   "unique_sellers": 1753,
+   "latest_block_timestamp": "2026-11-24T16:05:43.000Z"
+  },
+  "d7": {
+   "total_transactions": 2265199,
+   "total_amount": 582559008197,
+   "unique_buyers": 17025,
+   "unique_sellers": 4697,
+   "latest_block_timestamp": "2026-11-24T16:05:43.000Z"
+  },
+  "d30": {
+   "total_transactions": 7171379,
+   "total_amount": 1935797688563,
+   "unique_buyers": 41637,
+   "unique_sellers": 14319,
+   "latest_block_timestamp": "2026-11-24T14:45:48.000Z"
+  }
+ },
+ "settled": {
+  "read_at": "2026-11-24T16:23:53.955Z",
+  "payments_7d": {
+   "usd": 26723.18,
+   "payments": 1116641,
+   "sellers_paid": 1008,
+   "days": {
+    "from": "2026-11-17",
+    "to": "2026-11-23"
+   },
+   "rule": "USDC payments into indexed sellers' wallets on Base whose amount equals a price the seller quotes (payments at a price the seller does not quote are not counted; rows recorded before the 0.9.87 deploy on 2026-10-14 hold only daily totals, and for them a day's payments count when they average $1 or less), leaving out self-payments, wallets that paid more than 20 sellers in the window (crawlers and monitors), and wallets the seller itself sent USDC to in the window or the 7 days before it (a seller paying itself through wallets it funds; counted since 0.9.107)"
+  },
+  "scout": "0xa1d1c0cf717402ff3651aa4873ccf96410b01978",
+  "scout_wide": {
+   "sellers": 2620,
+   "tx": 4017,
+   "usd": 84.560601
+  },
+  "scout_rank": 2
+ },
+ "control": {
+  "bucket_sum_7d_usd": 582523.317208,
+  "overall_7d_usd": 582559.008197,
+  "ratio": 0.9999387341222129
+ },
+ "buckets_7d": [
+  {
+   "start": "2026-11-17T14:30:00.000Z",
+   "usd": 774.559437,
+   "tx": 20354,
+   "buyers": 1271,
+   "sellers": 228,
+   "usd_per_tx": 0.03805440881399234
+  },
+  {
+   "start": "2026-11-17T18:00:00.000Z",
+   "usd": 1229.867184,
+   "tx": 35158,
+   "buyers": 1536,
+   "sellers": 368,
+   "usd_per_tx": 0.03498114750554639
+  },
+  {
+   "start": "2026-11-17T21:30:00.000Z",
+   "usd": 1059.775908,
+   "tx": 32480,
+   "buyers": 1395,
+   "sellers": 386,
+   "usd_per_tx": 0.032628568596059115
+  },
+  {
+   "start": "2026-11-18T01:00:00.000Z",
+   "usd": 19211.052558,
+   "tx": 29388,
+   "buyers": 1403,
+   "sellers": 531,
+   "usd_per_tx": 0.6537039797876684
+  },
+  {
+   "start": "2026-11-18T04:30:00.000Z",
+   "usd": 8304.350015,
+   "tx": 31486,
+   "buyers": 1660,
+   "sellers": 465,
+   "usd_per_tx": 0.26374738026424444
+  },
+  {
+   "start": "2026-11-18T08:00:00.000Z",
+   "usd": 37826.363622,
+   "tx": 37489,
+   "buyers": 1891,
+   "sellers": 341,
+   "usd_per_tx": 1.0089990029608684
+  },
+  {
+   "start": "2026-11-18T11:30:00.000Z",
+   "usd": 2744.54482,
+   "tx": 36619,
+   "buyers": 1962,
+   "sellers": 381,
+   "usd_per_tx": 0.07494865561593708
+  },
+  {
+   "start": "2026-11-18T15:00:00.000Z",
+   "usd": 1988.153995,
+   "tx": 36091,
+   "buyers": 1702,
+   "sellers": 309,
+   "usd_per_tx": 0.05508725153085257
+  },
+  {
+   "start": "2026-11-18T18:30:00.000Z",
+   "usd": 2836.279303,
+   "tx": 46777,
+   "buyers": 1644,
+   "sellers": 318,
+   "usd_per_tx": 0.06063405740000427
+  },
+  {
+   "start": "2026-11-18T22:00:00.000Z",
+   "usd": 2201.175348,
+   "tx": 45102,
+   "buyers": 1716,
+   "sellers": 523,
+   "usd_per_tx": 0.048804384461886396
+  },
+  {
+   "start": "2026-11-19T01:30:00.000Z",
+   "usd": 33092.425097,
+   "tx": 41695,
+   "buyers": 1678,
+   "sellers": 592,
+   "usd_per_tx": 0.7936785009473558
+  },
+  {
+   "start": "2026-11-19T05:00:00.000Z",
+   "usd": 49667.505315,
+   "tx": 45793,
+   "buyers": 2180,
+   "sellers": 495,
+   "usd_per_tx": 1.0846091174415304
+  },
+  {
+   "start": "2026-11-19T08:30:00.000Z",
+   "usd": 19721.245624,
+   "tx": 45256,
+   "buyers": 1699,
+   "sellers": 512,
+   "usd_per_tx": 0.4357708508043132
+  },
+  {
+   "start": "2026-11-19T12:00:00.000Z",
+   "usd": 2815.161366,
+   "tx": 45764,
+   "buyers": 3494,
+   "sellers": 438,
+   "usd_per_tx": 0.06151475758237916
+  },
+  {
+   "start": "2026-11-19T15:30:00.000Z",
+   "usd": 1564.078978,
+   "tx": 41378,
+   "buyers": 1884,
+   "sellers": 325,
+   "usd_per_tx": 0.03779977229445599
+  },
+  {
+   "start": "2026-11-19T19:00:00.000Z",
+   "usd": 1399.652706,
+   "tx": 40164,
+   "buyers": 1590,
+   "sellers": 311,
+   "usd_per_tx": 0.03484843904989543
+  },
+  {
+   "start": "2026-11-19T22:30:00.000Z",
+   "usd": 1570.328546,
+   "tx": 39156,
+   "buyers": 1915,
+   "sellers": 829,
+   "usd_per_tx": 0.04010441684543876
+  },
+  {
+   "start": "2026-11-20T02:00:00.000Z",
+   "usd": 26197.973683,
+   "tx": 42344,
+   "buyers": 1702,
+   "sellers": 356,
+   "usd_per_tx": 0.6186938806678632
+  },
+  {
+   "start": "2026-11-20T05:30:00.000Z",
+   "usd": 52720.316716,
+   "tx": 49244,
+   "buyers": 1956,
+   "sellers": 419,
+   "usd_per_tx": 1.070593711233856
+  },
+  {
+   "start": "2026-11-20T09:00:00.000Z",
+   "usd": 34386.458824,
+   "tx": 49117,
+   "buyers": 2242,
+   "sellers": 498,
+   "usd_per_tx": 0.7000928156035588
+  },
+  {
+   "start": "2026-11-20T12:30:00.000Z",
+   "usd": 3529.976233,
+   "tx": 51704,
+   "buyers": 2013,
+   "sellers": 321,
+   "usd_per_tx": 0.06827278804347826
+  },
+  {
+   "start": "2026-11-20T16:00:00.000Z",
+   "usd": 1433.736376,
+   "tx": 50266,
+   "buyers": 2046,
+   "sellers": 239,
+   "usd_per_tx": 0.028522985238531015
+  },
+  {
+   "start": "2026-11-20T19:30:00.000Z",
+   "usd": 1374.409012,
+   "tx": 43347,
+   "buyers": 2191,
+   "sellers": 360,
+   "usd_per_tx": 0.03170713110480541
+  },
+  {
+   "start": "2026-11-20T23:00:00.000Z",
+   "usd": 1569.665533,
+   "tx": 41222,
+   "buyers": 2214,
+   "sellers": 757,
+   "usd_per_tx": 0.038078344888651694
+  },
+  {
+   "start": "2026-11-21T02:30:00.000Z",
+   "usd": 17006.395909,
+   "tx": 41011,
+   "buyers": 1660,
+   "sellers": 648,
+   "usd_per_tx": 0.41467888881031917
+  },
+  {
+   "start": "2026-11-21T06:00:00.000Z",
+   "usd": 1758.51882,
+   "tx": 49130,
+   "buyers": 3694,
+   "sellers": 391,
+   "usd_per_tx": 0.03579317769183798
+  },
+  {
+   "start": "2026-11-21T09:30:00.000Z",
+   "usd": 8454.657528,
+   "tx": 58303,
+   "buyers": 1989,
+   "sellers": 371,
+   "usd_per_tx": 0.14501239263845772
+  },
+  {
+   "start": "2026-11-21T13:00:00.000Z",
+   "usd": 1768.319876,
+   "tx": 56618,
+   "buyers": 2095,
+   "sellers": 323,
+   "usd_per_tx": 0.031232468049030345
+  },
+  {
+   "start": "2026-11-21T16:30:00.000Z",
+   "usd": 1488.697172,
+   "tx": 49097,
+   "buyers": 1858,
+   "sellers": 250,
+   "usd_per_tx": 0.030321550644642238
+  },
+  {
+   "start": "2026-11-21T20:00:00.000Z",
+   "usd": 1417.503428,
+   "tx": 43667,
+   "buyers": 1585,
+   "sellers": 207,
+   "usd_per_tx": 0.03246166276593308
+  },
+  {
+   "start": "2026-11-21T23:30:00.000Z",
+   "usd": 1961.130432,
+   "tx": 48970,
+   "buyers": 1730,
+   "sellers": 523,
+   "usd_per_tx": 0.04004758897284051
+  },
+  {
+   "start": "2026-11-22T03:00:00.000Z",
+   "usd": 17613.039202,
+   "tx": 57655,
+   "buyers": 1780,
+   "sellers": 328,
+   "usd_per_tx": 0.30549022984996965
+  },
+  {
+   "start": "2026-11-22T06:30:00.000Z",
+   "usd": 5847.057113,
+   "tx": 58952,
+   "buyers": 2668,
+   "sellers": 830,
+   "usd_per_tx": 0.09918335447482697
+  },
+  {
+   "start": "2026-11-22T10:00:00.000Z",
+   "usd": 2020.830515,
+   "tx": 57479,
+   "buyers": 2112,
+   "sellers": 468,
+   "usd_per_tx": 0.03515771873205867
+  },
+  {
+   "start": "2026-11-22T13:30:00.000Z",
+   "usd": 2210.310814,
+   "tx": 58507,
+   "buyers": 1826,
+   "sellers": 377,
+   "usd_per_tx": 0.03777857032491838
+  },
+  {
+   "start": "2026-11-22T17:00:00.000Z",
+   "usd": 3501.262527,
+   "tx": 44475,
+   "buyers": 1724,
+   "sellers": 256,
+   "usd_per_tx": 0.07872428391231029
+  },
+  {
+   "start": "2026-11-22T20:30:00.000Z",
+   "usd": 2528.488893,
+   "tx": 31564,
+   "buyers": 1564,
+   "sellers": 175,
+   "usd_per_tx": 0.08010673213154226
+  },
+  {
+   "start": "2026-11-23T00:00:00.000Z",
+   "usd": 42183.552132,
+   "tx": 36568,
+   "buyers": 1995,
+   "sellers": 1032,
+   "usd_per_tx": 1.15356465029534
+  },
+  {
+   "start": "2026-11-23T03:30:00.000Z",
+   "usd": 27226.517709,
+   "tx": 54386,
+   "buyers": 3190,
+   "sellers": 885,
+   "usd_per_tx": 0.5006162929614238
+  },
+  {
+   "start": "2026-11-23T07:00:00.000Z",
+   "usd": 25070.501172,
+   "tx": 46413,
+   "buyers": 3122,
+   "sellers": 801,
+   "usd_per_tx": 0.5401611869950229
+  },
+  {
+   "start": "2026-11-23T10:30:00.000Z",
+   "usd": 1719.180175,
+   "tx": 46853,
+   "buyers": 2038,
+   "sellers": 424,
+   "usd_per_tx": 0.036693065011845556
+  },
+  {
+   "start": "2026-11-23T14:00:00.000Z",
+   "usd": 1690.284663,
+   "tx": 56591,
+   "buyers": 2160,
+   "sellers": 236,
+   "usd_per_tx": 0.029868436023395943
+  },
+  {
+   "start": "2026-11-23T17:30:00.000Z",
+   "usd": 3821.65488,
+   "tx": 154639,
+   "buyers": 2325,
+   "sellers": 226,
+   "usd_per_tx": 0.02471339623251573
+  },
+  {
+   "start": "2026-11-23T21:00:00.000Z",
+   "usd": 2116.789868,
+   "tx": 65599,
+   "buyers": 1940,
+   "sellers": 267,
+   "usd_per_tx": 0.03226863013155688
+  },
+  {
+   "start": "2026-11-24T00:30:00.000Z",
+   "usd": 33206.811362,
+   "tx": 37469,
+   "buyers": 1679,
+   "sellers": 549,
+   "usd_per_tx": 0.8862476010034962
+  },
+  {
+   "start": "2026-11-24T04:00:00.000Z",
+   "usd": 43813.383055,
+   "tx": 39934,
+   "buyers": 1940,
+   "sellers": 529,
+   "usd_per_tx": 1.0971448654029148
+  },
+  {
+   "start": "2026-11-24T07:30:00.000Z",
+   "usd": 21475.402154,
+   "tx": 39891,
+   "buyers": 1858,
+   "sellers": 699,
+   "usd_per_tx": 0.5383520632222807
+  },
+  {
+   "start": "2026-11-24T11:00:00.000Z",
+   "usd": 2601.290777,
+   "tx": 37659,
+   "buyers": 2539,
+   "sellers": 627,
+   "usd_per_tx": 0.06907487657664835
+  },
+  {
+   "start": "2026-11-24T14:30:00.000Z",
+   "usd": 802.680833,
+   "tx": 16272,
+   "buyers": 2189,
+   "sellers": 168,
+   "usd_per_tx": 0.049328959746804325
+  }
+ ],
+ "buckets_30d": [
+  {
+   "start": "2026-10-25T12:00:00.000Z",
+   "usd": 8691.058846,
+   "tx": 85607,
+   "buyers": 2216,
+   "sellers": 948,
+   "usd_per_tx": 0.10152275919025314
+  },
+  {
+   "start": "2026-10-26T03:00:00.000Z",
+   "usd": 84889.620468,
+   "tx": 68110,
+   "buyers": 3404,
+   "sellers": 1082,
+   "usd_per_tx": 1.246360600029364
+  },
+  {
+   "start": "2026-10-26T18:00:00.000Z",
+   "usd": 11164.937135,
+   "tx": 64291,
+   "buyers": 2510,
+   "sellers": 1106,
+   "usd_per_tx": 0.17366252095938778
+  },
+  {
+   "start": "2026-10-27T09:00:00.000Z",
+   "usd": 7701.115559,
+   "tx": 91408,
+   "buyers": 3681,
+   "sellers": 1388,
+   "usd_per_tx": 0.08424990765578505
+  },
+  {
+   "start": "2026-10-28T00:00:00.000Z",
+   "usd": 6682.404597,
+   "tx": 94167,
+   "buyers": 2972,
+   "sellers": 1373,
+   "usd_per_tx": 0.07096333744305329
+  },
+  {
+   "start": "2026-10-28T15:00:00.000Z",
+   "usd": 31343.881114,
+   "tx": 95142,
+   "buyers": 2277,
+   "sellers": 931,
+   "usd_per_tx": 0.3294431598452839
+  },
+  {
+   "start": "2026-10-29T06:00:00.000Z",
+   "usd": 21555.473966,
+   "tx": 103705,
+   "buyers": 2621,
+   "sellers": 1082,
+   "usd_per_tx": 0.2078537579287402
+  },
+  {
+   "start": "2026-10-29T21:00:00.000Z",
+   "usd": 15632.489191,
+   "tx": 90846,
+   "buyers": 2377,
+   "sellers": 1475,
+   "usd_per_tx": 0.1720768024018669
+  },
+  {
+   "start": "2026-10-30T12:00:00.000Z",
+   "usd": 6579.500453,
+   "tx": 101223,
+   "buyers": 2733,
+   "sellers": 1173,
+   "usd_per_tx": 0.06500005387115576
+  },
+  {
+   "start": "2026-10-31T03:00:00.000Z",
+   "usd": 7398.852689,
+   "tx": 93856,
+   "buyers": 2941,
+   "sellers": 1719,
+   "usd_per_tx": 0.0788319626768667
+  },
+  {
+   "start": "2026-10-31T18:00:00.000Z",
+   "usd": 6388.880717,
+   "tx": 77477,
+   "buyers": 3426,
+   "sellers": 1390,
+   "usd_per_tx": 0.08246164302954426
+  },
+  {
+   "start": "2026-11-01T09:00:00.000Z",
+   "usd": 10264.95532,
+   "tx": 255618,
+   "buyers": 2387,
+   "sellers": 1332,
+   "usd_per_tx": 0.040157404095173266
+  },
+  {
+   "start": "2026-11-02T00:00:00.000Z",
+   "usd": 86890.465966,
+   "tx": 108472,
+   "buyers": 3199,
+   "sellers": 1533,
+   "usd_per_tx": 0.8010405078361237
+  },
+  {
+   "start": "2026-11-02T15:00:00.000Z",
+   "usd": 39983.364338,
+   "tx": 170263,
+   "buyers": 2765,
+   "sellers": 1081,
+   "usd_per_tx": 0.2348329604083095
+  },
+  {
+   "start": "2026-11-03T06:00:00.000Z",
+   "usd": 34173.898227,
+   "tx": 233098,
+   "buyers": 3114,
+   "sellers": 1341,
+   "usd_per_tx": 0.1466074278929892
+  },
+  {
+   "start": "2026-11-03T21:00:00.000Z",
+   "usd": 48267.687315,
+   "tx": 153308,
+   "buyers": 2785,
+   "sellers": 1535,
+   "usd_per_tx": 0.31484128235317144
+  },
+  {
+   "start": "2026-11-04T12:00:00.000Z",
+   "usd": 13600.45401,
+   "tx": 169994,
+   "buyers": 2373,
+   "sellers": 848,
+   "usd_per_tx": 0.08000549437038953
+  },
+  {
+   "start": "2026-11-05T03:00:00.000Z",
+   "usd": 63920.921259,
+   "tx": 99452,
+   "buyers": 3020,
+   "sellers": 1770,
+   "usd_per_tx": 0.6427313805554439
+  },
+  {
+   "start": "2026-11-05T18:00:00.000Z",
+   "usd": 44907.664977,
+   "tx": 117563,
+   "buyers": 2533,
+   "sellers": 1399,
+   "usd_per_tx": 0.3819880827896532
+  },
+  {
+   "start": "2026-11-06T09:00:00.000Z",
+   "usd": 16021.131395,
+   "tx": 151888,
+   "buyers": 2394,
+   "sellers": 837,
+   "usd_per_tx": 0.10547990226350995
+  },
+  {
+   "start": "2026-11-07T00:00:00.000Z",
+   "usd": 17605.672556,
+   "tx": 83503,
+   "buyers": 2857,
+   "sellers": 1643,
+   "usd_per_tx": 0.210838802869358
+  },
+  {
+   "start": "2026-11-07T15:00:00.000Z",
+   "usd": 16124.303595,
+   "tx": 186044,
+   "buyers": 2309,
+   "sellers": 1111,
+   "usd_per_tx": 0.08666930185870009
+  },
+  {
+   "start": "2026-11-08T06:00:00.000Z",
+   "usd": 15269.714702,
+   "tx": 91978,
+   "buyers": 2897,
+   "sellers": 839,
+   "usd_per_tx": 0.1660148590097632
+  },
+  {
+   "start": "2026-11-08T21:00:00.000Z",
+   "usd": 51778.692053,
+   "tx": 63850,
+   "buyers": 2668,
+   "sellers": 1417,
+   "usd_per_tx": 0.8109427103054033
+  },
+  {
+   "start": "2026-11-09T12:00:00.000Z",
+   "usd": 33459.652551,
+   "tx": 175485,
+   "buyers": 2335,
+   "sellers": 1367,
+   "usd_per_tx": 0.19066958743482348
+  },
+  {
+   "start": "2026-11-10T03:00:00.000Z",
+   "usd": 111289.362025,
+   "tx": 76800,
+   "buyers": 3286,
+   "sellers": 1121,
+   "usd_per_tx": 1.4490802347005207
+  },
+  {
+   "start": "2026-11-10T18:00:00.000Z",
+   "usd": 38881.562428,
+   "tx": 75132,
+   "buyers": 3074,
+   "sellers": 1597,
+   "usd_per_tx": 0.5175100147473779
+  },
+  {
+   "start": "2026-11-11T09:00:00.000Z",
+   "usd": 37707.900254,
+   "tx": 75037,
+   "buyers": 2993,
+   "sellers": 1402,
+   "usd_per_tx": 0.5025240915015259
+  },
+  {
+   "start": "2026-11-12T00:00:00.000Z",
+   "usd": 97549.412946,
+   "tx": 56689,
+   "buyers": 3063,
+   "sellers": 959,
+   "usd_per_tx": 1.7207820378909489
+  },
+  {
+   "start": "2026-11-12T15:00:00.000Z",
+   "usd": 37103.701309,
+   "tx": 100138,
+   "buyers": 2128,
+   "sellers": 1060,
+   "usd_per_tx": 0.3705256876410553
+  },
+  {
+   "start": "2026-11-13T06:00:00.000Z",
+   "usd": 42187.563163,
+   "tx": 110554,
+   "buyers": 2564,
+   "sellers": 1335,
+   "usd_per_tx": 0.38160141797673536
+  },
+  {
+   "start": "2026-11-13T21:00:00.000Z",
+   "usd": 23813.399293,
+   "tx": 158229,
+   "buyers": 2123,
+   "sellers": 1028,
+   "usd_per_tx": 0.15049958789476012
+  },
+  {
+   "start": "2026-11-14T12:00:00.000Z",
+   "usd": 7260.290518,
+   "tx": 169584,
+   "buyers": 2216,
+   "sellers": 890,
+   "usd_per_tx": 0.04281235563496556
+  },
+  {
+   "start": "2026-11-15T03:00:00.000Z",
+   "usd": 20332.741431,
+   "tx": 150873,
+   "buyers": 2743,
+   "sellers": 1727,
+   "usd_per_tx": 0.13476726406315245
+  },
+  {
+   "start": "2026-11-15T18:00:00.000Z",
+   "usd": 85092.821159,
+   "tx": 191489,
+   "buyers": 2538,
+   "sellers": 2277,
+   "usd_per_tx": 0.444374460982093
+  },
+  {
+   "start": "2026-11-16T09:00:00.000Z",
+   "usd": 16857.444787,
+   "tx": 562313,
+   "buyers": 2197,
+   "sellers": 1104,
+   "usd_per_tx": 0.029978757003661663
+  },
+  {
+   "start": "2026-11-17T00:00:00.000Z",
+   "usd": 134934.475669,
+   "tx": 152594,
+   "buyers": 3397,
+   "sellers": 1693,
+   "usd_per_tx": 0.8842711749413477
+  },
+  {
+   "start": "2026-11-17T15:00:00.000Z",
+   "usd": 23208.627272,
+   "tx": 143063,
+   "buyers": 2634,
+   "sellers": 1260,
+   "usd_per_tx": 0.16222662234120633
+  },
+  {
+   "start": "2026-11-18T06:00:00.000Z",
+   "usd": 52774.852813,
+   "tx": 163307,
+   "buyers": 3288,
+   "sellers": 932,
+   "usd_per_tx": 0.3231634456147011
+  },
+  {
+   "start": "2026-11-18T21:00:00.000Z",
+   "usd": 105219.710151,
+   "tx": 190735,
+   "buyers": 3325,
+   "sellers": 1581,
+   "usd_per_tx": 0.5516539185309461
+  },
+  {
+   "start": "2026-11-19T12:00:00.000Z",
+   "usd": 21016.679278,
+   "tx": 177535,
+   "buyers": 4912,
+   "sellers": 1386,
+   "usd_per_tx": 0.11838048428760525
+  },
+  {
+   "start": "2026-11-20T03:00:00.000Z",
+   "usd": 104003.639369,
+   "tx": 210988,
+   "buyers": 4063,
+   "sellers": 1002,
+   "usd_per_tx": 0.49293627774565374
+  },
+  {
+   "start": "2026-11-20T18:00:00.000Z",
+   "usd": 21977.820317,
+   "tx": 186549,
+   "buyers": 5149,
+   "sellers": 1678,
+   "usd_per_tx": 0.11781258713260324
+  },
+  {
+   "start": "2026-11-21T09:00:00.000Z",
+   "usd": 13603.769991,
+   "tx": 223069,
+   "buyers": 3789,
+   "sellers": 824,
+   "usd_per_tx": 0.0609845832051966
+  },
+  {
+   "start": "2026-11-22T00:00:00.000Z",
+   "usd": 28477.324767,
+   "tx": 241815,
+   "buyers": 3942,
+   "sellers": 1469,
+   "usd_per_tx": 0.11776492263507225
+  },
+  {
+   "start": "2026-11-22T15:00:00.000Z",
+   "usd": 75754.606075,
+   "tx": 184878,
+   "buyers": 3694,
+   "sellers": 1628,
+   "usd_per_tx": 0.40975457369184004
+  },
+  {
+   "start": "2026-11-23T06:00:00.000Z",
+   "usd": 33015.821136,
+   "tx": 319750,
+   "buyers": 5423,
+   "sellers": 1283,
+   "usd_per_tx": 0.10325510910398748
+  },
+  {
+   "start": "2026-11-23T21:00:00.000Z",
+   "usd": 101418.489817,
+   "tx": 194456,
+   "buyers": 3755,
+   "sellers": 1511,
+   "usd_per_tx": 0.5215498098130168
+  },
+  {
+   "start": "2026-11-24T12:00:00.000Z",
+   "usd": 2017.776573,
+   "tx": 29357,
+   "buyers": 2612,
+   "sellers": 591,
+   "usd_per_tx": 0.06873238317948019
+  }
+ ],
+ "median_bucket_usd_30d": 28477.324767,
+ "lumps": [
+  {
+   "start": "2026-11-17T00:00:00.000Z",
+   "usd": 134934.475669,
+   "tx": 152594,
+   "buyers": 3397,
+   "sellers": 1693,
+   "usd_per_tx": 0.8842711749413477,
+   "x_median": 4.738312912923771
+  },
+  {
+   "start": "2026-11-10T03:00:00.000Z",
+   "usd": 111289.362025,
+   "tx": 76800,
+   "buyers": 3286,
+   "sellers": 1121,
+   "usd_per_tx": 1.4490802347005207,
+   "x_median": 3.9079991865655854
+  },
+  {
+   "start": "2026-11-18T21:00:00.000Z",
+   "usd": 105219.710151,
+   "tx": 190735,
+   "buyers": 3325,
+   "sellers": 1581,
+   "usd_per_tx": 0.5516539185309461,
+   "x_median": 3.6948593665978895
+  },
+  {
+   "start": "2026-11-20T03:00:00.000Z",
+   "usd": 104003.639369,
+   "tx": 210988,
+   "buyers": 4063,
+   "sellers": 1002,
+   "usd_per_tx": 0.49293627774565374,
+   "x_median": 3.6521562407969292
+  },
+  {
+   "start": "2026-11-23T21:00:00.000Z",
+   "usd": 101418.489817,
+   "tx": 194456,
+   "buyers": 3755,
+   "sellers": 1511,
+   "usd_per_tx": 0.5215498098130168,
+   "x_median": 3.5613770130024798
+  }
+ ],
+ "concentration": {
+  "top1": 0.051802048505608204,
+  "top5": 0.10240015373657593,
+  "top20": 0.20516964001624635,
+  "top1_wallet": "9sZEFeQDPyjjFjZM9jK6i6L5eWMCrTHB7pCWjU1k9WXR",
+  "top1_sellers": 1
+ },
+ "returning": {
+  "method": {
+   "weeks": 4,
+   "ring_rule": "buyer wallet is among the top 1000 receivers (30d)",
+   "transfer_rule": "single payment >= $100",
+   "cap_rows_per_week": 150000,
+   "wide": {
+    "min_sellers": 20,
+    "wallets": 253,
+    "median_calls_per_seller": 1.7878787878787878,
+    "median_usd_per_call": 0.008714285714285714
+   }
+  },
+  "sellers": [
+   {
+    "recipient": "0xc7c64f7a5d6bdd0e777fd7c8b07befc0d57fc4ff",
+    "pools": [
+     "volume",
+     "buyers"
+    ],
+    "chains": [
+     "base"
+    ],
+    "facilitators": [
+     "coinbase"
+    ],
+    "usd_7d": 437979.4605,
+    "tx_7d": 2408,
+    "buyers_7d": 125,
+    "rows_by_week": [
+     2408,
+     1466,
+     1610,
+     978
+    ],
+    "week0_vs_tx7d": 1,
+    "rows_read": 6462,
+    "excluded_rows": 4599,
+    "complete": true,
+    "not_read": null,
+    "independent_buyers_4w": 351,
+    "returning_buyers": 0,
+    "returning_wide": 0
+   },
+   {
+    "recipient": "3MZVk97x9SeRxbYpc3jhzRfU2fyA3emYutnqfn9kNfYX",
+    "pools": [
+     "volume"
+    ],
+    "chains": [
+     "solana"
+    ],
+    "facilitators": [
+     "coinbase"
+    ],
+    "usd_7d": 31353.638,
+    "tx_7d": 27,
+    "buyers_7d": 9,
+    "rows_by_week": [
+     27,
+     36,
+     32,
+     28
+    ],
+    "week0_vs_tx7d": 1,
+    "rows_read": 123,
+    "excluded_rows": 34,
+    "complete": true,
+    "not_read": null,
+    "independent_buyers_4w": 23,
+    "returning_buyers": 5,
+    "returning_wide": 1
+   },
+   {
+    "recipient": "0x7284d41b5b852f2bd4c99bdf95043d84452d299c",
+    "pools": [
+     "volume",
+     "buyers"
+    ],
+    "chains": [
+     "base"
+    ],
+    "facilitators": [
+     "coinbase"
+    ],
+    "usd_7d": 19864.51,
+    "tx_7d": 1017923,
+    "buyers_7d": 5048,
+    "rows_by_week": [
+     150000,
+     150000,
+     150000,
+     150000
+    ],
+    "week0_vs_tx7d": null,
+    "rows_read": 600000,
+    "excluded_rows": 0,
+    "complete": false,
+    "not_read": "row_cap",
+    "independent_buyers_4w": null,
+    "returning_buyers": null,
+    "returning_wide": null
+   },
+   {
+    "recipient": "0xb315bae206846fc785bf06850e1a72d8c5e05b09",
+    "pools": [
+     "volume"
+    ],
+    "chains": [
+     "base"
+    ],
+    "facilitators": [
+     "fluxa"
+    ],
+    "usd_7d": 9540.19,
+    "tx_7d": 7,
+    "buyers_7d": 1,
+    "rows_by_week": [
+     7,
+     0,
+     0,
+     0
+    ],
+    "week0_vs_tx7d": 1,
+    "rows_read": 7,
+    "excluded_rows": 7,
+    "complete": true,
+    "not_read": null,
+    "independent_buyers_4w": 0,
+    "returning_buyers": 0,
+    "returning_wide": 0
+   },
+   {
+    "recipient": "0x589a2314a2e05f45e40c4823da3ba58d421db3d8",
+    "pools": [
+     "volume"
+    ],
+    "chains": [
+     "base"
+    ],
+    "facilitators": [
+     "coinbase"
+    ],
+    "usd_7d": 8726.84,
+    "tx_7d": 599941,
+    "buyers_7d": 43,
+    "rows_by_week": [
+     150000,
+     74694,
+     12848,
+     16302
+    ],
+    "week0_vs_tx7d": null,
+    "rows_read": 253844,
+    "excluded_rows": 0,
+    "complete": false,
+    "not_read": "row_cap",
+    "independent_buyers_4w": null,
+    "returning_buyers": null,
+    "returning_wide": null
+   },
+   {
+    "recipient": "0x47d3394c7234714e4b9e9b74827c12be847f9dda",
+    "pools": [
+     "volume"
+    ],
+    "chains": [
+     "base"
+    ],
+    "facilitators": [
+     "coinbase"
+    ],
+    "usd_7d": 8321.1,
+    "tx_7d": 3784,
+    "buyers_7d": 27,
+    "rows_by_week": [
+     3781,
+     3741,
+     3891,
+     3941
+    ],
+    "week0_vs_tx7d": 0.9992071881606766,
+    "rows_read": 15354,
+    "excluded_rows": 0,
+    "complete": true,
+    "not_read": null,
+    "independent_buyers_4w": 27,
+    "returning_buyers": 25,
+    "returning_wide": 0
+   },
+   {
+    "recipient": "0xbe87e47471660c5775df60896d8cc59c368a1db2",
+    "pools": [
+     "volume"
+    ],
+    "chains": [
+     "base"
+    ],
+    "facilitators": [
+     "fluxa"
+    ],
+    "usd_7d": 5618,
+    "tx_7d": 21,
+    "buyers_7d": 8,
+    "rows_by_week": [
+     21,
+     16,
+     5,
+     14
+    ],
+    "week0_vs_tx7d": 1,
+    "rows_read": 56,
+    "excluded_rows": 52,
+    "complete": true,
+    "not_read": null,
+    "independent_buyers_4w": 4,
+    "returning_buyers": 0,
+    "returning_wide": 0
+   },
+   {
+    "recipient": "7xvuVbuyzfoE8jLRAbdqwjNYgqLs9pVNx9FpkXPwVDVP",
+    "pools": [
+     "volume"
+    ],
+    "chains": [
+     "solana"
+    ],
+    "facilitators": [
+     "coinbase"
+    ],
+    "usd_7d": 5293,
+    "tx_7d": 200,
+    "buyers_7d": 47,
+    "rows_by_week": [
+     202,
+     57,
+     103,
+     170
+    ],
+    "week0_vs_tx7d": 1.01,
+    "rows_read": 532,
+    "excluded_rows": 23,
+    "complete": true,
+    "not_read": null,
+    "independent_buyers_4w": 89,
+    "returning_buyers": 17,
+    "returning_wide": 0
+   },
+   {
+    "recipient": "0xde128f221dfa09c4fb497e1fd03d3ef5249c4ffc",
+    "pools": [
+     "volume"
+    ],
+    "chains": [
+     "base"
+    ],
+    "facilitators": [
+     "fluxa"
+    ],
+    "usd_7d": 4994.02,
+    "tx_7d": 2,
+    "buyers_7d": 1,
+    "rows_by_week": [
+     2,
+     0,
+     0,
+     0
+    ],
+    "week0_vs_tx7d": 1,
+    "rows_read": 2,
+    "excluded_rows": 2,
+    "complete": true,
+    "not_read": null,
+    "independent_buyers_4w": 0,
+    "returning_buyers": 0,
+    "returning_wide": 0
+   },
+   {
+    "recipient": "0xcc74a6404d54de40572e67dc4fa03c6280e68ae3",
+    "pools": [
+     "volume"
+    ],
+    "chains": [
+     "base"
+    ],
+    "facilitators": [
+     "coinbase"
+    ],
+    "usd_7d": 3852.080002,
+    "tx_7d": 14,
+    "buyers_7d": 13,
+    "rows_by_week": [
+     14,
+     0,
+     2,
+     7
+    ],
+    "week0_vs_tx7d": 1,
+    "rows_read": 23,
+    "excluded_rows": 9,
+    "complete": true,
+    "not_read": null,
+    "independent_buyers_4w": 9,
+    "returning_buyers": 0,
+    "returning_wide": 0
+   },
+   {
+    "recipient": "0x32bc36ac43ac5545d0eb29960290b85f8f219008",
+    "pools": [
+     "volume"
+    ],
+    "chains": [
+     "base"
+    ],
+    "facilitators": [
+     "payAI"
+    ],
+    "usd_7d": 3429.44,
+    "tx_7d": 183,
+    "buyers_7d": 60,
+    "rows_by_week": [
+     183,
+     177,
+     145,
+     100
+    ],
+    "week0_vs_tx7d": 1,
+    "rows_read": 605,
+    "excluded_rows": 17,
+    "complete": true,
+    "not_read": null,
+    "independent_buyers_4w": 140,
+    "returning_buyers": 24,
+    "returning_wide": 0
+   },
+   {
+    "recipient": "0x5996b5c566680c0257a9b683807813dea98cf39e",
+    "pools": [
+     "volume"
+    ],
+    "chains": [
+     "base"
+    ],
+    "facilitators": [
+     "coinbase"
+    ],
+    "usd_7d": 3052,
+    "tx_7d": 34,
+    "buyers_7d": 3,
+    "rows_by_week": [
+     34,
+     15,
+     45,
+     45
+    ],
+    "week0_vs_tx7d": 1,
+    "rows_read": 139,
+    "excluded_rows": 77,
+    "complete": true,
+    "not_read": null,
+    "independent_buyers_4w": 5,
+    "returning_buyers": 4,
+    "returning_wide": 0
+   },
+   {
+    "recipient": "0x752f3f8641620b2e1cd586835425ea9b1aafe6a4",
+    "pools": [
+     "volume"
+    ],
+    "chains": [
+     "base"
+    ],
+    "facilitators": [
+     "mrdn"
+    ],
+    "usd_7d": 2408.565172,
+    "tx_7d": 139,
+    "buyers_7d": 5,
+    "rows_by_week": [
+     137,
+     151,
+     123,
+     119
+    ],
+    "week0_vs_tx7d": 0.9856115107913669,
+    "rows_read": 530,
+    "excluded_rows": 530,
+    "complete": true,
+    "not_read": null,
+    "independent_buyers_4w": 0,
+    "returning_buyers": 0,
+    "returning_wide": 0
+   },
+   {
+    "recipient": "0x1cec447da1915f018bd74006ff6d695468b68dd4",
+    "pools": [
+     "volume"
+    ],
+    "chains": [
+     "base"
+    ],
+    "facilitators": [
+     "mrdn"
+    ],
+    "usd_7d": 2364.424132,
+    "tx_7d": 135,
+    "buyers_7d": 5,
+    "rows_by_week": [
+     134,
+     123,
+     131,
+     115
+    ],
+    "week0_vs_tx7d": 0.9925925925925926,
+    "rows_read": 503,
+    "excluded_rows": 503,
+    "complete": true,
+    "not_read": null,
+    "independent_buyers_4w": 0,
+    "returning_buyers": 0,
+    "returning_wide": 0
+   },
+   {
+    "recipient": "0x593c8f423f64c1f0be76a2bdb68815d82eca4c89",
+    "pools": [
+     "volume"
+    ],
+    "chains": [
+     "base"
+    ],
+    "facilitators": [
+     "mrdn"
+    ],
+    "usd_7d": 2342.939025,
+    "tx_7d": 132,
+    "buyers_7d": 5,
+    "rows_by_week": [
+     132,
+     125,
+     137,
+     141
+    ],
+    "week0_vs_tx7d": 1,
+    "rows_read": 535,
+    "excluded_rows": 535,
+    "complete": true,
+    "not_read": null,
+    "independent_buyers_4w": 0,
+    "returning_buyers": 0,
+    "returning_wide": 0
+   },
+   {
+    "recipient": "0x371dcbe398eedf7d8663b150c1b9dc0e8c6ead4b",
+    "pools": [
+     "volume"
+    ],
+    "chains": [
+     "base"
+    ],
+    "facilitators": [
+     "mrdn"
+    ],
+    "usd_7d": 2226.340094,
+    "tx_7d": 124,
+    "buyers_7d": 5,
+    "rows_by_week": [
+     124,
+     134,
+     148,
+     139
+    ],
+    "week0_vs_tx7d": 1,
+    "rows_read": 545,
+    "excluded_rows": 545,
+    "complete": true,
+    "not_read": null,
+    "independent_buyers_4w": 0,
+    "returning_buyers": 0,
+    "returning_wide": 0
+   },
+   {
+    "recipient": "0xa6a90366a307080bccb859642d3378121fe8809d",
+    "pools": [
+     "volume"
+    ],
+    "chains": [
+     "base"
+    ],
+    "facilitators": [
+     "mrdn"
+    ],
+    "usd_7d": 2155.95275,
+    "tx_7d": 122,
+    "buyers_7d": 5,
+    "rows_by_week": [
+     121,
+     144,
+     120,
+     119
+    ],
+    "week0_vs_tx7d": 0.9918032786885246,
+    "rows_read": 504,
+    "excluded_rows": 504,
+    "complete": true,
+    "not_read": null,
+    "independent_buyers_4w": 0,
+    "returning_buyers": 0,
+    "returning_wide": 0
+   },
+   {
+    "recipient": "0x475436ef0a97286081d0fc2a762ad6296949327b",
+    "pools": [
+     "volume"
+    ],
+    "chains": [
+     "base"
+    ],
+    "facilitators": [
+     "mrdn"
+    ],
+    "usd_7d": 2138.51136,
+    "tx_7d": 120,
+    "buyers_7d": 5,
+    "rows_by_week": [
+     122,
+     116,
+     117,
+     131
+    ],
+    "week0_vs_tx7d": 1.0166666666666666,
+    "rows_read": 486,
+    "excluded_rows": 486,
+    "complete": true,
+    "not_read": null,
+    "independent_buyers_4w": 0,
+    "returning_buyers": 0,
+    "returning_wide": 0
+   },
+   {
+    "recipient": "0x85b47b40455ab2bd7921f76dce841b48c82d627c",
+    "pools": [
+     "volume"
+    ],
+    "chains": [
+     "base"
+    ],
+    "facilitators": [
+     "coinbase"
+    ],
+    "usd_7d": 1726.949784,
+    "tx_7d": 1481,
+    "buyers_7d": 2,
+    "rows_by_week": [
+     1488,
+     401,
+     1520,
+     1328
+    ],
+    "week0_vs_tx7d": 1.0047265361242403,
+    "rows_read": 4737,
+    "excluded_rows": 0,
+    "complete": true,
+    "not_read": null,
+    "independent_buyers_4w": 2,
+    "returning_buyers": 2,
+    "returning_wide": 0
+   },
+   {
+    "recipient": "0x2670b922ef37c7df47158725c0cc407b5382293f",
+    "pools": [
+     "volume"
+    ],
+    "chains": [
+     "base"
+    ],
+    "facilitators": [
+     "coinbase"
+    ],
+    "usd_7d": 1372.73,
+    "tx_7d": 525,
+    "buyers_7d": 27,
+    "rows_by_week": [
+     522,
+     343,
+     302,
+     226
+    ],
+    "week0_vs_tx7d": 0.9942857142857143,
+    "rows_read": 1393,
+    "excluded_rows": 5,
+    "complete": true,
+    "not_read": null,
+    "independent_buyers_4w": 56,
+    "returning_buyers": 13,
+    "returning_wide": 0
+   },
+   {
+    "recipient": "0x17cd53c04d707ef0dd615ef56c633f02915a7905",
+    "pools": [
+     "buyers"
+    ],
+    "chains": [
+     "base"
+    ],
+    "facilitators": [
+     "coinbase"
+    ],
+    "usd_7d": 297.3,
+    "tx_7d": 5946,
+    "buyers_7d": 5943,
+    "rows_by_week": [
+     5950,
+     5847,
+     5235,
+     6742
+    ],
+    "week0_vs_tx7d": 1.0006727211570803,
+    "rows_read": 23774,
+    "excluded_rows": 0,
+    "complete": true,
+    "not_read": null,
+    "independent_buyers_4w": 12283,
+    "returning_buyers": 56,
+    "returning_wide": 4
+   },
+   {
+    "recipient": "0xfe802b35182f49778eec14db3153fcb8b92a47ee",
+    "pools": [
+     "buyers"
+    ],
+    "chains": [
+     "base"
+    ],
+    "facilitators": [
+     "fluxa"
+    ],
+    "usd_7d": 141.924,
+    "tx_7d": 141924,
+    "buyers_7d": 725,
+    "rows_by_week": [
+     142039,
+     42876,
+     150000,
+     123655
+    ],
+    "week0_vs_tx7d": null,
+    "rows_read": 458570,
+    "excluded_rows": 2,
+    "complete": false,
+    "not_read": "row_cap",
+    "independent_buyers_4w": null,
+    "returning_buyers": null,
+    "returning_wide": null
+   },
+   {
+    "recipient": "0x8b29dabd6fbb5a09dacbc7978eaed66a8540721d",
+    "pools": [
+     "buyers"
+    ],
+    "chains": [
+     "base"
+    ],
+    "facilitators": [
+     "coinbase"
+    ],
+    "usd_7d": 987.673,
+    "tx_7d": 49434,
+    "buyers_7d": 713,
+    "rows_by_week": [
+     49455,
+     43771,
+     22845,
+     281
+    ],
+    "week0_vs_tx7d": 1.0004248088360237,
+    "rows_read": 116352,
+    "excluded_rows": 0,
+    "complete": true,
+    "not_read": null,
+    "independent_buyers_4w": 812,
+    "returning_buyers": 464,
+    "returning_wide": 10
+   },
+   {
+    "recipient": "0xcc1984e79726e7a0ae2b9df2ac9e79fb4983930e",
+    "pools": [
+     "buyers"
+    ],
+    "chains": [
+     "base"
+    ],
+    "facilitators": [
+     "ultravioletadao"
+    ],
+    "usd_7d": 964.53,
+    "tx_7d": 9653,
+    "buyers_7d": 345,
+    "rows_by_week": [
+     9653,
+     2101,
+     0,
+     0
+    ],
+    "week0_vs_tx7d": 1,
+    "rows_read": 11754,
+    "excluded_rows": 8910,
+    "complete": true,
+    "not_read": null,
+    "independent_buyers_4w": 321,
+    "returning_buyers": 321,
+    "returning_wide": 0
+   },
+   {
+    "recipient": "0x0e8370637d78d93f0781a62fa3e0b78a8dcc0fd9",
+    "pools": [
+     "buyers"
+    ],
+    "chains": [
+     "base"
+    ],
+    "facilitators": [
+     "coinbase"
+    ],
+    "usd_7d": 1.284,
+    "tx_7d": 428,
+    "buyers_7d": 317,
+    "rows_by_week": [
+     428,
+     383,
+     276,
+     176
+    ],
+    "week0_vs_tx7d": 1,
+    "rows_read": 1263,
+    "excluded_rows": 0,
+    "complete": true,
+    "not_read": null,
+    "independent_buyers_4w": 769,
+    "returning_buyers": 143,
+    "returning_wide": 24
+   },
+   {
+    "recipient": "0x7fd590191d67c804128329ab998aa365b8a2ee9d",
+    "pools": [
+     "buyers"
+    ],
+    "chains": [
+     "base"
+    ],
+    "facilitators": [
+     "coinbase"
+    ],
+    "usd_7d": 1.296,
+    "tx_7d": 432,
+    "buyers_7d": 302,
+    "rows_by_week": [
+     432,
+     371,
+     284,
+     191
+    ],
+    "week0_vs_tx7d": 1,
+    "rows_read": 1278,
+    "excluded_rows": 0,
+    "complete": true,
+    "not_read": null,
+    "independent_buyers_4w": 762,
+    "returning_buyers": 137,
+    "returning_wide": 24
+   },
+   {
+    "recipient": "0x2e8cde5d05f796b25168f568017a6cfb214bc45b",
+    "pools": [
+     "buyers"
+    ],
+    "chains": [
+     "base"
+    ],
+    "facilitators": [
+     "coinbase"
+    ],
+    "usd_7d": 0.9,
+    "tx_7d": 300,
+    "buyers_7d": 237,
+    "rows_by_week": [
+     300,
+     257,
+     192,
+     120
+    ],
+    "week0_vs_tx7d": 1,
+    "rows_read": 869,
+    "excluded_rows": 0,
+    "complete": true,
+    "not_read": null,
+    "independent_buyers_4w": 583,
+    "returning_buyers": 90,
+    "returning_wide": 23
+   },
+   {
+    "recipient": "0xe9030014f5dae217d0a152f02a043567b16c1abf",
+    "pools": [
+     "buyers"
+    ],
+    "chains": [
+     "base"
+    ],
+    "facilitators": [
+     "coinbase"
+    ],
+    "usd_7d": 490.293647,
+    "tx_7d": 17346,
+    "buyers_7d": 223,
+    "rows_by_week": [
+     17464,
+     5000
+    ],
+    "week0_vs_tx7d": null,
+    "rows_read": 22464,
+    "excluded_rows": 6512,
+    "complete": false,
+    "not_read": "source_error",
+    "independent_buyers_4w": null,
+    "returning_buyers": null,
+    "returning_wide": null
+   },
+   {
+    "recipient": "0x238d5cd86aa3e5215dc6ccfa5f8607d5748f4711",
+    "pools": [
+     "buyers"
+    ],
+    "chains": [
+     "base"
+    ],
+    "facilitators": [
+     "coinbase"
+    ],
+    "usd_7d": 1.04,
+    "tx_7d": 208,
+    "buyers_7d": 176,
+    "rows_by_week": [
+     208,
+     176,
+     124,
+     79
+    ],
+    "week0_vs_tx7d": 1,
+    "rows_read": 587,
+    "excluded_rows": 0,
+    "complete": true,
+    "not_read": null,
+    "independent_buyers_4w": 452,
+    "returning_buyers": 45,
+    "returning_wide": 14
+   },
+   {
+    "recipient": "0xdbd64967bae55891bd198240c3dfab803689f1ab",
+    "pools": [
+     "buyers"
+    ],
+    "chains": [
+     "base"
+    ],
+    "facilitators": [
+     "coinbase"
+    ],
+    "usd_7d": 0.364,
+    "tx_7d": 182,
+    "buyers_7d": 158,
+    "rows_by_week": [
+     182,
+     154,
+     116,
+     89
+    ],
+    "week0_vs_tx7d": 1,
+    "rows_read": 541,
+    "excluded_rows": 0,
+    "complete": true,
+    "not_read": null,
+    "independent_buyers_4w": 423,
+    "returning_buyers": 39,
+    "returning_wide": 17
+   },
+   {
+    "recipient": "0x28c376ca9e4ec9a7494ae1d5e473679cd0b8748f",
+    "pools": [
+     "buyers"
+    ],
+    "chains": [
+     "base"
+    ],
+    "facilitators": [
+     "coinbase"
+    ],
+    "usd_7d": 0.519,
+    "tx_7d": 173,
+    "buyers_7d": 150,
+    "rows_by_week": [
+     173,
+     153,
+     140,
+     71
+    ],
+    "week0_vs_tx7d": 1,
+    "rows_read": 537,
+    "excluded_rows": 0,
+    "complete": true,
+    "not_read": null,
+    "independent_buyers_4w": 425,
+    "returning_buyers": 44,
+    "returning_wide": 15
+   },
+   {
+    "recipient": "0x3c0820e2dabd5feae1fd03b78079dee15c7f83d8",
+    "pools": [
+     "buyers"
+    ],
+    "chains": [
+     "base"
+    ],
+    "facilitators": [
+     "daydreams"
+    ],
+    "usd_7d": 22.935,
+    "tx_7d": 250,
+    "buyers_7d": 137,
+    "rows_by_week": [
+     237,
+     228,
+     513,
+     525
+    ],
+    "week0_vs_tx7d": 0.948,
+    "rows_read": 1503,
+    "excluded_rows": 4,
+    "complete": true,
+    "not_read": null,
+    "independent_buyers_4w": 481,
+    "returning_buyers": 84,
+    "returning_wide": 0
+   },
+   {
+    "recipient": "0x4dd8ff24d586b105b26d7f6f853d6fa75f029e4b",
+    "pools": [
+     "buyers"
+    ],
+    "chains": [
+     "base"
+    ],
+    "facilitators": [
+     "coinbase"
+    ],
+    "usd_7d": 0.258,
+    "tx_7d": 129,
+    "buyers_7d": 114,
+    "rows_by_week": [
+     129,
+     106,
+     77,
+     45
+    ],
+    "week0_vs_tx7d": 1,
+    "rows_read": 357,
+    "excluded_rows": 0,
+    "complete": true,
+    "not_read": null,
+    "independent_buyers_4w": 283,
+    "returning_buyers": 23,
+    "returning_wide": 12
+   },
+   {
+    "recipient": "0x5f8b58f44d1d7e66d19ba82b4a8de02b9e3c9251",
+    "pools": [
+     "buyers"
+    ],
+    "chains": [
+     "base"
+    ],
+    "facilitators": [
+     "coinbase"
+    ],
+    "usd_7d": 0.992,
+    "tx_7d": 124,
+    "buyers_7d": 110,
+    "rows_by_week": [
+     124,
+     149,
+     97,
+     82
+    ],
+    "week0_vs_tx7d": 1,
+    "rows_read": 452,
+    "excluded_rows": 0,
+    "complete": true,
+    "not_read": null,
+    "independent_buyers_4w": 357,
+    "returning_buyers": 36,
+    "returning_wide": 16
+   },
+   {
+    "recipient": "0x6b7b3cb62a2d7d232bf5e0d030676bfb4f9ba4e5",
+    "pools": [
+     "buyers"
+    ],
+    "chains": [
+     "base"
+    ],
+    "facilitators": [
+     "coinbase"
+    ],
+    "usd_7d": 162.24,
+    "tx_7d": 160,
+    "buyers_7d": 110,
+    "rows_by_week": [
+     161,
+     130,
+     534,
+     1
+    ],
+    "week0_vs_tx7d": 1.00625,
+    "rows_read": 826,
+    "excluded_rows": 0,
+    "complete": true,
+    "not_read": null,
+    "independent_buyers_4w": 758,
+    "returning_buyers": 15,
+    "returning_wide": 1
+   },
+   {
+    "recipient": "0xc353262eebc4f14f7d474a0c822b7a3296b9d0ec",
+    "pools": [
+     "buyers"
+    ],
+    "chains": [
+     "base"
+    ],
+    "facilitators": [
+     "coinbase"
+    ],
+    "usd_7d": 0.345,
+    "tx_7d": 115,
+    "buyers_7d": 105,
+    "rows_by_week": [
+     115,
+     118,
+     80,
+     54
+    ],
+    "week0_vs_tx7d": 1,
+    "rows_read": 367,
+    "excluded_rows": 0,
+    "complete": true,
+    "not_read": null,
+    "independent_buyers_4w": 311,
+    "returning_buyers": 26,
+    "returning_wide": 12
+   },
+   {
+    "recipient": "0x6293ded2684f1a76e26becef87c137d691fbf800",
+    "pools": [
+     "buyers"
+    ],
+    "chains": [
+     "base"
+    ],
+    "facilitators": [
+     "coinbase"
+    ],
+    "usd_7d": 11.785,
+    "tx_7d": 1538,
+    "buyers_7d": 103,
+    "rows_by_week": [
+     1538,
+     1589,
+     123,
+     0
+    ],
+    "week0_vs_tx7d": 1,
+    "rows_read": 3250,
+    "excluded_rows": 80,
+    "complete": true,
+    "not_read": null,
+    "independent_buyers_4w": 145,
+    "returning_buyers": 15,
+    "returning_wide": 8
+   },
+   {
+    "recipient": "0x99f965eda128fbbbbecb16277af87121bc6ceab8",
+    "pools": [
+     "buyers"
+    ],
+    "chains": [
+     "base"
+    ],
+    "facilitators": [
+     "coinbase"
+    ],
+    "usd_7d": 0.54,
+    "tx_7d": 108,
+    "buyers_7d": 99,
+    "rows_by_week": [
+     108,
+     99,
+     79,
+     48
+    ],
+    "week0_vs_tx7d": 1,
+    "rows_read": 334,
+    "excluded_rows": 0,
+    "complete": true,
+    "not_read": null,
+    "independent_buyers_4w": 284,
+    "returning_buyers": 12,
+    "returning_wide": 7
+   }
+  ]
+ }
+}
